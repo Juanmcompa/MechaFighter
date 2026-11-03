@@ -75,7 +75,10 @@ def fondo_magenta(a):
 
 
 def piezas(nombre):
-    img = Image.open(os.path.join(FUENTES, nombre + '.jpg')).convert('RGB')
+    ruta = os.path.join(FUENTES, nombre + '.jpg')
+    if not os.path.exists(ruta):
+        ruta = ruta[:-4] + '.png'
+    img = Image.open(ruta).convert('RGB')
     a = np.asarray(img)
     alto, ancho = a.shape[:2]
     solido = ndimage.binary_opening(~fondo_magenta(a), iterations=2)
@@ -165,6 +168,92 @@ def retratos():
     return n
 
 
+# ---------- Terreno ----------
+# Nano Banana le agrega un rotulo abajo a cada pieza: por eso aca se recorta con cajas fijas (en pixeles de la hoja
+# original de 1408x768) en vez de detectar las piezas. Si se regenera una hoja, revisar estas cajas.
+TERRENO_TEXTURAS = [  # (id, x0, y0, x1, y1)
+    ('piso_a', 17, 17, 347, 347), ('piso_b', 364, 17, 694, 347), ('rejilla', 712, 17, 1042, 347), ('concreto', 1061, 17, 1391, 347),
+    ('muro_a', 17, 398, 345, 726), ('muro_b', 364, 398, 692, 726), ('acido', 790, 470, 966, 646), ('franjas', 1061, 398, 1389, 726),
+]
+TERRENO_OBJETOS = [  # baja = media cobertura, alta = cobertura total
+    ('cajones', 'baja', 17, 20, 348, 341), ('barriles', 'baja', 366, 20, 690, 341),
+    ('bolsas', 'baja', 712, 20, 1045, 341), ('barrera', 'baja', 1061, 20, 1388, 341),
+    ('contenedor', 'alta', 17, 398, 348, 722), ('pilar', 'alta', 366, 398, 690, 722),
+    ('generador', 'alta', 712, 398, 1045, 722), ('vigas', 'alta', 1061, 398, 1388, 722),
+]
+TERRENO_DETALLES_FILAS = [(40, 312), (440, 676)]  # franjas de la hoja de detalles sin los rotulos
+CASILLA = 32  # pixeles de juego por casilla (se guarda al doble, como las partes)
+
+
+def magenta_amplio(a):
+    r, g, b = a[..., 0].astype(int), a[..., 1].astype(int), a[..., 2].astype(int)
+    return (r > 120) & (b > 120) & (g < 110) & (r - g > 70) & (b - g > 70)
+
+
+def a_pixeles(rgb, mascara, w, h, colores=16):
+    chico = Image.fromarray(rgb).resize((w, h), Image.BOX)
+    q = np.asarray(chico.quantize(colors=colores, method=Image.MEDIANCUT, dither=Image.NONE).convert('RGB'))
+    if mascara is None:
+        return np.dstack([q, np.full((h, w), 255, np.uint8)])
+    m = np.asarray(Image.fromarray((mascara * 255).astype(np.uint8)).resize((w, h), Image.BOX)) > 120
+    return np.dstack([q, (m * 255).astype(np.uint8)])
+
+
+def recortar_objeto(a, caja, lado_max):
+    x0, y0, x1, y1 = caja
+    sub = a[y0:y1, x0:x1].copy()
+    solido = ndimage.binary_opening(~magenta_amplio(sub), iterations=2)
+    ys, xs = np.nonzero(solido)
+    if not len(xs):
+        return None
+    sub, solido = sub[ys.min():ys.max() + 1, xs.min():xs.max() + 1], solido[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    sub[~solido] = (7, 11, 8)
+    h, w = solido.shape
+    k = lado_max / max(w, h)
+    return a_pixeles(sub, solido, max(1, round(w * k)), max(1, round(h * k)))
+
+
+def terreno():
+    base = os.path.join(FUENTES, 'terreno-')
+    if not os.path.exists(base + 'texturas.png'):
+        return 0
+    out = os.path.join(SALIDA, 'terreno')
+    os.makedirs(out, exist_ok=True)
+    lado = CASILLA * ESCALA
+    man = {'casilla': lado, 'texturas': [], 'objetos': {}, 'detalles': []}
+    a = np.asarray(Image.open(base + 'texturas.png').convert('RGB'))
+    for pid, x0, y0, x1, y1 in TERRENO_TEXTURAS:
+        Image.fromarray(a_pixeles(a[y0:y1, x0:x1], None, lado, lado), 'RGBA').save(os.path.join(out, pid + '.png'))
+        man['texturas'].append(pid)
+    if os.path.exists(base + 'coberturas.png'):
+        a = np.asarray(Image.open(base + 'coberturas.png').convert('RGB'))
+        for pid, tipo, *caja in TERRENO_OBJETOS:
+            img = recortar_objeto(a, caja, round(lado * 0.94))
+            if img is not None:
+                Image.fromarray(img, 'RGBA').save(os.path.join(out, 'obj_' + pid + '.png'))
+                man['objetos'].setdefault(tipo, []).append('obj_' + pid)
+    if os.path.exists(base + 'detalles.png'):
+        a = np.asarray(Image.open(base + 'detalles.png').convert('RGB'))
+        n = 0
+        for y0, y1 in TERRENO_DETALLES_FILAS:
+            franja = a[y0:y1]
+            solido = ndimage.binary_opening(~magenta_amplio(franja), iterations=1)
+            lab, _ = ndimage.label(ndimage.binary_dilation(solido, iterations=14))
+            cajas = sorted((s[1].start, s[0].start, s[1].stop, s[0].stop) for s in ndimage.find_objects(lab)
+                           if (s[1].stop - s[1].start) * (s[0].stop - s[0].start) > 1500)
+            for x0, yy0, x1, yy1 in cajas:
+                img = recortar_objeto(franja, (x0, yy0, x1, yy1), round(lado * 0.7))
+                if img is None:
+                    continue
+                n += 1
+                nombre = 'det_%02d' % n
+                Image.fromarray(img, 'RGBA').save(os.path.join(out, nombre + '.png'))
+                man['detalles'].append(nombre)
+    with open(os.path.join(out, 'terreno.json'), 'w') as f:
+        json.dump(man, f, indent=1)
+    return len(man['texturas']) + sum(len(v) for v in man['objetos'].values()) + len(man['detalles'])
+
+
 def main():
     manifiesto = {'_escala': ESCALA}
     for nombre, lista in HOJAS.items():
@@ -187,7 +276,7 @@ def main():
             print('  %-20s %2dx%-2d ancla %s' % (pid, base.shape[1], base.shape[0], manifiesto[pid]['ancla']))
     with open(os.path.join(SALIDA, 'mecha', 'sprites.json'), 'w') as f:
         json.dump(manifiesto, f, indent=1, sort_keys=True)
-    print(len(manifiesto), 'partes ·', retratos(), 'retratos')
+    print(len(manifiesto) - 1, 'partes ·', retratos(), 'retratos ·', terreno(), 'piezas de terreno')
 
 
 if __name__ == '__main__':

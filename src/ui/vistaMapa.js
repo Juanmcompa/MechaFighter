@@ -1,5 +1,8 @@
 // Dibujo esquematico de un mapa (para el arranque y, mas adelante, para la preparacion de la mision).
 // No es el render de batalla (eso es src/vista/): es un plano, como el de una mesa de operaciones.
+import { TER } from '../vista/sprites.js';
+import { dibujarMapa as mapaConArte } from '../vista/dibujo.js';
+
 export const COLORES_CASILLA = {
   piso: '#1b2016',
   muro: '#3a4233',
@@ -16,6 +19,19 @@ export function dibujarMapa(canvas, mapa) {
   const ctx = canvas.getContext('2d');
   canvas.width = ancho * lado;
   canvas.height = alto * lado;
+  if (TER.listo) {
+    // con el tileset: el mismo mapa que en la batalla, y encima las apariciones
+    mapaConArte(ctx, mapa, lado);
+    for (const [bando, lista] of Object.entries(mapa.aparicion || {})) {
+      ctx.fillStyle = COLORES_CASILLA['aparicion_' + bando] || '#fff';
+      ctx.strokeStyle = '#000';
+      for (const [x, y] of lista) {
+        ctx.fillRect(x * lado + lado * 0.25, y * lado + lado * 0.25, lado * 0.5, lado * 0.5);
+        ctx.strokeRect(x * lado + lado * 0.25 + 0.5, y * lado + lado * 0.25 + 0.5, lado * 0.5 - 1, lado * 0.5 - 1);
+      }
+    }
+    return;
+  }
   for (let y = 0; y < alto; y++) {
     for (let x = 0; x < ancho; x++) {
       ctx.fillStyle = COLORES_CASILLA[mapa.leyenda[mapa.filas[y][x]]] || '#000';

@@ -1,0 +1,41 @@
+{
+ "casilla": 64,
+ "texturas": [
+  "piso_a",
+  "piso_b",
+  "rejilla",
+  "concreto",
+  "muro_a",
+  "muro_b",
+  "acido",
+  "franjas"
+ ],
+ "objetos": {
+  "baja": [
+   "obj_cajones",
+   "obj_barriles",
+   "obj_bolsas",
+   "obj_barrera"
+  ],
+  "alta": [
+   "obj_contenedor",
+   "obj_pilar",
+   "obj_generador",
+   "obj_vigas"
+  ]
+ },
+ "detalles": [
+  "det_01",
+  "det_02",
+  "det_03",
+  "det_04",
+  "det_05",
+  "det_06",
+  "det_07",
+  "det_08",
+  "det_09",
+  "det_10",
+  "det_11",
+  "det_12"
+ ]
+}

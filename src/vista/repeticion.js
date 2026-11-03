@@ -54,10 +54,11 @@ export class Repeticion {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // el mapa se dibuja una vez en un canvas aparte
     this.fondo = document.createElement('canvas');
-    this.fondo.width = ancho * this.L * dpr; this.fondo.height = alto * this.L * dpr;
-    const fc = this.fondo.getContext('2d');
-    fc.setTransform(dpr, 0, 0, dpr, 0, 0);
-    dibujarMapa(fc, this.mapa, this.L);
+    // El fondo se arma con suficiente detalle para la camara acercada (64 pixeles por casilla, lo que mide el
+    // tileset), aunque en pantalla se vea mas chico.
+    const lado = Math.max(Math.round(this.L * dpr), 64);
+    this.fondo.width = ancho * lado; this.fondo.height = alto * lado;
+    dibujarMapa(this.fondo.getContext('2d'), this.mapa, lado);
     this.cam = { x: (ancho * this.L) / 2, y: (alto * this.L) / 2, z: 1 };
   }
 

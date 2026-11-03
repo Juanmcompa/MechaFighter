@@ -3,7 +3,7 @@
 import { cargarDatos, leerConFetch } from './core/datos.js';
 import { validarDatos } from './core/validar.js';
 import { crearApp } from './ui/app.js';
-import { cargarSprites } from './vista/sprites.js';
+import { cargarSprites, cargarTerreno } from './vista/sprites.js';
 
 const raiz = document.getElementById('app');
 const registro = document.getElementById('registro');
@@ -31,7 +31,7 @@ async function arrancar() {
     return;
   }
   linea('Calibrando sensores...');
-  await cargarSprites('./', (datos.reglas.arte || {}).retratos || 0);
+  await Promise.all([cargarSprites('./', (datos.reglas.arte || {}).retratos || 0), cargarTerreno('./')]);
   const app = crearApp(datos, raiz);
   window.mechafighter = app; // para las pruebas y para mirar desde la consola
   app.ir('portada');

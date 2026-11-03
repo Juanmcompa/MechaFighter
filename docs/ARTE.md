@@ -11,7 +11,7 @@ de a poco.
 | `mecha-armado`, `mecha-partes-1`, `mecha-piernas`, `mecha-cabezas-mochilas`, `mecha-armas-1`, `mecha-armas-2` | ✓ en el juego |
 | `retratos-1` (6 pilotos) | ✓ en el juego |
 | `retratos-2` a `retratos-4`, `retratos-jefes` | falta |
-| `terreno-texturas`, `terreno-coberturas`, `terreno-detalles` | falta (prompts listos en la sección 6) |
+| `terreno-texturas`, `terreno-coberturas`, `terreno-detalles` | ✓ en el juego (recorte con cajas fijas: `TERRENO_*` en el script) |
 | Infantería, mutantes, vehículos, restos, efectos, íconos, medallas, marca | falta |
 
 ## Cómo se procesa

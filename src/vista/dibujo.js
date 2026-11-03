@@ -2,7 +2,7 @@
 // BeastMixer), cada funcion dibujarX puede usar la imagen y, si no cargo, volver a esto.
 // Vista cenital: el "frente" de cada unidad mira hacia +x antes de rotar.
 
-import { SPR, sprite } from './sprites.js';
+import { SPR, sprite, TER } from './sprites.js';
 
 export const COLORES = {
   piso: '#1a1e16', pisoLinea: 'rgba(143,220,90,0.05)',
@@ -20,7 +20,94 @@ export const COLORES = {
   carne: { base: '#b08070', luz: '#d6a796', sombra: '#73503f' }
 };
 
+// Numero fijo por casilla (siempre el mismo para el mismo mapa): elige variantes sin usar azar.
+function ruido(x, y, sal = 0) {
+  let h = (x * 374761393 + y * 668265263 + sal * 2147483647) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) % 1000;
+}
+
+const ALTO = { muro: true, cobertura_total: true };
+
+// El mapa con el tileset: pisos y muros que se repiten, coberturas con su sombra y detalles sueltos.
+function mapaConArte(ctx, mapa, L) {
+  const [ancho, alto] = mapa.tamano;
+  const T = (x, y) => (x < 0 || y < 0 || x >= ancho || y >= alto ? 'muro' : mapa.leyenda[mapa.filas[y][x]]);
+  const enZona = (x, y) => {
+    for (const [nombre, [[x1, y1], [x2, y2]]] of Object.entries(mapa.zonas || {})) {
+      if (x >= x1 && x <= x2 && y >= y1 && y <= y2) return nombre;
+    }
+    return null;
+  };
+  const img = (id) => TER.imgs[id];
+  ctx.imageSmoothingEnabled = false;
+  // 1. suelo
+  for (let y = 0; y < alto; y++) {
+    for (let x = 0; x < ancho; x++) {
+      const t = T(x, y), r = ruido(x, y), px = x * L, py = y * L;
+      let id;
+      if (t === 'muro') id = r < 160 && img('muro_b') ? 'muro_b' : 'muro_a';
+      else if (t === 'peligro') id = 'acido';
+      else {
+        const z = enZona(x, y);
+        if (z === 'extraccion' && img('franjas')) id = 'franjas';
+        else if (z && img('concreto')) id = 'concreto';
+        else id = r < 30 && img('rejilla') ? 'rejilla' : r < 250 && img('piso_b') ? 'piso_b' : 'piso_a';
+      }
+      ctx.drawImage(img(id) || img('piso_a'), px, py, L, L);
+    }
+  }
+  // 2. sombras de lo alto sobre el piso (la luz viene de arriba a la izquierda) y borde de los muros
+  for (let y = 0; y < alto; y++) {
+    for (let x = 0; x < ancho; x++) {
+      if (T(x, y) === 'muro') continue;
+      const px = x * L, py = y * L, s = Math.max(2, L * 0.16);
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      if (ALTO[T(x - 1, y)]) ctx.fillRect(px, py, s, L);
+      if (ALTO[T(x, y - 1)]) ctx.fillRect(px, py, L, s);
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      if (T(x - 1, y) === 'muro') ctx.fillRect(px, py, Math.max(1, L / 32), L);
+      if (T(x + 1, y) === 'muro') ctx.fillRect(px + L - Math.max(1, L / 32), py, Math.max(1, L / 32), L);
+      if (T(x, y - 1) === 'muro') ctx.fillRect(px, py, L, Math.max(1, L / 32));
+      if (T(x, y + 1) === 'muro') ctx.fillRect(px, py + L - Math.max(1, L / 32), L, Math.max(1, L / 32));
+    }
+  }
+  // 3. detalles sueltos sobre el piso libre
+  const det = TER.detalles;
+  for (let y = 0; y < alto; y++) {
+    for (let x = 0; x < ancho; x++) {
+      if (T(x, y) !== 'piso' || !det.length || ruido(x, y, 7) >= 65 || enZona(x, y)) continue;
+      const im = img(det[ruido(x, y, 3) % det.length]);
+      if (!im) continue;
+      const k = L / TER.casilla;
+      const w = im.width * k, h = im.height * k;
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(im, x * L + (L - w) / 2, y * L + (L - h) / 2, w, h);
+      ctx.globalAlpha = 1;
+    }
+  }
+  // 4. coberturas, con su sombra
+  for (let y = 0; y < alto; y++) {
+    for (let x = 0; x < ancho; x++) {
+      const t = T(x, y);
+      const lista = t === 'media_cobertura' ? TER.objetos.baja : t === 'cobertura_total' ? TER.objetos.alta : null;
+      if (!lista || !lista.length) continue;
+      const id = lista[ruido(x, y, 5) % lista.length];
+      const im = img(id);
+      if (!im) continue;
+      const k = L / TER.casilla;
+      const w = im.width * k, h = im.height * k, ox = x * L + (L - w) / 2, oy = y * L + (L - h) / 2;
+      const d = t === 'cobertura_total' ? L * 0.14 : L * 0.08;
+      ctx.globalAlpha = 0.5;
+      ctx.drawImage(TER.sombras[id], ox + d, oy + d, w, h);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(im, ox, oy, w, h);
+    }
+  }
+}
+
 export function dibujarMapa(ctx, mapa, L) {
+  if (TER.listo) { mapaConArte(ctx, mapa, L); zonas(ctx, mapa, L); return; }
   const [ancho, alto] = mapa.tamano;
   for (let y = 0; y < alto; y++) {
     for (let x = 0; x < ancho; x++) {
@@ -49,9 +136,13 @@ export function dibujarMapa(ctx, mapa, L) {
       }
     }
   }
+  zonas(ctx, mapa, L);
+}
+
+function zonas(ctx, mapa, L) {
   ctx.setLineDash([L / 4, L / 6]);
   ctx.strokeStyle = COLORES.zona;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = Math.max(1.5, L / 16);
   for (const [, [[x1, y1], [x2, y2]]] of Object.entries(mapa.zonas || {})) {
     ctx.strokeRect(x1 * L + 2, y1 * L + 2, (x2 - x1 + 1) * L - 4, (y2 - y1 + 1) * L - 4);
   }
