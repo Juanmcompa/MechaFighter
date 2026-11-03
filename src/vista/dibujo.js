@@ -170,6 +170,9 @@ export function dibujarUnidad(ctx, u, L, t) {
   ctx.fillStyle = 'rgba(0,0,0,0.35)';
   ctx.beginPath(); ctx.ellipse(L * 0.04, L * 0.08, L * 0.38, L * 0.3, 0, 0, Math.PI * 2); ctx.fill();
   ctx.rotate(u.ang);
+  // peso: retroceso al disparar (hacia atras) y el cuerpo que sube un poco a mitad de cada paso
+  if (u.retroceso) ctx.translate(-u.retroceso * L * 0.07, 0);
+  if (u.alza) { const k = 1 + u.alza * 0.035; ctx.scale(k, k); }
   if (!u.viva) ctx.globalAlpha = 0.85;
   const s = L / 24; // todo se dibuja en una grilla de 24 y se escala (ocupa casi toda la casilla)
   ctx.scale(s, s);

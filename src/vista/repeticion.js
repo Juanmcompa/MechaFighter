@@ -20,7 +20,8 @@ export class Repeticion {
     this.msPorTick = datos.reglas.ms_por_tick_en_repeticion;
     this.T = 0;
     this.i = 0;
-    this.velocidad = 2;
+    this.velocidad = 1;
+    this.temblor = 0; // sacudon de camara (explosiones, pasos pesados)
     this.pausado = false;
     this.terminado = false;
     this.unidades = new Map();
@@ -141,24 +142,31 @@ export class Repeticion {
     switch (e.tipo) {
       case 'aparece': {
         const f = e.ficha;
+        const torso = (f.apariencia && f.apariencia.torso) || '';
+        // peso: 0 liviano (infanteria, mutantes) .. 3 pesado. Define giro, pisada y sacudon.
+        const peso = f.cuerpo !== 'mecha' ? 0 : torso.includes('pesado') ? 3 : torso.includes('medio') ? 2 : torso ? 1 : 2;
         U.set(e.u, { id: e.u, ficha: f, x: f.x, y: f.y, desde: [f.x, f.y], hacia: [f.x, f.y], t0: 0, dur: 0, salto: false,
           ang: f.bando === 0 ? 0 : Math.PI, paso: 0, vida: f.vidaMax, viva: true, golpe: 0, estados: new Set(), moral: 'moral_firme',
-          grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6 });
+          grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6,
+          peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0 });
         if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + ' despliega una torreta', clase: 'info' });
         break;
       }
       case 'mueve':
       case 'salta':
         if (!u) break;
-        u.desde = [u.x, u.y]; u.hacia = e.a; u.t0 = e.t; u.dur = Math.max(1, e.d); u.salto = e.tipo === 'salta';
-        u.ang = Math.atan2(e.a[1] - u.y, e.a[0] - u.x);
+        u.desde = [u.hacia[0], u.hacia[1]]; u.hacia = e.a; u.t0 = e.t; u.dur = Math.max(1, e.d); u.salto = e.tipo === 'salta';
+        u.angObj = Math.atan2(e.a[1] - u.desde[1], e.a[0] - u.desde[0]);
+        u.pisoPendiente = true;
         break;
       case 'dispara': {
         const o = U.get(e.o);
         if (!u || !o) break;
         this.efectos.push({ tipo: 'fijado', id: o.id, t0: this.T, dur: 5, propio: o.ficha.bando === 0 });
         this.accion.set(u.id, e.t); this.accion.set(o.id, e.t);
-        u.ang = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
+        u.angObj = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
+        u.retroceso = 1;
+        this.efectos.push({ tipo: 'fogonazo', id: u.id, t0: this.T, dur: 1.6 });
         const desvio = e.acierta ? 0 : 0.6;
         this.efectos.push({ tipo: e.arma, de: [u.x, u.y], a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
         if (e.acierta) {
@@ -168,7 +176,10 @@ export class Repeticion {
         break;
       }
       case 'esquirla': if (u) { u.vida -= e.danio; u.golpe = 1; this.flotante(u, '-' + e.danio, '#ff9a5a'); } break;
-      case 'explota': this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: e.r + 0.6, t0: this.T, dur: 6 }); break;
+      case 'explota':
+        this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: e.r + 0.6, t0: this.T, dur: 9 });
+        this.temblor = Math.max(this.temblor, 1);
+        break;
       case 'vida': if (u) { u.vida = e.vida; this.flotante(u, '-' + e.dot, '#ff9a3a', true); } break;
       case 'repara': {
         const o = U.get(e.o);
@@ -179,7 +190,8 @@ export class Repeticion {
       case 'muere': {
         if (!u) break;
         u.viva = false; u.vida = 0; u.grito = null;
-        this.efectos.push({ tipo: 'explosion', a: [u.hacia[0], u.hacia[1]], r: 0.8, t0: this.T, dur: 7 });
+        this.efectos.push({ tipo: 'explosion', a: [u.hacia[0], u.hacia[1]], r: u.peso ? 0.9 + u.peso * 0.15 : 0.6, t0: this.T, dur: 10 });
+        if (u.peso) this.temblor = Math.max(this.temblor, 0.5 + u.peso * 0.2);
         const k = e.por ? U.get(e.por) : null;
         const propio = u.ficha.bando === 0;
         this.alEvento({ texto: k ? k.ficha.nombre + ' abatió a ' + u.ficha.nombre : u.ficha.nombre + ' cae', clase: propio ? 'mal' : 'bien', importante: propio && u.ficha.tipo === 'piloto' });
@@ -218,15 +230,40 @@ export class Repeticion {
 
   actualizarUnidades(ms) {
     for (const u of this.unidades.values()) {
-      if (u.dur && this.T < u.t0 + u.dur) {
-        const k = Math.max(0, (this.T - u.t0) / u.dur);
-        u.x = u.desde[0] + (u.hacia[0] - u.desde[0]) * k;
-        u.y = u.desde[1] + (u.hacia[1] - u.desde[1]) * k;
-        u.paso = (u.paso + (ms / 400) * this.velocidad) % 1;
-      } else { u.x = u.hacia[0]; u.y = u.hacia[1]; }
+      const dtTicks = this.pausado ? 0 : (ms / this.msPorTick) * this.velocidad;
+      // Girar lleva tiempo: el torso de los pesados tarda en encarar (se nota el peso al apuntar y al doblar).
+      let dif = u.angObj - u.ang;
+      while (dif > Math.PI) dif -= Math.PI * 2;
+      while (dif < -Math.PI) dif += Math.PI * 2;
+      const giro = [0.7, 0.4, 0.3, 0.22][u.peso] * dtTicks;
+      u.ang += Math.abs(dif) <= giro ? dif : Math.sign(dif) * giro;
+      if (u.dur && this.T < u.t0 + u.dur && u.viva) {
+        const k = Math.max(0, Math.min(1, (this.T - u.t0) / u.dur));
+        // Un mecha da pasos: arranca, carga el peso y frena en cada casilla (curva suave). La infanteria corre parejo.
+        const e = u.peso ? 0.5 - Math.cos(k * Math.PI) / 2 : k;
+        u.x = u.desde[0] + (u.hacia[0] - u.desde[0]) * e;
+        u.y = u.desde[1] + (u.hacia[1] - u.desde[1]) * e;
+        // la zancada sigue al paso: media vuelta de piernas por casilla
+        u.paso = ((u.pasos + e) * 0.5) % 1;
+        u.alza = u.peso ? Math.sin(k * Math.PI) : 0;
+        if (u.salto) u.alza = Math.sin(k * Math.PI) * 3;
+      } else {
+        u.x = u.hacia[0]; u.y = u.hacia[1]; u.alza = 0;
+        if (u.pisoPendiente) {
+          // la pisada: polvo, y en los pesados un sacudon chico
+          u.pisoPendiente = false;
+          u.pasos++;
+          if (u.peso && u.viva) {
+            this.efectos.push({ tipo: 'polvo', a: [u.x, u.y], t0: this.T, dur: 6, peso: u.peso, lado: u.pasos % 2 ? 1 : -1, ang: u.ang });
+            if (u.peso >= 3) this.temblor = Math.max(this.temblor, 0.25);
+          }
+        }
+      }
+      if (u.retroceso > 0) u.retroceso = Math.max(0, u.retroceso - dtTicks / 2.5);
       if (u.golpe > 0) u.golpe = Math.max(0, u.golpe - ms / 180);
       if (u.grito && this.T > u.grito.hasta) u.grito = null;
     }
+    this.temblor = Math.max(0, this.temblor - ms / 450);
     this.efectos = this.efectos.filter((f) => this.T < f.t0 + f.dur);
     this.flotantes = this.flotantes.filter((f) => this.T < f.t0 + f.dur);
   }
@@ -265,6 +302,10 @@ export class Repeticion {
     if (this.girado) { ctx.translate(0, ancho * L); ctx.rotate(-Math.PI / 2); }
     // camara: acercar y centrar
     const c = this.cam;
+    if (this.temblor > 0) {
+      const t = this.temblor * this.temblor * L * 0.18;
+      ctx.translate((Math.random() - 0.5) * t, (Math.random() - 0.5) * t);
+    }
     ctx.translate((ancho * L) / 2, (alto * L) / 2);
     ctx.scale(c.z, c.z);
     ctx.translate(-c.x, -c.y);
@@ -274,13 +315,42 @@ export class Repeticion {
     const seVe = (u) => !vistas || u.ficha.bando === 0 || vistas.has(Math.round(u.y) * ancho + Math.round(u.x));
 
     const lista = [...this.unidades.values()].sort((a, b) => (a.viva - b.viva) || a.y - b.y);
+    // polvo de las pisadas, debajo de las unidades
+    for (const f of this.efectos) {
+      if (f.tipo !== 'polvo') continue;
+      const k = (this.T - f.t0) / f.dur;
+      ctx.globalAlpha = 0.45 * (1 - k);
+      ctx.fillStyle = '#9aa58e';
+      const cx = (f.a[0] + 0.5) * L - Math.sin(f.ang) * f.lado * L * 0.22, cy = (f.a[1] + 0.5) * L + Math.cos(f.ang) * f.lado * L * 0.22;
+      for (let i = 0; i < 4; i++) {
+        const a = i * 1.7 + f.t0;
+        const r = L * (0.06 + 0.05 * f.peso) * (0.6 + k);
+        ctx.beginPath(); ctx.arc(cx + Math.cos(a) * L * 0.18 * (0.4 + k), cy + Math.sin(a) * L * 0.18 * (0.4 + k), r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
     for (const u of lista) if (seVe(u)) dibujarUnidad(ctx, u, L, this.T);
+    // fogonazos en la boca del arma
+    for (const f of this.efectos) {
+      if (f.tipo !== 'fogonazo') continue;
+      const u = this.unidades.get(f.id);
+      if (!u || !seVe(u)) continue;
+      const k = (this.T - f.t0) / f.dur;
+      const d = L * 0.62;
+      const fx = (u.x + 0.5) * L + Math.cos(u.ang) * d, fy = (u.y + 0.5) * L + Math.sin(u.ang) * d;
+      ctx.globalAlpha = 1 - k;
+      ctx.fillStyle = '#fff3b0';
+      ctx.beginPath(); ctx.arc(fx, fy, L * 0.14 * (1.2 - k), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffb347';
+      ctx.beginPath(); ctx.arc(fx, fy, L * 0.24 * (1.2 - k), 0, Math.PI * 2); ctx.globalAlpha = 0.5 * (1 - k); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
 
     // efectos
     for (const f of this.efectos) {
       const k = (this.T - f.t0) / f.dur;
       ctx.globalAlpha = Math.max(0, 1 - k);
-      if (f.tipo === 'fijado') { ctx.globalAlpha = 1; continue; }
+      if (f.tipo === 'fijado' || f.tipo === 'polvo' || f.tipo === 'fogonazo') { ctx.globalAlpha = 1; continue; }
       if (f.tipo === 'explosion') {
         const r = f.r * L * (0.4 + k);
         ctx.fillStyle = k < 0.3 ? '#fff2b0' : '#ff7a2a';
