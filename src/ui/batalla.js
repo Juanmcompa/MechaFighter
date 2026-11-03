@@ -63,7 +63,7 @@ export function batalla(app, raiz) {
   };
 
   const rep = new Repeticion({
-    datos, mision: m, registro: resultado.registro, canvas: lienzo,
+    datos, mision: m, registro: resultado.registro, canvas: lienzo, pilotos: pilotoDe,
     alEvento: nuevaLinea,
     alTerminar: () => mostrarFinal()
   });

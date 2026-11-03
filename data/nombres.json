@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Para inventar reclutas. El apodo se arma con cualquiera de la lista.",
+  "_ayuda": "Para inventar reclutas. El apodo se arma con cualquiera de la lista. \"mechas\": nombres con los que cada piloto bautiza su mecha (se puede cambiar en el hangar).",
   "nombres": [
     "Ana",
     "Bruno",
@@ -65,5 +65,35 @@
     "Yunque",
     "Grillo",
     "Trueno"
+  ],
+  "mechas": [
+    "La Negra",
+    "Pampero",
+    "Zonda",
+    "Carancho",
+    "Malevo",
+    "Fierro",
+    "Chatarra",
+    "La Gaucha",
+    "Ñandú",
+    "Puma",
+    "Yaguareté",
+    "Tero",
+    "Bondi",
+    "El Ruso",
+    "Tormenta",
+    "Garra",
+    "Matecocido",
+    "Colectivo",
+    "Tatú",
+    "Cascotazo",
+    "La Baldosa",
+    "Quebracho",
+    "Lechuza",
+    "Pirincho",
+    "Vieja Fiel",
+    "Tanguero",
+    "Chimango",
+    "Barrilete"
   ]
 }

@@ -3,6 +3,7 @@ import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, de
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot } from '../campana/partida.js';
+import { nombreDeMecha } from '../campana/reclutas.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
 
@@ -54,7 +55,7 @@ export function hangar(app, raiz, opciones = {}) {
     if (!pi) return;
     detalle.append(
       h('div', { class: 'columnas-hangar' },
-        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); })),
+        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }), panelHoja(pi)),
         h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
   };
 
@@ -78,7 +79,7 @@ export function hangar(app, raiz, opciones = {}) {
 
 export function fichaDe(datos, pi) {
   const u = unidadDePiloto(datos, pi, pi.mecha, pi.gambits);
-  return { bando: 0, apariencia: u.apariencia, armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual })), cuerpo: 'mecha' };
+  return { bando: 0, apariencia: u.apariencia, armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual })), cuerpo: 'mecha', marcas: pi.bajas || 0 };
 }
 
 function panelPiloto(app, pi) {
@@ -158,7 +159,21 @@ function panelMecha(app, pi, refrescar) {
         elegir));
   });
 
+  // El nombre del mecha: lo pone el piloto y se puede cambiar
+  const nombreActual = pi.mechaNombre || nombreDeMecha(datos, pi.nombre);
+  const nombreMecha = h('input', {
+    class: 'nombre-mecha', type: 'text', maxlength: 18, value: nombreActual, 'aria-label': 'Nombre del mecha',
+    onchange: (e) => {
+      // sin signos raros ni espacios de mas; vacio vuelve al nombre de siempre
+      const limpio = e.target.value.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 18);
+      pi.mechaNombre = limpio || nombreDeMecha(datos, pi.nombre);
+      e.target.value = pi.mechaNombre;
+      app.guardar();
+    }
+  });
   return panel('Mecha',
+    h('label', { class: 'fila-nombre-mecha' }, h('span', {}, '«'), nombreMecha, h('span', {}, '»'),
+      (pi.bajas || 0) ? h('span', { class: 'marcas-texto', title: 'Marcas de bajas en el torso' }, '▮'.repeat(Math.min(10, pi.bajas)) + (pi.bajas > 10 ? '+' : '')) : null),
     h('div', { class: 'mecha-cabecera' }, lienzo,
       h('dl', { class: 'stats' }, ...stats.flatMap(([i, n, v]) => [h('dt', {}, ico(i), n), h('dd', {}, String(v))]))),
     h('div', { class: 'peso' + (peso > capacidad ? ' sobrepeso' : '') },
@@ -215,4 +230,13 @@ function panelGambits(app, pi, refrescar) {
       boton('Orden', () => guardar([...lista, { condicion: 'enemigo_a_rango', accion: 'disparar', objetivo: 'enemigo_cercano' }]),
         { iconoNombre: 'mas', deshabilitado: lista.length >= G.maximo_por_unidad }),
       boton('De fábrica', () => guardar(datos.clases[pi.clase].gambits_de_fabrica), { iconoNombre: 'dado', clase: 'secundario' })));
+}
+
+// Lo que el piloto vivio: sus momentos, del mas nuevo al mas viejo
+function panelHoja(pi) {
+  const hoja = (pi.hoja || []).slice().reverse();
+  return panel('Hoja de servicio',
+    hoja.length
+      ? h('ul', { class: 'hoja-servicio' }, ...hoja.map((t) => h('li', {}, t)))
+      : h('p', { class: 'ayuda' }, 'Todavía no hay nada para contar. Ya va a haber.'));
 }

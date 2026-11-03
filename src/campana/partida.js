@@ -7,9 +7,11 @@
 import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision } from './misiones.js';
+import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
+const MAX_HOJA_MEMORIAL = 6;
 
 function azarDe(p, etiqueta) {
   p.paso = (p.paso || 0) + 1;
@@ -259,11 +261,16 @@ export function cerrarMision(datos, p, resultado) {
   const informe = { victoria: resultado.victoria, motivo: resultado.motivo, mision: m.nombre, pilotos: [], botin: [], creditos: 0, puntaje: 0, caidos: [], partesRescatadas: [] };
   const eliminados = resultado.motivo === 'escuadron_eliminado';
   p.misionesJugadas++;
+  // los momentos para recordar salen del registro, con los pilotos como estaban antes de la mision
+  const sector = p.sector + 1;
+  const donde = m.nombre + ' (sector ' + sector + ')';
+  const hoja = momentosDeMision(resultado.registro || [], m, sector, new Map(p.pilotos.map((x) => [x.id, x])));
 
   for (const pi of p.pilotos.slice()) {
     const s = resultado.resumen.pilotos[pi.id];
     if (!s) continue;
-    const linea = { id: pi.id, apodo: pi.apodo, nombre: pi.nombre, retrato: pi.retrato, clase: pi.clase, xp: 0, subioNivel: false, nuevas: [], estado: 'ok', bajas: s.bajas };
+    const linea = { id: pi.id, apodo: pi.apodo, nombre: pi.nombre, retrato: pi.retrato, clase: pi.clase, xp: 0, subioNivel: false, nuevas: [], estado: 'ok', bajas: s.bajas,
+      momentos: (hoja.momentos.get(pi.id) || []).slice() };
     let vivo = s.viva;
 
     if (!vivo && az.tirada(R.permadeath.chance_herida_en_vez_de_muerte)) {
@@ -282,8 +289,11 @@ export function cerrarMision(datos, p, resultado) {
         if (az.tirada(rescate)) { p.inventario.push(pz); informe.partesRescatadas.push(nombrePieza(datos, pz)); }
       }
       p.pilotos.splice(p.pilotos.indexOf(pi), 1);
+      const epitafio = hoja.caida.get(pi.id) || 'Cayó en combate, en ' + donde + '.';
+      linea.epitafio = epitafio;
       p.caidos.push({ nombre: pi.nombre, apodo: pi.apodo, retrato: pi.retrato, clase: pi.clase, personalidad: pi.personalidad, nivel: pi.nivel,
-        misiones: pi.misiones + 1, bajas: pi.bajas + s.bajas, medallas: pi.medallas.slice(), mision: m.nombre, sector: p.sector + 1 });
+        misiones: pi.misiones + 1, bajas: pi.bajas + s.bajas, medallas: pi.medallas.slice(), mision: m.nombre, sector: p.sector + 1,
+        mechaNombre: pi.mechaNombre || null, epitafio, hoja: (pi.hoja || []).concat(linea.momentos).slice(-MAX_HOJA_MEMORIAL) });
       informe.caidos.push(pi.apodo);
       // su vinculo queda solo
       for (const o of p.pilotos) if (o.vinculo === pi.id) o.vinculo = null;
@@ -292,6 +302,10 @@ export function cerrarMision(datos, p, resultado) {
     }
 
     pi.misiones++;
+    if (linea.estado === 'herido') linea.momentos.push('Lo dieron por muerto en ' + donde + ', y volvió.');
+    else if (s.vidaMinPct < 10) linea.momentos.push('Volvió de ' + donde + ' con el mecha hecho trizas.');
+    if (s.quedoSolo) linea.momentos.push('Quedó solo contra todos en ' + donde + '.');
+    sumarAHoja(pi, linea.momentos);
     pi.bajas += s.bajas;
     // XP
     let xp = s.bajas * R.xp.por_baja + Math.trunc(s.reparado / 40) * R.xp.por_curar;

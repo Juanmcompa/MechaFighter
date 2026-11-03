@@ -247,6 +247,18 @@ function mechaConSprites(ctx, f, u) {
   if (a.brazo_der) pieza(a.brazo_der, tw * 0.5, -th * 0.05, false);
   if (a.brazo_izq) pieza(a.brazo_izq, -tw * 0.5, -th * 0.05, true);
   if (a.cabeza) pieza(a.cabeza, 0, -th * 0.12);
+  // marcas de bajas pintadas en la espalda del torso: palitos de a cinco, como en una celda
+  const marcas = Math.min(u.marcas || f.marcas || 0, 15);
+  if (marcas) {
+    ctx.fillStyle = '#f2c94c';
+    const x0 = -tw / 2 + 1.2, y0 = th * 0.22;
+    for (let i = 0; i < marcas; i++) {
+      const grupo = Math.floor(i / 5), j = i % 5;
+      const x = x0 + grupo * 4.2 + j * 0.75;
+      if (j === 4) { ctx.save(); ctx.translate(x - 1.5, y0 + 0.9); ctx.rotate(-0.9); ctx.fillRect(-1.8, -0.2, 3.6, 0.45); ctx.restore(); }
+      else ctx.fillRect(x, y0, 0.45, 1.8);
+    }
+  }
   if (u.golpe > 0) {
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = u.golpe * 0.6;
@@ -362,6 +374,6 @@ export function dibujarMechaFicha(ctx, ficha, lado) {
   ctx.translate(lado / 2, lado / 2);
   ctx.scale(lado / 34, lado / 34);
   ctx.rotate(-Math.PI / 2);
-  dibujarMecha(ctx, ficha, { paso: 0.25, golpe: 0 });
+  dibujarMecha(ctx, ficha, { paso: 0.25, golpe: 0, marcas: ficha.marcas || 0 });
   ctx.restore();
 }

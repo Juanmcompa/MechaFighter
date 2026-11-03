@@ -187,3 +187,19 @@ button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offse
   color: var(--fosforo); background: rgba(10, 18, 13, .82); border: 2px solid var(--chapa-borde); border-radius: 4px;
 }
 .boton-camara:focus-visible { outline: 2px solid var(--ambar); }
+
+/* Personalidad: nombre del mecha y hoja de servicio */
+.fila-nombre-mecha { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; font: 400 22px 'Pixelify Sans', sans-serif; color: var(--fosforo); }
+.nombre-mecha {
+  flex: 1; min-width: 0; min-height: 40px; padding: 2px 6px; font: 400 22px 'Pixelify Sans', sans-serif; color: var(--texto);
+  background: transparent; border: 0; border-bottom: 2px dashed var(--chapa-borde); border-radius: 0;
+}
+.nombre-mecha:focus { outline: none; border-bottom-color: var(--ambar); background: var(--visor); }
+.marcas-texto { font-size: 14px; color: var(--ambar); letter-spacing: 1px; }
+.hoja-servicio { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.hoja-servicio li { padding-left: 16px; position: relative; line-height: 1.2; }
+.hoja-servicio li::before { content: '▸'; position: absolute; left: 0; color: var(--fosforo-tenue); }
+.hoja-servicio.corta { margin-top: 6px; font-size: 18px; color: var(--texto-tenue); }
+.epitafio { margin: 4px 0 0; color: var(--texto-tenue); font-style: italic; }
+.feed .voz { color: #9fd7ff; }
+.taclog .feed .voz { color: #9fd7ff; }

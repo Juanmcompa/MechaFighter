@@ -1,0 +1,40 @@
+{
+  "_ayuda": "Lo que dice cada piloto en la batalla, segun su personalidad y el momento. Si una personalidad no tiene frases para un momento, usa las de 'comun'. Frases cortas: entran en un globito. Momentos: inicio (arranca la mision), baja (derribo a alguien), herido (le queda poca vida), vinculo_cae (cayo su companero de vinculo), aliado_cae (cayo otro), victoria.",
+  "comun": {
+    "inicio": ["Sistemas en verde.", "Vamos, que se hace tarde.", "A trabajar.", "Escuadrón, en formación."],
+    "baja": ["Uno menos.", "Blanco abatido.", "Fuera de combate."],
+    "herido": ["¡Me dieron feo!", "Tengo el blindaje hecho un colador.", "¡Necesito apoyo!"],
+    "vinculo_cae": ["¡No! ¡NO!", "Esto lo van a pagar.", "Te voy a vengar, hermano."],
+    "aliado_cae": ["¡Perdimos uno!", "Cayó... sigan, sigan.", "Mantengan la línea."],
+    "victoria": ["Zona asegurada.", "Volvemos a casa.", "Otro día más vivos."]
+  },
+  "cobarde": {
+    "inicio": ["¿Seguro que esto está en el contrato?", "Yo me quedo atrás, por las dudas.", "Tengo un mal presentimiento."],
+    "baja": ["¿Le di? ¡Le di!", "Que no se levante, que no se levante...", "Ufff. Uno menos."],
+    "herido": ["¡Me van a matar! ¡Me van a matar!", "¡Esto no vale lo que pagan!", "¡Sáquenme de acá!"],
+    "aliado_cae": ["¡Soy el próximo!", "Nos van a liquidar a todos.", "No, no, no..."],
+    "victoria": ["¿Ya está? ¿Terminó?", "Sobreviví. No sé cómo.", "Nunca más. Hasta la próxima."]
+  },
+  "temerario": {
+    "inicio": ["¡A los tiros!", "El último que llega paga la cerveza.", "¡Por fin un poco de acción!"],
+    "baja": ["¡Ja! ¡El que sigue!", "¡Demasiado fácil!", "¿Eso es todo lo que tienen?"],
+    "herido": ["¡Apenas un rasguño!", "¡Eso me hizo cosquillas!", "¡Ahora sí estoy enojado!"],
+    "aliado_cae": ["¡Lo vengo yo!", "¡Al frente, carajo!", "¡Vengan de a uno!"],
+    "victoria": ["¿Ya? Me quedé con ganas.", "Otra vez ganamos. Aburrido.", "¡Que traigan más!"]
+  },
+  "sanguinario": {
+    "inicio": ["Huelo miedo.", "Hoy alguien no vuelve. Y no voy a ser yo.", "Que empiece la cacería."],
+    "baja": ["Me encanta este trabajo.", "Hasta nunca.", "¿Quién sigue?", "Otro para la cuenta."],
+    "herido": ["Sangre... por fin algo interesante.", "Eso fue un error.", "Ahora me toca a mí."],
+    "aliado_cae": ["Más bajas para mí.", "Tendría que haber apuntado mejor.", "Lástima. Era útil."],
+    "victoria": ["Todavía tengo hambre.", "Dejaron muy poco para mí.", "Bien. ¿El próximo contrato?"]
+  },
+  "leal": {
+    "inicio": ["Nadie se queda atrás.", "Cubro tu espalda.", "Volvemos todos o ninguno."],
+    "baja": ["¡Cubierto!", "Ese no te va a molestar más.", "Despejado. ¿Estás bien?"],
+    "herido": ["Estoy bien, sigan.", "Puedo aguantar. Cuídense ustedes.", "No es nada, no es nada."],
+    "vinculo_cae": ["¡Te prometí que volvíamos juntos!", "Perdoname. Perdoname.", "¿Y ahora qué hago sin vos?"],
+    "aliado_cae": ["¡No! Yo tenía que cubrirlo.", "Lo vamos a llevar a casa.", "Juntos, carajo. Juntos."],
+    "victoria": ["Estamos todos. ¿Estamos todos?", "Lo logramos, equipo.", "Vamos a casa."]
+  }
+}

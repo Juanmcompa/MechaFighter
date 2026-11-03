@@ -7,7 +7,9 @@ import { crearTablero, lineaDeTiro, distancia } from '../motor/espacio.js';
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
 export class Repeticion {
-  constructor({ datos, mision, registro, canvas, alEvento, alTerminar }) {
+  constructor({ datos, mision, registro, canvas, alEvento, alTerminar, pilotos }) {
+    this.porPiloto = pilotos || new Map(); // id de piloto -> piloto (para voces, vinculos y marcas)
+    this.ultimaVoz = -999;
     this.datos = datos;
     this.mision = mision;
     this.mapa = datos.mapas[mision.mapa];
@@ -148,7 +150,8 @@ export class Repeticion {
         U.set(e.u, { id: e.u, ficha: f, x: f.x, y: f.y, desde: [f.x, f.y], hacia: [f.x, f.y], t0: 0, dur: 0, salto: false,
           ang: f.bando === 0 ? 0 : Math.PI, paso: 0, vida: f.vidaMax, viva: true, golpe: 0, estados: new Set(), moral: 'moral_firme',
           grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6,
-          peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0 });
+          peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0,
+          marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
         if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + ' despliega una torreta', clase: 'info' });
         break;
       }
@@ -171,6 +174,10 @@ export class Repeticion {
         this.efectos.push({ tipo: e.arma, de: [u.x, u.y], a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
         if (e.acierta) {
           o.vida -= e.danio; o.golpe = 1;
+          if (o.ficha.tipo === 'piloto' && o.ficha.bando === 0 && !o.dijoHerido && o.vida > 0 && o.vida < o.ficha.vidaMax * 0.3) {
+            o.dijoHerido = true;
+            this.decir(o, 'herido');
+          }
           this.flotante(o, '-' + e.danio + (e.bloqueo ? ' ▣' : ''), e.cob ? '#ffd27a' : '#ff7a6a');
         } else this.flotante(o, 'falla', '#8a9488', true);
         break;
@@ -194,6 +201,17 @@ export class Repeticion {
         if (u.peso) this.temblor = Math.max(this.temblor, 0.5 + u.peso * 0.2);
         const k = e.por ? U.get(e.por) : null;
         const propio = u.ficha.bando === 0;
+        // voces: el que mato festeja (a veces); si cae uno de los nuestros, habla su vinculo o algun otro
+        if (k && k.ficha.bando === 0 && k.ficha.tipo === 'piloto' && this.azarVoz(e.t, k) < 55) this.decir(k, 'baja');
+        if (propio && u.ficha.tipo === 'piloto') {
+          const pil = this.porPiloto.get(u.ficha.ref);
+          const vinc = pil && pil.vinculo ? [...U.values()].find((x) => x.viva && x.ficha.ref === pil.vinculo && x.ficha.bando === 0) : null;
+          if (vinc) this.decir(vinc, 'vinculo_cae', true);
+          else {
+            const otros = [...U.values()].filter((x) => x.viva && x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
+            if (otros.length) this.decir(otros[this.azarVoz(e.t, u) % otros.length], 'aliado_cae', true);
+          }
+        }
         this.alEvento({ texto: k ? k.ficha.nombre + ' abatió a ' + u.ficha.nombre : u.ficha.nombre + ' cae', clase: propio ? 'mal' : 'bien', importante: propio && u.ficha.tipo === 'piloto' });
         break;
       }
@@ -220,8 +238,41 @@ export class Repeticion {
         break;
       case 'habilidad': if (u) this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true); break;
       case 'oleada': if (e.n > 1) this.alEvento({ texto: 'Oleada ' + e.n + ' de ' + e.de, clase: 'aviso', importante: true }); break;
-      case 'fin': break;
+      case 'inicio': {
+        const nuestros = [...U.values()].filter((x) => x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
+        if (nuestros.length) this.decir(nuestros[(nuestros.length * 7 + this.registro.length) % nuestros.length], 'inicio', true);
+        break;
+      }
+      case 'fin': {
+        if (!e.victoria) break;
+        const vivos = [...U.values()].filter((x) => x.viva && x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
+        if (vivos.length) this.decir(vivos[this.azarVoz(e.t, vivos[0]) % vivos.length], 'victoria', true);
+        break;
+      }
     }
+  }
+
+  // Numero fijo (0..99) para elegir frases sin azar: la misma batalla se ve igual cada vez.
+  azarVoz(t, u) {
+    let h = (t * 2654435761 + Number(String(u.id).slice(1)) * 40503) >>> 0;
+    h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
+    return ((h ^ (h >>> 13)) >>> 0) % 100;
+  }
+
+  // Un piloto dice algo segun su personalidad. Para no llenar todo de globos: cada uno espera un rato entre
+  // frase y frase, y entre todos tambien (salvo lo importante: forzar).
+  decir(u, momento, forzar = false) {
+    if (!u || !u.viva && momento !== 'vinculo_cae') return;
+    const V = this.datos.voces || {};
+    const pers = u.ficha.personalidad;
+    const lista = (V[pers] && V[pers][momento]) || (V.comun && V.comun[momento]);
+    if (!lista || !lista.length) return;
+    if (!forzar && (this.T - this.ultimaVoz < 14 || this.T - u.vozT < 45)) return;
+    if (u.grito && this.T < u.grito.hasta && !forzar) return;
+    const texto = lista[this.azarVoz(Math.floor(this.T), u) % lista.length];
+    u.grito = { texto, hasta: this.T + 24 };
+    u.vozT = this.T; this.ultimaVoz = this.T;
+    this.alEvento({ texto: u.ficha.nombre + ': «' + texto + '»', clase: 'voz', importante: momento === 'vinculo_cae' });
   }
 
   flotante(u, texto, color, chico = false) {

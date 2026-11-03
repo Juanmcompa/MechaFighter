@@ -16,7 +16,8 @@
     "misiones",
     "sectores",
     "nombres",
-    "textos"
+    "textos",
+    "voces"
   ],
   "mapas": [
     "puesto_01"

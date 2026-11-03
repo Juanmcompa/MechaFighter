@@ -20,7 +20,9 @@ export function fin(app, raiz) {
       retrato(datos, c, 'retrato-chico caido') || ico('lapida'),
       h('div', {},
         h('strong', {}, '«' + c.apodo + '» ' + c.nombre),
-        h('small', {}, (datos.clases[c.clase] || {}).nombre + ' · niv ' + c.nivel + ' · ' + c.misiones + ' misiones · ' + c.bajas + ' bajas · cayó en ' + c.mision + ' (sector ' + c.sector + ')'),
+        h('small', {}, (datos.clases[c.clase] || {}).nombre + ' · niv ' + c.nivel + (c.mechaNombre ? ' · piloteaba «' + c.mechaNombre + '»' : '') + ' · ' + c.misiones + ' misiones · ' + c.bajas + ' bajas'),
+        h('p', { class: 'epitafio' }, c.epitafio || ('Cayó en ' + c.mision + ' (sector ' + c.sector + ').')),
+        c.hoja && c.hoja.length ? h('ul', { class: 'hoja-servicio corta' }, ...c.hoja.filter((t) => t !== c.epitafio).slice(-3).map((t) => h('li', {}, t))) : null,
         c.medallas.length ? h('div', { class: 'chips' }, ...c.medallas.map((m) => chip('medalla', datos.medallas[m].nombre, '', 'chip-medalla'))) : null)))))
       : null,
     h('div', { class: 'acciones' },

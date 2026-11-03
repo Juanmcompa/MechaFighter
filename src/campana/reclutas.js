@@ -30,6 +30,7 @@ export function crearRecluta(datos, azar, idNuevo, clase = null, usados = [], re
     nombre,
     apodo: azar.elegir(libres.length ? libres : N.apodos),
     retrato: elegirRetrato(datos, nombre, retratosUsados),
+    mechaNombre: nombreDeMecha(datos, nombre),
     clase: claseId,
     personalidad: azar.elegir(Object.keys(datos.personalidades)),
     nivel: 1, xp: 0,
@@ -52,4 +53,10 @@ export function elegirRetrato(datos, nombre, usados = []) {
     if (!usados.includes(n)) return n;
   }
   return inicio + 1;
+}
+
+// Nombre con el que el piloto bautiza su mecha: sale de su nombre (sin gastar azar). Se cambia en el hangar.
+export function nombreDeMecha(datos, nombre) {
+  const lista = datos.nombres.mechas || [];
+  return lista.length ? lista[huellaTexto('mecha:' + nombre) % lista.length] : '';
 }
