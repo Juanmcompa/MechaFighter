@@ -61,6 +61,21 @@ console.log('Ganchos y personalidades');
   ok(evaluar({}, { u }, { todos: [true, { no: { dato: 'yo.moral', op: '<', valor: 40 } }] }, {}), 'todos / no / dato');
 }
 
+console.log('Escolta');
+{
+  // Bug de noviembre: con 5 o 6 pilotos llenaban la zona de extraccion y el transporte no podia entrar.
+  let trabadas = 0;
+  for (let n = 0; n < 60; n++) {
+    const az = crearAzar(7000 + n);
+    const k = 5 + (n % 2);
+    const esc = Array.from({ length: k }, (_, i) => crearRecluta(datos, az, 'p' + i)).map((p) => ({ piloto: p, mecha: p.mecha, gambits: p.gambits }));
+    const m = armarMision(datos, 'escolta', 1, az);
+    const r = simular(datos, { mision: m, escuadron: esc, semilla: m.semilla });
+    if (r.motivo === 'tiempo_agotado') trabadas++;
+  }
+  ok(trabadas === 0, 'con escuadrones grandes, el transporte siempre puede entrar a la zona (' + trabadas + ' trabadas de 60)');
+}
+
 console.log('Campana');
 {
   const a = nuevaPartida(datos, 321), b = nuevaPartida(datos, 321);

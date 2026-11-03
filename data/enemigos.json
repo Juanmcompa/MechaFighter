@@ -191,6 +191,14 @@
       },
       "gambits": [
         {
+          "condicion": "enemigo_cerca",
+          "parametros": {
+            "casillas": 4
+          },
+          "accion": "mantener",
+          "objetivo": "yo"
+        },
+        {
           "condicion": "siempre",
           "accion": "avanzar",
           "objetivo": "objetivo_mision"

@@ -140,6 +140,9 @@ export function elegirObjetivo(B, u, sel) {
 function objetivoMision(B, u) {
   const m = B.mision;
   if (u.bando === 0) {
+    // Escolta: el objetivo de los pilotos es acompanar al transporte, no meterse en la zona. Si la llenan,
+    // el escoltado no puede entrar (pasaba con escuadrones de 5 o 6).
+    if (B.vip && B.vip.viva && u !== B.vip) return B.vip;
     if (m.zonaMeta) return casillaDeZona(B, u, B.mapa.zonas[m.zonaMeta]);
     if (B.lider && B.lider.viva) return B.lider;
   } else {
@@ -216,7 +219,9 @@ function accion(B, u, id, obj, correa) {
 
     case 'avanzar': {
       if (!obj || obj.especial) return null;
-      const meta = obj.punto ? 0 : 1;
+      // a un punto se llega; a un enemigo, al lado; al escoltado se lo acompana dejandole lugar
+      // a un punto se llega; a un enemigo, al lado; al escoltado se lo acompana dejandole lugar
+      const meta = obj.punto ? 0 : obj === B.vip && u.bando === obj.bando ? 2 : 1;
       if (distancia(u, obj) <= meta) return null;
       return mover(B, u, obj.x, obj.y, correa);
     }
@@ -329,6 +334,44 @@ function accion(B, u, id, obj, correa) {
   return null;
 }
 
+// ---------- Abrir paso al escoltado ----------
+
+// Las dos proximas casillas del camino del escoltado hacia su meta (sin contar a nadie que lo tape).
+function caminoDelEscoltado(B) {
+  const v = B.vip;
+  if (!v || !v.viva || !B.mision.zonaMeta) return [];
+  const meta = casillaDeZona(B, v, B.mapa.zonas[B.mision.zonaMeta]);
+  const c = campo(B.tablero, meta.x, meta.y);
+  const out = [];
+  let p = { x: v.x, y: v.y };
+  for (let i = 0; i < 2; i++) {
+    let mejor = null, mejorD = c[p.y * B.tablero.ancho + p.x];
+    for (const [x, y] of vecinos(B.tablero, p.x, p.y)) {
+      const d = c[y * B.tablero.ancho + x];
+      if (d >= 0 && d < mejorD) { mejor = { x, y }; mejorD = d; }
+    }
+    if (!mejor) break;
+    out.push(mejor);
+    p = mejor;
+  }
+  return out;
+}
+
+// Si este piloto esta parado en el camino del escoltado, se corre a un costado. Solo sin enemigos a la vista:
+// en pleno tiroteo, el que esta adelante le hace de escudo.
+function abrirPaso(B, u) {
+  if (!B.vip || u === B.vip || u.bando !== B.vip.bando || u.mover > 0) return null;
+  if (enemigosConocidos(B, u).length) return null;
+  const camino = caminoDelEscoltado(B);
+  if (!camino.some((c) => c.x === u.x && c.y === u.y)) return null;
+  const ocupada = ocupadaPara(B, u);
+  for (const [x, y] of vecinos(B.tablero, u.x, u.y)) {
+    if (ocupada(x, y) || camino.some((c) => c.x === x && c.y === y)) continue;
+    return { tipo: 'mover', a: [x, y], anula: 'abre_paso' };
+  }
+  return null;
+}
+
 // ---------- La decision completa ----------
 
 export function decidir(B, u) {
@@ -353,6 +396,10 @@ export function decidir(B, u) {
     const intencion = accion(B, u, h.hacer.accion, elegirObjetivo(B, u, h.hacer.objetivo), null);
     if (intencion) return { ...intencion, anula: h.registro || h.hacer.accion };
   }
+  // Abrir paso al escoltado le gana a las ordenes (pero no al panico)
+  const paso = abrirPaso(B, u);
+  if (paso) return paso;
+
   if (correa && distancia(u, correa.ancla) > correa.max) {
     const i = mover(B, u, correa.ancla.x, correa.ancla.y, null);
     if (i) return { ...i, anula: 'correa' };

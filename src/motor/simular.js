@@ -68,7 +68,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
   }
   if (mision.vip) {
     const [x, y] = ap.jugador[0];
-    B.vip = B.agregarUnidad(unidadEnemiga(datos, mision.vip, 1), 0, x, y);
+    // el escoltado se blinda segun la mision: si no, a nivel 1 contra enemigos de nivel 5 no duraba nada
+    B.vip = B.agregarUnidad(unidadEnemiga(datos, mision.vip, mision.nivel || 1), 0, x, y);
     B.vip.rol = 'vip';
   }
   const oleadas = mision.oleadas || [];
