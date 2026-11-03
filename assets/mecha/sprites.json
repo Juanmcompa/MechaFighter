@@ -1,0 +1,155 @@
+{
+ "_escala": 2,
+ "brazo_canon_riel": {
+  "ancla": [
+   6.7,
+   33.1
+  ],
+  "h": 40,
+  "w": 14
+ },
+ "brazo_escudo": {
+  "ancla": [
+   9.0,
+   21.2
+  ],
+  "h": 26,
+  "w": 24
+ },
+ "brazo_hoja": {
+  "ancla": [
+   6.8,
+   30.2
+  ],
+  "h": 36,
+  "w": 15
+ },
+ "brazo_lanzallamas": {
+  "ancla": [
+   4.6,
+   23.3
+  ],
+  "h": 28,
+  "w": 17
+ },
+ "brazo_lanzamisiles": {
+  "ancla": [
+   9.0,
+   24.8
+  ],
+  "h": 30,
+  "w": 23
+ },
+ "brazo_rifle": {
+  "ancla": [
+   7.3,
+   30.2
+  ],
+  "h": 36,
+  "w": 16
+ },
+ "brazo_rotativa": {
+  "ancla": [
+   7.1,
+   25.2
+  ],
+  "h": 30,
+  "w": 18
+ },
+ "cabeza_optica": {
+  "ancla": [
+   8.0,
+   8.0
+  ],
+  "h": 16,
+  "w": 16
+ },
+ "cabeza_sensor": {
+  "ancla": [
+   8.0,
+   8.0
+  ],
+  "h": 16,
+  "w": 16
+ },
+ "mochila_municion": {
+  "ancla": [
+   12.5,
+   0.0
+  ],
+  "h": 16,
+  "w": 20
+ },
+ "mochila_propulsor": {
+  "ancla": [
+   9.5,
+   0.0
+  ],
+  "h": 19,
+  "w": 20
+ },
+ "mochila_reparacion": {
+  "ancla": [
+   7.1,
+   0.0
+  ],
+  "h": 21,
+  "w": 20
+ },
+ "mochila_torreta": {
+  "ancla": [
+   8.6,
+   0.0
+  ],
+  "h": 25,
+  "w": 18
+ },
+ "piernas_bipode": {
+  "ancla": [
+   5.5,
+   0.0
+  ],
+  "h": 22,
+  "w": 11
+ },
+ "piernas_orugas": {
+  "ancla": [
+   7.0,
+   19.0
+  ],
+  "h": 38,
+  "w": 14
+ },
+ "piernas_saltarinas": {
+  "ancla": [
+   4.5,
+   0.0
+  ],
+  "h": 28,
+  "w": 10
+ },
+ "torso_ligero": {
+  "ancla": [
+   13.0,
+   10.5
+  ],
+  "h": 21,
+  "w": 26
+ },
+ "torso_medio": {
+  "ancla": [
+   15.0,
+   15.0
+  ],
+  "h": 30,
+  "w": 30
+ },
+ "torso_pesado": {
+  "ancla": [
+   20.0,
+   13.5
+  ],
+  "h": 27,
+  "w": 40
+ }
+}

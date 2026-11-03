@@ -1,5 +1,5 @@
 // Nodos que no son misiones: taller, reclutamiento y eventos (incluye el descanso).
-import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad } from './comun.js';
+import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato } from './comun.js';
 import { comprar, vender, contratar, seguir, precioPieza } from '../campana/partida.js';
 
 function pie(app) {
@@ -45,8 +45,10 @@ export function reclutamiento(app, raiz) {
         const clase = datos.clases[c.clase];
         const pers = textoPersonalidad(datos, c);
         return panel(null,
-          h('h2', { class: 'apodo' }, '«' + c.apodo + '»'),
-          h('p', { class: 'nombre-real' }, c.nombre),
+          h('div', { class: 'cabecera-piloto' }, retrato(datos, c, 'retrato-grande'),
+            h('div', { class: 'cabecera-nombre' },
+              h('h2', { class: 'apodo' }, '«' + c.apodo + '»'),
+              h('p', { class: 'nombre-real' }, c.nombre))),
           h('div', { class: 'chips' }, chip(clase.icono, clase.nombre, clase.descripcion, 'chip-clase'), chip(pers.icono || 'evento', pers.texto, pers.titulo, 'chip-personalidad')),
           h('p', { class: 'ayuda' }, clase.descripcion),
           c.contratado ? h('p', { class: 'texto-bien' }, 'Se suma al escuadrón.')

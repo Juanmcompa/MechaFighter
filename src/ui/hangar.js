@@ -1,5 +1,5 @@
 // Hangar: el escuadron, el mecha de cada piloto (partes por encaje) y sus ordenes (gambits).
-import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, describirParte, nombrePieza, textoPersonalidad } from './comun.js';
+import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato } from './comun.js';
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot } from '../campana/partida.js';
@@ -18,13 +18,10 @@ export function hangar(app, raiz, opciones = {}) {
   const pintarLista = () => {
     lista.innerHTML = '';
     for (const pi of p.pilotos) {
-      const lienzo = h('canvas', { width: 64, height: 64, class: 'mini-mecha', 'aria-hidden': 'true' });
-      const ficha = fichaDe(datos, pi);
-      dibujarMechaFicha(lienzo.getContext('2d'), ficha, 64);
       lista.append(h('button', {
         class: 'tarjeta-piloto' + (pi.id === sel ? ' activa' : ''), role: 'tab', 'aria-selected': pi.id === sel ? 'true' : 'false',
         onclick: () => { sel = pi.id; pintarLista(); pintarDetalle(); }
-      }, lienzo,
+      }, retrato(datos, pi, 'retrato-tarjeta'),
       h('span', { class: 'tp-apodo' }, pi.apodo),
       h('span', { class: 'tp-clase' }, ico(datos.clases[pi.clase].icono), datos.clases[pi.clase].nombre),
       h('span', { class: 'tp-nivel', title: 'Nivel' }, String(pi.nivel))));
@@ -70,7 +67,8 @@ function panelPiloto(app, pi) {
   const xpAnt = R.xp_por_nivel[pi.nivel - 1] || 0;
   return panel('Piloto',
     h('div', { class: 'cabecera-piloto' },
-      h('div', {},
+      retrato(datos, pi, 'retrato-grande'),
+      h('div', { class: 'cabecera-nombre' },
         h('h2', { class: 'apodo' }, '«' + pi.apodo + '»'),
         h('p', { class: 'nombre-real' }, pi.nombre)),
       h('div', { class: 'nivel' }, h('span', {}, 'NIV'), h('strong', {}, String(pi.nivel)))),

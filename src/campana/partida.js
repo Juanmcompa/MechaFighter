@@ -31,7 +31,7 @@ export function nuevaPartida(datos, semilla) {
   const az = azarDe(p, 'inicio');
   const otras = Object.keys(datos.clases).filter((c) => !['vanguardia', 'tirador', 'medico'].includes(c));
   const clases = ['vanguardia', 'tirador', 'medico', az.elegir(otras)].slice(0, R.reclutas_iniciales);
-  for (const c of clases) p.pilotos.push(crearRecluta(datos, az, nuevoId(p), c, p.pilotos.map((x) => x.apodo)));
+  for (const c of clases) p.pilotos.push(crearRecluta(datos, az, nuevoId(p), c, p.pilotos.map((x) => x.apodo), p.pilotos.map((x) => x.retrato)));
   // Vinculos de a pares: con alguien tienen que contar (y a alguien van a extranar)
   for (let i = 0; i + 1 < p.pilotos.length; i += 2) vincular(p.pilotos[i], p.pilotos[i + 1]);
   p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] });
@@ -108,8 +108,9 @@ export function elegirNodo(datos, p, i) {
     case 'reclutamiento': {
       const az = azarDe(p, 'recluta');
       const usados = p.pilotos.map((x) => x.apodo).concat(p.caidos.map((x) => x.apodo));
-      const a = crearRecluta(datos, az, nuevoId(p), null, usados);
-      p.nodo.candidatos = [a, crearRecluta(datos, az, nuevoId(p), null, usados.concat(a.apodo))];
+      const caras = p.pilotos.map((x) => x.retrato);
+      const a = crearRecluta(datos, az, nuevoId(p), null, usados, caras);
+      p.nodo.candidatos = [a, crearRecluta(datos, az, nuevoId(p), null, usados.concat(a.apodo), caras.concat(a.retrato))];
       p.estado = 'reclutamiento';
       break;
     }
@@ -262,7 +263,7 @@ export function cerrarMision(datos, p, resultado) {
   for (const pi of p.pilotos.slice()) {
     const s = resultado.resumen.pilotos[pi.id];
     if (!s) continue;
-    const linea = { id: pi.id, apodo: pi.apodo, nombre: pi.nombre, clase: pi.clase, xp: 0, subioNivel: false, nuevas: [], estado: 'ok', bajas: s.bajas };
+    const linea = { id: pi.id, apodo: pi.apodo, nombre: pi.nombre, retrato: pi.retrato, clase: pi.clase, xp: 0, subioNivel: false, nuevas: [], estado: 'ok', bajas: s.bajas };
     let vivo = s.viva;
 
     if (!vivo && az.tirada(R.permadeath.chance_herida_en_vez_de_muerte)) {
@@ -281,7 +282,7 @@ export function cerrarMision(datos, p, resultado) {
         if (az.tirada(rescate)) { p.inventario.push(pz); informe.partesRescatadas.push(nombrePieza(datos, pz)); }
       }
       p.pilotos.splice(p.pilotos.indexOf(pi), 1);
-      p.caidos.push({ nombre: pi.nombre, apodo: pi.apodo, clase: pi.clase, personalidad: pi.personalidad, nivel: pi.nivel,
+      p.caidos.push({ nombre: pi.nombre, apodo: pi.apodo, retrato: pi.retrato, clase: pi.clase, personalidad: pi.personalidad, nivel: pi.nivel,
         misiones: pi.misiones + 1, bajas: pi.bajas + s.bajas, medallas: pi.medallas.slice(), mision: m.nombre, sector: p.sector + 1 });
       informe.caidos.push(pi.apodo);
       // su vinculo queda solo

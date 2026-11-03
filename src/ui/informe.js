@@ -1,5 +1,5 @@
 // Informe despues de la mision: quien volvio, quien no, que aprendieron y que se llevaron.
-import { h, montar, ico, boton, panel, chip } from './comun.js';
+import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 
 export function informe(app, raiz, inf) {
   const { datos } = app;
@@ -16,6 +16,7 @@ export function informe(app, raiz, inf) {
     panel('Escuadrón',
       h('ul', { class: 'informe-pilotos' }, ...inf.pilotos.map((l) => h('li', { class: 'estado-' + l.estado },
         h('div', { class: 'ip-cabeza' },
+          retrato(datos, l, 'retrato-chico' + (l.estado === 'muerto' ? ' caido' : '')),
           ico(l.estado === 'muerto' ? 'lapida' : datos.clases[l.clase].icono),
           h('strong', {}, l.apodo),
           h('span', { class: 'ip-estado' }, l.estado === 'muerto' ? 'Caído en combate' : l.estado === 'herido' ? 'Herido de gravedad, sobrevive' : 'Vuelve'),

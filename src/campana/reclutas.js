@@ -1,6 +1,7 @@
 // Inventa reclutas: nombre, apodo, clase, personalidad, y su mecha armado con las partes sugeridas de la clase.
 
 import { ENCAJES } from '../motor/unidades.js';
+import { huellaTexto } from '../core/azar.js';
 
 const POR_DEFECTO = { cabeza: 'cabeza_sensor', torso: 'torso_medio', piernas: 'piernas_bipode', mochila: 'mochila_vacia' };
 
@@ -19,14 +20,16 @@ export function mechaDeClase(datos, claseId) {
 }
 
 // usados: apodos que ya estan en el escuadron (para no tener dos "Brasa").
-export function crearRecluta(datos, azar, idNuevo, clase = null, usados = []) {
+export function crearRecluta(datos, azar, idNuevo, clase = null, usados = [], retratosUsados = []) {
   const N = datos.nombres;
   const libres = N.apodos.filter((a) => !usados.includes(a));
   const claseId = clase || azar.elegir(Object.keys(datos.clases));
+  const nombre = azar.elegir(N.nombres) + ' ' + azar.elegir(N.apellidos);
   return {
     id: idNuevo,
-    nombre: azar.elegir(N.nombres) + ' ' + azar.elegir(N.apellidos),
+    nombre,
     apodo: azar.elegir(libres.length ? libres : N.apodos),
+    retrato: elegirRetrato(datos, nombre, retratosUsados),
     clase: claseId,
     personalidad: azar.elegir(Object.keys(datos.personalidades)),
     nivel: 1, xp: 0,
@@ -36,4 +39,17 @@ export function crearRecluta(datos, azar, idNuevo, clase = null, usados = []) {
     mecha: mechaDeClase(datos, claseId),
     gambits: datos.clases[claseId].gambits_de_fabrica.map((g) => JSON.parse(JSON.stringify(g)))
   };
+}
+
+// Retrato de un piloto: sale de su nombre (no gasta azar, asi la campana sigue igual) y evita repetir caras
+// dentro del escuadron mientras alcancen.
+export function elegirRetrato(datos, nombre, usados = []) {
+  const total = (datos.reglas.arte && datos.reglas.arte.retratos) || 0;
+  if (!total) return 0;
+  const inicio = huellaTexto(nombre) % total;
+  for (let k = 0; k < total; k++) {
+    const n = ((inicio + k) % total) + 1;
+    if (!usados.includes(n)) return n;
+  }
+  return inicio + 1;
 }

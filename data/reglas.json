@@ -93,5 +93,8 @@
     "poco_comun": 28,
     "raro": 10,
     "epico": 2
+  },
+  "arte": {
+    "retratos": 6
   }
 }

@@ -2,6 +2,8 @@
 // BeastMixer), cada funcion dibujarX puede usar la imagen y, si no cargo, volver a esto.
 // Vista cenital: el "frente" de cada unidad mira hacia +x antes de rotar.
 
+import { SPR, sprite } from './sprites.js';
+
 export const COLORES = {
   piso: '#1a1e16', pisoLinea: 'rgba(143,220,90,0.05)',
   muro: '#3a4233', muroLuz: '#4d5843', muroSombra: '#252b20',
@@ -110,7 +112,60 @@ function dibujarArma(ctx, tipo, lado) {
   }
 }
 
+// Mecha armado con los sprites de sus partes (si cargaron todas las que necesita).
+// Los sprites miran hacia ARRIBA: se gira 90 grados para que miren hacia +x como el resto del dibujo.
+function mechaConSprites(ctx, f, u) {
+  if (!SPR.listo || !f.apariencia) return false;
+  const color = f.bando === 0 ? 'azul' : 'rojo';
+  const a = f.apariencia;
+  const torso = sprite(color, a.torso);
+  if (!torso) return false;
+  const E = SPR.escala;
+  const M = (id) => SPR.meta[id];
+  const T = M(a.torso);
+  const tw = T.w / E, th = T.h / E;
+  ctx.save();
+  ctx.rotate(Math.PI / 2);
+  ctx.imageSmoothingEnabled = false;
+  // dibuja la parte id con su punto de enganche en (x, y); espejo = del lado izquierdo
+  const pieza = (id, x, y, espejo = false) => {
+    const im = sprite(color, id);
+    if (!im) return;
+    const m = M(id);
+    const w = m.w / E, h = m.h / E, ax = m.ancla[0] / E, ay = m.ancla[1] / E;
+    ctx.save();
+    ctx.translate(x, y);
+    if (espejo) ctx.scale(-1, 1);
+    ctx.drawImage(im, -ax, -ay, w, h);
+    ctx.restore();
+  };
+  const zancada = Math.sin(u.paso * Math.PI * 2) * 1.6;
+  const piernas = a.piernas;
+  if (piernas) {
+    const orugas = piernas.includes('orugas');
+    const dx = orugas ? tw * 0.42 : tw * 0.26;
+    const dy = orugas ? 0 : th * 0.05;
+    pieza(piernas, dx, dy + (orugas ? 0 : zancada), false);
+    pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true);
+  }
+  if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
+  ctx.drawImage(torso, -tw / 2, -th / 2, tw, th);
+  if (a.brazo_der) pieza(a.brazo_der, tw * 0.5, -th * 0.05, false);
+  if (a.brazo_izq) pieza(a.brazo_izq, -tw * 0.5, -th * 0.05, true);
+  if (a.cabeza) pieza(a.cabeza, 0, -th * 0.12);
+  if (u.golpe > 0) {
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = u.golpe * 0.6;
+    ctx.drawImage(torso, -tw / 2, -th / 2, tw, th);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  ctx.restore();
+  return true;
+}
+
 function dibujarMecha(ctx, f, u) {
+  if (mechaConSprites(ctx, f, u)) return;
   const c = colorBando(f);
   const a = f.apariencia || {};
   const pesado = (a.torso || '').includes('pesado'), ligero = (a.torso || '').includes('ligero');
@@ -211,7 +266,7 @@ export function dibujarMechaFicha(ctx, ficha, lado) {
   ctx.clearRect(0, 0, lado, lado);
   ctx.save();
   ctx.translate(lado / 2, lado / 2);
-  ctx.scale(lado / 40, lado / 40);
+  ctx.scale(lado / 34, lado / 34);
   ctx.rotate(-Math.PI / 2);
   dibujarMecha(ctx, ficha, { paso: 0.25, golpe: 0 });
   ctx.restore();

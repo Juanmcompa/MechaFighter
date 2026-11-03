@@ -136,7 +136,7 @@ h1:focus, h2:focus { outline: none; }
 .nivel strong { font: 700 26px/1 'Pixelify Sans', sans-serif; color: var(--fosforo); }
 .xp { display: grid; gap: 2px; } .xp small { color: var(--texto-tenue); }
 .mecha-cabecera { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.mecha-grande { width: 120px; height: 120px; background: radial-gradient(circle, #1d2418, #0b0d09 70%); border: 1px solid var(--chapa-borde); image-rendering: auto; }
+.mecha-grande { width: 150px; height: 150px; background: radial-gradient(circle, #1d2418, #0b0d09 70%); border: 1px solid var(--chapa-borde); image-rendering: auto; }
 .stats { display: grid; grid-template-columns: auto auto; gap: 2px 12px; margin: 0; font-size: 19px; }
 .stats dt { color: var(--texto-tenue); display: flex; gap: 5px; align-items: center; }
 .stats dd { margin: 0; text-align: right; color: var(--texto); }
@@ -236,3 +236,15 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .memorial small { display: block; color: var(--texto-tenue); }
 
 @media (prefers-reduced-motion: reduce) { body::after { display: none; } }
+
+/* --- Retratos (pixel art: sin suavizar) --- */
+.retrato { display: block; flex: none; image-rendering: pixelated; background: #0a0f2c; border: 2px solid var(--chapa-borde); }
+.retrato-tarjeta { width: 64px; height: 72px; }
+.retrato-grande { width: 96px; height: 108px; border-color: var(--azul); }
+.retrato-chico { width: 40px; height: 45px; }
+.retrato-mini { width: 28px; height: 32px; border-width: 1px; }
+.retrato.caido { filter: grayscale(1) brightness(.7); border-color: var(--alarma); }
+.cabecera-piloto { gap: 12px; }
+.cabecera-nombre { flex: 1; }
+.tarjeta-piloto.activa .retrato { border-color: var(--fosforo); }
+.mecha-grande { image-rendering: pixelated; }

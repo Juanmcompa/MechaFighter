@@ -1,6 +1,8 @@
 // Ayudas compartidas por las pantallas: armar elementos, describir partes y pilotos, la barra de arriba.
 import { icono } from './iconos.js';
 import { nombrePieza, normalizarPieza } from '../motor/unidades.js';
+import { rutaRetrato } from '../vista/sprites.js';
+import { elegirRetrato } from '../campana/reclutas.js';
 
 // h('div', { class: 'x', onclick: fn }, hijo1, 'texto', ...). html: '...' para meter iconos.
 export function h(tag, attrs = {}, ...hijos) {
@@ -86,4 +88,11 @@ export function barraCampana(datos, p, acciones = []) {
       chip('piloto', p.pilotos.length + '/' + datos.reglas.escuadra_maxima, 'Pilotos'),
       s ? chip('mision', 'Sector ' + (p.sector + 1), s.nombre) : null),
     h('div', { class: 'hud-acciones' }, ...acciones));
+}
+
+// Retrato pixelado del piloto (los guardados viejos no lo tienen: se calcula del nombre).
+export function retrato(datos, piloto, clase = '') {
+  const n = piloto.retrato || elegirRetrato(datos, piloto.nombre || piloto.apodo || '');
+  if (!n) return null;
+  return h('img', { class: 'retrato ' + clase, src: rutaRetrato(n), alt: '', width: 48, height: 54, loading: 'lazy' });
 }

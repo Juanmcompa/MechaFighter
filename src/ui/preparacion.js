@@ -1,5 +1,5 @@
 // Antes de la mision: el briefing, el plano del mapa, contra que se enfrentan y quienes van.
-import { h, montar, ico, boton, panel, chip, barraCampana } from './comun.js';
+import { h, montar, ico, boton, panel, chip, barraCampana, retrato } from './comun.js';
 import { dibujarMapa } from './vistaMapa.js';
 import { escuadronParaMision } from '../campana/partida.js';
 
@@ -36,7 +36,7 @@ export function preparacion(app, raiz) {
         panel('Hostiles', m.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
         panel('Escuadrón',
           h('ul', { class: 'lista-escuadron' }, ...escuadron.map(({ piloto }) => h('li', {},
-            ico(datos.clases[piloto.clase].icono), h('strong', {}, piloto.apodo), ' · ' + datos.clases[piloto.clase].nombre + ' · niv ' + piloto.nivel,
+            retrato(datos, piloto, 'retrato-mini'), ico(datos.clases[piloto.clase].icono), h('strong', {}, piloto.apodo), ' · ' + datos.clases[piloto.clase].nombre + ' · niv ' + piloto.nivel,
             piloto.traumas.length ? chip('trauma', String(piloto.traumas.length), 'Con traumas', 'chip-trauma') : null)))),
         h('div', { class: 'acciones' },
           boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),

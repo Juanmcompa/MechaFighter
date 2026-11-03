@@ -1,5 +1,5 @@
 // Fin de la campana: resultado, puntaje y el memorial de los que no volvieron.
-import { h, montar, ico, boton, panel, chip } from './comun.js';
+import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 
 export function fin(app, raiz) {
   const { datos } = app;
@@ -17,7 +17,7 @@ export function fin(app, raiz) {
     gano && p.pilotos.length ? panel('Vuelven', h('ul', { class: 'lista-simple' }, ...p.pilotos.map((pi) =>
       h('li', {}, ico(datos.clases[pi.clase].icono), ' «' + pi.apodo + '» ' + pi.nombre + ' · niv ' + pi.nivel + ' · ' + pi.bajas + ' bajas')))) : null,
     p.caidos.length ? panel('Memorial', h('ul', { class: 'memorial' }, ...p.caidos.map((c) => h('li', {},
-      ico('lapida'),
+      retrato(datos, c, 'retrato-chico caido') || ico('lapida'),
       h('div', {},
         h('strong', {}, '«' + c.apodo + '» ' + c.nombre),
         h('small', {}, (datos.clases[c.clase] || {}).nombre + ' · niv ' + c.nivel + ' · ' + c.misiones + ' misiones · ' + c.bajas + ' bajas · cayó en ' + c.mision + ' (sector ' + c.sector + ')'),

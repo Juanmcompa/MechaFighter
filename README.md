@@ -55,3 +55,5 @@ Detalle en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 Diseño y desarrollo: **Juan M. Comparini**.
 
 Fuentes: Pixelify Sans y VT323, con licencia SIL Open Font License (ver `fuentes/`).
+
+Arte generado con IA (Nano Banana, de Google) a partir de los prompts de [docs/ARTE.md](docs/ARTE.md), y procesado para el juego con `tools/procesar_arte.py`.
