@@ -1,0 +1,51 @@
+// Iconos de linea (24x24, trazo del color del texto). Placeholder propio, liviano y nitido en cualquier pantalla.
+const P = {
+  mision: '<circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+  mira: '<circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
+  jefe: '<path d="M5 10a7 7 0 0 1 14 0v4l-2 2v3H7v-3l-2-2z"/><circle cx="9" cy="11" r="1.6" fill="currentColor"/><circle cx="15" cy="11" r="1.6" fill="currentColor"/><path d="M10 19v-2M14 19v-2"/>',
+  taller: '<path d="M14.5 5.5a4 4 0 0 0-5 5L4 16l4 4 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-3-1-1-3z"/>',
+  reclutamiento: '<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/>',
+  evento: '<path d="M9 9a3 3 0 1 1 4.5 2.6c-1 .6-1.5 1.3-1.5 2.4"/><circle cx="12" cy="18" r="1" fill="currentColor"/><rect x="3" y="3" width="18" height="18" rx="2"/>',
+  descanso: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  escudo: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/>',
+  cruz: '<path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5z"/>',
+  daga: '<path d="M14 4l6 6-9 9H7v-4z"/><path d="M5 19l-2 2M13 7l4 4"/>',
+  llave: '<path d="M14.5 5.5a4 4 0 0 0-5 5L4 16l4 4 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-3-1-1-3z"/>',
+  estrella: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  ojo: '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  espadas: '<path d="M4 4l10 10M20 4L10 14M7 17l-3 3M17 17l3 3M6 15l3 3M18 15l-3 3"/>',
+  creditos: '<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 10h3M8 14h8M15 10h1"/>',
+  puntaje: '<path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 13v4M8 20h8"/>',
+  hangar: '<path d="M3 20V9l9-5 9 5v11"/><path d="M7 20v-6h10v6M7 17h10"/>',
+  pausa: '<path d="M8 5v14M16 5v14"/>',
+  play: '<path d="M7 4l13 8-13 8z"/>',
+  rapido: '<path d="M3 5l8 7-8 7zM12 5l8 7-8 7z"/>',
+  saltar: '<path d="M4 5l9 7-9 7zM18 5v14"/>',
+  arriba: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  abajo: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  cerrar: '<path d="M6 6l12 12M18 6L6 18"/>',
+  mas: '<path d="M12 5v14M5 12h14"/>',
+  vida: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  medalla: '<circle cx="12" cy="15" r="5"/><path d="M8.5 11L6 3h4l2 5 2-5h4l-2.5 8"/>',
+  cicatriz: '<path d="M5 19L19 5M8 9l2 2M11 6l2 2M12 13l2 2M15 10l2 2"/>',
+  trauma: '<path d="M4 12h3l2-5 3 10 3-8 2 3h3"/>',
+  vinculo: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  atras: '<path d="M15 5l-7 7 7 7"/>',
+  calavera: '<path d="M5 10a7 7 0 0 1 14 0v4l-2 2v3H7v-3l-2-2z"/><circle cx="9" cy="11" r="1.6" fill="currentColor"/><circle cx="15" cy="11" r="1.6" fill="currentColor"/>',
+  lapida: '<path d="M6 21V9a6 6 0 0 1 12 0v12zM4 21h16M12 10v5M10 12h4"/>',
+  piloto: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  peso: '<path d="M6 8h12l2 12H4zM9 8a3 3 0 0 1 6 0"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  bala: '<path d="M5 19l9-9M14 4h6v6l-6 4-4-4z"/>',
+  dado: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/>',
+  // personalidades y clases (los nombres de icono que usan los datos)
+  huida: '<path d="M13 4a2 2 0 1 1 0 .1M9 21l3-7 3 3v5M6 12l3-4 4 1 3 3h3"/>',
+  rayo: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  colmillo: '<path d="M4 5h16l-3 6-2-3-3 10-3-10-2 3z"/>',
+  lazo: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
+};
+
+export function icono(nombre, clase = '') {
+  const d = P[nombre] || P.evento;
+  return `<svg class="ico ${clase}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+}

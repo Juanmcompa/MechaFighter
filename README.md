@@ -10,11 +10,15 @@ medallas, y si mueren no vuelven.
 Inspirado en *Mechabellum* (preparación táctica sin control en tiempo real), *Wartales* (escuadrón, moral, heridas),
 *Door Kickers* (planificar antes de entrar) y los gambits de *Final Fantasy XII*.
 
+**Jugar:** https://juanmcompa.github.io/MechaFighter/
+
 ## Estado
 
-Primer paso: la base. Hay datos de ejemplo, el núcleo (azar con semilla, carga y validación de datos) y una pantalla de
-arranque que muestra si los datos están bien y dibuja el mapa de prueba. El combate todavía no existe. Ver
-[PLAN.md](PLAN.md).
+**MVP jugable** (Early Access). Una campaña de 3 sectores con mapa de nodos (contratos, taller, reclutas, señales,
+descanso y un jefe por sector); 5 tipos de misión (defensa por oleadas, asalto, escolta, patrulla con niebla, duelo);
+hangar con partes de mecha y editor de órdenes; batalla automática con pausa, velocidades y salto al final; informe con
+experiencia, cicatrices, traumas, medallas, botín y muerte permanente; memorial de caídos; guardado automático.
+Los gráficos son provisorios, dibujados con código. Ver [PLAN.md](PLAN.md).
 
 ## Editar el contenido
 

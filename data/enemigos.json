@@ -2,56 +2,229 @@
   "_ayuda": "Unidades que no son de tu escuadron. Tres clases de cuerpo: 'mecha' (se arma con partes, como los tuyos), 'infanteria' y 'mutante' (numeros directos en 'stats'). Las 'escuadras' son los grupos que aparecen en las misiones. 'amenaza' sirve para armar misiones parejas.",
   "unidades": {
     "saqueador": {
-      "nombre": "Saqueador", "cuerpo": "infanteria", "personalidad": "temerario", "amenaza": 1, "sprite": "soldado_rifle",
-      "stats": { "estructura": 40, "blindaje": 0, "velocidad": 4, "punteria": 50, "evasion": 10, "iniciativa": 5, "moral": 50, "vision": 6 },
+      "nombre": "Saqueador",
+      "cuerpo": "infanteria",
+      "personalidad": "temerario",
+      "amenaza": 1,
+      "sprite": "soldado_rifle",
+      "stats": {
+        "estructura": 40,
+        "blindaje": 0,
+        "velocidad": 4,
+        "punteria": 50,
+        "evasion": 10,
+        "iniciativa": 5,
+        "moral": 50,
+        "vision": 6
+      },
       "arma": "brazo_rifle",
       "gambits": [
-        { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
-        { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_cercano" }
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
       ]
     },
     "saqueador_incendiario": {
-      "nombre": "Incendiario", "cuerpo": "infanteria", "personalidad": "sanguinario", "amenaza": 2, "sprite": "soldado_lanzallamas",
-      "stats": { "estructura": 50, "blindaje": 1, "velocidad": 4, "punteria": 55, "evasion": 5, "iniciativa": 4, "moral": 60, "vision": 6 },
+      "nombre": "Incendiario",
+      "cuerpo": "infanteria",
+      "personalidad": "sanguinario",
+      "amenaza": 2,
+      "sprite": "soldado_lanzallamas",
+      "stats": {
+        "estructura": 50,
+        "blindaje": 1,
+        "velocidad": 4,
+        "punteria": 55,
+        "evasion": 5,
+        "iniciativa": 4,
+        "moral": 60,
+        "vision": 6
+      },
       "arma": "brazo_lanzallamas",
       "gambits": [
-        { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
-        { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_mas_debil" }
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_mas_debil"
+        }
       ]
     },
     "mecha_pirata": {
-      "nombre": "Mecha pirata", "cuerpo": "mecha", "clase": "vanguardia", "personalidad": "temerario", "nivel": 2, "amenaza": 3,
-      "partes": { "cabeza": "cabeza_sensor", "torso": "torso_medio", "piernas": "piernas_bipode",
-                  "brazo_izq": "brazo_rotativa", "brazo_der": "brazo_escudo", "mochila": "mochila_vacia" }
+      "nombre": "Mecha pirata",
+      "cuerpo": "mecha",
+      "clase": "vanguardia",
+      "personalidad": "temerario",
+      "nivel": 2,
+      "amenaza": 3,
+      "partes": {
+        "cabeza": "cabeza_sensor",
+        "torso": "torso_medio",
+        "piernas": "piernas_bipode",
+        "brazo_izq": "brazo_rotativa",
+        "brazo_der": "brazo_escudo",
+        "mochila": "mochila_vacia"
+      }
     },
     "mutante_rastrero": {
-      "nombre": "Rastrero", "cuerpo": "mutante", "personalidad": "sanguinario", "amenaza": 2, "sprite": "mutante_verde",
-      "stats": { "estructura": 70, "blindaje": 1, "velocidad": 3, "punteria": 70, "evasion": 15, "iniciativa": 7, "moral": 100, "vision": 5 },
-      "arma_natural": { "danio": 16, "alcance": 1, "cadencia": 3, "punteria": 10 },
+      "nombre": "Rastrero",
+      "cuerpo": "mutante",
+      "personalidad": "sanguinario",
+      "amenaza": 2,
+      "sprite": "mutante_verde",
+      "stats": {
+        "estructura": 70,
+        "blindaje": 1,
+        "velocidad": 3,
+        "punteria": 70,
+        "evasion": 15,
+        "iniciativa": 7,
+        "moral": 100,
+        "vision": 5
+      },
+      "arma_natural": {
+        "danio": 16,
+        "alcance": 1,
+        "cadencia": 3,
+        "punteria": 10
+      },
       "gambits": [
-        { "condicion": "enemigo_a_rango", "accion": "atacar_cuerpo_a_cuerpo", "objetivo": "enemigo_cercano" },
-        { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_mas_debil" }
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_mas_debil"
+        }
       ]
     },
     "mutante_escupidor": {
-      "nombre": "Escupidor", "cuerpo": "mutante", "personalidad": "temerario", "amenaza": 3, "sprite": "mutante_carne",
-      "stats": { "estructura": 120, "blindaje": 3, "velocidad": 5, "punteria": 55, "evasion": 0, "iniciativa": 3, "moral": 100, "vision": 6 },
-      "arma_natural": { "danio": 12, "alcance": 5, "cadencia": 6, "punteria": 0, "estado": "fuga_hidraulica", "chance_estado": 25 },
+      "nombre": "Escupidor",
+      "cuerpo": "mutante",
+      "personalidad": "temerario",
+      "amenaza": 3,
+      "sprite": "mutante_carne",
+      "stats": {
+        "estructura": 120,
+        "blindaje": 3,
+        "velocidad": 5,
+        "punteria": 55,
+        "evasion": 0,
+        "iniciativa": 3,
+        "moral": 100,
+        "vision": 6
+      },
+      "arma_natural": {
+        "danio": 12,
+        "alcance": 5,
+        "cadencia": 6,
+        "punteria": 0,
+        "estado": "fuga_hidraulica",
+        "chance_estado": 25
+      },
       "gambits": [
-        { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
-        { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_cercano" }
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
       ]
     },
     "torreta_ligera": {
-      "nombre": "Torreta", "cuerpo": "mecha", "invocacion": true, "amenaza": 1, "sprite": "torreta",
-      "stats": { "estructura": 60, "blindaje": 3, "velocidad": 0, "punteria": 60, "evasion": 0, "iniciativa": 3, "moral": 100, "vision": 7 },
+      "nombre": "Torreta",
+      "cuerpo": "mecha",
+      "invocacion": true,
+      "amenaza": 1,
+      "sprite": "torreta",
+      "stats": {
+        "estructura": 60,
+        "blindaje": 3,
+        "velocidad": 0,
+        "punteria": 60,
+        "evasion": 0,
+        "iniciativa": 3,
+        "moral": 100,
+        "vision": 7
+      },
       "arma": "brazo_rotativa",
-      "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" }]
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "transporte": {
+      "nombre": "Transporte",
+      "cuerpo": "mecha",
+      "amenaza": 0,
+      "sprite": "transporte",
+      "stats": {
+        "estructura": 240,
+        "blindaje": 6,
+        "velocidad": 7,
+        "punteria": 0,
+        "evasion": 0,
+        "iniciativa": 1,
+        "moral": 100,
+        "vision": 5
+      },
+      "gambits": [
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "objetivo_mision"
+        }
+      ]
     }
   },
   "escuadras": {
-    "patrulla_saqueadora": { "nombre": "Patrulla saqueadora", "miembros": ["saqueador", "saqueador", "saqueador_incendiario"], "dificultad": 1 },
-    "banda_con_mecha":     { "nombre": "Banda con mecha",     "miembros": ["mecha_pirata", "saqueador", "saqueador"], "dificultad": 2 },
-    "nido":                { "nombre": "Nido",                "miembros": ["mutante_rastrero", "mutante_rastrero", "mutante_escupidor"], "dificultad": 2 }
+    "patrulla_saqueadora": {
+      "nombre": "Patrulla saqueadora",
+      "miembros": [
+        "saqueador",
+        "saqueador",
+        "saqueador_incendiario"
+      ],
+      "dificultad": 1
+    },
+    "banda_con_mecha": {
+      "nombre": "Banda con mecha",
+      "miembros": [
+        "mecha_pirata",
+        "saqueador",
+        "saqueador"
+      ],
+      "dificultad": 2
+    },
+    "nido": {
+      "nombre": "Nido",
+      "miembros": [
+        "mutante_rastrero",
+        "mutante_rastrero",
+        "mutante_escupidor"
+      ],
+      "dificultad": 2
+    }
   }
 }

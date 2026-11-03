@@ -24,17 +24,16 @@ MechaFighter/
 │   ├── main.js                         arranque
 │   ├── core/                           compartido, sin pantalla: azar.js, datos.js, validar.js, bus.js
 │   ├── motor/                          EL COMBATE. Puro: sin DOM, sin reloj, sin Math.random
-│   │   ├── simular.js                  simular(mision, escuadrones, semilla, datos) → { resultado, registro }
-│   │   ├── estado.js                   arma el estado inicial (mecha = partes + piloto)
-│   │   ├── tick.js                     las fases de cada tick
-│   │   ├── decision/                   ganchos.js, gambits.js, condiciones.js, funciones.js, objetivos.js
-│   │   ├── resolucion/                 movimiento.js, disparos.js, efectos.js
-│   │   ├── espacio/                    grilla.js, caminos.js (A*), vision.js (línea de tiro y niebla)
-│   │   ├── moral.js, objetivosMision.js
-│   │   └── registro.js                 eventos que leen la vista y la campaña
-│   ├── vista/                          SOLO lee el registro: canvas, repeticion.js, sprites.js, efectos.js
-│   ├── ui/                             pantallas: hangar, editor de gambits, preparación, informe, sectores
-│   ├── campana/                        sectores, escuadrón, permadeath, progresión, botín, guardado
+│   │   ├── simular.js                  simular(datos, { mision, escuadron, semilla }) → { victoria, registro, resumen, huella }
+│   │   ├── unidades.js                 arma los números de una unidad (piloto + partes, o enemigo)
+│   │   ├── espacio.js                  grilla, caminos (BFS), línea de tiro, cobertura
+│   │   ├── estado.js                   ayudas sobre el estado: orden fijo, conocidos, estados, moral
+│   │   ├── decision.js                 condiciones, objetivos, ganchos y gambits → intención
+│   │   ├── resolucion.js               movimientos, disparos, reparaciones, invocaciones
+│   │   └── moral.js
+│   ├── vista/                          SOLO lee el registro: repeticion.js (reproduce) y dibujo.js (placeholders)
+│   ├── ui/                             app.js (cambia de pantalla) + una pantalla por archivo
+│   ├── campana/                        partida.js (sectores, nodos, informe, permadeath), misiones.js, reclutas.js, guardado.js
 │   └── red/                            baliza.js (códigos de batalla), tablas.js (puntajes)
 ├── servidor/                           worker.js, local.mjs, prueba.mjs (Cloudflare, como Shakedown)
 ├── tools/                              validar-datos.mjs, simular.mjs (batallas por consola, para balance)
@@ -185,9 +184,9 @@ pieza y anclajes calculados). Mientras tanto la vista dibuja formas simples por 
 ## Orden de trabajo
 
 1. `core/` (azar, datos, validación) ✓
-2. `motor/decision/`: condiciones, ganchos y gambits, con pruebas sin pantalla
-3. Resto del `motor/` + `tools/simular.mjs` (batallas por consola, para balance)
-4. `vista/`: repetición del registro en canvas
-5. `ui/`: hangar, editor de gambits y preparación
-6. `campana/`: sectores, permadeath, progresión
+2. `motor/` completo + `tools/simular.mjs` ✓
+3. `vista/`: repetición del registro en canvas, con dibujos provisorios ✓
+4. `ui/`: portada, sectores, hangar con editor de gambits, preparación, batalla, informe, taller, reclutas, fin ✓
+5. `campana/`: sectores, permadeath, progresión, botín, guardado ✓ (MVP publicado)
+6. Arte final con Nano Banana (método BeastMixer) reemplazando `vista/dibujo.js`
 7. `servidor/` + `red/`: balizas y tablas

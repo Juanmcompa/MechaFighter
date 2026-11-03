@@ -1,0 +1,41 @@
+{
+  "_ayuda": "Lo que dicen los pilotos en la batalla cuando un gancho los hace desobedecer (la clave es el 'registro' del gancho), y otros textos cortos de la batalla.",
+  "gritos": {
+    "huye_en_panico": "¡Me voy de acá!",
+    "corre_a_cubrir": "¡Aguantá, voy!",
+    "se_quiebra": "¡No puedo más!",
+    "no_otra_vez": "¡Esta vez no!",
+    "correa": "¡No te separes!"
+  },
+  "motivos_fin": {
+    "sobrevivir_oleadas": "Resistieron todas las oleadas",
+    "escuadron_eliminado": "El escuadrón cayó",
+    "enemigos_eliminados": "No quedó un enemigo en pie",
+    "zona_perdida": "Perdieron la posición",
+    "unidad_muerta": "Cayó el objetivo",
+    "unidad_llega_a_zona": "Llegaron a la extracción",
+    "escuadron_llega_a_zona": "El escuadrón llegó a la extracción",
+    "tiempo_agotado": "Se acabó el tiempo"
+  },
+  "eventos": [
+    {
+      "texto": "Un carguero abandonado. Adentro hay créditos olvidados.",
+      "creditos": [
+        40,
+        90
+      ]
+    },
+    {
+      "texto": "Una señal de auxilio resulta ser una trampa. Salen a tiempo, con el susto.",
+      "moral": -5
+    },
+    {
+      "texto": "Un viejo mecánico les regala una parte que no usa.",
+      "parte": true
+    },
+    {
+      "texto": "Noche tranquila en la órbita. Los pilotos juegan al truco y se ríen un rato.",
+      "moral": 10
+    }
+  ]
+}

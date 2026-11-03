@@ -1,23 +1,77 @@
 {
   "_ayuda": "Prefijos y sufijos que pueden salir en las partes del botin. 'etiquetas' dice a que partes se puede pegar (alcanza con que la parte tenga una). 'peso' es que tan seguido sale. Las modificaciones se suman al arma o a la parte (en % cuando terminan en _pct).",
   "sobrecargado": {
-    "tipo": "prefijo", "nombre": "Sobrecargado", "etiquetas": ["balistico", "energia"], "peso": 10, "rareza_minima": "poco_comun",
-    "mods": { "danio_pct": 15, "recarga": 2 }
+    "tipo": "prefijo",
+    "nombre": "Sobrecargado",
+    "etiquetas": [
+      "balistico",
+      "energia"
+    ],
+    "peso": 10,
+    "rareza_minima": "poco_comun",
+    "mods": {
+      "danio_pct": 15,
+      "recarga": 2
+    }
   },
   "calibrado": {
-    "tipo": "prefijo", "nombre": "Calibrado", "etiquetas": ["arma"], "peso": 14, "rareza_minima": "comun",
-    "mods": { "punteria": 8 }
+    "tipo": "prefijo",
+    "nombre": "Calibrado",
+    "etiquetas": [
+      "arma"
+    ],
+    "peso": 14,
+    "rareza_minima": "comun",
+    "mods": {
+      "punteria": 8
+    }
   },
   "reforzado": {
-    "tipo": "prefijo", "nombre": "Reforzado", "etiquetas": ["ligero", "medio", "pesado", "escudo"], "peso": 12, "rareza_minima": "comun",
-    "mods": { "blindaje": 2, "peso": 2 }
+    "tipo": "prefijo",
+    "nombre": "Reforzado",
+    "etiquetas": [
+      "ligero",
+      "medio",
+      "pesado",
+      "escudo"
+    ],
+    "peso": 12,
+    "rareza_minima": "comun",
+    "mods": {
+      "blindaje": 2,
+      "peso": 2
+    }
   },
   "de_tambor": {
-    "tipo": "sufijo", "nombre": "de tambor", "etiquetas": ["balistico"], "peso": 10, "rareza_minima": "comun",
-    "mods": { "municion_pct": 50 }
+    "tipo": "sufijo",
+    "nombre": "de tambor",
+    "etiquetas": [
+      "balistico"
+    ],
+    "peso": 10,
+    "rareza_minima": "comun",
+    "mods": {
+      "municion_pct": 50
+    }
   },
   "del_carnicero": {
-    "tipo": "sufijo", "nombre": "del Carnicero", "etiquetas": ["cuerpo_a_cuerpo", "fuego"], "peso": 6, "rareza_minima": "raro",
-    "mods": { "danio_pct": 25 }, "ganchos": [{ "tipo": "moral", "evento": "baja_propia", "delta": 5 }]
+    "tipo": "sufijo",
+    "nombre": "del Carnicero",
+    "etiquetas": [
+      "cuerpo_a_cuerpo",
+      "fuego"
+    ],
+    "peso": 6,
+    "rareza_minima": "raro",
+    "mods": {
+      "danio_pct": 25
+    },
+    "ganchos": [
+      {
+        "tipo": "moral",
+        "evento": "baja_propia",
+        "delta": 5
+      }
+    ]
   }
 }

@@ -10,7 +10,20 @@
     "base": 70,
     "maxima": 100,
     "umbral_tembloroso": 40,
-    "umbral_quebrado": 15
+    "umbral_quebrado": 15,
+    "recupera_cada_ticks": 15,
+    "eventos_base": {
+      "aliado_muerto": -10,
+      "vinculo_muerto": -20,
+      "vinculo_herido": -5,
+      "baja_propia": 5,
+      "baja_aliada": 2,
+      "explosion_cerca": -5,
+      "recibio_impacto": -2,
+      "quedo_solo": -10,
+      "vip_herido": -5,
+      "oleada_nueva": -3
+    }
   },
   "cobertura": {
     "media": 25,
@@ -21,11 +34,11 @@
   "punteria_maxima": 95,
   "xp_por_nivel": [
     0,
-    100,
-    250,
-    450,
-    700,
-    1000
+    120,
+    300,
+    550,
+    850,
+    1200
   ],
   "xp": {
     "por_baja": 25,
@@ -52,5 +65,33 @@
     "quedo_solo",
     "vip_herido",
     "oleada_nueva"
-  ]
+  ],
+  "peligro_danio_por_tick": 1,
+  "enemigos": {
+    "mejora_por_nivel_pct": 22
+  },
+  "campana": {
+    "costo_reclutar": 90,
+    "costo_descanso": 0,
+    "venta_pct": 40,
+    "precio_parte_por_rareza": {
+      "comun": 60,
+      "poco_comun": 110,
+      "raro": 180,
+      "epico": 260
+    },
+    "partes_en_taller": 4,
+    "botin_chance_afijo": 45,
+    "puntaje_por_sector": 200,
+    "evento_creditos": [
+      30,
+      90
+    ]
+  },
+  "rarezas": {
+    "comun": 60,
+    "poco_comun": 28,
+    "raro": 10,
+    "epico": 2
+  }
 }

@@ -1,15 +1,47 @@
 {
   "_ayuda": "Como se arma el mapa de nodos de cada campana. Cada sector tiene varias columnas de nodos; el jugador elige un camino de izquierda a derecha. 'tipos_de_nodo' son los pesos de lo que puede aparecer.",
   "campana_base": {
-    "nombre": "Cinturon de Kessler",
+    "nombre": "Cinturón de Kessler",
     "sectores": 3,
     "columnas_por_sector": 6,
-    "nodos_por_columna": { "min": 2, "max": 4 },
+    "nodos_por_columna": {
+      "min": 2,
+      "max": 4
+    },
     "tipos_de_nodo": {
-      "mision": 60, "taller": 12, "reclutamiento": 10, "evento": 12, "descanso": 6
+      "mision": 60,
+      "taller": 12,
+      "reclutamiento": 10,
+      "evento": 12,
+      "descanso": 6
     },
     "ultima_columna": "jefe",
-    "dificultad_por_sector": [1, 2, 3],
-    "misiones_por_dificultad": { "1": ["defensa", "patrulla", "escolta"], "2": ["asalto", "defensa", "patrulla", "escolta"], "3": ["asalto", "duelo"] }
+    "dificultad_por_sector": [
+      1,
+      2,
+      3
+    ],
+    "misiones_por_dificultad": {
+      "1": [
+        "defensa",
+        "patrulla",
+        "escolta"
+      ],
+      "2": [
+        "asalto",
+        "defensa",
+        "patrulla",
+        "escolta"
+      ],
+      "3": [
+        "asalto",
+        "duelo"
+      ]
+    },
+    "nivel_enemigo_por_sector": [
+      1,
+      3,
+      5
+    ]
   }
 }

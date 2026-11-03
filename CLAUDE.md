@@ -64,6 +64,12 @@ Desde la raíz del repo, con Node 22:
 - `node tools/validar-datos.mjs`: revisa que todos los JSON estén bien y que cada referencia exista. **Correrlo
   después de tocar cualquier cosa en `data/`.**
 - `node tests/core.test.mjs`: el azar es repetible y la validación atrapa errores.
+- `node tests/motor.test.mjs`: determinismo de cada tipo de misión, **huella de referencia** (si cambia sin querer, se
+  rompió algo), ganchos de personalidad y campaña.
+- `npm run balance`: `tools/simular.mjs` (cada misión por dificultad) y `tools/campana.mjs` (campañas enteras con piloto
+  automático). Referencia actual: el piloto automático gana ~35% de las campañas y pierde ~4 pilotos por campaña.
+
+Publicado en GitHub Pages: https://juanmcompa.github.io/MechaFighter/ (se actualiza solo con cada Push).
 
 Para ver el juego en la compu hace falta un servidor local (los navegadores no leen JSON con doble clic):
 `npx serve .` o `python -m http.server`, y abrir la dirección que muestra.

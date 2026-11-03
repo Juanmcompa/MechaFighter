@@ -1,6 +1,24 @@
 {
   "_ayuda": "Lista de todas las tablas que carga el juego. Si agregas un archivo nuevo en data/, sumalo aca. Los mapas van en data/mapas/ y se listan en 'mapas'.",
-  "tablas": ["reglas", "clases", "partes", "afijos", "personalidades", "gambits", "habilidades", "estados",
-             "cicatrices", "traumas", "medallas", "enemigos", "misiones", "sectores", "nombres"],
-  "mapas": ["puesto_01"]
+  "tablas": [
+    "reglas",
+    "clases",
+    "partes",
+    "afijos",
+    "personalidades",
+    "gambits",
+    "habilidades",
+    "estados",
+    "cicatrices",
+    "traumas",
+    "medallas",
+    "enemigos",
+    "misiones",
+    "sectores",
+    "nombres",
+    "textos"
+  ],
+  "mapas": [
+    "puesto_01"
+  ]
 }

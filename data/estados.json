@@ -1,16 +1,91 @@
 {
   "_ayuda": "Estados temporales (duracion en ticks) y estados de moral. Los de moral se activan solos al cruzar los umbrales de reglas.json y suman ganchos con el mismo formato que las personalidades.",
-  "suprimido":       { "nombre": "Suprimido", "icono": "rafaga", "duracion": 12, "mods": { "punteria": -25, "velocidad": 2 } },
-  "en_llamas":       { "nombre": "En llamas", "icono": "llama", "duracion": 15, "danio_por_tick": 2, "ignora_blindaje": true,
-                       "ganchos": [{ "tipo": "moral", "evento": "recibio_impacto", "delta": -3 }] },
-  "emp":             { "nombre": "Pulso EMP", "icono": "rayo", "duracion": 8, "mods": { "sin_habilidades": true, "punteria": -15 } },
-  "fuga_hidraulica": { "nombre": "Fuga hidraulica", "icono": "gota", "duracion": 0, "danio_por_tick": 1, "nota": "duracion 0 = hasta que lo reparen" },
-  "atrincherado":    { "nombre": "Atrincherado", "icono": "escudo", "duracion": 20, "mods": { "blindaje": 6, "inmovil": true } },
-  "moral_firme":     { "nombre": "Firme", "icono": "ancla", "tipo": "moral", "ganchos": [] },
-  "moral_temblorosa":{ "nombre": "Tembloroso", "icono": "temblor", "tipo": "moral",
-                       "mods": { "punteria": -10 },
-                       "ganchos": [{ "tipo": "subir_prioridad", "etiquetas": ["defensa"], "delta": 1 }] },
-  "moral_quebrada":  { "nombre": "Quebrado", "icono": "craneo", "tipo": "moral",
-                       "ganchos": [{ "tipo": "anular", "prioridad": 80, "cuando": true,
-                                     "hacer": { "accion": "buscar_cobertura", "objetivo": "yo" }, "registro": "se_quiebra" }] }
+  "suprimido": {
+    "nombre": "Suprimido",
+    "icono": "rafaga",
+    "duracion": 12,
+    "mods": {
+      "punteria": -25,
+      "velocidad": 2
+    }
+  },
+  "en_llamas": {
+    "nombre": "En llamas",
+    "icono": "llama",
+    "duracion": 15,
+    "danio_por_tick": 2,
+    "ignora_blindaje": true,
+    "ganchos": [
+      {
+        "tipo": "moral",
+        "evento": "recibio_impacto",
+        "delta": -3
+      }
+    ]
+  },
+  "emp": {
+    "nombre": "Pulso EMP",
+    "icono": "rayo",
+    "duracion": 8,
+    "mods": {
+      "sin_habilidades": true,
+      "punteria": -15
+    }
+  },
+  "fuga_hidraulica": {
+    "nombre": "Fuga hidráulica",
+    "icono": "gota",
+    "duracion": 0,
+    "danio_por_tick": 1,
+    "nota": "duracion 0 = hasta que lo reparen"
+  },
+  "atrincherado": {
+    "nombre": "Atrincherado",
+    "icono": "escudo",
+    "duracion": 20,
+    "mods": {
+      "blindaje": 6,
+      "inmovil": true
+    }
+  },
+  "moral_firme": {
+    "nombre": "Firme",
+    "icono": "ancla",
+    "tipo": "moral",
+    "ganchos": []
+  },
+  "moral_temblorosa": {
+    "nombre": "Tembloroso",
+    "icono": "temblor",
+    "tipo": "moral",
+    "mods": {
+      "punteria": -10
+    },
+    "ganchos": [
+      {
+        "tipo": "subir_prioridad",
+        "etiquetas": [
+          "defensa"
+        ],
+        "delta": 1
+      }
+    ]
+  },
+  "moral_quebrada": {
+    "nombre": "Quebrado",
+    "icono": "craneo",
+    "tipo": "moral",
+    "ganchos": [
+      {
+        "tipo": "anular",
+        "prioridad": 80,
+        "cuando": true,
+        "hacer": {
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        },
+        "registro": "se_quiebra"
+      }
+    ]
+  }
 }

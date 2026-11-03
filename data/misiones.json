@@ -1,57 +1,211 @@
 {
   "_ayuda": "Plantillas de contrato. Una mision concreta se arma eligiendo un mapa, numeros dentro de los rangos y escuadras enemigas. Victoria y derrota son listas de condiciones: se gana si se cumple UNA de victoria, se pierde si se cumple UNA de derrota.",
   "defensa": {
-    "nombre": "Resistir la posicion", "tipo": "sobrevivencia", "icono": "escudo",
-    "descripcion": "Aguanten {oleadas} oleadas sin perder el nucleo.",
-    "mapas": ["puesto_01"],
-    "parametros": { "oleadas": { "min": 3, "max": 5 }, "ticks_entre_oleadas": 120 },
-    "victoria": [{ "tipo": "sobrevivir_oleadas" }],
-    "derrota":  [{ "tipo": "escuadron_eliminado" }, { "tipo": "zona_perdida", "zona": "nucleo" }],
-    "enemigos": ["patrulla_saqueadora", "nido"],
-    "recompensa": { "creditos": [80, 140], "botin": 2 },
-    "puntaje": { "por_baja": 10, "por_credito_ahorrado": 1, "por_superviviente": 50 }
+    "nombre": "Resistir la posición",
+    "tipo": "sobrevivencia",
+    "icono": "escudo",
+    "descripcion": "Aguanten {oleadas} oleadas sin perder el núcleo.",
+    "mapas": [
+      "puesto_01"
+    ],
+    "parametros": {
+      "oleadas": {
+        "min": 2,
+        "max": 4
+      },
+      "ticks_entre_oleadas": 120
+    },
+    "victoria": [
+      {
+        "tipo": "sobrevivir_oleadas"
+      }
+    ],
+    "derrota": [
+      {
+        "tipo": "escuadron_eliminado"
+      },
+      {
+        "tipo": "zona_perdida",
+        "zona": "nucleo"
+      }
+    ],
+    "enemigos": [
+      "patrulla_saqueadora",
+      "nido"
+    ],
+    "recompensa": {
+      "creditos": [
+        80,
+        140
+      ],
+      "botin": 2
+    },
+    "puntaje": {
+      "por_baja": 10,
+      "por_credito_ahorrado": 1,
+      "por_superviviente": 50
+    }
   },
   "asalto": {
-    "nombre": "Golpe quirurgico", "tipo": "asalto", "icono": "mira",
-    "descripcion": "Eliminen al lider enemigo.",
-    "mapas": ["puesto_01"],
-    "victoria": [{ "tipo": "unidad_muerta", "unidad": "lider" }],
-    "derrota":  [{ "tipo": "escuadron_eliminado" }, { "tipo": "tiempo_agotado", "ticks": 1500 }],
-    "enemigos": ["banda_con_mecha"],
+    "nombre": "Golpe quirúrgico",
+    "tipo": "asalto",
+    "icono": "mira",
+    "descripcion": "Eliminen al líder enemigo.",
+    "mapas": [
+      "puesto_01"
+    ],
+    "victoria": [
+      {
+        "tipo": "unidad_muerta",
+        "unidad": "lider"
+      }
+    ],
+    "derrota": [
+      {
+        "tipo": "escuadron_eliminado"
+      },
+      {
+        "tipo": "tiempo_agotado",
+        "ticks": 1500
+      }
+    ],
+    "enemigos": [
+      "banda_con_mecha"
+    ],
     "lider": "mecha_pirata",
-    "recompensa": { "creditos": [120, 180], "botin": 3 },
-    "puntaje": { "por_baja": 10, "por_superviviente": 50, "por_tick_restante": 0 }
+    "recompensa": {
+      "creditos": [
+        120,
+        180
+      ],
+      "botin": 3
+    },
+    "puntaje": {
+      "por_baja": 10,
+      "por_superviviente": 50,
+      "por_tick_restante": 0
+    }
   },
   "escolta": {
-    "nombre": "Carga preciosa", "tipo": "escolta", "icono": "estrella",
-    "descripcion": "Lleven al VIP hasta la extraccion.",
-    "mapas": ["puesto_01"],
-    "vip": "torreta_ligera",
-    "victoria": [{ "tipo": "unidad_llega_a_zona", "unidad": "vip", "zona": "extraccion" }],
-    "derrota":  [{ "tipo": "unidad_muerta", "unidad": "vip" }, { "tipo": "escuadron_eliminado" }],
-    "enemigos": ["patrulla_saqueadora"],
-    "recompensa": { "creditos": [100, 150], "botin": 2 },
-    "puntaje": { "por_baja": 5, "por_superviviente": 50, "vip_intacto": 100 }
+    "nombre": "Carga preciosa",
+    "tipo": "escolta",
+    "icono": "estrella",
+    "descripcion": "Lleven el transporte hasta la extracción.",
+    "mapas": [
+      "puesto_01"
+    ],
+    "vip": "transporte",
+    "victoria": [
+      {
+        "tipo": "unidad_llega_a_zona",
+        "unidad": "vip",
+        "zona": "extraccion"
+      }
+    ],
+    "derrota": [
+      {
+        "tipo": "unidad_muerta",
+        "unidad": "vip"
+      },
+      {
+        "tipo": "escuadron_eliminado"
+      }
+    ],
+    "enemigos": [
+      "patrulla_saqueadora"
+    ],
+    "recompensa": {
+      "creditos": [
+        100,
+        150
+      ],
+      "botin": 2
+    },
+    "puntaje": {
+      "por_baja": 5,
+      "por_superviviente": 50,
+      "vip_intacto": 100
+    },
+    "vip_aparece": "jugador"
   },
   "patrulla": {
-    "nombre": "Reconocimiento", "tipo": "patrulla", "icono": "ojo",
+    "nombre": "Reconocimiento",
+    "tipo": "patrulla",
+    "icono": "ojo",
     "descripcion": "Crucen el sector. Hay niebla y emboscadas.",
-    "mapas": ["puesto_01"], "niebla": true,
-    "parametros": { "emboscadas": { "min": 1, "max": 3 } },
-    "victoria": [{ "tipo": "escuadron_llega_a_zona", "zona": "extraccion" }],
-    "derrota":  [{ "tipo": "escuadron_eliminado" }],
-    "enemigos": ["patrulla_saqueadora", "nido"],
-    "recompensa": { "creditos": [90, 130], "botin": 3 },
-    "puntaje": { "por_baja": 10, "por_superviviente": 60 }
+    "mapas": [
+      "puesto_01"
+    ],
+    "niebla": true,
+    "parametros": {
+      "emboscadas": {
+        "min": 1,
+        "max": 2
+      }
+    },
+    "victoria": [
+      {
+        "tipo": "escuadron_llega_a_zona",
+        "zona": "extraccion"
+      }
+    ],
+    "derrota": [
+      {
+        "tipo": "escuadron_eliminado"
+      }
+    ],
+    "enemigos": [
+      "patrulla_saqueadora",
+      "nido"
+    ],
+    "recompensa": {
+      "creditos": [
+        90,
+        130
+      ],
+      "botin": 3
+    },
+    "puntaje": {
+      "por_baja": 10,
+      "por_superviviente": 60
+    }
   },
   "duelo": {
-    "nombre": "Duelo de escuadrones", "tipo": "duelo", "icono": "espadas",
-    "descripcion": "Escuadron contra escuadron, mismas condiciones.",
-    "mapas": ["puesto_01"], "simetrico": true,
-    "victoria": [{ "tipo": "enemigos_eliminados" }],
-    "derrota":  [{ "tipo": "escuadron_eliminado" }, { "tipo": "tiempo_agotado", "ticks": 2000 }],
-    "enemigos": ["banda_con_mecha"],
-    "recompensa": { "creditos": [150, 200], "botin": 2 },
-    "puntaje": { "por_baja": 15, "por_superviviente": 40 }
+    "nombre": "Duelo de escuadrones",
+    "tipo": "duelo",
+    "icono": "espadas",
+    "descripcion": "Escuadrón contra escuadrón.",
+    "mapas": [
+      "puesto_01"
+    ],
+    "simetrico": true,
+    "victoria": [
+      {
+        "tipo": "enemigos_eliminados"
+      }
+    ],
+    "derrota": [
+      {
+        "tipo": "escuadron_eliminado"
+      },
+      {
+        "tipo": "tiempo_agotado",
+        "ticks": 2000
+      }
+    ],
+    "enemigos": [
+      "banda_con_mecha"
+    ],
+    "recompensa": {
+      "creditos": [
+        150,
+        200
+      ],
+      "botin": 2
+    },
+    "puntaje": {
+      "por_baja": 15,
+      "por_superviviente": 40
+    }
   }
 }
