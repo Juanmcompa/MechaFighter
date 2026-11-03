@@ -33,17 +33,22 @@ export class Repeticion {
   medir() {
     const [ancho, alto] = this.mapa.tamano;
     const disponible = this.canvas.parentElement.clientWidth || 640;
-    const altoMax = Math.max(240, window.innerHeight * 0.62);
-    this.L = Math.max(12, Math.floor(Math.min(disponible / ancho, altoMax / alto)));
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    this.canvas.width = ancho * this.L * dpr;
-    this.canvas.height = alto * this.L * dpr;
-    this.canvas.style.width = ancho * this.L + 'px';
-    this.canvas.style.height = alto * this.L + 'px';
+    // En un celular parado, el mapa (que es apaisado) se gira 90 grados: asi ocupa la pantalla en vez de quedar
+    // como una tira chiquita. El lado izquierdo del mapa (donde arranca el escuadron) queda abajo.
+    this.girado = window.innerHeight > window.innerWidth && ancho > alto;
+    const [cw, ch] = this.girado ? [alto, ancho] : [ancho, alto];
+    const altoMax = Math.max(240, window.innerHeight * (this.girado ? 0.5 : 0.62));
+    this.L = Math.max(10, Math.floor(Math.min(disponible / cw, altoMax / ch)));
+    const dpr = (this.dpr = Math.min(2, window.devicePixelRatio || 1));
+    this.W = cw * this.L; this.H = ch * this.L;
+    this.canvas.width = this.W * dpr;
+    this.canvas.height = this.H * dpr;
+    this.canvas.style.width = this.W + 'px';
+    this.canvas.style.height = this.H + 'px';
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // el mapa se dibuja una vez en un canvas aparte
     this.fondo = document.createElement('canvas');
-    this.fondo.width = this.canvas.width; this.fondo.height = this.canvas.height;
+    this.fondo.width = ancho * this.L * dpr; this.fondo.height = alto * this.L * dpr;
     const fc = this.fondo.getContext('2d');
     fc.setTransform(dpr, 0, 0, dpr, 0, 0);
     dibujarMapa(fc, this.mapa, this.L);
@@ -89,6 +94,7 @@ export class Repeticion {
       case 'dispara': {
         const o = U.get(e.o);
         if (!u || !o) break;
+        this.efectos.push({ tipo: 'fijado', id: o.id, t0: this.T, dur: 5, propio: o.ficha.bando === 0 });
         u.ang = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
         const desvio = e.acierta ? 0 : 0.6;
         this.efectos.push({ tipo: e.arma, de: [u.x, u.y], a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
@@ -179,10 +185,18 @@ export class Repeticion {
     return vistas;
   }
 
+  // De coordenadas del mapa (en pixeles) a la pantalla, teniendo en cuenta si esta girado.
+  aPantalla(px, py) {
+    return this.girado ? [py, this.mapa.tamano[0] * this.L - px] : [px, py];
+  }
+
   dibujar() {
-    const ctx = this.ctx, L = this.L;
+    const ctx = this.ctx, L = this.L, dpr = this.dpr;
     const [ancho, alto] = this.mapa.tamano;
-    ctx.clearRect(0, 0, ancho * L, alto * L);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, this.W, this.H);
+    // todo lo del mapa se dibuja en coordenadas del mapa; el giro lo hace la transformacion
+    if (this.girado) { ctx.translate(0, ancho * L); ctx.rotate(-Math.PI / 2); }
     ctx.drawImage(this.fondo, 0, 0, ancho * L, alto * L);
     const vistas = this.visibles();
     const seVe = (u) => !vistas || u.ficha.bando === 0 || vistas.has(Math.round(u.y) * ancho + Math.round(u.x));
@@ -194,6 +208,7 @@ export class Repeticion {
     for (const f of this.efectos) {
       const k = (this.T - f.t0) / f.dur;
       ctx.globalAlpha = Math.max(0, 1 - k);
+      if (f.tipo === 'fijado') { ctx.globalAlpha = 1; continue; }
       if (f.tipo === 'explosion') {
         const r = f.r * L * (0.4 + k);
         ctx.fillStyle = k < 0.3 ? '#fff2b0' : '#ff7a2a';
@@ -229,12 +244,33 @@ export class Repeticion {
       for (let y = 0; y < alto; y++) for (let x = 0; x < ancho; x++) if (!vistas.has(y * ancho + x)) ctx.fillRect(x * L, y * L, L, L);
     }
 
-    // barras de vida, estados, nombres y gritos
-    ctx.font = `${Math.max(11, L * 0.5)}px VT323, monospace`;
+    // Desde aca, todo en coordenadas de pantalla (los textos nunca se giran)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const centro = (u) => this.aPantalla((u.x + 0.5) * L, (u.y + 0.5) * L);
+
+    // miras amarillas sobre quien esta siendo apuntado
+    for (const f of this.efectos) {
+      if (f.tipo !== 'fijado') continue;
+      const u = this.unidades.get(f.id);
+      if (!u || !u.viva || !seVe(u)) continue;
+      const [cx, cy] = centro(u);
+      const r = L * 0.62, c = L * 0.22;
+      ctx.strokeStyle = f.propio ? '#d9553f' : '#f2c94c';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+        ctx.moveTo(cx + sx * r, cy + sy * (r - c)); ctx.lineTo(cx + sx * r, cy + sy * r); ctx.lineTo(cx + sx * (r - c), cy + sy * r);
+      }
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+
+    ctx.font = `${Math.max(12, L * 0.5)}px VT323, monospace`;
     ctx.textAlign = 'center';
     for (const u of lista) {
       if (!u.viva || !seVe(u)) continue;
-      const cx = (u.x + 0.5) * L, top = u.y * L - 2;
+      const [cx, cy] = centro(u);
+      const top = cy - L * 0.5 - 2;
       const pct = Math.max(0, u.vida / u.ficha.vidaMax);
       if (pct < 1 || u.ficha.bando === 0) {
         ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(cx - L * 0.4, top - 4, L * 0.8, 4);
@@ -246,17 +282,20 @@ export class Repeticion {
       if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - L * 0.5, top + 4); }
       if (u.grito) {
         const w = ctx.measureText(u.grito.texto).width + 10;
-        const bx = Math.min(Math.max(cx, w / 2 + 2), ancho * L - w / 2 - 2), by = Math.max(14, top - L * 0.5);
-        ctx.fillStyle = '#e8edd8'; ctx.fillRect(bx - w / 2, by - L * 0.5, w, L * 0.62);
-        ctx.fillStyle = '#121510'; ctx.fillText(u.grito.texto, bx, by);
+        const hb = Math.max(14, L * 0.62);
+        const bx = Math.min(Math.max(cx, w / 2 + 2), this.W - w / 2 - 2), by = Math.max(hb, top - 4);
+        ctx.fillStyle = '#e8edd8'; ctx.fillRect(bx - w / 2, by - hb + 2, w, hb);
+        ctx.fillStyle = '#121510'; ctx.fillText(u.grito.texto, bx, by - 2);
       }
     }
     for (const f of this.flotantes) {
       const k = (this.T - f.t0) / f.dur;
+      const [fx, fy] = this.aPantalla((f.x + 0.5) * L, (f.y + 0.5) * L);
+      const y = fy - L * 0.5 - k * L * 0.8;
       ctx.globalAlpha = 1 - k;
-      ctx.font = `${Math.max(10, L * (f.chico ? 0.42 : 0.55))}px VT323, monospace`;
-      ctx.fillStyle = '#000'; ctx.fillText(f.texto, (f.x + 0.5) * L + 1, (f.y - k * 0.8) * L + 1);
-      ctx.fillStyle = f.color; ctx.fillText(f.texto, (f.x + 0.5) * L, (f.y - k * 0.8) * L);
+      ctx.font = `${Math.max(11, L * (f.chico ? 0.42 : 0.55))}px VT323, monospace`;
+      ctx.fillStyle = '#000'; ctx.fillText(f.texto, fx + 1, y + 1);
+      ctx.fillStyle = f.color; ctx.fillText(f.texto, fx, y);
       ctx.globalAlpha = 1;
     }
     ctx.textAlign = 'start';

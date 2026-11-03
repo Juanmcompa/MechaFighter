@@ -14,6 +14,23 @@ export function hangar(app, raiz, opciones = {}) {
   const volver = () => (p.estado === 'preparacion' ? app.ir('preparacion') : app.continuar());
   const lista = h('div', { class: 'lista-pilotos', role: 'tablist', 'aria-label': 'Pilotos' });
   const detalle = h('div', { class: 'detalle-piloto' });
+  // En el celular se ve una cosa por vez: el piloto y su mecha, o sus ordenes. En la compu, las dos juntas.
+  let pestana = opciones.pestana || 'piloto';
+  const pestanas = h('div', { class: 'pestanas', role: 'tablist', 'aria-label': 'Secciones' });
+  const pintarPestanas = () => {
+    pestanas.innerHTML = '';
+    for (const [id, texto] of [['piloto', 'Piloto y mecha'], ['ordenes', 'Órdenes']]) {
+      pestanas.append(h('button', {
+        class: 'pestana' + (pestana === id ? ' activa' : ''), role: 'tab', 'aria-selected': pestana === id ? 'true' : 'false',
+        onclick: () => { pestana = id; pintarPestanas(); detalle.className = 'detalle-piloto ver-' + pestana; }
+      }, '[ ' + texto + ' ]'));
+    }
+  };
+  const mover = (paso) => {
+    const i = p.pilotos.findIndex((x) => x.id === sel);
+    sel = p.pilotos[(i + paso + p.pilotos.length) % p.pilotos.length].id;
+    pintarLista(); pintarDetalle();
+  };
 
   const pintarLista = () => {
     lista.innerHTML = '';
@@ -26,16 +43,19 @@ export function hangar(app, raiz, opciones = {}) {
       h('span', { class: 'tp-clase' }, ico(datos.clases[pi.clase].icono), datos.clases[pi.clase].nombre),
       h('span', { class: 'tp-nivel', title: 'Nivel' }, String(pi.nivel))));
     }
+    const activa = lista.querySelector('.activa');
+    if (activa && activa.scrollIntoView) activa.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
 
   const pintarDetalle = () => {
     detalle.innerHTML = '';
+    detalle.className = 'detalle-piloto ver-' + pestana;
     const pi = p.pilotos.find((x) => x.id === sel);
     if (!pi) return;
     detalle.append(
       h('div', { class: 'columnas-hangar' },
-        h('div', {}, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); })),
-        panelGambits(app, pi, () => pintarDetalle())));
+        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); })),
+        h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
   };
 
   montar(raiz, 
@@ -46,7 +66,12 @@ export function hangar(app, raiz, opciones = {}) {
     opciones.primeraVez
       ? h('p', { class: 'aviso-inicial' }, ico('estrella'), ' Este es tu escuadrón. Revisá a cada piloto: su mecha y sus órdenes. Cuando estés, volvé al mapa y elegí un contrato.')
       : null,
-    lista, detalle);
+    h('div', { class: 'carrusel' },
+      botonIcono('atras', 'Piloto anterior', () => mover(-1), 'flecha'),
+      lista,
+      botonIcono('atras', 'Piloto siguiente', () => mover(1), 'flecha flecha-der')),
+    pestanas, detalle);
+  pintarPestanas();
   pintarLista();
   pintarDetalle();
 }
@@ -122,10 +147,15 @@ function panelMecha(app, pi, refrescar) {
         refrescar();
       }
     }, ...opciones);
+    // Se ve una caja con el nombre y los datos de la parte; el select del navegador va encima, invisible,
+    // asi en el celular se abre la lista nativa (comoda para el dedo) sin perder el diseno.
     return h('div', { class: 'fila-slot' },
       h('span', { class: 'slot-nombre' }, nombre),
-      elegir,
-      h('small', { class: 'slot-datos rareza-' + (actual ? datos.partes[actual.parte].rareza : 'comun') }, actual ? describirParte(datos, actual) : ''));
+      h('div', { class: 'selector rareza-' + (actual ? datos.partes[actual.parte].rareza : 'comun') },
+        h('strong', {}, actual && actual.parte !== 'mochila_vacia' ? nombrePieza(datos, actual) : '— vacío —'),
+        h('small', {}, actual && actual.parte !== 'mochila_vacia' ? describirParte(datos, actual) : 'Tocá para elegir'),
+        h('span', { class: 'selector-flecha', 'aria-hidden': 'true' }, '▼'),
+        elegir));
   });
 
   return panel('Mecha',

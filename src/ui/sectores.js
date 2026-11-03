@@ -74,6 +74,9 @@ export function sectores(app, raiz) {
       ? h('p', { class: 'recuerdo' }, ico('lapida'), ' En memoria de ' + p.ultimoInforme.caidos.join(', ') + '.') : null
   );
   pintar();
+  // que se vea la columna que toca elegir (en el celular el mapa es vertical y largo)
+  const disponible = mapa.querySelector('.columna-sector.disponible');
+  if (disponible && disponible.scrollIntoView) requestAnimationFrame(() => disponible.scrollIntoView({ block: 'center', inline: 'center' }));
   // Si hay un solo camino, ya queda elegido
   const opciones = nodosSiguientes(p);
   if (opciones.length === 1) { elegido = { c: p.columna + 1, i: 0 }; pintar(); mostrar(opciones[0], 0); }

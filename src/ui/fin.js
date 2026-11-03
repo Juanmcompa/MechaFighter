@@ -24,6 +24,6 @@ export function fin(app, raiz) {
         c.medallas.length ? h('div', { class: 'chips' }, ...c.medallas.map((m) => chip('medalla', datos.medallas[m].nombre, '', 'chip-medalla'))) : null)))))
       : null,
     h('div', { class: 'acciones' },
-      boton('Nueva campaña', () => { app.borrarGuardada(); app.ir('portada'); }, { iconoNombre: 'mas', clase: 'principal' })),
-    h('p', { class: 'firma' }, 'Desarrollado por Juan M. Comparini'));
+      boton('Nueva campaña', () => { app.borrarGuardada(); app.ir('portada'); }, { iconoNombre: 'mas', clase: 'principal' }))
+  );
 }

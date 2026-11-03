@@ -1,5 +1,5 @@
 // La batalla: el motor la resuelve entera en un instante y aca se la mira, con pausa, velocidades y saltar.
-import { h, montar, ico, botonIcono, boton, barra } from './comun.js';
+import { h, montar, ico, botonIcono, boton, barra, retrato, VERSION } from './comun.js';
 import { simular } from '../motor/simular.js';
 import { Repeticion } from '../vista/repeticion.js';
 import { escuadronParaMision, cerrarMision } from '../campana/partida.js';
@@ -8,7 +8,9 @@ export function batalla(app, raiz) {
   const { datos } = app;
   const p = app.partida;
   const m = p.nodo.mision;
-  const resultado = simular(datos, { mision: m, escuadron: escuadronParaMision(datos, p), semilla: m.semilla });
+  const escuadron = escuadronParaMision(datos, p);
+  const pilotoDe = new Map(escuadron.map(({ piloto }) => [piloto.id, piloto]));
+  const resultado = simular(datos, { mision: m, escuadron, semilla: m.semilla });
   // El resultado se anota YA, antes de mirar la repeticion: recargar la pagina no deshace una muerte.
   const informe = cerrarMision(datos, p, resultado);
   app.guardar();
@@ -22,15 +24,29 @@ export function batalla(app, raiz) {
   const botones = {};
   const final = h('div', { class: 'final oculto' });
 
-  montar(raiz, 
-    h('header', { class: 'hud hud-batalla' },
-      h('h1', { class: 'titulo-batalla' }, ico(m.icono), ' ', m.nombre),
-      reloj,
-      h('div', { class: 'controles', role: 'group', 'aria-label': 'Velocidad' },
-        (botones.pausa = botonIcono('pausa', 'Pausa', () => { rep.pausado = !rep.pausado; marcar(); })),
-        ...velocidades.map((v) => (botones[v] = h('button', { class: 'boton-icono vel', 'aria-label': 'Velocidad ' + v, onclick: () => { rep.velocidad = v; rep.pausado = false; marcar(); } }, v + '×'))),
-        botonIcono('saltar', 'Ver el final', () => rep.saltarAlFinal()))),
-    h('div', { class: 'columnas-batalla' }, envoltura, h('aside', { class: 'lateral' }, plantel, feed)),
+  // Una tarjeta por piloto (retrato, nombre y vida), armadas una vez y actualizadas en cada cuadro
+  const tarjetas = new Map();
+  for (const { piloto } of escuadron) {
+    const vida = barra(1, 1);
+    const li = h('li', { class: 'pl-tarjeta' }, retrato(datos, piloto, 'retrato-plantel'),
+      h('div', { class: 'pl-datos' }, h('span', { class: 'pl-nombre' }, piloto.apodo), vida));
+    tarjetas.set(piloto.id, { li, vida });
+    plantel.append(li);
+  }
+
+  montar(raiz,
+    h('div', { class: 'barra-sistema' }, h('span', { class: 'senal' }, '▮▮▮'), h('span', {}, 'SYSTEM RUNNING'), h('span', { class: 'led' })),
+    h('header', { class: 'hud-batalla' },
+      h('div', { class: 'visor visor-mision' }, h('h1', { class: 'titulo-batalla' }, ico(m.icono), ' ', m.nombre)),
+      h('div', { class: 'visor visor-reloj' }, reloj)),
+    h('div', { class: 'controles', role: 'group', 'aria-label': 'Velocidad' },
+      (botones.pausa = botonIcono('pausa', 'Pausa', () => { rep.pausado = !rep.pausado; marcar(); }, 'control')),
+      ...velocidades.map((v) => (botones[v] = h('button', { class: 'boton-icono control vel', 'aria-label': 'Velocidad ' + v, onclick: () => { rep.velocidad = v; rep.pausado = false; marcar(); } }, v + 'x'))),
+      botonIcono('saltar', 'Ver el final', () => rep.saltarAlFinal(), 'control')),
+    h('div', { class: 'columnas-batalla' },
+      h('div', { class: 'col-campo' }, plantel, envoltura),
+      h('section', { class: 'taclog', 'aria-label': 'Registro de combate' }, h('h2', { class: 'taclog-titulo' }, '[ TAC-LOG ]'), feed)),
+    h('footer', { class: 'pie-sistema' }, h('span', {}, '[ SECTOR ' + (p.sector + 1) + ' ]'), h('span', {}, '[ SYSTEM v' + VERSION + ' ]')),
     final);
 
   const nuevaLinea = (ev) => {
@@ -51,12 +67,15 @@ export function batalla(app, raiz) {
   marcar();
 
   const pintarPlantel = () => {
-    plantel.innerHTML = '';
     for (const u of rep.pilotos()) {
-      plantel.append(h('li', { class: u.viva ? '' : 'caido' },
-        h('span', { class: 'pl-nombre' }, u.viva ? '' : '✝ ', u.ficha.nombre),
-        barra(Math.max(0, u.vida), u.ficha.vidaMax, u.vida / u.ficha.vidaMax < 0.3 ? 'critica' : ''),
-        u.moral === 'moral_quebrada' ? h('span', { class: 'pl-moral', title: 'Moral quebrada' }, '!') : null));
+      const t = tarjetas.get(u.ficha.ref);
+      if (!t) continue;
+      const pct = Math.max(0, Math.round((u.vida * 100) / u.ficha.vidaMax));
+      t.vida.firstChild.style.width = pct + '%';
+      t.vida.classList.toggle('critica', pct < 30);
+      t.li.classList.toggle('caido', !u.viva);
+      t.li.classList.toggle('quebrado', u.viva && u.moral === 'moral_quebrada');
+      t.li.title = u.ficha.nombre + (u.viva ? ' · ' + pct + '%' : ' · caído');
     }
   };
 

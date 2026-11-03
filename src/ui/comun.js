@@ -4,6 +4,9 @@ import { nombrePieza, normalizarPieza } from '../motor/unidades.js';
 import { rutaRetrato } from '../vista/sprites.js';
 import { elegirRetrato } from '../campana/reclutas.js';
 
+// Version que se muestra en la barra de estado de abajo
+export const VERSION = '0.3';
+
 // h('div', { class: 'x', onclick: fn }, hijo1, 'texto', ...). html: '...' para meter iconos.
 export function h(tag, attrs = {}, ...hijos) {
   const el = document.createElement(tag);

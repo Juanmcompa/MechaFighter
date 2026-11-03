@@ -33,5 +33,5 @@ export function portada(app, raiz) {
           h('li', {}, h('strong', {}, 'En el hangar'), ' cambiá partes y programá cada mecha: SI pasa algo → HACÉ algo.'),
           h('li', {}, h('strong', {}, 'Mirá la batalla.'), ' No hay control: lo que programaste, y lo que el piloto decida, es lo que pasa.'),
           h('li', {}, h('strong', {}, 'Cuidá a tu gente.'), ' Ganan experiencia, cicatrices y medallas. La muerte es permanente.'))),
-      h('p', { class: 'firma' }, 'Desarrollado por Juan M. Comparini · App en desarrollo / Early Access')));
+      h('p', { class: 'firma' }, 'App en desarrollo · Early Access')));
 }

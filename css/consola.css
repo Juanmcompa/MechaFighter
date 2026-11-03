@@ -1,0 +1,176 @@
+/* La consola: marco de metal con tornillos, paneles biselados y la disposicion para el celular.
+   Va despues de base.css y juego.css y les gana. Pensado primero para el telefono parado. */
+
+:root {
+  --fondo: #060a07;
+  --consola: #0e1712;
+  --marco: #263a2c;
+  --marco-luz: #3d5745;
+  --chapa: #111c15;
+  --chapa-borde: #33463a;
+  --chapa-luz: #4c6553;
+  --chapa-sombra: #1a261e;
+  --visor: #0a120d;
+  --navy: #0f1d3a;
+}
+
+body { background: radial-gradient(ellipse at center, #0c140f 0%, #040604 80%); }
+
+/* --- Marco de la consola (envuelve cada pantalla) --- */
+.pantalla {
+  --tornillo: radial-gradient(circle, #5d7464 0 3px, #1a261e 3.5px 4.5px, transparent 5px);
+  margin: 6px auto; padding: 16px 14px 10px; min-height: calc(100vh - 12px); min-height: calc(100dvh - 12px);
+  background:
+    var(--tornillo) 3px 3px / 14px 14px no-repeat,
+    var(--tornillo) calc(100% - 3px) 3px / 14px 14px no-repeat,
+    var(--tornillo) 3px calc(100% - 3px) / 14px 14px no-repeat,
+    var(--tornillo) calc(100% - 3px) calc(100% - 3px) / 14px 14px no-repeat,
+    var(--consola);
+  border: 5px solid var(--marco); border-top-color: var(--marco-luz); border-radius: 16px;
+  box-shadow: inset 0 0 0 2px #070b08, 0 12px 40px rgba(0, 0, 0, .7);
+  grid-template-rows: auto;
+}
+@media (max-width: 600px) { .pantalla { margin: 3px; padding: 14px 10px 8px; min-height: calc(100dvh - 6px); } }
+
+/* --- Paneles biselados con tornillos chicos --- */
+.panel {
+  --t: radial-gradient(circle, #50665a 0 1.6px, transparent 2.4px);
+  background:
+    var(--t) 3px 3px / 8px 8px no-repeat, var(--t) calc(100% - 3px) 3px / 8px 8px no-repeat,
+    var(--t) 3px calc(100% - 3px) / 8px 8px no-repeat, var(--t) calc(100% - 3px) calc(100% - 3px) / 8px 8px no-repeat,
+    var(--chapa);
+  border: 3px solid var(--chapa-borde); border-top-color: var(--chapa-luz); border-bottom-color: var(--chapa-sombra);
+  border-radius: 5px; padding: 14px 12px 12px;
+}
+.panel::before, .panel::after { display: none; }
+.rotulo { margin: -14px 0 10px -12px; }
+
+/* --- Botones con volumen --- */
+.boton { border-radius: 4px; }
+.boton.principal { background: linear-gradient(#9cec6e, #6fca47); border-color: #a9f27d; box-shadow: 0 4px 0 #3f6b2a; }
+.boton-icono { border-radius: 4px; background: linear-gradient(#24342a, #17221b); border-color: #3e5446; box-shadow: 0 3px 0 #070b08; }
+.boton-icono.activo { background: linear-gradient(#9cec6e, #6fca47); border-color: #a9f27d; box-shadow: 0 3px 0 #3f6b2a; color: #0b120d; }
+
+/* --- Barra de estado de abajo --- */
+.pie-sistema {
+  display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap;
+  margin-top: 4px; padding: 6px 4px 0; border-top: 2px solid var(--marco);
+  color: var(--texto-tenue); font-size: 16px; letter-spacing: .5px;
+}
+.pie-firma { flex: 1; text-align: center; }
+.senal { color: var(--fosforo); letter-spacing: -1px; }
+
+/* =================== BATALLA =================== */
+.pantalla-batalla { gap: 10px; }
+.barra-sistema { display: flex; justify-content: space-between; align-items: center; color: var(--texto-tenue); letter-spacing: 2px; font-size: 18px; margin-top: -6px; }
+.barra-sistema .senal { color: #2d3d32; }
+.led { width: 10px; height: 10px; border-radius: 50%; background: var(--fosforo); box-shadow: 0 0 8px var(--fosforo); }
+.hud-batalla { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.visor { display: flex; align-items: center; padding: 8px 12px; background: var(--visor); border: 2px solid var(--chapa-borde); border-radius: 5px; box-shadow: inset 0 2px 6px #000; min-width: 0; }
+.titulo-batalla { font: 400 18px 'Pixelify Sans', sans-serif; margin: 0; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titulo-batalla .ico { color: var(--fosforo); }
+.reloj { font: 400 32px/1 'VT323', monospace; color: var(--fosforo); text-shadow: 0 0 8px rgba(143, 220, 90, .5); }
+.controles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 8px; background: var(--visor); border: 2px solid var(--chapa-borde); border-radius: 5px; }
+.boton-icono.control { width: 100%; height: 56px; font: 400 24px 'Pixelify Sans', sans-serif; }
+.boton-icono.control .ico { width: 28px; height: 28px; }
+
+.columnas-batalla { display: grid; gap: 10px; }
+.col-campo { display: grid; gap: 8px; align-content: start; }
+.plantel { list-style: none; margin: 0; padding: 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(82px, 1fr)); gap: 6px;
+  background: var(--visor); border: 2px solid var(--chapa-borde); border-radius: 5px; }
+.pl-tarjeta { display: flex; gap: 5px; align-items: center; padding: 4px; min-width: 0; background: #16221a; border: 2px solid var(--chapa-borde); border-radius: 4px; }
+.pl-tarjeta .barra { height: 6px; }
+.pl-datos { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.pl-nombre { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-tarjeta.caido { opacity: .55; filter: grayscale(1); }
+.pl-tarjeta.caido .pl-nombre { text-decoration: line-through; }
+.pl-tarjeta.quebrado { border-color: var(--ambar); }
+.retrato-plantel { width: 28px; height: 32px; border-width: 1px; }
+.campo-envoltura { display: grid; justify-content: center; padding: 4px; background: #070b08; border: 3px solid var(--chapa-borde); border-radius: 5px; }
+.taclog { display: grid; gap: 4px; padding: 8px 12px; background: var(--visor); border: 3px solid var(--chapa-borde); border-radius: 5px; box-shadow: inset 0 2px 8px #000; }
+.taclog-titulo { margin: 0; font: 400 20px 'VT323', monospace; color: var(--fosforo); display: flex; gap: 10px; align-items: center; }
+.taclog-titulo::after { content: ''; flex: 1; height: 8px; background: #1d2a21; border-radius: 2px; }
+.taclog .feed { max-height: 130px; padding: 0; background: none; border: 0; font-size: 21px; }
+.taclog .feed li { color: #7fbf5a; }
+.taclog .feed .bien { color: var(--fosforo); }
+.taclog .feed .mal { color: var(--alarma); }
+.taclog .feed .aviso { color: var(--ambar); }
+@media (min-width: 1000px) {
+  .columnas-batalla { grid-template-columns: 1fr 300px; align-items: start; }
+  .taclog .feed { max-height: 60vh; }
+}
+
+/* =================== HANGAR =================== */
+.carrusel { display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; gap: 4px; }
+.flecha { background: none; border: 0; box-shadow: none; color: var(--fosforo); width: 32px; }
+.flecha .ico { width: 28px; height: 28px; }
+.flecha-der .ico { transform: rotate(180deg); }
+.lista-pilotos { scroll-snap-type: x mandatory; padding: 4px 2px; }
+.tarjeta-piloto { scroll-snap-align: center; width: 104px; background: var(--navy); border: 3px solid #2e55c9; border-radius: 4px; }
+.tarjeta-piloto.activa { background: #13301a; border-color: var(--fosforo); box-shadow: 0 0 0 2px rgba(143, 220, 90, .2); }
+.tarjeta-piloto .retrato { border-color: #1b2f7a; }
+.pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pestana {
+  min-height: 52px; padding: 6px; cursor: pointer; border-radius: 5px;
+  font: 400 17px 'Pixelify Sans', sans-serif; text-transform: uppercase;
+  color: var(--texto-tenue); background: var(--visor); border: 3px solid var(--chapa-borde);
+}
+.pestana.activa { color: #0b120d; background: linear-gradient(#9cec6e, #6fca47); border-color: #a9f27d; box-shadow: 0 4px 0 #3f6b2a; }
+.pestana:focus-visible { outline: 2px solid var(--ambar); outline-offset: 2px; }
+@media (max-width: 899px) {
+  .ver-piloto .col-ordenes, .ver-ordenes .col-piloto { display: none; }
+}
+@media (min-width: 900px) { .pestanas { display: none; } }
+
+.stats { grid-template-columns: auto auto auto auto; column-gap: 12px; font-size: 20px; }
+.mecha-grande { width: 120px; height: 120px; }
+.fila-slot { grid-template-columns: 92px 1fr; padding: 5px 0; border-top: 0; }
+.slot-nombre { font: 400 15px 'Pixelify Sans', sans-serif; text-transform: uppercase; color: #9fc28a; }
+.selector {
+  position: relative; display: grid; gap: 1px; padding: 6px 34px 6px 10px; min-height: 52px; align-content: center;
+  background: var(--visor); border: 2px solid #3e5a46; border-radius: 5px; box-shadow: inset 0 0 0 1px #070b08;
+}
+.selector strong { font-size: 20px; font-weight: 400; color: var(--texto); }
+.selector small { font-size: 15px; color: var(--texto-tenue); }
+.selector.rareza-poco_comun strong { color: #7fb6ea; }
+.selector.rareza-raro strong { color: var(--ambar); }
+.selector-flecha { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--fosforo); font-size: 14px; }
+.selector select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; min-height: 0; }
+.selector:focus-within { outline: 2px solid var(--ambar); outline-offset: 2px; }
+.selector:hover { border-color: var(--fosforo-tenue); }
+
+/* =================== MAPA DEL SECTOR (vertical en el celular) =================== */
+@media (max-width: 640px) {
+  .mapa-envoltura { overflow: visible; }
+  .mapa-sector {
+    display: flex; flex-direction: column-reverse; gap: 16px; min-width: 0; padding: 14px 6px;
+    background: repeating-linear-gradient(0deg, transparent 0 63px, rgba(143, 220, 90, .06) 63px 64px), #0b0d09;
+  }
+  .columna-sector { flex-direction: row; justify-content: center; gap: 26px; }
+}
+
+/* =================== Ajustes generales para el celular =================== */
+@media (max-width: 600px) {
+  .titulo-pantalla { font-size: 26px; }
+  .hud { padding: 5px; }
+  .hud-datos .chip { font-size: 18px; padding: 2px 6px; }
+  .gambit { grid-template-columns: 22px 1fr; padding: 6px; }
+  .retrato-grande { width: 84px; height: 95px; }
+}
+
+/* Batalla en el celular: que entren mapa y TAC-LOG sin bajar */
+@media (max-width: 600px) {
+  .pantalla-batalla { gap: 7px; }
+  .barra-sistema { font-size: 15px; }
+  .visor { padding: 5px 10px; }
+  .reloj { font-size: 26px; }
+  .controles { gap: 6px; padding: 6px; }
+  .boton-icono.control { height: 46px; font-size: 20px; }
+  .plantel { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 4px; padding: 4px; }
+  .pl-tarjeta { padding: 3px; gap: 4px; }
+  .pl-nombre { font-size: 15px; }
+  .retrato-plantel { width: 22px; height: 25px; }
+  .taclog { padding: 6px 10px; }
+  .taclog .feed { max-height: 92px; font-size: 19px; }
+}
+@media (min-width: 601px) { .plantel { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }

@@ -2,6 +2,7 @@
 // (app, raiz, ...argumentos) y dibuja lo suyo adentro de raiz.
 
 import { guardar, cargar, borrar } from '../campana/guardado.js';
+import { h, VERSION } from './comun.js';
 import { portada } from './portada.js';
 import { sectores } from './sectores.js';
 import { hangar } from './hangar.js';
@@ -27,6 +28,13 @@ export function crearApp(datos, raiz) {
       window.scrollTo(0, 0);
       const r = PANTALLAS[nombre](app, raiz, ...args);
       if (typeof r === 'function') app.limpieza = r;
+      // barra de estado de la consola, abajo de todo (la batalla trae la suya)
+      if (nombre !== 'batalla') {
+        raiz.append(h('footer', { class: 'pie-sistema' },
+          h('span', {}, '[ SYSTEM v' + VERSION + ' ]'),
+          h('span', { class: 'pie-firma' }, 'Desarrollado por Juan M. Comparini'),
+          h('span', { class: 'senal' }, '▮▮▮▮▮▮')));
+      }
       const titulo = raiz.querySelector('h1, h2');
       if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
     },
