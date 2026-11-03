@@ -174,3 +174,16 @@ body { background: radial-gradient(ellipse at center, #0c140f 0%, #040604 80%); 
   .taclog .feed { max-height: 92px; font-size: 19px; }
 }
 @media (min-width: 601px) { .plantel { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+
+/* Camara: tarjetas que se tocan y boton sobre el mapa */
+.plantel li { display: contents; }
+button.pl-tarjeta { font: inherit; color: var(--texto); text-align: left; cursor: pointer; width: 100%; }
+button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offset: 2px; }
+.pl-tarjeta.siguiendo { border-color: var(--ambar); background: #2a2410; box-shadow: 0 0 0 2px rgba(242, 201, 76, .25); }
+.campo-envoltura { position: relative; overflow: hidden; }
+.boton-camara {
+  position: absolute; top: 8px; right: 8px; display: inline-flex; gap: 5px; align-items: center;
+  min-height: 34px; padding: 3px 9px; cursor: pointer; font: 17px 'VT323', monospace;
+  color: var(--fosforo); background: rgba(10, 18, 13, .82); border: 2px solid var(--chapa-borde); border-radius: 4px;
+}
+.boton-camara:focus-visible { outline: 2px solid var(--ambar); }

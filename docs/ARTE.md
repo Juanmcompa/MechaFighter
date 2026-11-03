@@ -11,7 +11,8 @@ de a poco.
 | `mecha-armado`, `mecha-partes-1`, `mecha-piernas`, `mecha-cabezas-mochilas`, `mecha-armas-1`, `mecha-armas-2` | ✓ en el juego |
 | `retratos-1` (6 pilotos) | ✓ en el juego |
 | `retratos-2` a `retratos-4`, `retratos-jefes` | falta |
-| Infantería, mutantes, vehículos, restos, efectos, terreno, íconos, medallas, marca | falta |
+| `terreno-texturas`, `terreno-coberturas`, `terreno-detalles` | falta (prompts listos en la sección 6) |
+| Infantería, mutantes, vehículos, restos, efectos, íconos, medallas, marca | falta |
 
 ## Cómo se procesa
 
@@ -208,15 +209,87 @@ Using the attached image as the style reference (same 8-bit pixel art, palette, 
 Background solid flat pure magenta (#FF00FF). No text, no numbers.
 ```
 
-## 6. Terreno — `terreno.png`
+## 6. Terreno (tileset de los mapas)
+
+Los mapas se arman con letras en `data/mapas/*.json` y cada letra es una casilla. Por eso el terreno va en **piezas
+cuadradas** y no como un fondo pintado: cualquier mapa nuevo que se escriba con letras queda vestido solo.
+
+Tres hojas, en este orden. La primera define el estilo del terreno; en las otras dos se adjunta esa primera.
+
+- **Colores apagados, verde grisáceo**, más oscuros que los mechas: el piso no compite con las unidades (azules y rojas).
+- **Sin sombras proyectadas**: las pone el juego, para que todas caigan para el mismo lado.
+- El juego dibuja el borde entre muro y piso; los muros solo necesitan su "techo".
+
+### 6A · Texturas que se repiten — `terreno-texturas.png` (define el estilo)
 
 ```
-Using the attached image as the style reference (same 8-bit pixel art, palette and outline), draw a sheet of SQUARE floor and obstacle tiles for a top-down industrial space outpost, strictly top-down view. Grid of 4 columns by 3 rows, every tile exactly square and the same size, separated by thick solid magenta (#FF00FF) gutters:
-Row 1: metal floor plate A; metal floor plate B with rivets; metal floor with yellow-black hazard stripes on one edge; concrete floor with cracks.
-Row 2: tall WALL block (top face visible, darker sides); stack of low WOODEN CRATES; group of 3 metal BARRELS; row of SANDBAGS.
-Row 3: big shipping CONTAINER section (tall); thick concrete PILLAR; glowing green ACID PUDDLE on floor; dark OIL STAIN on floor.
-Each floor tile must tile seamlessly with itself. Background between tiles solid flat pure magenta (#FF00FF). No text.
+8-bit pixel art TILESET for a retro top-down tactical game set in a derelict industrial space outpost. ORTHOGRAPHIC TOP-DOWN PLAN VIEW, camera directly above looking straight down, no perspective, no isometric angle, no visible walls sides.
+
+A sheet of 8 SQUARE tiles in a grid of 4 columns and 2 rows. Every tile is exactly the same size: 32x32 pixel art, scaled up 8x with hard square pixels (256x256 each). Tiles are separated by thick solid magenta (#FF00FF) gutters, with a magenta border around the whole sheet.
+
+Every tile must be SEAMLESS: its left edge continues into its right edge and its top edge into its bottom edge, so it can repeat in a grid with no visible seams. No object, crack or detail may touch or cross the tile edges except the continuous pattern itself.
+
+Row 1:
+1. METAL FLOOR: dark riveted steel plates, subtle panel seams, a little wear.
+2. METAL FLOOR VARIANT: same plates with a few scratches and one small bolt cluster, same colors.
+3. FLOOR GRATE: metal grating with dark gaps showing depth below.
+4. CONCRETE FLOOR: worn concrete with faint cracks and stains.
+Row 2:
+5. WALL TOP: the flat roof of a thick industrial wall seen from above, heavy riveted plating, slightly lighter than the floor.
+6. WALL TOP VARIANT: same wall roof with pipes and a small vent running across it.
+7. ACID POOL: glowing toxic green liquid with a few bubbles, darker green edges blending into the liquid (the whole tile is liquid).
+8. HAZARD FLOOR: steel floor with diagonal yellow and black hazard stripes, worn paint.
+
+STRICT LIMITED PALETTE, muted and desaturated so units stand out on top: dark greens and grey-greens #0E1712 #1A261E #2B3A30 #3F5245 #5E7564 #8A9E8C, rust #6B4A2F, worn yellow #C9A83C, black #070B08, toxic green #7FE05A only for the acid. 1-pixel dark outlines only where needed, no anti-aliasing, no gradients, no drop shadows, light from the top-left.
+
+No text, no numbers, no labels, no grid lines inside the tiles.
 ```
+
+### 6B · Coberturas — `terreno-coberturas.png` (adjuntando `terreno-texturas.png`)
+
+Cada objeto ocupa **una casilla** y se apoya sobre el piso. Los de media cobertura son bajos; los de cobertura total,
+altos y macizos.
+
+```
+Using the attached image as the exact style reference (same 8-bit pixel art, same pixel size, same muted grey-green palette, same top-down plan view seen from directly above), draw 8 separate OBJECTS for the same industrial outpost, in one row from left to right, with lots of empty magenta space between them so no object touches another.
+
+Each object fits inside one 32x32 pixel tile (scaled 8x) and is seen strictly from directly above: we see its TOP, not its sides.
+
+LOW COVER (soldiers crouch behind them):
+1. Stack of 2 wooden supply CRATES with metal corners.
+2. Group of 3 metal BARRELS, one with a hazard symbol on the lid.
+3. Curved row of SANDBAGS.
+4. Low concrete JERSEY BARRIER with yellow paint stripes.
+HIGH COVER (they block line of sight):
+5. Section of a big rusty SHIPPING CONTAINER roof with corrugated lines.
+6. Thick square concrete PILLAR top with exposed rebar.
+7. Industrial GENERATOR seen from above with cooling fans and cables.
+8. Tall stack of steel girders and pipes.
+
+No drop shadows, no ground under the objects. Background solid flat pure magenta (#FF00FF). No text, no labels, no grid.
+```
+
+### 6C · Detalles sueltos — `terreno-detalles.png` (adjuntando `terreno-texturas.png`)
+
+Manchas y marcas que el juego desparrama sobre el piso al azar, así dos mapas iguales no se ven iguales.
+
+```
+Using the attached image as the exact style reference (same 8-bit pixel art, same pixel size, same palette, top-down plan view), draw 10 small separate FLOOR DECALS that will be placed on top of floor tiles, in one row from left to right with lots of empty magenta space between them. Each one fits inside a 32x32 pixel tile and leaves transparent space around its shape:
+1. Dark OIL STAIN puddle.
+2. Black SCORCH MARK from an explosion.
+3. Spiderweb of CRACKS in the floor.
+4. Scattered BOLTS and small debris.
+5. Painted floor ARROW, worn white paint.
+6. Painted large number "07" stencil, worn yellow paint.
+7. Small square FLOOR VENT.
+8. Tire and TRACK MARKS crossing.
+9. Small cluster of BULLET CASINGS.
+10. Small puddle of green ACID.
+Background solid flat pure magenta (#FF00FF) everywhere around the shapes. No shadows, no labels.
+```
+
+Si en `terreno-texturas` alguna casilla no repite bien (se nota el corte), no hace falta regenerar todo: el script
+recorta el centro de cada casilla y empareja los bordes.
 
 ## 7. Íconos — `iconos-1.png` a `iconos-4.png`
 

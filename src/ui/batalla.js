@@ -16,7 +16,11 @@ export function batalla(app, raiz) {
   app.guardar();
 
   const lienzo = h('canvas', { class: 'campo', 'aria-label': 'Batalla' });
-  const envoltura = h('div', { class: 'campo-envoltura' }, lienzo);
+  const botonCamara = h('button', {
+    class: 'boton-camara', 'aria-label': 'Cambiar cámara',
+    onclick: () => { rep.alternarGeneral(); marcarCamara(); }
+  });
+  const envoltura = h('div', { class: 'campo-envoltura' }, lienzo, botonCamara);
   const feed = h('ol', { class: 'feed', 'aria-live': 'polite' });
   const plantel = h('ul', { class: 'plantel' });
   const reloj = h('span', { class: 'reloj' }, '00:00');
@@ -28,8 +32,12 @@ export function batalla(app, raiz) {
   const tarjetas = new Map();
   for (const { piloto } of escuadron) {
     const vida = barra(1, 1);
-    const li = h('li', { class: 'pl-tarjeta' }, retrato(datos, piloto, 'retrato-plantel'),
-      h('div', { class: 'pl-datos' }, h('span', { class: 'pl-nombre' }, piloto.apodo), vida));
+    // tocar la tarjeta: la camara sigue a ese piloto (tocar de nuevo: vuelve a la camara automatica)
+    const li = h('li', {}, h('button', {
+      class: 'pl-tarjeta', 'aria-pressed': 'false', 'aria-label': 'Seguir a ' + piloto.apodo,
+      onclick: () => { rep.alternarSeguir(piloto.id); marcarCamara(); }
+    }, retrato(datos, piloto, 'retrato-plantel'),
+    h('span', { class: 'pl-datos' }, h('span', { class: 'pl-nombre' }, piloto.apodo), vida)));
     tarjetas.set(piloto.id, { li, vida });
     plantel.append(li);
   }
@@ -60,11 +68,23 @@ export function batalla(app, raiz) {
     alTerminar: () => mostrarFinal()
   });
 
+  const marcarCamara = () => {
+    for (const [id, t] of tarjetas) {
+      const sigue = rep.seguir && rep.unidades.get(rep.seguir) && rep.unidades.get(rep.seguir).ficha.ref === id;
+      t.li.firstChild.classList.toggle('siguiendo', !!sigue);
+      t.li.firstChild.setAttribute('aria-pressed', sigue ? 'true' : 'false');
+    }
+    botonCamara.innerHTML = '';
+    botonCamara.append(ico(rep.seguir ? 'piloto' : rep.modoCamara === 'general' ? 'mapa' : 'mira'),
+      h('span', {}, rep.seguir ? 'Siguiendo' : rep.modoCamara === 'general' ? 'Todo el mapa' : 'Acción'));
+  };
+
   const marcar = () => {
     botones.pausa.classList.toggle('activo', rep.pausado);
     for (const v of velocidades) botones[v].classList.toggle('activo', !rep.pausado && rep.velocidad === v);
   };
   marcar();
+  marcarCamara();
 
   const pintarPlantel = () => {
     for (const u of rep.pilotos()) {
@@ -73,9 +93,11 @@ export function batalla(app, raiz) {
       const pct = Math.max(0, Math.round((u.vida * 100) / u.ficha.vidaMax));
       t.vida.firstChild.style.width = pct + '%';
       t.vida.classList.toggle('critica', pct < 30);
-      t.li.classList.toggle('caido', !u.viva);
-      t.li.classList.toggle('quebrado', u.viva && u.moral === 'moral_quebrada');
-      t.li.title = u.ficha.nombre + (u.viva ? ' · ' + pct + '%' : ' · caído');
+      const b = t.li.firstChild;
+      b.classList.toggle('caido', !u.viva);
+      b.classList.toggle('quebrado', u.viva && u.moral === 'moral_quebrada');
+      if (!u.viva && b.classList.contains('siguiendo')) marcarCamara();
+      b.title = u.ficha.nombre + (u.viva ? ' · ' + pct + '%' : ' · caído');
     }
   };
 

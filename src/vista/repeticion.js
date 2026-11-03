@@ -27,6 +27,12 @@ export class Repeticion {
     this.efectos = [];
     this.flotantes = [];
     this.ultimoTick = registro.length ? registro[registro.length - 1].t : 0;
+    // Camara (en pixeles del mapa): centro y zoom. modo 'auto' se acerca a donde estan peleando;
+    // 'general' muestra todo; seguir = id de una unidad (se toca su retrato).
+    this.cam = null;
+    this.modoCamara = 'auto';
+    this.seguir = null;
+    this.accion = new Map(); // id de unidad -> ultimo tick en que disparo, recibio o reparo
     this.medir();
   }
 
@@ -52,6 +58,60 @@ export class Repeticion {
     const fc = this.fondo.getContext('2d');
     fc.setTransform(dpr, 0, 0, dpr, 0, 0);
     dibujarMapa(fc, this.mapa, this.L);
+    this.cam = { x: (ancho * this.L) / 2, y: (alto * this.L) / 2, z: 1 };
+  }
+
+  // ---------- Camara ----------
+
+  // Lo que la camara quiere mostrar ahora: { x, y, z } en pixeles del mapa.
+  objetivoCamara() {
+    const [ancho, alto] = this.mapa.tamano;
+    const L = this.L, Wm = ancho * L, Hm = alto * L;
+    const general = { x: Wm / 2, y: Hm / 2, z: 1 };
+    const ZOOM_MAX = 2.4;
+    if (this.seguir) {
+      const u = this.unidades.get(this.seguir);
+      if (u && u.viva) return { x: (u.x + 0.5) * L, y: (u.y + 0.5) * L, z: 2.1 };
+      this.seguir = null;
+    }
+    if (this.modoCamara === 'general') return general;
+    // la accion: quienes dispararon o recibieron en los ultimos ticks; si no hay, el escuadron
+    let lista = [...this.unidades.values()].filter((u) => u.viva && this.T - (this.accion.get(u.id) ?? -999) < 25);
+    if (!lista.length) lista = [...this.unidades.values()].filter((u) => u.viva && u.ficha.bando === 0);
+    if (!lista.length) return general;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const u of lista) { x0 = Math.min(x0, u.x); x1 = Math.max(x1, u.x); y0 = Math.min(y0, u.y); y1 = Math.max(y1, u.y); }
+    const margen = 3; // casillas alrededor
+    const z = Math.max(1, Math.min(ZOOM_MAX, Math.min(ancho / (x1 - x0 + 1 + margen * 2), alto / (y1 - y0 + 1 + margen * 2))));
+    return { x: ((x0 + x1) / 2 + 0.5) * L, y: ((y0 + y1) / 2 + 0.5) * L, z };
+  }
+
+  moverCamara(ms) {
+    const obj = this.objetivoCamara();
+    const k = 1 - Math.pow(this.seguir ? 0.88 : 0.95, ms / 16);
+    const c = this.cam;
+    c.z += (obj.z - c.z) * k;
+    c.x += (obj.x - c.x) * k;
+    c.y += (obj.y - c.y) * k;
+    // que la vista no se salga del mapa
+    const [ancho, alto] = this.mapa.tamano;
+    const Wm = ancho * this.L, Hm = alto * this.L;
+    const mx = Wm / (2 * c.z), my = Hm / (2 * c.z);
+    c.x = Math.max(mx, Math.min(Wm - mx, c.x));
+    c.y = Math.max(my, Math.min(Hm - my, c.y));
+  }
+
+  // Tocar un retrato: seguir a ese piloto; tocarlo de nuevo, volver a la camara automatica.
+  alternarSeguir(ref) {
+    const u = [...this.unidades.values()].find((x) => x.ficha.ref === ref && x.ficha.bando === 0);
+    this.seguir = u && u.viva && this.seguir !== u.id ? u.id : null;
+    return this.seguir;
+  }
+
+  alternarGeneral() {
+    this.seguir = null;
+    this.modoCamara = this.modoCamara === 'general' ? 'auto' : 'general';
+    return this.modoCamara;
   }
 
   // Avanza el reloj (ms reales) y aplica los eventos que van tocando.
@@ -59,6 +119,7 @@ export class Repeticion {
     if (!this.pausado && !this.terminado) this.T += (ms / this.msPorTick) * this.velocidad;
     while (this.i < this.registro.length && this.registro[this.i].t <= this.T) this.aplicar(this.registro[this.i++]);
     this.actualizarUnidades(ms);
+    this.moverCamara(ms);
     if (this.i >= this.registro.length && !this.terminado) { this.terminado = true; this.alTerminar(); }
   }
 
@@ -95,6 +156,7 @@ export class Repeticion {
         const o = U.get(e.o);
         if (!u || !o) break;
         this.efectos.push({ tipo: 'fijado', id: o.id, t0: this.T, dur: 5, propio: o.ficha.bando === 0 });
+        this.accion.set(u.id, e.t); this.accion.set(o.id, e.t);
         u.ang = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
         const desvio = e.acierta ? 0 : 0.6;
         this.efectos.push({ tipo: e.arma, de: [u.x, u.y], a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
@@ -187,7 +249,10 @@ export class Repeticion {
 
   // De coordenadas del mapa (en pixeles) a la pantalla, teniendo en cuenta si esta girado.
   aPantalla(px, py) {
-    return this.girado ? [py, this.mapa.tamano[0] * this.L - px] : [px, py];
+    const [ancho, alto] = this.mapa.tamano;
+    const c = this.cam;
+    const x = (px - c.x) * c.z + (ancho * this.L) / 2, y = (py - c.y) * c.z + (alto * this.L) / 2;
+    return this.girado ? [y, ancho * this.L - x] : [x, y];
   }
 
   dibujar() {
@@ -197,6 +262,12 @@ export class Repeticion {
     ctx.clearRect(0, 0, this.W, this.H);
     // todo lo del mapa se dibuja en coordenadas del mapa; el giro lo hace la transformacion
     if (this.girado) { ctx.translate(0, ancho * L); ctx.rotate(-Math.PI / 2); }
+    // camara: acercar y centrar
+    const c = this.cam;
+    ctx.translate((ancho * L) / 2, (alto * L) / 2);
+    ctx.scale(c.z, c.z);
+    ctx.translate(-c.x, -c.y);
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(this.fondo, 0, 0, ancho * L, alto * L);
     const vistas = this.visibles();
     const seVe = (u) => !vistas || u.ficha.bando === 0 || vistas.has(Math.round(u.y) * ancho + Math.round(u.x));
@@ -247,6 +318,7 @@ export class Repeticion {
     // Desde aca, todo en coordenadas de pantalla (los textos nunca se giran)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const centro = (u) => this.aPantalla((u.x + 0.5) * L, (u.y + 0.5) * L);
+    const Lz = L * c.z; // una casilla, ya con el zoom
 
     // miras amarillas sobre quien esta siendo apuntado
     for (const f of this.efectos) {
@@ -254,7 +326,7 @@ export class Repeticion {
       const u = this.unidades.get(f.id);
       if (!u || !u.viva || !seVe(u)) continue;
       const [cx, cy] = centro(u);
-      const r = L * 0.62, c = L * 0.22;
+      const r = Lz * 0.62, c = Lz * 0.22;
       ctx.strokeStyle = f.propio ? '#d9553f' : '#f2c94c';
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -265,24 +337,24 @@ export class Repeticion {
       ctx.lineWidth = 1;
     }
 
-    ctx.font = `${Math.max(12, L * 0.5)}px VT323, monospace`;
+    ctx.font = `${Math.max(12, Lz * 0.5)}px VT323, monospace`;
     ctx.textAlign = 'center';
     for (const u of lista) {
       if (!u.viva || !seVe(u)) continue;
       const [cx, cy] = centro(u);
-      const top = cy - L * 0.5 - 2;
+      const top = cy - Lz * 0.5 - 2;
       const pct = Math.max(0, u.vida / u.ficha.vidaMax);
       if (pct < 1 || u.ficha.bando === 0) {
-        ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(cx - L * 0.4, top - 4, L * 0.8, 4);
+        ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(cx - Lz * 0.4, top - 4, Lz * 0.8, 4);
         ctx.fillStyle = pct > 0.5 ? '#8fdc5a' : pct > 0.25 ? '#e0a43a' : '#d9553f';
-        ctx.fillRect(cx - L * 0.4 + 1, top - 3, (L * 0.8 - 2) * pct, 2);
+        ctx.fillRect(cx - Lz * 0.4 + 1, top - 3, (Lz * 0.8 - 2) * pct, 2);
       }
-      if (u.estados.has('en_llamas')) { ctx.fillStyle = '#ff8a2a'; ctx.fillRect(cx + L * 0.42, top - 4, 3, 3); }
-      if (u.estados.has('suprimido')) { ctx.fillStyle = '#b8b8b8'; ctx.fillRect(cx + L * 0.42, top, 3, 3); }
-      if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - L * 0.5, top + 4); }
+      if (u.estados.has('en_llamas')) { ctx.fillStyle = '#ff8a2a'; ctx.fillRect(cx + Lz * 0.42, top - 4, 3, 3); }
+      if (u.estados.has('suprimido')) { ctx.fillStyle = '#b8b8b8'; ctx.fillRect(cx + Lz * 0.42, top, 3, 3); }
+      if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - Lz * 0.5, top + 4); }
       if (u.grito) {
         const w = ctx.measureText(u.grito.texto).width + 10;
-        const hb = Math.max(14, L * 0.62);
+        const hb = Math.max(14, Lz * 0.62);
         const bx = Math.min(Math.max(cx, w / 2 + 2), this.W - w / 2 - 2), by = Math.max(hb, top - 4);
         ctx.fillStyle = '#e8edd8'; ctx.fillRect(bx - w / 2, by - hb + 2, w, hb);
         ctx.fillStyle = '#121510'; ctx.fillText(u.grito.texto, bx, by - 2);
@@ -291,9 +363,9 @@ export class Repeticion {
     for (const f of this.flotantes) {
       const k = (this.T - f.t0) / f.dur;
       const [fx, fy] = this.aPantalla((f.x + 0.5) * L, (f.y + 0.5) * L);
-      const y = fy - L * 0.5 - k * L * 0.8;
+      const y = fy - Lz * 0.5 - k * Lz * 0.8;
       ctx.globalAlpha = 1 - k;
-      ctx.font = `${Math.max(11, L * (f.chico ? 0.42 : 0.55))}px VT323, monospace`;
+      ctx.font = `${Math.max(11, Lz * (f.chico ? 0.42 : 0.55))}px VT323, monospace`;
       ctx.fillStyle = '#000'; ctx.fillText(f.texto, fx + 1, y + 1);
       ctx.fillStyle = f.color; ctx.fillText(f.texto, fx, y);
       ctx.globalAlpha = 1;
