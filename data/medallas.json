@@ -1,0 +1,7 @@
+{
+  "_ayuda": "Se ganan en el informe. 'requisito' se mira contra lo que paso en la mision (sale del registro del combate).",
+  "corazon_de_acero": { "nombre": "Corazon de acero", "icono": "medalla", "requisito": { "sobrevivio_con_vida_pct_menor": 10 }, "mods": { "moral": 10 } },
+  "ojo_de_halcon":    { "nombre": "Ojo de halcon",    "icono": "medalla", "requisito": { "bajas_en_mision": 4 },             "mods": { "punteria": 3 } },
+  "angel_guardian":   { "nombre": "Angel guardian",   "icono": "medalla", "requisito": { "reparado_total": 150 },            "mods": { "moral": 5 } },
+  "veterano":         { "nombre": "Veterano",         "icono": "medalla", "requisito": { "misiones_sobrevividas": 10 },      "mods": { "moral": 15 } }
+}

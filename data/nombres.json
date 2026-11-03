@@ -1,0 +1,6 @@
+{
+  "_ayuda": "Para inventar reclutas. El apodo se arma con cualquiera de la lista.",
+  "nombres": ["Ana", "Bruno", "Carla", "Dario", "Eva", "Facundo", "Gala", "Hugo", "Ines", "Joaquin", "Kira", "Lautaro", "Mora", "Nahuel", "Olga", "Pilar", "Quique", "Rocio", "Santi", "Tamara", "Ulises", "Vera", "Walter", "Yanina", "Zoe"],
+  "apellidos": ["Acosta", "Benitez", "Castro", "Diaz", "Ferreyra", "Gomez", "Herrera", "Ibarra", "Juarez", "Ledesma", "Molina", "Nunez", "Ortiz", "Paz", "Quiroga", "Rios", "Sosa", "Torres", "Vega", "Zarate"],
+  "apodos": ["Chispa", "Tuerca", "Lobo", "Pibe", "Faro", "Remache", "Ceniza", "Cuervo", "Bala", "Mate", "Brasa", "Niebla", "Yunque", "Grillo", "Trueno"]
+}

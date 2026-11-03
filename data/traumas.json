@@ -1,0 +1,24 @@
+{
+  "_ayuda": "Heridas de la cabeza. Mismo formato de ganchos que las personalidades. 'cura' dice como se va.",
+  "neurosis_de_combate": {
+    "nombre": "Neurosis de combate", "icono": "explosion",
+    "origen": { "evento": "explosion_cerca", "chance": 20 },
+    "ganchos": [{ "tipo": "moral", "evento": "explosion_cerca", "delta": -20 }],
+    "cura": { "tipo": "misiones_de_descanso", "cantidad": 3 }
+  },
+  "culpa_del_superviviente": {
+    "nombre": "Culpa del superviviente", "icono": "lapida",
+    "origen": { "evento": "vinculo_muerto", "chance": 60 },
+    "ganchos": [
+      { "tipo": "anular", "prioridad": 70, "cuando": { "dato": "aliado_mas_herido.vida_pct", "op": "<", "valor": 20 },
+        "hacer": { "accion": "seguir", "objetivo": "aliado_mas_herido" }, "registro": "no_otra_vez" }
+    ],
+    "cura": { "tipo": "nuevo_vinculo" }
+  },
+  "miedo_a_quedar_solo": {
+    "nombre": "Miedo a quedar solo", "icono": "solo",
+    "origen": { "evento": "quedo_solo", "chance": 30 },
+    "ganchos": [{ "tipo": "correa", "ancla": "aliado_cercano", "distancia_maxima": 3 }],
+    "cura": { "tipo": "misiones_de_descanso", "cantidad": 2 }
+  }
+}

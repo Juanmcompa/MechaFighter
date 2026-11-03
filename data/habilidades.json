@@ -1,0 +1,27 @@
+{
+  "_ayuda": "Habilidades activas. 'enfriamiento' y 'demora' en ticks. Si 'consume_mochila' es true, gasta un uso de la mochila (y sin usos no se puede).",
+  "muro_de_escudos": {
+    "nombre": "Muro de escudos", "icono": "escudo", "enfriamiento": 40, "demora": 2, "alcance": 0,
+    "efecto": { "estado_propio": "atrincherado" }, "requiere_parte": "escudo"
+  },
+  "disparo_apuntado": {
+    "nombre": "Disparo apuntado", "icono": "mira", "enfriamiento": 30, "demora": 6, "alcance": 0,
+    "efecto": { "multiplica_danio_pct": 200, "punteria": 25 }, "requiere_parte": "arma"
+  },
+  "fuego_de_supresion": {
+    "nombre": "Fuego de supresion", "icono": "rafaga", "enfriamiento": 20, "demora": 1, "alcance": 0,
+    "efecto": { "estado": "suprimido", "chance": 70, "area": 1 }, "requiere_parte": "supresion"
+  },
+  "reparacion_de_campo": {
+    "nombre": "Reparacion de campo", "icono": "llave", "enfriamiento": 15, "demora": 3, "alcance": 1,
+    "efecto": { "repara": 40, "quita_estados": ["fuga_hidraulica", "en_llamas"] }, "consume_mochila": true
+  },
+  "propulsion": {
+    "nombre": "Propulsion", "icono": "cohete", "enfriamiento": 25, "demora": 1, "alcance": 4,
+    "efecto": { "salto": 4 }, "consume_mochila": true
+  },
+  "desplegar_torreta": {
+    "nombre": "Desplegar torreta", "icono": "torreta", "enfriamiento": 0, "demora": 5, "alcance": 1,
+    "efecto": { "invoca": "torreta_ligera" }, "consume_mochila": true
+  }
+}

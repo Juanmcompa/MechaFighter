@@ -1,0 +1,15 @@
+{
+  "_ayuda": "Heridas permanentes del PILOTO. Salen en el informe despues de la mision segun 'origen'. Pueden tener mods (numeros) y ganchos (comportamiento).",
+  "mano_temblorosa": {
+    "nombre": "Mano temblorosa", "icono": "mano", "origen": { "evento": "quedo_bajo_pct", "valor": 15, "chance": 25 },
+    "mods": { "punteria": -8 }
+  },
+  "ojo_bionico": {
+    "nombre": "Ojo bionico", "icono": "ojo", "origen": { "evento": "herida_grave", "chance": 15 },
+    "mods": { "punteria": 5, "vision": 1 }, "texto": "Perdio un ojo. El reemplazo ve mejor."
+  },
+  "pierna_rota": {
+    "nombre": "Pierna mal soldada", "icono": "hueso", "origen": { "evento": "herida_grave", "chance": 20 },
+    "mods": { "iniciativa": -2 }
+  }
+}

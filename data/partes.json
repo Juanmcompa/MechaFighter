@@ -1,0 +1,90 @@
+{
+  "_ayuda": "Cada mecha se arma con una parte por encaje: cabeza, torso, piernas, mochila y dos brazos (izquierdo y derecho usan las mismas partes de tipo 'brazo'). El peso total no puede pasar la capacidad del torso. velocidad = ticks que tarda en avanzar una casilla (menos es mas rapido). Un brazo con 'arma' dispara; con 'escudo' bloquea. 'recuperable' dice si se puede rescatar del mecha de un piloto muerto.",
+  "torso_ligero": {
+    "nombre": "Torso Gacela", "encaje": "torso", "rareza": "comun", "etiquetas": ["ligero"],
+    "estructura": 90, "blindaje": 2, "capacidad": 30, "peso": 8, "costo": 40, "recuperable": true, "sprite": "torso_ligero"
+  },
+  "torso_medio": {
+    "nombre": "Torso Mula", "encaje": "torso", "rareza": "comun", "etiquetas": ["medio"],
+    "estructura": 130, "blindaje": 4, "capacidad": 40, "peso": 12, "costo": 60, "recuperable": true, "sprite": "torso_medio"
+  },
+  "torso_pesado": {
+    "nombre": "Torso Bunker", "encaje": "torso", "rareza": "comun", "etiquetas": ["pesado"],
+    "estructura": 180, "blindaje": 7, "capacidad": 55, "peso": 18, "costo": 90, "recuperable": true, "sprite": "torso_pesado"
+  },
+  "piernas_bipode": {
+    "nombre": "Bipode estandar", "encaje": "piernas", "rareza": "comun", "etiquetas": ["piernas"],
+    "velocidad": 4, "evasion": 5, "peso": 6, "costo": 30, "recuperable": true, "sprite": "piernas_bipode"
+  },
+  "piernas_orugas": {
+    "nombre": "Orugas", "encaje": "piernas", "rareza": "comun", "etiquetas": ["orugas", "estable"],
+    "velocidad": 6, "evasion": 0, "blindaje": 2, "peso": 10, "costo": 45, "recuperable": true, "sprite": "piernas_orugas"
+  },
+  "piernas_saltarinas": {
+    "nombre": "Patas de salto", "encaje": "piernas", "rareza": "poco_comun", "etiquetas": ["salto"],
+    "velocidad": 3, "evasion": 12, "peso": 5, "costo": 60, "recuperable": true, "sprite": "piernas_saltarinas"
+  },
+  "cabeza_sensor": {
+    "nombre": "Sensor basico", "encaje": "cabeza", "rareza": "comun", "etiquetas": ["sensor"],
+    "vision": 7, "punteria": 0, "peso": 2, "costo": 15, "recuperable": true, "sprite": "cabeza_sensor"
+  },
+  "cabeza_optica": {
+    "nombre": "Optica de precision", "encaje": "cabeza", "rareza": "poco_comun", "etiquetas": ["sensor", "precision"],
+    "vision": 9, "punteria": 10, "peso": 3, "costo": 50, "recuperable": true, "sprite": "cabeza_optica"
+  },
+  "brazo_rifle": {
+    "nombre": "Rifle M7", "encaje": "brazo", "rareza": "comun", "etiquetas": ["arma", "balistico", "rifle"],
+    "arma": { "danio": 14, "alcance": 6, "cadencia": 4, "municion": 12, "recarga": 8, "punteria": 5 },
+    "ranuras_afijo": 1, "peso": 5, "costo": 35, "recuperable": true, "sprite": "brazo_rifle"
+  },
+  "brazo_rotativa": {
+    "nombre": "Ametralladora rotativa", "encaje": "brazo", "rareza": "comun", "etiquetas": ["arma", "balistico", "supresion"],
+    "arma": { "danio": 6, "alcance": 5, "cadencia": 1, "municion": 40, "recarga": 14, "punteria": -10, "suprime": 15 },
+    "ranuras_afijo": 1, "peso": 9, "costo": 55, "recuperable": true, "sprite": "brazo_rotativa"
+  },
+  "brazo_canon_riel": {
+    "nombre": "Canon de riel", "encaje": "brazo", "rareza": "poco_comun", "etiquetas": ["arma", "energia", "precision"],
+    "arma": { "danio": 40, "alcance": 10, "cadencia": 12, "municion": 4, "recarga": 16, "punteria": 15, "perfora": 4 },
+    "ranuras_afijo": 2, "peso": 12, "costo": 90, "recuperable": true, "sprite": "brazo_canon_riel"
+  },
+  "brazo_lanzallamas": {
+    "nombre": "Lanzallamas", "encaje": "brazo", "rareza": "poco_comun", "etiquetas": ["arma", "fuego", "area"],
+    "arma": { "danio": 8, "alcance": 3, "cadencia": 2, "municion": 20, "recarga": 12, "punteria": 20, "estado": "en_llamas", "chance_estado": 40, "ignora_cobertura": true },
+    "ranuras_afijo": 1, "peso": 8, "costo": 60, "recuperable": true, "sprite": "brazo_lanzallamas"
+  },
+  "brazo_hoja": {
+    "nombre": "Hoja vibratoria", "encaje": "brazo", "rareza": "comun", "etiquetas": ["arma", "cuerpo_a_cuerpo"],
+    "arma": { "danio": 22, "alcance": 1, "cadencia": 3, "municion": 0, "recarga": 0, "punteria": 15 },
+    "ranuras_afijo": 1, "peso": 4, "costo": 40, "recuperable": true, "sprite": "brazo_hoja"
+  },
+  "brazo_lanzamisiles": {
+    "nombre": "Lanzamisiles", "encaje": "brazo", "rareza": "raro", "etiquetas": ["arma", "explosivo", "area"],
+    "arma": { "danio": 30, "alcance": 8, "cadencia": 10, "municion": 6, "recarga": 20, "punteria": 0, "radio": 1 },
+    "ranuras_afijo": 2, "peso": 11, "costo": 110, "recuperable": true, "sprite": "brazo_lanzamisiles"
+  },
+  "brazo_escudo": {
+    "nombre": "Escudo de placas", "encaje": "brazo", "rareza": "comun", "etiquetas": ["escudo", "defensivo"],
+    "escudo": { "bloqueo": 30, "blindaje": 3 },
+    "peso": 7, "costo": 35, "recuperable": true, "sprite": "brazo_escudo"
+  },
+  "mochila_vacia": {
+    "nombre": "Sin mochila", "encaje": "mochila", "rareza": "comun", "etiquetas": [],
+    "peso": 0, "costo": 0, "recuperable": false, "sprite": null
+  },
+  "mochila_reparacion": {
+    "nombre": "Kit de reparacion", "encaje": "mochila", "rareza": "comun", "etiquetas": ["reparacion", "consumible"],
+    "usos": 3, "habilidad": "reparacion_de_campo", "peso": 4, "costo": 40, "recuperable": true, "sprite": "mochila_reparacion"
+  },
+  "mochila_propulsor": {
+    "nombre": "Propulsor", "encaje": "mochila", "rareza": "poco_comun", "etiquetas": ["movilidad"],
+    "usos": 2, "habilidad": "propulsion", "peso": 5, "costo": 55, "recuperable": true, "sprite": "mochila_propulsor"
+  },
+  "mochila_municion": {
+    "nombre": "Cargador extra", "encaje": "mochila", "rareza": "comun", "etiquetas": ["municion"],
+    "municion_pct": 50, "peso": 4, "costo": 25, "recuperable": true, "sprite": "mochila_municion"
+  },
+  "mochila_torreta": {
+    "nombre": "Torreta plegable", "encaje": "mochila", "rareza": "poco_comun", "etiquetas": ["torreta", "consumible"],
+    "usos": 1, "habilidad": "desplegar_torreta", "peso": 8, "costo": 70, "recuperable": true, "sprite": "mochila_torreta"
+  }
+}

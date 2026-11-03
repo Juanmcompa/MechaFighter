@@ -1,0 +1,33 @@
+{
+  "_ayuda": "Cada letra de 'filas' es una casilla. Ver 'leyenda'. Las coordenadas son [columna, fila] desde arriba a la izquierda, empezando en 0. Las zonas son rectangulos [[col1, fila1], [col2, fila2]].",
+  "nombre": "Puesto avanzado 01",
+  "tamano": [24, 16],
+  "ambiente": "industrial",
+  "leyenda": { ".": "piso", "#": "muro", "h": "media_cobertura", "H": "cobertura_total", "~": "peligro" },
+  "filas": [
+    "########################",
+    "#......................#",
+    "#..h......##......H....#",
+    "#..h......##......H....#",
+    "#.....HH........h......#",
+    "#......................#",
+    "#...........~~.........#",
+    "#..h....HHHH~~HH....h..#",
+    "#..h....H......H....h..#",
+    "#.......H......H.......#",
+    "#.....h..........h.....#",
+    "#......................#",
+    "#..H......##......h....#",
+    "#..H......##......h....#",
+    "#......................#",
+    "########################"
+  ],
+  "aparicion": {
+    "jugador": [[2, 5], [2, 6], [2, 9], [2, 10], [4, 7], [4, 8]],
+    "enemigo": [[21, 5], [21, 6], [21, 9], [21, 10], [19, 7], [19, 8]]
+  },
+  "zonas": {
+    "nucleo": [[9, 8], [14, 9]],
+    "extraccion": [[21, 1], [22, 2]]
+  }
+}

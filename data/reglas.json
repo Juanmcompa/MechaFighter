@@ -1,0 +1,56 @@
+{
+  "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
+  "version_datos": 1,
+  "version_motor": 1,
+  "ms_por_tick_en_repeticion": 100,
+  "ticks_maximos": 3000,
+  "escuadra_maxima": 6,
+  "reclutas_iniciales": 4,
+  "moral": {
+    "base": 70,
+    "maxima": 100,
+    "umbral_tembloroso": 40,
+    "umbral_quebrado": 15
+  },
+  "cobertura": {
+    "media": 25,
+    "total": 50
+  },
+  "danio_minimo": 1,
+  "punteria_minima": 5,
+  "punteria_maxima": 95,
+  "xp_por_nivel": [
+    0,
+    100,
+    250,
+    450,
+    700,
+    1000
+  ],
+  "xp": {
+    "por_baja": 25,
+    "por_mision": 40,
+    "por_curar": 10,
+    "por_sobrevivir_herido": 15
+  },
+  "permadeath": {
+    "chance_recuperar_partes": 50,
+    "chance_herida_en_vez_de_muerte": 30
+  },
+  "recursos_iniciales": {
+    "creditos": 300,
+    "chatarra": 20
+  },
+  "eventos": [
+    "aliado_muerto",
+    "vinculo_muerto",
+    "vinculo_herido",
+    "baja_propia",
+    "baja_aliada",
+    "explosion_cerca",
+    "recibio_impacto",
+    "quedo_solo",
+    "vip_herido",
+    "oleada_nueva"
+  ]
+}

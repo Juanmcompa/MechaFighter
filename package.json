@@ -1,0 +1,11 @@
+{
+  "name": "mechafighter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Auto-battler tactico de mechas con progresion roguelite (HTML/JS, sin dependencias).",
+  "scripts": {
+    "test": "node tools/validar-datos.mjs && node tests/core.test.mjs",
+    "datos": "node tools/validar-datos.mjs"
+  }
+}

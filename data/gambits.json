@@ -1,0 +1,82 @@
+{
+  "_ayuda": "Catalogo de lo que el jugador combina en el editor: SI condicion -> ACCION sobre OBJETIVO. Las condiciones son arboles: todos / alguno / no / dato / existe / fn. 'param' toma el valor que eligio el jugador. Las 'fn' son funciones del motor (src/motor/decision/funciones.js): una nueva necesita codigo y prueba.",
+  "condiciones": {
+    "siempre": { "texto": "Siempre", "icono": "infinito", "expr": true },
+    "enemigo_a_rango": {
+      "texto": "Enemigo a tiro", "icono": "mira",
+      "expr": { "existe": "enemigo", "donde": { "fn": "a_tiro" } }
+    },
+    "enemigo_cerca": {
+      "texto": "Enemigo a {casillas} casillas o menos", "icono": "alerta",
+      "parametros": { "casillas": { "tipo": "entero", "min": 1, "max": 8, "defecto": 2 } },
+      "expr": { "existe": "enemigo", "donde": { "dato": "distancia", "op": "<=", "param": "casillas" } }
+    },
+    "enemigo_aislado": {
+      "texto": "Enemigo sin aliados cerca", "icono": "solo",
+      "expr": { "existe": "enemigo", "donde": { "fn": "aislado" } }
+    },
+    "aliado_vida_bajo": {
+      "texto": "Aliado con vida < {valor}%", "icono": "cruz",
+      "parametros": { "valor": { "tipo": "entero", "min": 10, "max": 90, "defecto": 30 } },
+      "expr": { "existe": "aliado", "donde": { "dato": "vida_pct", "op": "<", "param": "valor" } }
+    },
+    "yo_vida_bajo": {
+      "texto": "Mi vida < {valor}%", "icono": "corazon",
+      "parametros": { "valor": { "tipo": "entero", "min": 10, "max": 90, "defecto": 30 } },
+      "expr": { "dato": "yo.vida_pct", "op": "<", "param": "valor" }
+    },
+    "sin_municion": {
+      "texto": "Sin municion", "icono": "cargador",
+      "expr": { "dato": "yo.municion", "op": "==", "valor": 0 }
+    },
+    "en_cobertura": {
+      "texto": "Estoy a cubierto", "icono": "muro",
+      "expr": { "fn": "en_cobertura" }
+    },
+    "flanqueado": {
+      "texto": "Me flanquean", "icono": "flecha_lateral",
+      "expr": { "fn": "flanqueado" }
+    },
+    "moral_baja": {
+      "texto": "Moral < {valor}", "icono": "craneo",
+      "parametros": { "valor": { "tipo": "entero", "min": 10, "max": 90, "defecto": 40 } },
+      "expr": { "dato": "yo.moral", "op": "<", "param": "valor" }
+    },
+    "vip_en_peligro": {
+      "texto": "El VIP esta en peligro", "icono": "estrella",
+      "expr": { "todos": [ { "fn": "hay_vip" }, { "dato": "vip.vida_pct", "op": "<", "valor": 50 } ] }
+    }
+  },
+  "acciones": {
+    "disparar":              { "texto": "Disparar", "icono": "bala", "etiquetas": ["ataque"], "requiere": ["arma_a_distancia"] },
+    "atacar_cuerpo_a_cuerpo":{ "texto": "Cuerpo a cuerpo", "icono": "daga", "etiquetas": ["ataque", "avance"], "requiere": ["arma_cuerpo_a_cuerpo"] },
+    "suprimir":              { "texto": "Fuego de supresion", "icono": "rafaga", "etiquetas": ["ataque", "control"], "habilidad": "fuego_de_supresion" },
+    "disparo_apuntado":      { "texto": "Disparo apuntado", "icono": "mira", "etiquetas": ["ataque"], "habilidad": "disparo_apuntado" },
+    "avanzar":               { "texto": "Avanzar", "icono": "flecha", "etiquetas": ["avance", "movimiento"] },
+    "flanquear":             { "texto": "Flanquear", "icono": "flecha_lateral", "etiquetas": ["avance", "movimiento"] },
+    "seguir":                { "texto": "Seguir", "icono": "pasos", "etiquetas": ["movimiento"] },
+    "replegarse":            { "texto": "Replegarse", "icono": "huida", "etiquetas": ["movimiento", "defensa"] },
+    "buscar_cobertura":      { "texto": "Buscar cobertura", "icono": "muro", "etiquetas": ["movimiento", "defensa"] },
+    "mantener":              { "texto": "Mantener posicion", "icono": "ancla", "etiquetas": ["defensa"] },
+    "recargar":              { "texto": "Recargar", "icono": "cargador", "etiquetas": ["defensa"] },
+    "reparar":               { "texto": "Reparar", "icono": "llave", "etiquetas": ["curacion"], "habilidad": "reparacion_de_campo" },
+    "desplegar_torreta":     { "texto": "Desplegar torreta", "icono": "torreta", "etiquetas": ["apoyo"], "habilidad": "desplegar_torreta" },
+    "propulsion":            { "texto": "Propulsion", "icono": "cohete", "etiquetas": ["movimiento"], "habilidad": "propulsion" },
+    "muro_de_escudos":       { "texto": "Muro de escudos", "icono": "escudo", "etiquetas": ["defensa"], "habilidad": "muro_de_escudos" }
+  },
+  "objetivos": {
+    "yo":                   { "texto": "Yo mismo" },
+    "enemigo_cercano":      { "texto": "Enemigo mas cercano" },
+    "enemigo_mas_debil":    { "texto": "Enemigo con menos vida" },
+    "enemigo_mas_peligroso":{ "texto": "Enemigo mas peligroso" },
+    "enemigo_aislado":      { "texto": "Enemigo aislado" },
+    "aliado_cercano":       { "texto": "Aliado mas cercano" },
+    "aliado_mas_herido":    { "texto": "Aliado mas herido" },
+    "vinculo":              { "texto": "Su companero de vinculo" },
+    "vip":                  { "texto": "El VIP" },
+    "objetivo_mision":      { "texto": "Objetivo de la mision" },
+    "lejos_de_enemigos":    { "texto": "Lejos de los enemigos" }
+  },
+  "funciones": ["a_tiro", "aislado", "en_cobertura", "flanqueado", "hay_vip"],
+  "maximo_por_unidad": 8
+}

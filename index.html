@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mecha Fighter</title>
+  <meta name="description" content="Auto-battler tactico de mechas: arma tu escuadron, programalo y mira como pelea.">
+  <link rel="stylesheet" href="css/base.css">
+</head>
+<body>
+  <main id="app" class="arranque">
+    <header class="marquesina">
+      <h1>MECHA<span>FIGHTER</span></h1>
+      <p class="sub">Escuadron tactico autonomo · v<span id="version">0.1</span></p>
+    </header>
+
+    <section class="panel" aria-labelledby="t-sistema">
+      <h2 id="t-sistema" class="rotulo">Sistema</h2>
+      <ol id="registro" class="registro" aria-live="polite"></ol>
+    </section>
+
+    <section class="panel" aria-labelledby="t-mapa">
+      <h2 id="t-mapa" class="rotulo">Sector de prueba</h2>
+      <canvas id="mapa" width="480" height="320" aria-label="Vista del mapa de prueba"></canvas>
+      <ul class="leyenda" id="leyenda"></ul>
+    </section>
+
+    <footer class="pie">
+      <button class="boton" disabled title="Proximamente">Hangar</button>
+      <p class="firma">Desarrollado por Juan M. Comparini · App en desarrollo</p>
+    </footer>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

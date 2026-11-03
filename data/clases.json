@@ -1,0 +1,76 @@
+{
+  "_ayuda": "La clase es la formacion del PILOTO: define en que es bueno, sus habilidades y sus gambits de fabrica. Los numeros del mecha salen de sus partes (partes.json). Las bonificaciones se suman a las del mecha.",
+  "vanguardia": {
+    "nombre": "Vanguardia",
+    "rol": "tanque",
+    "descripcion": "Primera linea. Aguanta el fuego y fija a los enemigos.",
+    "icono": "escudo",
+    "piloto": { "punteria": 55, "evasion": 5, "iniciativa": 4, "moral": 75 },
+    "por_nivel": { "punteria": 2, "moral": 2, "blindaje": 1 },
+    "partes_sugeridas": ["torso_pesado", "piernas_orugas", "brazo_escudo", "brazo_rotativa"],
+    "habilidades_iniciales": ["muro_de_escudos"],
+    "gambits_de_fabrica": [
+      { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
+      { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_cercano" }
+    ]
+  },
+  "tirador": {
+    "nombre": "Tirador",
+    "rol": "dano",
+    "descripcion": "Pega fuerte desde lejos. Fragil si lo alcanzan.",
+    "icono": "mira",
+    "piloto": { "punteria": 75, "evasion": 10, "iniciativa": 5, "moral": 65 },
+    "por_nivel": { "punteria": 3, "evasion": 1 },
+    "partes_sugeridas": ["torso_ligero", "piernas_bipode", "cabeza_optica", "brazo_canon_riel"],
+    "habilidades_iniciales": ["disparo_apuntado"],
+    "gambits_de_fabrica": [
+      { "condicion": "enemigo_cerca", "parametros": { "casillas": 2 }, "accion": "replegarse", "objetivo": "lejos_de_enemigos" },
+      { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_mas_debil" },
+      { "condicion": "siempre", "accion": "buscar_cobertura", "objetivo": "yo" }
+    ]
+  },
+  "medico": {
+    "nombre": "Medico",
+    "rol": "sanador",
+    "descripcion": "Repara mechas aliados en pleno combate.",
+    "icono": "cruz",
+    "piloto": { "punteria": 50, "evasion": 10, "iniciativa": 6, "moral": 70 },
+    "por_nivel": { "punteria": 1, "moral": 3 },
+    "partes_sugeridas": ["torso_medio", "piernas_bipode", "mochila_reparacion", "brazo_rifle"],
+    "habilidades_iniciales": ["reparacion_de_campo"],
+    "gambits_de_fabrica": [
+      { "condicion": "aliado_vida_bajo", "parametros": { "valor": 40 }, "accion": "reparar", "objetivo": "aliado_mas_herido" },
+      { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
+      { "condicion": "siempre", "accion": "seguir", "objetivo": "aliado_mas_herido" }
+    ]
+  },
+  "infiltrador": {
+    "nombre": "Infiltrador",
+    "rol": "picaro",
+    "descripcion": "Rapido. Flanquea y remata a los que quedan solos.",
+    "icono": "daga",
+    "piloto": { "punteria": 65, "evasion": 20, "iniciativa": 8, "moral": 60 },
+    "por_nivel": { "evasion": 2, "iniciativa": 1, "punteria": 1 },
+    "partes_sugeridas": ["torso_ligero", "piernas_saltarinas", "brazo_hoja", "mochila_propulsor"],
+    "habilidades_iniciales": ["propulsion"],
+    "gambits_de_fabrica": [
+      { "condicion": "enemigo_aislado", "accion": "atacar_cuerpo_a_cuerpo", "objetivo": "enemigo_aislado" },
+      { "condicion": "siempre", "accion": "flanquear", "objetivo": "enemigo_mas_debil" }
+    ]
+  },
+  "ingeniero": {
+    "nombre": "Ingeniero",
+    "rol": "apoyo",
+    "descripcion": "Despliega torretas y abastece municion.",
+    "icono": "llave",
+    "piloto": { "punteria": 55, "evasion": 8, "iniciativa": 5, "moral": 70 },
+    "por_nivel": { "punteria": 2, "moral": 1 },
+    "partes_sugeridas": ["torso_medio", "piernas_bipode", "mochila_torreta", "brazo_rifle"],
+    "habilidades_iniciales": ["desplegar_torreta"],
+    "gambits_de_fabrica": [
+      { "condicion": "enemigo_a_rango", "accion": "desplegar_torreta", "objetivo": "yo" },
+      { "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" },
+      { "condicion": "siempre", "accion": "seguir", "objetivo": "aliado_cercano" }
+    ]
+  }
+}

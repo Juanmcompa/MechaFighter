@@ -1,0 +1,37 @@
+{
+  "_ayuda": "Rasgo con el que nace cada piloto y que no cambia. El motor no sabe que es un Cobarde: solo aplica sus 'ganchos'. Tipos de gancho: anular (desobedece y hace otra cosa), correr_umbral (mueve un numero de sus gambits), subir_prioridad (sube acciones en su lista), ignorar_condicion (a veces no ve una condicion), cambiar_objetivo, correa (no se aleja de alguien), moral (como le pega un evento). 'visible': false = el jugador no la ve en la ficha; solo la 'pista'.",
+  "cobarde": {
+    "nombre": "Cobarde", "visible": false, "pista": "Mira demasiado la salida.", "icono": "huida",
+    "ganchos": [
+      { "tipo": "anular", "prioridad": 100,
+        "cuando": { "dato": "yo.vida_pct", "op": "<", "valor": 25 },
+        "hacer": { "accion": "replegarse", "objetivo": "lejos_de_enemigos" }, "registro": "huye_en_panico" },
+      { "tipo": "correr_umbral", "dato": "yo.vida_pct", "delta": 10 },
+      { "tipo": "moral", "evento": "aliado_muerto", "delta": -15 }
+    ]
+  },
+  "temerario": {
+    "nombre": "Temerario", "visible": true, "pista": "Primero dispara, despues pregunta.", "icono": "rayo",
+    "ganchos": [
+      { "tipo": "subir_prioridad", "etiquetas": ["ataque", "avance"], "delta": 1 },
+      { "tipo": "ignorar_condicion", "condicion": "en_cobertura", "chance": 50 }
+    ]
+  },
+  "sanguinario": {
+    "nombre": "Sanguinario", "visible": true, "pista": "Huele la sangre.", "icono": "colmillo",
+    "ganchos": [
+      { "tipo": "cambiar_objetivo", "etiquetas": ["ataque"], "selector": "enemigo_mas_debil", "chance": 70 },
+      { "tipo": "moral", "evento": "baja_propia", "delta": 10 }
+    ]
+  },
+  "leal": {
+    "nombre": "Leal", "visible": true, "pista": "No deja a nadie atras.", "icono": "lazo",
+    "ganchos": [
+      { "tipo": "correa", "ancla": "vinculo", "distancia_maxima": 4 },
+      { "tipo": "anular", "prioridad": 90,
+        "cuando": { "dato": "vinculo.vida_pct", "op": "<", "valor": 30 },
+        "hacer": { "accion": "seguir", "objetivo": "vinculo" }, "registro": "corre_a_cubrir" },
+      { "tipo": "moral", "evento": "vinculo_muerto", "delta": -30 }
+    ]
+  }
+}
