@@ -1,0 +1,51 @@
+{
+ "_escala": 2,
+ "dron_artillado": {
+  "h": 46,
+  "w": 35
+ },
+ "dron_bombardero": {
+  "h": 46,
+  "w": 37
+ },
+ "dron_cazador": {
+  "h": 50,
+  "w": 38
+ },
+ "dron_centinela": {
+  "h": 38,
+  "w": 54
+ },
+ "dron_pesado": {
+  "h": 45,
+  "w": 54
+ },
+ "dron_pesado_b": {
+  "h": 60,
+  "w": 22
+ },
+ "dron_rotativo": {
+  "h": 54,
+  "w": 27
+ },
+ "dron_vigia": {
+  "h": 45,
+  "w": 46
+ },
+ "dron_vigia_b": {
+  "h": 48,
+  "w": 22
+ },
+ "transporte_carga": {
+  "h": 72,
+  "w": 35
+ },
+ "transporte_combustible": {
+  "h": 72,
+  "w": 36
+ },
+ "transporte_lona": {
+  "h": 72,
+  "w": 36
+ }
+}

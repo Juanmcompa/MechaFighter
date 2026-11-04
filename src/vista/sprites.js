@@ -33,6 +33,22 @@ export async function cargarSprites(base = './', cantidadRetratos = 0) {
   return SPR;
 }
 
+// ---------- Unidades enteras (camion, drones): assets/unidades ----------
+export const UNI = { escala: 2, meta: {}, imgs: {} };
+
+export async function cargarUnidades(base = './') {
+  try {
+    const r = await fetch(base + 'assets/unidades/unidades.json', { cache: 'no-cache' });
+    if (!r.ok) return UNI;
+    const meta = await r.json();
+    UNI.escala = meta._escala || 2;
+    delete meta._escala;
+    UNI.meta = meta;
+    await Promise.all(Object.keys(meta).map((id) => cargarImagen(base + 'assets/unidades/' + id + '.png').then((im) => { if (im) UNI.imgs[id] = im; })));
+  } catch { /* sin sprites: dibujos por codigo */ }
+  return UNI;
+}
+
 export const sprite = (color, id) => (id ? SPR.imgs[color + '/' + id] || null : null);
 
 // Ruta del retrato numero n (1..cantidad)

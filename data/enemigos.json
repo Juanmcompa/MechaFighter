@@ -203,6 +203,11 @@
           "accion": "avanzar",
           "objetivo": "objetivo_mision"
         }
+      ],
+      "sprites": [
+        "transporte_carga",
+        "transporte_combustible",
+        "transporte_lona"
       ]
     },
     "francotirador_pirata": {
@@ -337,6 +342,209 @@
           "objetivo": "yo"
         }
       ]
+    },
+    "dron_vigia": {
+      "nombre": "Dron vigía",
+      "cuerpo": "dron",
+      "amenaza": 1,
+      "sprite": "dron_vigia",
+      "sprites": [
+        "dron_vigia",
+        "dron_vigia_b"
+      ],
+      "stats": {
+        "estructura": 30,
+        "blindaje": 0,
+        "velocidad": 3,
+        "punteria": 35,
+        "evasion": 24,
+        "iniciativa": 7,
+        "moral": 100,
+        "vision": 10
+      },
+      "arma": "brazo_rifle",
+      "gambits": [
+        {
+          "condicion": "enemigo_cerca",
+          "parametros": {
+            "casillas": 3
+          },
+          "accion": "replegarse",
+          "objetivo": "lejos_de_enemigos"
+        },
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "dron_artillado": {
+      "nombre": "Dron artillado",
+      "cuerpo": "dron",
+      "amenaza": 1,
+      "sprite": "dron_artillado",
+      "sprites": [
+        "dron_artillado"
+      ],
+      "stats": {
+        "estructura": 40,
+        "blindaje": 1,
+        "velocidad": 4,
+        "punteria": 45,
+        "evasion": 16,
+        "iniciativa": 6,
+        "moral": 100,
+        "vision": 7
+      },
+      "arma": "brazo_rifle",
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "dron_rotativo": {
+      "nombre": "Dron rotativo",
+      "cuerpo": "dron",
+      "amenaza": 2,
+      "sprite": "dron_rotativo",
+      "sprites": [
+        "dron_rotativo"
+      ],
+      "stats": {
+        "estructura": 40,
+        "blindaje": 2,
+        "velocidad": 4,
+        "punteria": 35,
+        "evasion": 12,
+        "iniciativa": 5,
+        "moral": 100,
+        "vision": 7
+      },
+      "arma": "brazo_rotativa",
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "dron_cazador": {
+      "nombre": "Dron cazador",
+      "cuerpo": "dron",
+      "amenaza": 2,
+      "sprite": "dron_cazador",
+      "sprites": [
+        "dron_cazador",
+        "dron_bombardero"
+      ],
+      "stats": {
+        "estructura": 45,
+        "blindaje": 1,
+        "velocidad": 3,
+        "punteria": 55,
+        "evasion": 19,
+        "iniciativa": 7,
+        "moral": 100,
+        "vision": 8
+      },
+      "arma": "brazo_rifle",
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_debil"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "dron_pesado": {
+      "nombre": "Dron pesado",
+      "cuerpo": "dron",
+      "amenaza": 3,
+      "sprite": "dron_pesado",
+      "sprites": [
+        "dron_pesado",
+        "dron_pesado_b"
+      ],
+      "stats": {
+        "estructura": 80,
+        "blindaje": 3,
+        "velocidad": 6,
+        "punteria": 45,
+        "evasion": 5,
+        "iniciativa": 3,
+        "moral": 100,
+        "vision": 8
+      },
+      "arma": "brazo_rotativa",
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_peligroso"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "dron_centinela": {
+      "nombre": "Dron centinela",
+      "cuerpo": "dron",
+      "amenaza": 2,
+      "sprite": "dron_centinela",
+      "sprites": [
+        "dron_centinela"
+      ],
+      "stats": {
+        "estructura": 45,
+        "blindaje": 2,
+        "velocidad": 5,
+        "punteria": 45,
+        "evasion": 9,
+        "iniciativa": 4,
+        "moral": 100,
+        "vision": 8
+      },
+      "arma": "brazo_emp",
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
     }
   },
   "escuadras": {
@@ -366,6 +574,33 @@
         "mutante_escupidor"
       ],
       "dificultad": 2
+    },
+    "enjambre": {
+      "nombre": "Enjambre de drones",
+      "miembros": [
+        "dron_vigia",
+        "dron_artillado",
+        "dron_artillado"
+      ],
+      "dificultad": 1
+    },
+    "ala_de_drones": {
+      "nombre": "Ala de drones",
+      "miembros": [
+        "dron_cazador",
+        "dron_rotativo",
+        "dron_artillado"
+      ],
+      "dificultad": 2
+    },
+    "drones_pesados": {
+      "nombre": "Drones pesados",
+      "miembros": [
+        "dron_pesado",
+        "dron_artillado",
+        "dron_centinela"
+      ],
+      "dificultad": 3
     }
   }
 }

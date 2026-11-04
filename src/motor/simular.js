@@ -298,7 +298,9 @@ function revisarObjetivos(B, oleadasPendientes, leerZona, guardarZona) {
 // Lo que la vista necesita para dibujar una unidad desde el principio.
 function ficha(u) {
   return {
-    bando: u.bando, nombre: u.nombre, tipo: u.tipo, cuerpo: u.cuerpo, clase: u.clase, personalidad: u.personalidad, sprite: u.sprite || null,
+    bando: u.bando, nombre: u.nombre, tipo: u.tipo, cuerpo: u.cuerpo, clase: u.clase, personalidad: u.personalidad,
+    // si el tipo tiene varios dibujos, cada unidad usa uno (fijo por su numero)
+    sprite: u.variantes ? u.variantes[Number(u.id.slice(1)) % u.variantes.length] : u.sprite || null,
     apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto, vida: u.vida,
     armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual }))
   };

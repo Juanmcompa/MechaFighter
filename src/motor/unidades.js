@@ -208,6 +208,7 @@ export function unidadEnemiga(datos, id, nivel = 1) {
     vinculoRef: null,
     cuerpo: def.cuerpo,
     sprite: def.sprite || id,
+    variantes: def.sprites || null, // la vista elige una (mismo tipo, otro dibujo)
     amenaza: def.amenaza || 1,
     vidaMax: escala(s.estructura),
     blindaje: s.blindaje,
@@ -218,7 +219,7 @@ export function unidadEnemiga(datos, id, nivel = 1) {
     evasion: s.evasion,
     iniciativa: s.iniciativa,
     moral: s.moral,
-    moralFija: def.cuerpo === 'mutante' || !!def.invocacion || id === 'transporte',
+    moralFija: def.cuerpo === 'mutante' || def.cuerpo === 'dron' || !!def.invocacion || id === 'transporte',
     armas,
     escudo: null,
     mochila: null,

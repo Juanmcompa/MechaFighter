@@ -8,7 +8,8 @@ Hace falta Python con pillow, numpy y scipy. Por cada hoja:
      para que queden pixeles nitidos de 8 bits;
   3. calcula el punto de enganche de cada pieza (hombro de los brazos, cadera de las piernas);
   4. de las partes de mecha hace la version roja (enemigos) y verde cambiando solo los azules.
-Escribe assets/mecha/<color>/<parte>.png, assets/mecha/sprites.json y assets/retratos/<n>.png.
+Escribe assets/mecha/<color>/<parte>.png, assets/mecha/sprites.json, assets/retratos/<n>.png,
+assets/terreno/ y assets/unidades/ (vehiculos y drones enteros).
 
 Si cambia el orden o la cantidad de piezas de una hoja, se ajusta HOJAS mas abajo.
 """
@@ -254,6 +255,80 @@ def terreno():
     return len(man['texturas']) + sum(len(v) for v in man['objetos'].values()) + len(man['detalles'])
 
 
+# ---------- Unidades enteras (vehiculos y drones) ----------
+# Una imagen por unidad, mirando para arriba (como las partes). 'frente': para donde mira en la hoja.
+# 'color': rojo = se recolorea como enemigo. Escribe assets/unidades/<id>.png y unidades.json.
+UNIDADES = {
+    'unidades-transporte': [
+        ('transporte_carga', {'alto': 36, 'frente': 'arriba'}),
+        ('transporte_combustible', {'alto': 36, 'frente': 'arriba'}),
+        ('transporte_lona', {'alto': 36, 'frente': 'arriba'}),
+    ],
+    'unidades-drones-1': [
+        ('dron_artillado', {'alto': 23, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_cazador', {'alto': 25, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_rotativo', {'alto': 27, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_bombardero', {'alto': 23, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_pesado_b', {'alto': 30, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_vigia_b', {'alto': 24, 'frente': 'abajo', 'color': 'rojo'}),
+    ],
+    'unidades-drones-2': [
+        ('dron_vigia', {'ancho': 23, 'frente': 'abajo', 'color': 'rojo'}),
+        ('dron_pesado', {'ancho': 27, 'frente': 'arriba', 'color': 'rojo'}),
+        ('dron_centinela', {'ancho': 27, 'frente': 'arriba', 'color': 'rojo'}),
+    ],
+}
+
+
+def limpiar(img):
+    # las helices borrosas dejan pixeles teñidos de magenta: afuera; y las motas sueltas tambien
+    img = img.copy()
+    for y in range(img.shape[0]):
+        for x in range(img.shape[1]):
+            r, g, b, al = img[y, x]
+            if al:
+                h, s_, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+                if 0.75 <= h <= 0.97 and s_ > 0.22:
+                    img[y, x, 3] = 0
+    lab, n = ndimage.label(img[..., 3] > 0)
+    if n > 1:
+        tam = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+        for i, t in enumerate(tam):
+            if t < 6:
+                img[lab == i + 1, 3] = 0
+    return img
+
+
+def unidades():
+    out = os.path.join(SALIDA, 'unidades')
+    man = {'_escala': ESCALA}
+    for nombre, lista in UNIDADES.items():
+        if not any(os.path.exists(os.path.join(FUENTES, nombre + ext)) for ext in ('.jpg', '.png')):
+            continue
+        a, solido, cajas = piezas(nombre)
+        if len(cajas) != len(lista):
+            sys.exit('%s: encontre %d piezas y esperaba %d.' % (nombre, len(cajas), len(lista)))
+        os.makedirs(out, exist_ok=True)
+        for caja, item in zip(cajas, lista):
+            if not item:
+                continue
+            pid, spec = item
+            # recorte justo a lo opaco (el ruido del fondo agranda las cajas)
+            x0, y0, x1, y1 = caja
+            ys, xs = np.nonzero(solido[y0:y1, x0:x1])
+            caja = [x0 + xs.min(), y0 + ys.min(), x0 + xs.max() + 1, y0 + ys.max() + 1]
+            img = limpiar(reducir(a, solido, caja, spec))
+            if spec.get('frente') == 'abajo':
+                img = img[::-1, ::-1].copy()  # media vuelta: todas miran para arriba
+            img = recolorear(img, COLORES.get(spec.get('color', 'azul')))
+            Image.fromarray(img, 'RGBA').save(os.path.join(out, pid + '.png'))
+            man[pid] = {'w': img.shape[1], 'h': img.shape[0]}
+    if len(man) > 1:
+        with open(os.path.join(out, 'unidades.json'), 'w') as f:
+            json.dump(man, f, indent=1, sort_keys=True)
+    return len(man) - 1
+
+
 def main():
     manifiesto = {'_escala': ESCALA}
     for nombre, lista in HOJAS.items():
@@ -276,7 +351,7 @@ def main():
             print('  %-20s %2dx%-2d ancla %s' % (pid, base.shape[1], base.shape[0], manifiesto[pid]['ancla']))
     with open(os.path.join(SALIDA, 'mecha', 'sprites.json'), 'w') as f:
         json.dump(manifiesto, f, indent=1, sort_keys=True)
-    print(len(manifiesto) - 1, 'partes ·', retratos(), 'retratos ·', terreno(), 'piezas de terreno')
+    print(len(manifiesto) - 1, 'partes ·', retratos(), 'retratos ·', terreno(), 'piezas de terreno ·', unidades(), 'unidades')
 
 
 if __name__ == '__main__':

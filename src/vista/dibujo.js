@@ -2,7 +2,7 @@
 // BeastMixer), cada funcion dibujarX puede usar la imagen y, si no cargo, volver a esto.
 // Vista cenital: el "frente" de cada unidad mira hacia +x antes de rotar.
 
-import { SPR, sprite, TER } from './sprites.js';
+import { SPR, sprite, TER, UNI } from './sprites.js';
 
 export const COLORES = {
   piso: '#1a1e16', pisoLinea: 'rgba(143,220,90,0.05)',
@@ -177,6 +177,8 @@ export function dibujarUnidad(ctx, u, L, t) {
   const s = L / 24; // todo se dibuja en una grilla de 24 y se escala (ocupa casi toda la casilla)
   ctx.scale(s, s);
   if (!u.viva) dibujarRestos(ctx, f);
+  else if (UNI.imgs[f.sprite]) dibujarUnidadSprite(ctx, f, u, t);
+  else if (f.cuerpo === 'dron') dibujarDronSimple(ctx, f);
   else if (f.cuerpo === 'mutante') dibujarMutante(ctx, f, u, t);
   else if (f.cuerpo === 'infanteria') dibujarSoldado(ctx, f, u);
   else if (f.sprite === 'torreta') dibujarTorreta(ctx, f, u);
@@ -348,6 +350,37 @@ function dibujarTorreta(ctx, f, u) {
   rect(ctx, -6, -6, 12, 12, c.base, '#000');
   rect(ctx, 2, -1.5, 13, 3, '#222', '#000');
   if (u.golpe > 0) { ctx.fillStyle = `rgba(255,255,255,${u.golpe * 0.7})`; ctx.fillRect(-9, -9, 18, 18); }
+}
+
+// Camion y drones: una imagen entera (assets/unidades), mirando para adelante.
+// Los drones flotan: suben y bajan un poco y su sombra queda abajo, corrida.
+function dibujarUnidadSprite(ctx, f, u, t) {
+  const im = UNI.imgs[f.sprite];
+  const m = UNI.meta[f.sprite];
+  const w = m.w / UNI.escala, h = m.h / UNI.escala;
+  const dron = f.cuerpo === 'dron';
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  if (dron) {
+    const flota = Math.sin((t || 0) / 260 + u.semilla) * 0.8;
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(3, 4, w * 0.36, h * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.translate(-1.5 + flota * 0.3, -1.5 + flota);
+  }
+  ctx.rotate(Math.PI / 2);
+  if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
+  ctx.drawImage(im, -w / 2, -h / 2, w, h);
+  ctx.filter = 'none';
+  ctx.restore();
+}
+
+// Dron sin sprite (por si no cargo el arte): cruz con cuatro rotores
+function dibujarDronSimple(ctx, f) {
+  const c = colorBando(f);
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(-7, -7); ctx.lineTo(7, 7); ctx.moveTo(-7, 7); ctx.lineTo(7, -7); ctx.stroke();
+  for (const [x, y] of [[-7, -7], [7, 7], [-7, 7], [7, -7]]) { ctx.fillStyle = 'rgba(200,200,200,0.5)'; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill(); }
+  rect(ctx, -4, -4, 8, 8, c.base, '#000');
 }
 
 // Holograma: silueta de mecha en lineas, que titila

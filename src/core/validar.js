@@ -7,7 +7,7 @@ const ENCAJES_MECHA = { cabeza: 'cabeza', torso: 'torso', piernas: 'piernas', br
 const RAREZAS = ['comun', 'poco_comun', 'raro', 'epico'];
 const OPERADORES = ['<', '<=', '>', '>=', '==', '!='];
 const GANCHOS = ['anular', 'correr_umbral', 'subir_prioridad', 'ignorar_condicion', 'cambiar_objetivo', 'correa', 'moral', 'confusion', 'perdido'];
-const CUERPOS = ['mecha', 'infanteria', 'mutante'];
+const CUERPOS = ['mecha', 'infanteria', 'mutante', 'dron'];
 const VICTORIA_DERROTA = ['sobrevivir_oleadas', 'escuadron_eliminado', 'enemigos_eliminados', 'zona_perdida', 'unidad_muerta',
   'unidad_llega_a_zona', 'escuadron_llega_a_zona', 'tiempo_agotado'];
 const CASILLAS_CAMINABLES = ['piso', 'peligro'];
