@@ -92,6 +92,7 @@ function atacar(B, u, i) {
 
   for (const idx of i.armas) {
     const a = u.armas[idx];
+    if (!a) continue; // se le rompio el brazo en este mismo tick
     if (o.vida <= 0) break;
     const melee = a.alcance <= 1;
     const cob = melee || a.ignoraCobertura ? null : cobertura(B.tablero, o, u);
@@ -99,12 +100,13 @@ function atacar(B, u, i) {
     // pelear al lado de un amigo da confianza
     const amigo = u.amigo ? porId(B, u.amigo) : null;
     const bonusAmigo = amigo && amigo.viva && distancia(u, amigo) <= 3 ? B.datos.reglas.animo.bonus_amigo_punteria : 0;
-    let chance = a.punteria + (mu.punteria || 0) + (ef.punteria || 0) + bonusAmigo - o.evasion - (mo.evasion || 0) - castigo;
+    let chance = a.punteria + (mu.punteria || 0) + (ef.punteria || 0) + bonusAmigo - o.evasion - (mo.evasion || 0) - castigo -
+      (i.cabina ? B.datos.reglas.partes_mecha.castigo_cabina : 0);
     chance = Math.max(R.punteria_minima, Math.min(R.punteria_maxima, chance));
     const acierta = az.tirada(chance);
     let danio = 0, bloqueo = false;
     if (acierta) {
-      danio = golpear(B, u, o, a, ef.multiplica_danio_pct || 100);
+      danio = golpear(B, u, o, a, ef.multiplica_danio_pct || 100, !!i.cabina);
       if (danio < 0) { bloqueo = true; danio = -danio; }
     }
     B.log({ tipo: 'dispara', u: u.id, o: o.id, arma: a.tipoVisual, slot: a.slot, acierta, danio, cob, bloqueo });
@@ -128,7 +130,44 @@ function atacar(B, u, i) {
 }
 
 // Aplica el danio de un golpe y devuelve cuanto hizo (negativo si el escudo lo freno a la mitad).
-function golpear(B, u, o, a, multPct) {
+// Donde pega el impacto en un mecha: brazos, piernas, cabeza o torso. Si una zona junta mucho danio, se rompe.
+function zonaDelGolpe(B, o, danio, cabina) {
+  if (!o.slots) return;
+  const P = B.datos.reglas.partes_mecha;
+  o.golpeCabina = !!cabina;
+  if (cabina) return;
+  let tiro = B.azarPartes.entero(0, 99), zona = null;
+  for (const [z, c] of Object.entries(P.chance)) { if (tiro < c) { zona = z; break; } tiro -= c; }
+  if (!zona || !o.slots[zona] || o.rotas.includes(zona)) return;
+  o.danioSlot[zona] = (o.danioSlot[zona] || 0) + danio;
+  if (o.danioSlot[zona] * 100 >= o.vidaMax * P.aguante_pct[zona]) romperParte(B, o, zona);
+}
+
+export function romperParte(B, o, zona) {
+  const P = B.datos.reglas.partes_mecha;
+  const s = o.slots[zona];
+  o.rotas.push(zona);
+  if (zona === 'brazo_izq' || zona === 'brazo_der') {
+    o.armas = o.armas.filter((a) => a.slot !== zona);
+    if (s.escudoBlindaje) { o.escudo = null; o.blindaje -= s.escudoBlindaje; }
+  } else if (zona === 'piernas') {
+    o.velocidad += P.piernas_rotas.velocidad;
+    o.evasion -= P.piernas_rotas.evasion;
+  } else if (zona === 'cabeza') {
+    o.vision = Math.min(o.vision, P.cabeza_rota.vision);
+    o.radar = 0;
+    for (const a of o.armas) a.punteria -= s.punteria + P.cabeza_rota.punteria;
+  }
+  // lo que daba esa parte se pierde: etiquetas (ordenes que pedian la parte) y su habilidad
+  const quedan = new Set();
+  for (const [z, x] of Object.entries(o.slots)) if (!o.rotas.includes(z)) for (const e of x.etiquetas) quedan.add(e);
+  o.etiquetasPartes = o.etiquetasPartes.filter((e) => quedan.has(e) || !Object.values(o.slots).some((x) => x.etiquetas.includes(e)));
+  if (s.habilidad && !o.clasesHabilidades.includes(s.habilidad)) o.habilidades = o.habilidades.filter((h) => h !== s.habilidad);
+  B.log({ tipo: 'parte_rota', u: o.id, zona, parte: s.parte });
+  evento(B, 'parte_rota', o);
+}
+
+function golpear(B, u, o, a, multPct, cabina = false) {
   const R = B.datos.reglas;
   // sobrecarga y similares: el atacante pega un % mas
   const extra = 100 + (mods(B, u).danio_pct || 0);
@@ -138,12 +177,14 @@ function golpear(B, u, o, a, multPct) {
   let bloqueo = false;
   if (o.escudo && a.alcance > 1 && B.azarCombate.tirada(o.escudo.bloqueo)) { danio = Math.max(1, danio >> 1); bloqueo = true; }
   herir(B, o, danio, u);
+  zonaDelGolpe(B, o, danio, cabina);
   return bloqueo ? -danio : danio;
 }
 
 export function herir(B, o, danio, autor) {
   const antes = vidaPct(o);
   o.vida -= danio;
+  o.golpeCabina = false; // si el ultimo golpe no fue a la cabina, el mecha no queda entero
   o.s.danioRecibido += danio;
   o.s.vidaMinPct = Math.min(o.s.vidaMinPct, vidaPct(o));
   if (autor) { autor.s.danioHecho += danio; o.ultimoAtacante = autor.id; }

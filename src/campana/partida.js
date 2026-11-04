@@ -7,6 +7,7 @@
 import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision, sumarCondicion } from './misiones.js';
+import { saquear } from './saqueo.js';
 import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana, misionEncuentro } from './legado.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
@@ -344,7 +345,7 @@ export function cerrarMision(datos, p, resultado) {
   const R = datos.reglas;
   const az = azarDe(p, 'informe');
   const m = p.nodo.mision;
-  const informe = { victoria: resultado.victoria, motivo: resultado.motivo, mision: m.nombre, pilotos: [], botin: [], creditos: 0, puntaje: 0, caidos: [], partesRescatadas: [] };
+  const informe = { victoria: resultado.victoria, motivo: resultado.motivo, mision: m.nombre, pilotos: [], botin: [], creditos: 0, puntaje: 0, caidos: [], partesRescatadas: [], saqueo: [], chatarra: 0 };
   const eliminados = resultado.motivo === 'escuadron_eliminado';
   p.misionesJugadas++;
   // los momentos para recordar salen del registro, con los pilotos como estaban antes de la mision
@@ -460,6 +461,11 @@ export function cerrarMision(datos, p, resultado) {
       p.inventario.push(pieza);
       informe.botin.push(nombrePieza(datos, pieza));
     }
+    // saqueo de los mechas enemigos: entero si cayo por la cabina, chatarra si no
+    const sq = saquear(datos, resultado.registro || [], m, az);
+    for (const x of sq.piezas) { p.inventario.push(x.pieza); informe.saqueo.push(nombrePieza(datos, x.pieza) + ' (de ' + x.de + ')'); }
+    informe.chatarra = sq.chatarra;
+    p.creditos += sq.chatarra;
   }
   // Contra el escuadron de la campana anterior: si se gana, a veces se rescata a uno de entre los restos
   if (m.rivales) {

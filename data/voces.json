@@ -68,6 +68,12 @@
       "Control, vienen más.",
       "¡Otra oleada, Control!",
       "Control, nos están rodeando."
+    ],
+    "parte_rota": [
+      "¡Control, perdí un brazo! Sigo con lo que tengo.",
+      "¡Me volaron una pieza! Sigo en pie.",
+      "Daño estructural. Esto no es bueno, Control.",
+      "¡Me dejaron rengo, Control!"
     ]
   },
   "cobarde": {
@@ -105,6 +111,10 @@
     ],
     "oleada": [
       "¡Control, son demasiados!"
+    ],
+    "parte_rota": [
+      "¡Me están desarmando! ¡Sáquenme de acá!",
+      "No, no, no... ¡Control, se me cae a pedazos!"
     ]
   },
   "temerario": {
@@ -149,6 +159,10 @@
     ],
     "discute": [
       "¡Si no te gusta, quedate atrás!"
+    ],
+    "parte_rota": [
+      "¡Ja! Con un brazo me alcanza.",
+      "¿Eso es todo? Vengan."
     ]
   },
   "sanguinario": {

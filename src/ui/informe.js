@@ -40,7 +40,10 @@ export function informe(app, raiz, inf) {
         chip('creditos', '+' + inf.creditos, 'Créditos'),
         chip('puntaje', '+' + inf.puntaje, 'Puntaje')),
       inf.botin.length ? h('ul', { class: 'lista-simple' }, ...inf.botin.map((b) => h('li', {}, ico('estrella'), ' ' + b))) : h('p', { class: 'ayuda' }, inf.victoria ? 'Sin partes esta vez.' : 'Sin pago ni botín.'),
-      inf.partesRescatadas.length ? h('p', { class: 'ayuda' }, 'Rescatado de los caídos: ' + inf.partesRescatadas.join(', ') + '.') : null),
+      inf.partesRescatadas.length ? h('p', { class: 'ayuda' }, 'Rescatado de los caídos: ' + inf.partesRescatadas.join(', ') + '.') : null,
+      inf.saqueo && inf.saqueo.length ? h('ul', { class: 'lista-simple saqueo' }, ...inf.saqueo.map((b) => h('li', {}, ico('mira'), ' Saqueado entero: ' + b))) : null,
+      inf.chatarra ? h('p', { class: 'ayuda' }, ico('llave'), ' Chatarra de los mechas destrozados: +' + inf.chatarra + ' créditos.' +
+        (inf.saqueo && inf.saqueo.length ? '' : ' Para llevarte sus armas enteras, apuntá a la cabina.')) : null),
     h('div', { class: 'acciones' },
       boton(p.estado === 'fin' ? 'Final de la campaña' : 'Seguir', () => app.continuar(), { iconoNombre: 'play', clase: 'principal' }),
       p.estado !== 'fin' ? boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }) : null));

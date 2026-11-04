@@ -331,6 +331,17 @@
         "ataque"
       ],
       "habilidad": "sobrecarga"
+    },
+    "disparar_cabina": {
+      "texto": "Apuntar a la cabina",
+      "icono": "mira",
+      "etiquetas": [
+        "ataque"
+      ],
+      "requiere": [
+        "arma_a_distancia"
+      ],
+      "ayuda": "Acierta menos, pero si el mecha enemigo cae así, su arma queda entera para el botín."
     }
   },
   "objetivos": {

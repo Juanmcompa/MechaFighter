@@ -155,6 +155,13 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
     mochila: mochila && mochila.usos ? { id: piezas.mochila.parte, usos: mochila.usos } : null,
     habilidades,
     etiquetasPartes: [...new Set(ENCAJES.flatMap((e) => (parte(e) ? parte(e).etiquetas : [])))],
+    // zonas que se pueden romper (ver reglas.partes_mecha): que parte hay y que trae
+    slots: Object.fromEntries(['brazo_izq', 'brazo_der', 'piernas', 'cabeza'].filter((e) => parte(e)).map((e) => [e, {
+      parte: piezas[e].parte, etiquetas: parte(e).etiquetas, habilidad: parte(e).habilidad || null,
+      escudoBlindaje: parte(e).escudo ? parte(e).escudo.blindaje + (mods(e).blindaje || 0) : 0,
+      punteria: e === 'cabeza' ? (parte(e).punteria || 0) + (mods('cabeza').punteria || 0) : 0
+    }])),
+    clasesHabilidades: [...(clase.habilidades_iniciales || [])],
     ganchos,
     gambits: gambits && gambits.length ? gambits : clase.gambits_de_fabrica,
     apariencia: {

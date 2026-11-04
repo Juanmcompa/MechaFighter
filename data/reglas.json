@@ -1,7 +1,7 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 1,
-  "version_motor": 4,
+  "version_motor": 5,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
   "escuadra_maxima": 6,
@@ -24,7 +24,8 @@
       "vip_herido": -5,
       "oleada_nueva": -3,
       "discusion": -4,
-      "amigo_muerto": -12
+      "amigo_muerto": -12,
+      "parte_rota": -6
     }
   },
   "cobertura": {
@@ -68,7 +69,8 @@
     "vip_herido",
     "oleada_nueva",
     "discusion",
-    "amigo_muerto"
+    "amigo_muerto",
+    "parte_rota"
   ],
   "peligro_danio_por_tick": 1,
   "enemigos": {
@@ -117,5 +119,30 @@
     "sector_encuentro": 1,
     "columna_encuentro": 2,
     "nivel_max_rival": 2
+  },
+  "partes_mecha": {
+    "_ayuda": "Daño por partes: cada impacto directo a un mecha cae en una zona (chance en %; el resto va al torso). Si una zona junta el daño de su % de la estructura, se rompe: brazo sin arma ni habilidad, piernas mas lentas, cabeza casi ciega.",
+    "chance": {
+      "brazo_izq": 12,
+      "brazo_der": 12,
+      "piernas": 10,
+      "cabeza": 6
+    },
+    "aguante_pct": {
+      "brazo_izq": 40,
+      "brazo_der": 40,
+      "piernas": 45,
+      "cabeza": 30
+    },
+    "piernas_rotas": {
+      "velocidad": 3,
+      "evasion": 10
+    },
+    "cabeza_rota": {
+      "vision": 3,
+      "punteria": 10
+    },
+    "castigo_cabina": 20,
+    "chatarra_creditos": 15
   }
 }

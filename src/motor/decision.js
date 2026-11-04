@@ -246,6 +246,13 @@ function accion(B, u, id, obj, correa) {
     case 'disparar':
       return esUnidad && obj.bando !== u.bando ? disparo(B, u, obj, aDistancia) : null;
 
+    case 'disparar_cabina': {
+      // solo contra mechas (los que tienen partes que saquear)
+      if (!esUnidad || obj.bando === u.bando || !obj.slots || obj.tipo === 'invocacion') return null;
+      const i = disparo(B, u, obj, aDistancia);
+      return i && i.tipo === 'atacar' ? { ...i, cabina: true } : i;
+    }
+
     case 'atacar_cuerpo_a_cuerpo': {
       if (!esUnidad || obj.bando === u.bando || !u.armas.some(cuerpoACuerpo)) return null;
       if (distancia(u, obj) <= 1) return disparo(B, u, obj, cuerpoACuerpo);

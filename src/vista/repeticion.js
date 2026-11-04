@@ -12,6 +12,8 @@ const VOZ_ANULA = new Set(['se_manda', 'se_le_pasa', 'perdido', 'reubicado', 'co
 // Lo que dicen los pilotos de la campana anterior cuando aparecen del otro lado
 const EX_PILOTO = ['Control... ¿sos vos? Nos dejaste ahí.', 'No me mires así. Pagan mejor que vos.', 'Nadie vino a buscarnos, Control.', 'Ahora sí vas a ver cómo peleo.'];
 
+const ZONAS = { brazo_izq: 'Brazo izquierdo destruido', brazo_der: 'Brazo derecho destruido', piernas: 'Piernas destruidas', cabeza: 'Cabeza destruida' };
+
 export class Repeticion {
   constructor({ datos, mision, registro, canvas, alEvento, alTerminar, pilotos }) {
     this.porPiloto = pilotos || new Map(); // id de piloto -> piloto (para voces, vinculos y marcas)
@@ -221,7 +223,7 @@ export class Repeticion {
             if (otros.length) this.decir(otros[this.azarVoz(e.t, u) % otros.length], 'aliado_cae', true);
           }
         }
-        this.alEvento({ texto: k ? k.ficha.nombre + ' abatió a ' + u.ficha.nombre : u.ficha.nombre + ' cae', clase: propio ? 'mal' : 'bien', importante: propio && u.ficha.tipo === 'piloto' });
+        this.alEvento({ texto: (k ? k.ficha.nombre + ' abatió a ' + u.ficha.nombre : u.ficha.nombre + ' cae') + (e.limpio && !propio ? ' · tiro a la cabina, queda entero' : ''), clase: propio ? 'mal' : 'bien', importante: propio && u.ficha.tipo === 'piloto' });
         break;
       }
       case 'anula': {
@@ -253,6 +255,19 @@ export class Repeticion {
         u.moral = e.estado;
         if (e.estado === 'moral_quebrada') this.alEvento({ texto: u.ficha.nombre + ' se quiebra', clase: 'aviso' });
         break;
+      case 'parte_rota': {
+        if (!u) break;
+        const nombre = ZONAS[e.zona] || e.zona;
+        this.efectos.push({ tipo: 'explosion', a: [u.hacia[0], u.hacia[1]], r: 0.6, t0: this.T, dur: 7 });
+        this.temblor = Math.max(this.temblor, 0.4);
+        this.flotante(u, nombre, '#ffb04a', true);
+        // el brazo roto deja de verse
+        if (e.zona.startsWith('brazo')) u.ficha = { ...u.ficha, apariencia: { ...u.ficha.apariencia, [e.zona]: null } };
+        const propio = u.ficha.bando === 0;
+        this.alEvento({ texto: u.ficha.nombre + ': ' + nombre.toLowerCase() + '.', clase: propio ? 'mal' : 'bien', importante: propio });
+        if (propio) this.decir(u, 'parte_rota', true);
+        break;
+      }
       case 'habilidad': {
         if (!u) break;
         this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true);

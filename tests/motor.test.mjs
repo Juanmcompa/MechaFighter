@@ -7,6 +7,7 @@ import { armarMision } from '../src/campana/misiones.js';
 import { crearRecluta } from '../src/campana/reclutas.js';
 import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector } from '../src/campana/partida.js';
 import { fotoPiloto } from '../src/campana/legado.js';
+import { saquear } from '../src/campana/saqueo.js';
 import { leerDisco } from '../tools/leer-disco.mjs';
 
 let fallas = 0;
@@ -121,6 +122,27 @@ console.log('Campana');
   ok(!!nodo && nodo.mision.rivales.length === 3, 'el escuadron anterior aparece en un contrato');
   const r = simular(datos, { mision: nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: nodo.mision.semilla });
   ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.exPiloto && e.ficha.bando === 1), 'pelean del otro lado');
+}
+
+// Daño por partes: un brazo roto no vuelve a disparar; un tiro a la cabina deja el mecha para saquear
+{
+  let rotos = 0, dispararonRotos = 0, limpios = 0, piezas = 0;
+  for (let s = 1; s <= 30; s++) {
+    const az = crearAzar(s * 7);
+    const esc = ['vanguardia', 'tirador', 'medico', 'infiltrador'].map((c, i) => crearRecluta(datos, az, 'p' + i, c));
+    esc[1].gambits = [{ condicion: 'enemigo_a_rango', accion: 'disparar_cabina', objetivo: 'enemigo_mas_peligroso' }, ...esc[1].gambits];
+    const m = armarMision(datos, s % 2 ? 'asalto' : 'duelo', 2, crearAzar(s), 3);
+    const r = simular(datos, { mision: m, escuadron: esc.map((p) => ({ piloto: p, mecha: p.mecha, gambits: p.gambits })), semilla: m.semilla });
+    const roto = new Map();
+    for (const e of r.registro) {
+      if (e.tipo === 'parte_rota') { rotos++; roto.set(e.u + e.zona, e.t); }
+      if (e.tipo === 'dispara' && roto.has(e.u + e.slot) && e.t > roto.get(e.u + e.slot)) dispararonRotos++;
+      if (e.tipo === 'muere' && e.limpio) limpios++;
+    }
+    if (r.victoria) piezas += saquear(datos, r.registro, m, crearAzar(s)).piezas.length;
+  }
+  ok(rotos > 0 && dispararonRotos === 0, 'un brazo roto deja de disparar (' + rotos + ' partes rotas)');
+  ok(limpios > 0 && piezas > 0, 'tiro a la cabina: mechas enteros para saquear (' + piezas + ' piezas)');
 }
 
 console.log(fallas ? '\n' + fallas + ' falla(s)' : '\nTodo bien');

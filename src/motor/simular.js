@@ -28,6 +28,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
     vistos: [new Set(), new Set()],
     azarDecision: azar.derivar('decision'),
     azarCombate: azar.derivar('combate'),
+    azarPartes: azar.derivar('partes'),
     eventosTick: [],
     vip: null,
     lider: null,
@@ -44,6 +45,10 @@ export function simular(datos, { mision, escuadron, semilla }) {
       // tormenta / noche: todos ven menos (nunca menos de 2 casillas)
       vision: Math.max(2, plantilla.vision + (mision.visionDelta || 0)),
       armas: plantilla.armas.map((a) => ({ ...a })),
+      habilidades: [...(plantilla.habilidades || [])],
+      etiquetasPartes: [...(plantilla.etiquetasPartes || [])],
+      slots: plantilla.slots ? JSON.parse(JSON.stringify(plantilla.slots)) : null,
+      rotas: [], danioSlot: {}, golpeCabina: false,
       mochila: plantilla.mochila ? { ...plantilla.mochila } : null,
       id: 'u' + num, num: num++, bando,
       x: c[0], y: c[1], mx: bando === 0 ? 1 : -1, my: 0,
@@ -205,7 +210,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
       if (!u.viva || u.vida > 0) continue;
       u.viva = false;
       const killer = u.ultimoAtacante ? B.porId.get(u.ultimoAtacante) : null;
-      B.log({ tipo: 'muere', u: u.id, por: killer ? killer.id : null });
+      // limpio: cayo por un tiro a la cabina (el resto del mecha queda para saquear)
+      B.log({ tipo: 'muere', u: u.id, por: killer ? killer.id : null, ...(u.golpeCabina ? { limpio: true } : {}) });
       if (killer) {
         killer.s.bajas++;
         evento(B, 'baja_propia', killer);
