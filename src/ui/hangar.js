@@ -46,20 +46,36 @@ export function hangar(app, raiz, opciones = {}) {
       h('span', { class: 'tp-clase' }, ico(datos.clases[pi.clase].icono), datos.clases[pi.clase].nombre),
       h('span', { class: 'tp-nivel', title: 'Nivel' }, String(pi.nivel))));
     }
+    // centra la tarjeta elegida solo en horizontal (scrollIntoView movia toda la pagina)
     const activa = lista.querySelector('.activa');
-    if (activa && activa.scrollIntoView) activa.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (activa) lista.scrollLeft = activa.offsetLeft - (lista.clientWidth - activa.clientWidth) / 2;
   };
 
+  // Redibuja sin que se note: arma todo nuevo y lo cambia de una (sin quedar vacio en el medio),
+  // y deja la pagina y las listas con scroll horizontal donde estaban. Asi tocar una parte no "recarga".
   const pintarDetalle = () => {
-    detalle.innerHTML = '';
+    const y = window.scrollY;
+    const scrolls = [...detalle.querySelectorAll('[data-scroll]')].map((el) => [el.dataset.scroll, el.scrollLeft, el.scrollTop]);
     detalle.className = 'detalle-piloto ver-' + pestana;
     const pi = p.pilotos.find((x) => x.id === sel);
-    if (!pi) return;
-    detalle.append(
+    if (!pi) { detalle.replaceChildren(); return; }
+    const refrescar = () => { pintarTarjetaPiloto(); pintarDetalle(); };
+    detalle.replaceChildren(
       h('div', { class: 'columnas-hangar' },
-        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }),
+        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, refrescar),
           seccion('Relaciones', panelRelaciones(app, pi), false), seccion('Hoja de servicio', panelHoja(pi), false)),
         h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
+    for (const [id, x, yy] of scrolls) {
+      const el = detalle.querySelector('[data-scroll="' + id + '"]');
+      if (el) { el.scrollLeft = x; el.scrollTop = yy; }
+    }
+    window.scrollTo(0, y);
+  };
+  // la tarjeta del piloto (nivel, nombre) sin redibujar todo el carrusel
+  const pintarTarjetaPiloto = () => {
+    const x = lista.scrollLeft;
+    pintarLista();
+    lista.scrollLeft = x;
   };
 
   montar(raiz, 
@@ -172,9 +188,8 @@ function panelEstado(app, pi, refrescar) {
   const hacer = (que) => {
     if (!reparar(datos, p, pi.id, que)) return;
     app.guardar();
-    const y = window.scrollY;
-    app.ir('hangar', { piloto: pi.id, pestana: 'piloto' });
-    window.scrollTo(0, y);
+    actualizarCreditos(app);
+    refrescar();
   };
   const btn = (texto, que, costo) => boton(texto + ' · ' + costo + ' cr', () => hacer(que),
     { iconoNombre: 'llave', clase: 'secundario', deshabilitado: p.creditos < costo });
@@ -349,7 +364,7 @@ function panelMecha(app, pi, refrescar) {
     h('div', { class: 'armado-encaje' },
       h('h3', { class: 'sub-panel' }, ico('llave'), ' ' + nombreSlot + (tarjetas.length > 1 ? ' · tocá una parte para comparar' : '')),
       tarjetas.length > (puesta && puesta.parte !== 'mochila_vacia' ? 1 : 0)
-        ? h('div', { class: 'tarjetas-partes' }, ...tarjetas)
+        ? h('div', { class: 'tarjetas-partes', 'data-scroll': 'partes-' + slot }, ...tarjetas)
         : h('p', { class: 'ayuda' }, 'No hay partes de este tipo en el depósito. Se ganan en las misiones o se compran en el taller.'),
       detalleCand),
     seccion('Estado y reparación', panelEstado(app, pi, refrescar), costoReparacion(datos, pi).total > 0),
@@ -357,8 +372,11 @@ function panelMecha(app, pi, refrescar) {
 }
 
 // Seccion que se abre y se cierra (asi el celular no es un scroll infinito)
+const ABIERTAS = {}; // que secciones abrio o cerro el jugador (se respeta al redibujar)
 function seccion(titulo, contenido, abierta) {
-  return h('details', { class: 'seccion', ...(abierta ? { open: true } : {}) }, h('summary', {}, titulo), contenido);
+  const open = ABIERTAS[titulo] !== undefined ? ABIERTAS[titulo] : abierta;
+  return h('details', { class: 'seccion', ...(open ? { open: true } : {}), ontoggle: (e) => { ABIERTAS[titulo] = e.target.open; } },
+    h('summary', {}, titulo), contenido);
 }
 
 // ---------- Pasivas: lo que el piloto lleva puesto sin que se lo pidan ----------
@@ -427,7 +445,7 @@ function panelGambits(app, pi, refrescar) {
         h('div', { class: 'orden-pasos', role: 'tablist' }, ...pasos.map(([c, t]) => h('button', {
           class: 'orden-paso' + (ORDEN.paso === c ? ' activo' : ''), role: 'tab', onclick: () => { ORDEN.paso = c; refrescar(); }
         }, t))),
-        h('div', { class: 'orden-opciones' }, ...opciones.map(([id, o]) => {
+        h('div', { class: 'orden-opciones', 'data-scroll': 'opciones-' + i + '-' + ORDEN.paso }, ...opciones.map(([id, o]) => {
           const bloq = falta[letra + ':' + id];
           return h('button', {
             class: 'orden-opcion' + (id === g[campo] ? ' elegida' : '') + (bloq ? ' bloqueada' : ''), disabled: !!bloq && id !== g[campo],
@@ -481,4 +499,10 @@ function panelHoja(pi) {
     hoja.length
       ? h('ul', { class: 'hoja-servicio' }, ...hoja.map((t) => h('li', {}, t)))
       : h('p', { class: 'ayuda' }, 'Todavía no hay nada para contar. Ya va a haber.'));
+}
+
+// Los creditos de la barra de arriba (sin redibujar la pantalla)
+function actualizarCreditos(app) {
+  const c = document.querySelector('.hud-datos .chip');
+  if (c) c.lastChild.textContent = String(app.partida.creditos);
 }
