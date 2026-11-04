@@ -21,6 +21,8 @@ export function preparacion(app, raiz) {
     const icono = u.cuerpo === 'mutante' ? 'colmillo' : u.cuerpo === 'mecha' ? 'jefe' : 'piloto';
     return chip(icono, (m.niebla ? '?' : n) + ' × ' + u.nombre + (m.lider === id ? ' (líder)' : ''), u.nombre);
   });
+  // el escuadron de la campana anterior, ahora enemigo
+  for (const r of m.rivales || []) enemigos.push(chip('calavera', '«' + r.piloto.apodo + '» · ' + datos.clases[r.piloto.clase].nombre + ' niv ' + r.piloto.nivel, 'Tu escuadrón anterior', 'chip-alerta'));
   const escuadron = escuadronParaMision(datos, p);
 
   montar(raiz, 

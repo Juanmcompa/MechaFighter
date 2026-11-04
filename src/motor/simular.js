@@ -98,6 +98,12 @@ export function simular(datos, { mision, escuadron, semilla }) {
     proximaOleadaEn = B.t + (mision.ticksEntreOleadas || 0);
   };
   if (oleadas.length) soltarOleada();
+  // escuadron de otra campana, ahora del otro lado (ver campana/legado.js)
+  (mision.rivales || []).forEach((r, i) => {
+    const [x, y] = ap.enemigo[(i + 1) % ap.enemigo.length];
+    const base = unidadDePiloto(datos, r.piloto, r.mecha, r.gambits);
+    B.agregarUnidad({ ...base, tipo: 'enemigo', ref: 'ex:' + r.piloto.id, vinculoRef: null, amenaza: 3, exPiloto: true }, 1, x, y);
+  });
   for (const em of mision.emboscadas || []) {
     em.unidades.forEach((id) => B.agregarUnidad(unidadEnemiga(datos, id, mision.nivel || 1), 1, em.casilla[0], em.casilla[1]));
   }
@@ -279,7 +285,7 @@ function revisarObjetivos(B, oleadasPendientes, leerZona, guardarZona) {
 function ficha(u) {
   return {
     bando: u.bando, nombre: u.nombre, tipo: u.tipo, cuerpo: u.cuerpo, clase: u.clase, personalidad: u.personalidad, sprite: u.sprite || null,
-    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref,
+    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto,
     armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual }))
   };
 }

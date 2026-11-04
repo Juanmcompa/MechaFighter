@@ -5,7 +5,8 @@ import { simular } from '../src/motor/simular.js';
 import { evaluar } from '../src/motor/decision.js';
 import { armarMision } from '../src/campana/misiones.js';
 import { crearRecluta } from '../src/campana/reclutas.js';
-import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir } from '../src/campana/partida.js';
+import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector } from '../src/campana/partida.js';
+import { fotoPiloto } from '../src/campana/legado.js';
 import { leerDisco } from '../tools/leer-disco.mjs';
 
 let fallas = 0;
@@ -28,7 +29,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === 'pgy3hp', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === 'xgy1lm', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {
@@ -90,6 +91,36 @@ console.log('Campana');
   ok(inf.pilotos.length === 4 && p.columna === 0, 'el informe cubre al escuadron y se avanza una columna');
   ok(p.caidos.length === inf.caidos.length && p.pilotos.length + p.caidos.length === 4, 'los muertos pasan al memorial');
   ok(JSON.parse(JSON.stringify(p)).semilla === 99, 'la partida se puede guardar');
+}
+
+// Caminos del sector: a cada nodo se llega, y desde cada uno se sigue
+{
+  const p = nuevaPartida(datos, 77);
+  const cols = p.sectores[0].columnas;
+  let bien = true;
+  for (let c = 0; c + 1 < cols.length; c++) {
+    if (cols[c].some((n) => !n.sig || !n.sig.length)) bien = false;
+    if (cols[c + 1].some((n) => !cols[c].some((a) => a.sig.includes(n.i)))) bien = false;
+  }
+  ok(bien, 'caminos del sector: todos los nodos enlazados');
+  elegirNodo(datos, p, 0);
+  const desde = cols[0][p.posicion];
+  ok(nodosSiguientes(p).every((n) => desde.sig.includes(n.i)), 'solo se puede ir a los nodos enlazados');
+}
+
+// Legado: el veterano pasa a la campana siguiente y el escuadron perdido aparece como enemigo
+{
+  const vieja = nuevaPartida(datos, 55);
+  const fotos = vieja.pilotos.map(fotoPiloto);
+  const legado = { resultado: 'derrota', sectorNombre: 'Chatarrería Sur', veterano: { ...fotos[0], nivel: 4, comoLlego: 'sobrevivio' }, escuadron: fotos.slice(1) };
+  const p = nuevaPartida(datos, 56, legado);
+  ok(p.pilotos.length === datos.reglas.reclutas_iniciales + 1 && p.pilotos.some((x) => x.veterano && x.nivel === 4), 'el veterano entra a la campana nueva');
+  p.sector = datos.reglas.legado.sector_encuentro;
+  generarSector(datos, p);
+  const nodo = p.sectores[p.sector].columnas.flat().find((n) => n.encuentro);
+  ok(!!nodo && nodo.mision.rivales.length === 3, 'el escuadron anterior aparece en un contrato');
+  const r = simular(datos, { mision: nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: nodo.mision.semilla });
+  ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.exPiloto && e.ficha.bando === 1), 'pelean del otro lado');
 }
 
 console.log(fallas ? '\n' + fallas + ' falla(s)' : '\nTodo bien');

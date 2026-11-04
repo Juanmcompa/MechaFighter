@@ -264,3 +264,12 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .pips-intel i { width: 14px; height: 14px; border: 2px solid var(--ambar); display: inline-block; }
 .pips-intel i.lleno { background: var(--ambar); }
 .cita-jefe { margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--alarma); color: #e06a5a; font-style: italic; }
+
+/* Legado entre campanas */
+.legado-linea { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.legado-linea .ico { color: var(--alarma); }
+.veteranos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.tarjeta-veterano { display: grid; justify-items: center; gap: 4px; padding: 10px; background: var(--chapa); border: 2px solid var(--chapa-borde); color: var(--texto); cursor: pointer; font: inherit; }
+.tarjeta-veterano:hover { border-color: var(--fosforo-tenue); }
+.tarjeta-veterano.elegido { border-color: var(--fosforo); box-shadow: 0 0 0 3px rgba(143,220,90,.2); }
+.tarjeta-veterano small { color: var(--texto-tenue); }

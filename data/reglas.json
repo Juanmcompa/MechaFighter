@@ -110,5 +110,12 @@
     "chance_perdido": 18,
     "bonus_amigo_punteria": 6,
     "chance_discusion": 4
+  },
+  "legado": {
+    "chance_sobrevive": 40,
+    "chance_rescate": 70,
+    "sector_encuentro": 1,
+    "columna_encuentro": 2,
+    "nivel_max_rival": 2
   }
 }

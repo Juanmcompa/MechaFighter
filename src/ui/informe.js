@@ -27,6 +27,8 @@ export function informe(app, raiz, inf) {
         l.estado === 'muerto' ? h('p', { class: 'epitafio' }, l.nombre + '. ' + (l.epitafio || 'Cayó en combate.')) : null,
         l.estado !== 'muerto' && l.momentos && l.momentos.length ? h('ul', { class: 'hoja-servicio corta' }, ...l.momentos.map((t) => h('li', {}, t))) : null,
         l.nuevas.length ? h('div', { class: 'chips' }, ...l.nuevas.map(nuevaCosa)) : null)))),
+    inf.rescatado ? panel('Rescate',
+      h('p', {}, ico('vinculo'), ' Entre los restos encontraron a «' + inf.rescatado + '», vivo. Vuelve al escuadrón.')) : null,
     inf.inteligencia ? panel('Inteligencia',
       h('p', {}, ico('ojo'), ' Averiguaron algo más sobre ' + inf.inteligencia.jefe + ' (' + inf.inteligencia.valor + '/' + inf.inteligencia.maxima + ').')) : null,
     inf.relaciones && inf.relaciones.length ? panel('Relaciones',

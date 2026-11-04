@@ -7,6 +7,7 @@
 import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision, sumarCondicion } from './misiones.js';
+import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana, misionEncuentro } from './legado.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
@@ -28,7 +29,8 @@ const nuevoId = (p) => 'p' + (p.siguienteId++);
 
 // ---------- Inicio ----------
 
-export function nuevaPartida(datos, semilla) {
+// legado: lo que dejo la campana anterior (veterano, escuadron perdido). Ver legado.js.
+export function nuevaPartida(datos, semilla, legado = null) {
   const R = datos.reglas;
   const p = {
     version: VERSION_PARTIDA, versionDatos: R.version_datos, semilla, paso: 0, siguienteId: 1,
@@ -43,6 +45,13 @@ export function nuevaPartida(datos, semilla) {
   for (const c of clases) p.pilotos.push(crearRecluta(datos, az, nuevoId(p), c, p.pilotos.map((x) => x.apodo), p.pilotos.map((x) => x.retrato)));
   // Vinculos de a pares: con alguien tienen que contar (y a alguien van a extranar)
   for (let i = 0; i + 1 < p.pilotos.length; i += 2) vincular(p.pilotos[i], p.pilotos[i + 1]);
+  if (legado && legado.veterano) {
+    const v = legado.veterano;
+    sumarPilotoDeOtraCampana(datos, p, v, nuevoId(p), v.comoLlego === 'sobrevivio'
+      ? 'Sobrevivió a la caída de su escuadrón en ' + (legado.sectorNombre || 'la campaña anterior') + '. Volvió a firmar.'
+      : 'Veterano de la campaña anterior. Eligió seguir.');
+  }
+  if (legado && legado.escuadron && legado.escuadron.length) p.encuentro = { escuadron: legado.escuadron, sectorNombre: legado.sectorNombre, hecho: false };
   p.afinidad = {};
   const azAf = azarAparte(p, 'afinidad');
   for (const pi of p.pilotos) presentar(datos, p, pi, azAf);
@@ -90,6 +99,13 @@ export function generarSector(datos, p) {
       col.push(nodo);
     }
     columnas.push(col);
+  }
+  // El escuadron de la campana anterior aparece en un contrato del sector indicado
+  const L = datos.reglas.legado;
+  if (p.encuentro && !p.encuentro.hecho && p.sector === Math.min(L.sector_encuentro, def.sectores - 1)) {
+    const col = columnas[Math.min(L.columna_encuentro, columnas.length - 2)];
+    const k = Math.max(0, col.findIndex((n) => n.tipo === 'mision'));
+    col[k] = { tipo: 'mision', i: col[k].i, encuentro: true, mision: misionEncuentro(datos, p, az, dif, nivel) };
   }
   // Caminos: cada nodo lleva a 1 o 2 de la columna siguiente (los de enfrente), y a cada nodo llega al menos uno.
   for (let c = 0; c < columnas.length - 1; c++) {
@@ -217,7 +233,7 @@ function avanzar(datos, p) {
   if (p.estado === 'fin') return;
   if (p.columna >= def.columnas_por_sector - 1) {
     p.puntaje += datos.reglas.campana.puntaje_por_sector;
-    if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; return; }
+    if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; p.legado = legadoDeVictoria(p); return; }
     p.sector++;
     generarSector(datos, p);
   }
@@ -334,6 +350,7 @@ export function cerrarMision(datos, p, resultado) {
   const sector = p.sector + 1;
   const donde = m.nombre + ' (sector ' + sector + ')';
   const desplegados = p.pilotos.filter((x) => resultado.resumen.pilotos[x.id]);
+  const fotos = desplegados.map(fotoPiloto); // como estaban antes de la mision (para el legado)
   const apodos = new Map(p.pilotos.map((x) => [x.id, x.apodo]));
   const nombreDe = (id) => apodos.get(id) || '?';
   const hoja = momentosDeMision(resultado.registro || [], m, sector, new Map(p.pilotos.map((x) => [x.id, x])));
@@ -443,13 +460,35 @@ export function cerrarMision(datos, p, resultado) {
       informe.botin.push(nombrePieza(datos, pieza));
     }
   }
+  // Contra el escuadron de la campana anterior: si se gana, a veces se rescata a uno de entre los restos
+  if (m.rivales) {
+    p.encuentro.hecho = true;
+    if (resultado.victoria && az.tirada(R.legado.chance_rescate)) {
+      const f = m.rivales.map((r) => r.piloto).sort((a, b) => b.nivel - a.nivel)[0];
+      const viejo = p.encuentro.escuadron.find((x) => x.id === f.id) || f;
+      const pi = sumarPilotoDeOtraCampana(datos, p, viejo, nuevoId(p), 'Rescatado de entre los restos en ' + donde + '. Volvió a casa.');
+      presentar(datos, p, pi, azarAparte(p, 'afinidad:' + pi.id));
+      informe.rescatado = pi.apodo;
+    }
+  }
+
   informe.puntaje = puntos;
   p.puntaje += puntos;
   p.ultimoInforme = informe;
   p.nodo = null;
 
   // Perder un contrato no termina la partida: se sigue viaje sin recompensa. Sin pilotos, si.
-  if (!p.pilotos.length) { p.estado = 'fin'; p.resultado = 'derrota'; }
+  if (!p.pilotos.length) {
+    p.estado = 'fin'; p.resultado = 'derrota';
+    p.legado = legadoDeDerrota(datos, p, fotos, azarAparte(p, 'legado'));
+  }
   else avanzar(datos, p);
   return informe;
+}
+
+// Al ganar la campana: quien sigue en la proxima (uno solo)
+export function elegirVeterano(p, pilotoId) {
+  if (!p.legado || p.resultado !== 'victoria') return;
+  const pi = p.pilotos.find((x) => x.id === pilotoId);
+  p.legado.veterano = pi ? { ...fotoPiloto(pi), comoLlego: 'eligio' } : null;
 }

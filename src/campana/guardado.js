@@ -16,3 +16,21 @@ export function cargar() {
 export function borrar() {
   try { localStorage.removeItem(CLAVE); } catch { /* nada */ }
 }
+
+// Legado entre campanas (veterano, escuadron perdido): aparte de la partida, asi no se borra con ella.
+const CLAVE_LEGADO = 'mechafighter.legado.v1';
+
+export function guardarLegado(legado) {
+  try { localStorage.setItem(CLAVE_LEGADO, JSON.stringify(legado)); return true; } catch { return false; }
+}
+
+export function cargarLegado() {
+  try {
+    const t = localStorage.getItem(CLAVE_LEGADO);
+    return t ? JSON.parse(t) : null;
+  } catch { return null; }
+}
+
+export function borrarLegado() {
+  try { localStorage.removeItem(CLAVE_LEGADO); } catch { /* nada */ }
+}

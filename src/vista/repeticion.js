@@ -9,6 +9,9 @@ const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama
 // Anulaciones que se cuentan por radio con la voz del piloto (ver voces.json)
 const VOZ_ANULA = new Set(['se_manda', 'se_le_pasa', 'perdido', 'reubicado', 'confusion', 'discute']);
 
+// Lo que dicen los pilotos de la campana anterior cuando aparecen del otro lado
+const EX_PILOTO = ['Control... ¿sos vos? Nos dejaste ahí.', 'No me mires así. Pagan mejor que vos.', 'Nadie vino a buscarnos, Control.', 'Ahora sí vas a ver cómo peleo.'];
+
 export class Repeticion {
   constructor({ datos, mision, registro, canvas, alEvento, alTerminar, pilotos }) {
     this.porPiloto = pilotos || new Map(); // id de piloto -> piloto (para voces, vinculos y marcas)
@@ -157,6 +160,8 @@ export class Repeticion {
           peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0,
           marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
         if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + ' despliega una torreta', clase: 'info' });
+        // el escuadron de la campana anterior, del otro lado
+        if (f.exPiloto) this.alEvento({ texto: f.nombre.toUpperCase() + ' (canal abierto): «' + EX_PILOTO[Number(e.u.slice(1)) % EX_PILOTO.length] + '»', clase: 'mal', importante: true });
         break;
       }
       case 'mueve':
