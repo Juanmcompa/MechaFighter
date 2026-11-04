@@ -242,6 +242,76 @@
           "objetivo": "yo"
         }
       ]
+    },
+    "jefe_varga": {
+      "nombre": "Varga «La Grúa»",
+      "cuerpo": "mecha",
+      "clase": "vanguardia",
+      "personalidad": "temerario",
+      "nivel": 3,
+      "amenaza": 5,
+      "jefe": true,
+      "partes": {
+        "cabeza": "cabeza_sensor",
+        "torso": "torso_pesado",
+        "piernas": "piernas_orugas",
+        "brazo_izq": "brazo_rotativa",
+        "brazo_der": "brazo_lanzallamas",
+        "mochila": "mochila_municion"
+      }
+    },
+    "jefe_madre": {
+      "nombre": "La Madre",
+      "cuerpo": "mutante",
+      "personalidad": "sanguinario",
+      "amenaza": 6,
+      "sprite": "mutante_verde",
+      "stats": {
+        "estructura": 190,
+        "blindaje": 3,
+        "velocidad": 2,
+        "punteria": 75,
+        "evasion": 5,
+        "iniciativa": 7,
+        "moral": 200,
+        "vision": 7
+      },
+      "arma_natural": {
+        "danio": 24,
+        "alcance": 1,
+        "cadencia": 3,
+        "punteria": 15
+      },
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_mas_debil"
+        }
+      ],
+      "jefe": true
+    },
+    "jefe_ostrova": {
+      "nombre": "Coronel Ostrova",
+      "cuerpo": "mecha",
+      "clase": "tirador",
+      "personalidad": "leal",
+      "nivel": 5,
+      "amenaza": 7,
+      "jefe": true,
+      "partes": {
+        "cabeza": "cabeza_optica",
+        "torso": "torso_medio",
+        "piernas": "piernas_bipode",
+        "brazo_izq": "brazo_canon_riel",
+        "brazo_der": "brazo_rifle",
+        "mochila": "mochila_vacia"
+      }
     }
   },
   "escuadras": {

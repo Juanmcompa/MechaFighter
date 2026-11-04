@@ -248,3 +248,19 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .cabecera-nombre { flex: 1; }
 .tarjeta-piloto.activa .retrato { border-color: var(--fosforo); }
 .mecha-grande { image-rendering: pixelated; }
+
+/* Caminos entre nodos e inteligencia del sector */
+.mapa-sector { position: relative; }
+.mapa-sector .caminos { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.mapa-sector .caminos line { stroke: rgba(143,220,90,.18); stroke-width: 2; stroke-dasharray: 4 5; }
+.mapa-sector .caminos line.abierto { stroke: var(--fosforo); stroke-opacity: .8; stroke-dasharray: 6 4; }
+.mapa-sector .caminos line.hecho { stroke: var(--fosforo); stroke-opacity: .55; stroke-dasharray: none; stroke-width: 3; }
+.columna-sector { position: relative; z-index: 1; }
+.nodo.inalcanzable { opacity: .35; }
+.nodo.aca { box-shadow: 0 0 0 3px var(--fosforo); }
+.intel { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--texto); }
+.intel .ico { color: var(--ambar); }
+.pips-intel { display: inline-flex; gap: 4px; }
+.pips-intel i { width: 14px; height: 14px; border: 2px solid var(--ambar); display: inline-block; }
+.pips-intel i.lleno { background: var(--ambar); }
+.cita-jefe { margin: 6px 0; padding-left: 10px; border-left: 3px solid var(--alarma); color: #e06a5a; font-style: italic; }

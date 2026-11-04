@@ -277,6 +277,10 @@ export class Repeticion {
       }
       case 'inicio': {
         this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ' + this.lineaControl('inicio', e.t), clase: 'control' });
+        if (this.mision && this.mision.jefe) {
+          this.alEvento({ texto: 'CONTROL › ESCUADRÓN: Objetivo confirmado: ' + this.mision.jefe.nombre + '. No vuelvan sin su cabeza.', clase: 'control', importante: true });
+          this.alEvento({ texto: this.mision.jefe.nombre.toUpperCase() + ' (canal abierto): «' + this.mision.jefe.frase + '»', clase: 'mal', importante: true });
+        }
         const nuestros = this.nuestros(false);
         if (nuestros.length) this.decir(nuestros[(nuestros.length * 7 + this.registro.length) % nuestros.length], 'inicio', true);
         break;

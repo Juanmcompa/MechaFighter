@@ -15,8 +15,9 @@ function escuadra(datos, azar, lista, dificultad) {
 }
 
 // dificultad: cuantas y cuales escuadras. nivel: que tan fuertes (si no se pasa, igual a la dificultad).
-export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificultad) {
-  const tpl = datos.misiones[plantillaId];
+// cambios: para los jefes de sector, otro lider y otras escuadras que los de la plantilla.
+export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificultad, cambios = null) {
+  const tpl = cambios ? { ...datos.misiones[plantillaId], ...cambios } : datos.misiones[plantillaId];
   const mapaId = azar.elegir(tpl.mapas);
   const mapa = datos.mapas[mapaId];
   const p = tpl.parametros || {};
@@ -110,16 +111,23 @@ function sortearCondiciones(datos, dificultad, azar) {
 
 // Pasa las condiciones a datos concretos de la mision, que el motor entiende.
 function aplicarCondiciones(datos, m, ids, azar, tpl) {
-  m.condiciones = ids;
+  m.condiciones = [];
   m.estadosEscuadron = [];
   m.visionDelta = 0;
+  for (const id of ids) sumarCondicion(datos, m, id, azar, tpl.enemigos);
+}
+
+// Suma una condicion a una mision ya armada (tambien la usa la campana: la inteligencia sobre el jefe).
+export function sumarCondicion(datos, m, id, azar, escuadras) {
+  if (m.condiciones.includes(id)) return;
+  m.condiciones.push(id);
   const mapa = datos.mapas[m.mapa];
-  for (const id of ids) {
+  {
     const e = datos.condiciones_mision[id].efectos;
     if (e.vision) m.visionDelta += e.vision;
     if (e.niebla !== undefined) m.niebla = e.niebla;
     if (e.estado_escuadron) m.estadosEscuadron.push(e.estado_escuadron);
-    if (e.refuerzos) m.refuerzos = { tick: e.refuerzos, unidades: escuadra(datos, azar, tpl.enemigos, m.dificultad) };
+    if (e.refuerzos) m.refuerzos = { tick: e.refuerzos, unidades: escuadra(datos, azar, escuadras, m.dificultad) };
     if (e.unidad_extra) {
       if (m.oleadas.length) m.oleadas[0].push(e.unidad_extra);
       else m.emboscadas.push({ unidades: [e.unidad_extra], casilla: mapa.aparicion.enemigo[0] });

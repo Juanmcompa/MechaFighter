@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Como se arma el mapa de nodos de cada campana. Cada sector tiene varias columnas de nodos; el jugador elige un camino de izquierda a derecha. 'tipos_de_nodo' son los pesos de lo que puede aparecer.",
+  "_ayuda": "Como se arma el mapa de nodos de cada campana. Cada sector tiene varias columnas de nodos; el jugador elige un camino de izquierda a derecha. 'tipos_de_nodo' son los pesos de lo que puede aparecer. 'sectores': el objetivo y el jefe con nombre de cada sector, en orden. Ganar misiones del sector junta inteligencia sobre el jefe (ver 'inteligencia').",
   "campana_base": {
     "nombre": "Cinturón de Kessler",
     "sectores": 3,
@@ -42,6 +42,59 @@
       1,
       3,
       5
+    ],
+    "enlaces_por_nodo": {
+      "min": 1,
+      "max": 2
+    },
+    "inteligencia": {
+      "maxima": 3,
+      "por_mision": 1,
+      "sin_datos": "refuerzos",
+      "con_datos": "inteligencia",
+      "datos_desde": 2
+    },
+    "sectores_def": [
+      {
+        "nombre": "Chatarrería Sur",
+        "objetivo": "Varga «La Grúa» controla los desarmaderos del sur y cobra peaje a todo lo que pasa. Encontralo y bajalo.",
+        "jefe": {
+          "unidad": "jefe_varga",
+          "nombre": "Varga «La Grúa»",
+          "plantilla": "asalto",
+          "escuadras": [
+            "banda_con_mecha",
+            "patrulla_saqueadora"
+          ],
+          "frase": "¿Mercenarios? En mi chatarrería no entra nadie sin pagar."
+        }
+      },
+      {
+        "nombre": "Colonias Muertas",
+        "objetivo": "Algo anida bajo las colonias abandonadas y los mutantes salen de ahí. Hay que llegar al nido y matar a la Madre.",
+        "jefe": {
+          "unidad": "jefe_madre",
+          "nombre": "La Madre",
+          "plantilla": "asalto",
+          "escuadras": [
+            "nido"
+          ],
+          "frase": "(un chillido que satura la radio)"
+        }
+      },
+      {
+        "nombre": "Anillo de Kessler",
+        "objetivo": "La coronel Ostrova y su escuadrón de élite cierran la salida del cinturón. Es ella o ustedes.",
+        "jefe": {
+          "unidad": "jefe_ostrova",
+          "nombre": "Coronel Ostrova",
+          "plantilla": "asalto",
+          "escuadras": [
+            "banda_con_mecha"
+          ],
+          "frase": "Control, ¿no? Despedite de tus pilotos."
+        }
+      }
     ]
   }
 }

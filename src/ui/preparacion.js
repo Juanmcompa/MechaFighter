@@ -30,6 +30,9 @@ export function preparacion(app, raiz) {
       h('div', {},
         panel('Briefing',
           h('p', { class: 'briefing' }, m.descripcion),
+          m.jefe ? h('p', { class: 'cita-jefe' }, '«' + m.jefe.frase + '»') : null,
+          m.jefe ? h('p', { class: 'ayuda' }, ico('ojo'), ' Inteligencia reunida: ' + (m.inteligencia || 0) + '. ' +
+            (!m.inteligencia ? 'Llegan a ciegas: los esperan con refuerzos.' : m.condiciones.includes('inteligencia') ? 'Saben dónde está: sin niebla y atentos.' : 'Datos sueltos.')) : null,
           h('div', { class: 'chips' },
             chip('mira', 'Nivel ' + m.nivel, 'Nivel de los enemigos'),
             chip('creditos', '+' + m.recompensa.creditos, 'Pago si ganan'),

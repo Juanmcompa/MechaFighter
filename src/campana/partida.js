@@ -6,7 +6,7 @@
 
 import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
-import { armarMision } from './misiones.js';
+import { armarMision, sumarCondicion } from './misiones.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
@@ -61,6 +61,7 @@ function vincular(a, b) {
 
 export function generarSector(datos, p) {
   const def = datos.sectores.campana_base;
+  const sdef = def.sectores_def[p.sector] || def.sectores_def.at(-1);
   const az = azarDe(p, 'sector');
   const dif = def.dificultad_por_sector[p.sector] || def.dificultad_por_sector.at(-1);
   const pesos = Object.entries(def.tipos_de_nodo);
@@ -77,30 +78,81 @@ export function generarSector(datos, p) {
       const nodo = { tipo };
       if (tipo === 'mision') nodo.mision = armarMision(datos, az.elegir(misionesPosibles), dif, az, nivel);
       if (tipo === 'jefe') {
-        nodo.mision = armarMision(datos, 'asalto', dif + 1, az, nivel + 1);
-        nodo.mision.nombre = 'Jefe del sector';
+        const J = sdef.jefe;
+        nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });
+        nodo.mision.nombre = J.nombre;
+        nodo.mision.descripcion = 'Objetivo del sector: ' + J.nombre + '. ' + nodo.mision.descripcion;
+        nodo.mision.jefe = { nombre: J.nombre, frase: J.frase };
         nodo.mision.recompensa.creditos += 100;
         nodo.mision.recompensa.botin += 1;
       }
+      nodo.i = i;
       col.push(nodo);
     }
     columnas.push(col);
   }
-  p.sectores[p.sector] = { nombre: def.nombre + ' · ' + (p.sector + 1) + '/' + def.sectores, dificultad: dif, columnas };
+  // Caminos: cada nodo lleva a 1 o 2 de la columna siguiente (los de enfrente), y a cada nodo llega al menos uno.
+  for (let c = 0; c < columnas.length - 1; c++) {
+    const a = columnas[c], b = columnas[c + 1];
+    const frente = (i) => Math.round(((i + 0.5) / a.length) * b.length - 0.5);
+    for (const nodo of a) {
+      const j = Math.max(0, Math.min(b.length - 1, frente(nodo.i)));
+      nodo.sig = [j];
+      if (b.length > 1 && az.entero(def.enlaces_por_nodo.min, def.enlaces_por_nodo.max) > 1) {
+        const otro = j + (az.tirada(50) ? 1 : -1);
+        const k = otro >= 0 && otro < b.length ? otro : j + (j + 1 < b.length ? 1 : -1);
+        if (!nodo.sig.includes(k)) nodo.sig.push(k);
+      }
+    }
+    for (const nb of b) {
+      if (a.some((x) => x.sig.includes(nb.i))) continue;
+      // nadie llega: lo engancha el de enfrente
+      const cerca = a.slice().sort((x, y) => Math.abs(x.i / a.length - nb.i / b.length) - Math.abs(y.i / a.length - nb.i / b.length))[0];
+      cerca.sig.push(nb.i);
+    }
+    for (const nodo of a) nodo.sig.sort((x, y) => x - y);
+  }
+  p.sectores[p.sector] = {
+    nombre: sdef.nombre, numero: p.sector + 1, de: def.sectores, objetivo: sdef.objetivo, jefe: sdef.jefe.nombre,
+    dificultad: dif, columnas, inteligencia: 0
+  };
   p.columna = -1;
+  p.posicion = null; // en que nodo de la columna actual esta el escuadron
 }
 
+// Inteligencia sobre el jefe: sin datos llega con refuerzos; con suficientes, sin niebla y el escuadron atento.
+function inteligenciaAlJefe(datos, p, nodo) {
+  const I = datos.sectores.campana_base.inteligencia;
+  const s = p.sectores[p.sector];
+  if (s.inteligencia === undefined) return; // partida guardada antes de que existiera
+  const m = nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
+  const az = azarAparte(p, 'jefe');
+  const escuadras = datos.sectores.campana_base.sectores_def[p.sector] ? datos.sectores.campana_base.sectores_def[p.sector].jefe.escuadras : ['banda_con_mecha'];
+  if (!s.inteligencia) sumarCondicion(datos, m, I.sin_datos, az, escuadras);
+  else if (s.inteligencia >= I.datos_desde) sumarCondicion(datos, m, I.con_datos, az, escuadras);
+  m.cantidadEnemigos = m.oleadas.reduce((t, o) => t + o.length, 0) + m.emboscadas.reduce((t, e) => t + e.unidades.length, 0) + (m.refuerzos ? m.refuerzos.unidades.length : 0);
+  m.inteligencia = s.inteligencia;
+}
+
+// Los nodos a los que se puede ir desde donde esta el escuadron
 export function nodosSiguientes(p) {
   const s = p.sectores[p.sector];
-  return s && s.columnas[p.columna + 1] ? s.columnas[p.columna + 1] : [];
+  if (!s || !s.columnas[p.columna + 1]) return [];
+  const sig = s.columnas[p.columna + 1];
+  if (p.columna < 0 || p.posicion === null || p.posicion === undefined) return sig;
+  const aca = s.columnas[p.columna][p.posicion];
+  return aca && aca.sig ? sig.filter((n) => aca.sig.includes(n.i)) : sig;
 }
 
 export function elegirNodo(datos, p, i) {
   const nodo = nodosSiguientes(p)[i];
   if (!nodo) return null;
   p.columna++;
+  p.posicion = nodo.i;
   p.nodo = { ...nodo, indice: i };
   nodo.visitado = true;
+  // al jefe se llega con lo que se averiguo en el camino
+  if (nodo.tipo === 'jefe') inteligenciaAlJefe(datos, p, p.nodo);
   const R = datos.reglas.campana;
   switch (nodo.tipo) {
     case 'mision':
@@ -364,6 +416,13 @@ export function cerrarMision(datos, p, resultado) {
       if (gana) { pi.medallas.push(id); linea.nuevas.push({ tipo: 'medalla', id }); }
     }
     informe.pilotos.push(linea);
+  }
+
+  // Inteligencia sobre el jefe del sector: cada mision ganada en el camino suma
+  const sec = p.sectores[p.sector];
+  if (resultado.victoria && p.nodo.tipo === 'mision' && sec && sec.inteligencia !== undefined) {
+    const I = datos.sectores.campana_base.inteligencia;
+    if (sec.inteligencia < I.maxima) { sec.inteligencia += I.por_mision; informe.inteligencia = { valor: sec.inteligencia, maxima: I.maxima, jefe: sec.jefe }; }
   }
 
   // Afinidad: lo que vivieron juntos los acerca o los separa
