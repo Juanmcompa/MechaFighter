@@ -1,4 +1,4 @@
-import { h, montar, boton, panel, ico, retrato } from './comun.js';
+import { h, montar, boton, panel, ico, retrato, version } from './comun.js';
 import { nuevaPartida } from '../campana/partida.js';
 import { cargarLegado, borrarLegado } from '../campana/guardado.js';
 
@@ -46,5 +46,6 @@ export function portada(app, raiz) {
           h('li', {}, h('strong', {}, 'En el hangar'), ' cambiá partes y programá cada mecha: SI pasa algo → HACÉ algo.'),
           h('li', {}, h('strong', {}, 'Mirá la batalla.'), ' No hay control: lo que programaste, y lo que el piloto decida, es lo que pasa.'),
           h('li', {}, h('strong', {}, 'Cuidá a tu gente.'), ' Ganan experiencia, cicatrices y medallas. La muerte es permanente.'))),
-      h('p', { class: 'firma' }, 'App en desarrollo · Early Access')));
+      h('p', { class: 'firma' }, 'App en desarrollo · Early Access'),
+      app.datos.version ? h('p', { class: 'version' }, h('strong', {}, 'v' + version(app.datos)), ' · ' + app.datos.version.cambio) : null));
 }

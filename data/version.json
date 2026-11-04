@@ -1,0 +1,6 @@
+{
+  "_ayuda": "Version del juego que se muestra en la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero' y copia el titulo del commit en 'cambio'). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
+  "mayor": 0,
+  "numero": 30,
+  "cambio": "Versión del juego en la portada, se suma sola en cada commit"
+}

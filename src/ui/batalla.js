@@ -1,5 +1,5 @@
 // La batalla: el motor la resuelve entera en un instante y aca se la mira, con pausa, velocidades y saltar.
-import { h, montar, ico, botonIcono, boton, barra, retrato, VERSION } from './comun.js';
+import { h, montar, ico, botonIcono, boton, barra, retrato, version } from './comun.js';
 import { simular } from '../motor/simular.js';
 import { Repeticion } from '../vista/repeticion.js';
 import { escuadronParaMision, cerrarMision } from '../campana/partida.js';
@@ -54,7 +54,7 @@ export function batalla(app, raiz) {
     h('div', { class: 'columnas-batalla' },
       h('div', { class: 'col-campo' }, plantel, envoltura),
       h('section', { class: 'taclog', 'aria-label': 'Registro de combate' }, h('h2', { class: 'taclog-titulo' }, '[ TAC-LOG ]'), feed)),
-    h('footer', { class: 'pie-sistema' }, h('span', {}, '[ SECTOR ' + (p.sector + 1) + ' ]'), h('span', {}, '[ SYSTEM v' + VERSION + ' ]')),
+    h('footer', { class: 'pie-sistema' }, h('span', {}, '[ SECTOR ' + (p.sector + 1) + ' ]'), h('span', {}, '[ SYSTEM v' + version(app.datos) + ' ]')),
     final);
 
   const nuevaLinea = (ev) => {

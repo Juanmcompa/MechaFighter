@@ -21,7 +21,8 @@
     "condiciones_mision",
     "afinidad",
     "dilemas",
-    "generador_mapas"
+    "generador_mapas",
+    "version"
   ],
   "mapas": [
     "puesto_01",

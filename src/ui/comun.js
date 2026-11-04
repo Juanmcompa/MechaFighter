@@ -5,7 +5,8 @@ import { rutaRetrato } from '../vista/sprites.js';
 import { elegirRetrato } from '../campana/reclutas.js';
 
 // Version que se muestra en la barra de estado de abajo
-export const VERSION = '0.3';
+// Version del juego (data/version.json, la suma sola tools/hooks/post-commit en cada commit)
+export const version = (datos) => (datos && datos.version ? datos.version.mayor + '.' + datos.version.numero : '0');
 
 // h('div', { class: 'x', onclick: fn }, hijo1, 'texto', ...). html: '...' para meter iconos.
 export function h(tag, attrs = {}, ...hijos) {

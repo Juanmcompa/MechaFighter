@@ -2,7 +2,7 @@
 // (app, raiz, ...argumentos) y dibuja lo suyo adentro de raiz.
 
 import { guardar, cargar, borrar } from '../campana/guardado.js';
-import { h, VERSION } from './comun.js';
+import { h, version } from './comun.js';
 import { portada } from './portada.js';
 import { sectores } from './sectores.js';
 import { hangar } from './hangar.js';
@@ -31,7 +31,7 @@ export function crearApp(datos, raiz) {
       // barra de estado de la consola, abajo de todo (la batalla trae la suya)
       if (nombre !== 'batalla') {
         raiz.append(h('footer', { class: 'pie-sistema' },
-          h('span', {}, '[ SYSTEM v' + VERSION + ' ]'),
+          h('span', {}, '[ SYSTEM v' + version(app.datos) + ' ]'),
           h('span', { class: 'pie-firma' }, 'Desarrollado por Juan M. Comparini'),
           h('span', { class: 'senal' }, '▮▮▮▮▮▮')));
       }
