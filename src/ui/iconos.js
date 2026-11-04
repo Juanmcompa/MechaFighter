@@ -25,6 +25,7 @@ const P = {
   abajo: '<path d="M12 5v14M6 13l6 6 6-6"/>',
   cerrar: '<path d="M6 6l12 12M18 6L6 18"/>',
   mas: '<path d="M12 5v14M5 12h14"/>',
+  menos: '<path d="M5 12h14"/>',
   vida: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
   medalla: '<circle cx="12" cy="15" r="5"/><path d="M8.5 11L6 3h4l2 5 2-5h4l-2.5 8"/>',
   cicatriz: '<path d="M5 19L19 5M8 9l2 2M11 6l2 2M12 13l2 2M15 10l2 2"/>',

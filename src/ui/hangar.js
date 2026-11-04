@@ -57,7 +57,8 @@ export function hangar(app, raiz, opciones = {}) {
     if (!pi) return;
     detalle.append(
       h('div', { class: 'columnas-hangar' },
-        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }), panelRelaciones(app, pi), panelHoja(pi)),
+        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }),
+          seccion('Relaciones', panelRelaciones(app, pi), false), seccion('Hoja de servicio', panelHoja(pi), false)),
         h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
   };
 
@@ -200,45 +201,128 @@ function panelHabilidades(datos, pi) {
     h('p', { class: 'ayuda' }, 'Algunas partes traen habilidades y órdenes nuevas (★). Si las equipás, aparecen en el editor de órdenes.'));
 }
 
+// ---------- Armado del mecha ----------
+// Una pantalla: el mecha con sus 6 encajes alrededor, los numeros al lado y abajo las partes del deposito
+// para el encaje elegido. Tocar una parte la prueba (se ve que mejora y que empeora); "Equipar" la pone.
+const ARMADO = { slot: 'brazo_der', cand: null }; // queda entre redibujos (y entre pilotos)
+
+const STATS = [
+  ['estructura', 'vida', 'Estructura', 1], ['blindaje', 'escudo', 'Blindaje', 1], ['dano', 'bala', 'Daño', 1],
+  ['alcance', 'mira', 'Alcance', 1], ['punteria', 'mira', 'Puntería', 1], ['evasion', 'huida', 'Evasión', 1],
+  ['paso', 'rapido', 'Paso', -1], ['vision', 'ojo', 'Visión', 1]
+];
+
+function statsDe(datos, pi, mecha) {
+  const u = unidadDePiloto(datos, pi, mecha, pi.gambits);
+  const { peso, capacidad } = pesoMecha(datos, mecha);
+  return {
+    estructura: u.vidaMax, blindaje: u.blindaje, punteria: u.punteria, evasion: u.evasion, vision: u.vision, paso: u.velocidad,
+    // daño cada 10 ticks, sumando las armas (asi se comparan una ametralladora y un cañon)
+    dano: u.armas.reduce((s, a) => s + Math.round((a.danio * 10) / Math.max(1, a.cadencia)), 0),
+    alcance: u.armas.length ? Math.max(...u.armas.map((a) => a.alcance)) : 0,
+    peso, capacidad, habilidades: u.habilidades
+  };
+}
+
+function conPieza(pi, slot, cand, inventario) {
+  const m = { ...pi.mecha };
+  m[slot] = cand === 'sacar' ? (slot === 'mochila' ? { parte: 'mochila_vacia', afijos: [] } : null) : inventario[cand];
+  return m;
+}
+
+// Lo que cambia (para las tarjetas): mejoras en verde, empeoras en rojo, las mas grandes primero
+function diferencias(a, b) {
+  const out = [];
+  for (const [k, , nombre, dir] of STATS) {
+    const d = b[k] - a[k];
+    if (d) out.push({ nombre, d, bien: d * dir > 0, peso: Math.abs(d) / Math.max(1, Math.abs(a[k])) });
+  }
+  return out.sort((x, y) => y.peso - x.peso);
+}
+
+const imgParte = (id) => h('img', { class: 'img-parte', src: 'assets/mecha/azul/' + id + '.png', alt: '', onerror: (e) => { e.target.style.visibility = 'hidden'; } });
+
 function panelMecha(app, pi, refrescar) {
   const { datos } = app;
   const p = app.partida;
-  const u = unidadDePiloto(datos, pi, pi.mecha, pi.gambits);
-  const { peso, capacidad } = pesoMecha(datos, pi.mecha);
-  const lienzo = h('canvas', { width: 160, height: 160, class: 'mecha-grande', 'aria-label': 'Vista del mecha' });
-  dibujarMechaFicha(lienzo.getContext('2d'), fichaDe(datos, pi), 160);
+  const actual = statsDe(datos, pi, pi.mecha);
+  if (!SLOTS.some(([s]) => s === ARMADO.slot)) ARMADO.slot = 'brazo_der';
+  const slot = ARMADO.slot;
+  // si la candidata ya no esta (se equipo o cambio el piloto), se limpia
+  if (ARMADO.cand !== null && ARMADO.cand !== 'sacar' && (!p.inventario[ARMADO.cand] || datos.partes[p.inventario[ARMADO.cand].parte].encaje !== encajeDeSlot(slot))) ARMADO.cand = null;
+  const prueba = ARMADO.cand !== null ? statsDe(datos, pi, conPieza(pi, slot, ARMADO.cand, p.inventario)) : null;
+  const rotas = partesRotas(pi);
 
-  const stats = [
-    ['vida', 'Estructura', u.vidaMax], ['escudo', 'Blindaje', u.blindaje], ['rapido', 'Paso', u.velocidad + ' t'],
-    ['mira', 'Puntería', u.punteria], ['huida', 'Evasión', u.evasion], ['ojo', 'Visión', u.vision]
-  ];
-  const filas = SLOTS.map(([slot, nombre]) => {
-    const actual = normalizarPieza(pi.mecha[slot]);
-    const opciones = [h('option', { value: 'actual', selected: true }, actual && actual.parte !== 'mochila_vacia' ? nombrePieza(datos, actual) : '— vacío —')];
-    if (actual && actual.parte !== 'mochila_vacia' && slot !== 'torso' && slot !== 'piernas') opciones.push(h('option', { value: 'sacar' }, '✕ Sacar'));
-    p.inventario.forEach((pz, idx) => {
-      if (datos.partes[pz.parte].encaje === encajeDeSlot(slot)) opciones.push(h('option', { value: String(idx) }, '↺ ' + nombrePieza(datos, pz) + (datos.partes[pz.parte].habilidad ? ' ★' : '')));
-    });
-    const elegir = h('select', {
-      'aria-label': nombre,
-      onchange: (ev) => {
-        const v = ev.target.value;
-        if (v === 'actual') return;
-        equipar(datos, p, pi.id, slot, v === 'sacar' ? null : Number(v));
-        app.guardar();
-        refrescar();
-      }
-    }, ...opciones);
-    // Se ve una caja con el nombre y los datos de la parte; el select del navegador va encima, invisible,
-    // asi en el celular se abre la lista nativa (comoda para el dedo) sin perder el diseno.
-    return h('div', { class: 'fila-slot' },
-      h('span', { class: 'slot-nombre' }, nombre),
-      h('div', { class: 'selector rareza-' + (actual ? datos.partes[actual.parte].rareza : 'comun') },
-        h('strong', {}, actual && actual.parte !== 'mochila_vacia' ? nombrePieza(datos, actual) : '— vacío —'),
-        h('small', {}, actual && actual.parte !== 'mochila_vacia' ? describirParte(datos, actual) : 'Tocá para elegir'),
-        h('span', { class: 'selector-flecha', 'aria-hidden': 'true' }, '▼'),
-        elegir));
-  });
+  const lienzo = h('canvas', { width: 150, height: 150, class: 'mecha-grande', 'aria-label': 'Vista del mecha' });
+  dibujarMechaFicha(lienzo.getContext('2d'), fichaDe(datos, pi), 150);
+  const botonSlot = ([s, nombre]) => {
+    const pz = normalizarPieza(pi.mecha[s]);
+    const vacio = !pz || pz.parte === 'mochila_vacia';
+    return h('button', {
+      class: 'slot-boton' + (s === slot ? ' activo' : '') + (rotas.includes(s) ? ' rota' : '') + (vacio ? ' vacio' : '') + (!vacio && datos.partes[pz.parte].habilidad ? ' especial' : ''),
+      'aria-pressed': s === slot ? 'true' : 'false',
+      onclick: () => { ARMADO.slot = s; ARMADO.cand = null; refrescar(); }
+    }, h('small', {}, nombre), h('strong', {}, vacio ? '— vacío —' : datos.partes[pz.parte].nombre + (rotas.includes(s) ? ' ✕' : '')));
+  };
+  const izq = [SLOTS[0], SLOTS[3], SLOTS[5]], der = [SLOTS[1], SLOTS[4], SLOTS[2]]; // cabeza, brazo izq, mochila | torso, brazo der, piernas
+
+  const filaStat = ([k, icono, nombre, dir]) => {
+    const v = actual[k], n = prueba ? prueba[k] : v, d = n - v;
+    return h('div', { class: 'stat-fila' + (d ? (d * dir > 0 ? ' mejora' : ' empeora') : '') },
+      h('span', { class: 'stat-nombre' }, ico(icono), nombre),
+      h('span', { class: 'stat-valor' }, String(v) + (k === 'paso' ? ' t' : ''),
+        d ? h('em', {}, ' → ' + n + ' ' + (d * dir > 0 ? '▲' : '▼')) : null));
+  };
+  const carga = prueba || actual;
+  const panelStats = h('div', { class: 'armado-stats' },
+    ...STATS.map(filaStat),
+    h('div', { class: 'stat-fila carga' + (carga.peso > carga.capacidad ? ' empeora' : '') },
+      h('span', { class: 'stat-nombre' }, ico('peso'), 'Carga'),
+      h('span', { class: 'stat-valor' }, carga.peso + ' / ' + carga.capacidad)),
+    barra(carga.peso, carga.capacidad, carga.peso > carga.capacidad ? 'sobrepeso' : ''),
+    carga.peso > carga.capacidad ? h('small', { class: 'aviso-peso' }, 'Sobrepeso: camina más lento.') : null);
+
+  // Tarjetas del encaje elegido: lo puesto, sacarlo, y lo que hay en el deposito
+  const puesta = normalizarPieza(pi.mecha[slot]);
+  const tarjetas = [];
+  const tarjeta = (cand, pz, titulo, extra) => {
+    const dif = cand === null ? [] : diferencias(actual, statsDe(datos, pi, conPieza(pi, slot, cand, p.inventario)));
+    const pp = pz ? datos.partes[pz.parte] : null;
+    return h('button', {
+      class: 'tarjeta-parte rareza-' + (pp ? pp.rareza : 'comun') + (ARMADO.cand === cand ? ' elegida' : '') + (cand === null ? ' puesta' : ''),
+      onclick: () => { ARMADO.cand = cand === ARMADO.cand ? null : cand; refrescar(); }
+    },
+    pz ? imgParte(pz.parte) : h('span', { class: 'img-parte' }, ico('cerrar')),
+    h('strong', {}, titulo),
+    extra ? h('small', { class: 'tp-extra' }, extra) : null,
+    pp && pp.habilidad ? h('small', { class: 'tp-hab' }, '★ ' + datos.habilidades[pp.habilidad].nombre) : null,
+    cand === null ? h('small', { class: 'tp-puesta' }, 'Puesta') : h('span', { class: 'tp-difs' },
+      ...dif.slice(0, 3).map((x) => h('span', { class: x.bien ? 'bien' : 'mal' }, (x.bien ? '▲ ' : '▼ ') + x.nombre + ' ' + (x.d > 0 ? '+' : '') + x.d)),
+      dif.length ? null : h('span', {}, 'Igual')));
+  };
+  if (puesta && puesta.parte !== 'mochila_vacia') tarjetas.push(tarjeta(null, puesta, nombrePieza(datos, puesta), rotas.includes(slot) ? 'ROTA' : null));
+  p.inventario.forEach((pz, idx) => { if (datos.partes[pz.parte].encaje === encajeDeSlot(slot)) tarjetas.push(tarjeta(idx, pz, nombrePieza(datos, pz))); });
+  if (puesta && puesta.parte !== 'mochila_vacia' && slot !== 'torso' && slot !== 'piernas') tarjetas.push(tarjeta('sacar', null, 'Sacar'));
+
+  // La elegida: que es y el boton para ponerla
+  let detalleCand = null;
+  if (ARMADO.cand !== null) {
+    const pz = ARMADO.cand === 'sacar' ? null : p.inventario[ARMADO.cand];
+    const pp = pz ? datos.partes[pz.parte] : null;
+    const habNueva = prueba.habilidades.filter((x) => !actual.habilidades.includes(x));
+    const habPierde = actual.habilidades.filter((x) => !prueba.habilidades.includes(x));
+    detalleCand = h('div', { class: 'armado-detalle' },
+      h('strong', {}, pz ? nombrePieza(datos, pz) : 'Dejar el encaje vacío'),
+      pz ? h('p', {}, (pp.descripcion ? pp.descripcion + ' ' : '') + describirParte(datos, pz)) : null,
+      habNueva.length ? h('p', { class: 'bien' }, '★ Gana: ' + habNueva.map((x) => datos.habilidades[x].nombre).join(', ') + ' (y sus órdenes)') : null,
+      habPierde.length ? h('p', { class: 'mal' }, '✕ Pierde: ' + habPierde.map((x) => datos.habilidades[x].nombre).join(', ')) : null,
+      h('div', { class: 'acciones' },
+        boton('Probar otra', () => { ARMADO.cand = null; refrescar(); }, { clase: 'secundario' }),
+        boton(pz ? 'Equipar' : 'Sacar', () => {
+          equipar(datos, p, pi.id, slot, ARMADO.cand === 'sacar' ? null : ARMADO.cand);
+          ARMADO.cand = null; app.guardar(); refrescar();
+        }, { iconoNombre: 'llave', clase: 'principal' })));
+  }
 
   // El nombre del mecha: lo pone el piloto y se puede cambiar
   const nombreActual = pi.mechaNombre || nombreDeMecha(datos, pi.nombre);
@@ -252,23 +336,63 @@ function panelMecha(app, pi, refrescar) {
       app.guardar();
     }
   });
+  const nombreSlot = SLOTS.find(([s]) => s === slot)[1];
   return panel('Mecha',
     h('label', { class: 'fila-nombre-mecha' }, h('span', {}, '«'), nombreMecha, h('span', {}, '»'),
       (pi.bajas || 0) ? h('span', { class: 'marcas-texto', title: 'Marcas de bajas en el torso' }, '▮'.repeat(Math.min(10, pi.bajas)) + (pi.bajas > 10 ? '+' : '')) : null),
-    h('div', { class: 'mecha-cabecera' }, lienzo,
-      h('dl', { class: 'stats' }, ...stats.flatMap(([i, n, v]) => [h('dt', {}, ico(i), n), h('dd', {}, String(v))]))),
-    h('div', { class: 'peso' + (peso > capacidad ? ' sobrepeso' : '') },
-      h('span', {}, ico('peso'), 'Carga ' + peso + ' / ' + capacidad),
-      barra(peso, capacidad), peso > capacidad ? h('small', {}, 'Sobrepeso: el mecha camina más lento.') : null),
-    panelEstado(app, pi, refrescar),
-    ...filas,
-    panelHabilidades(datos, pi),
-    h('p', { class: 'ayuda' }, ico('estrella'), ' Partes en depósito: ' + p.inventario.length + '. Las ganás en las misiones o las comprás en el taller.'));
+    h('div', { class: 'armado' },
+      h('div', { class: 'armado-mecha' },
+        h('div', { class: 'slots-col' }, ...izq.map(botonSlot)), lienzo, h('div', { class: 'slots-col' }, ...der.map(botonSlot))),
+      panelStats),
+    h('div', { class: 'armado-encaje' },
+      h('h3', { class: 'sub-panel' }, ico('llave'), ' ' + nombreSlot + (tarjetas.length > 1 ? ' · tocá una parte para comparar' : '')),
+      tarjetas.length > (puesta && puesta.parte !== 'mochila_vacia' ? 1 : 0)
+        ? h('div', { class: 'tarjetas-partes' }, ...tarjetas)
+        : h('p', { class: 'ayuda' }, 'No hay partes de este tipo en el depósito. Se ganan en las misiones o se compran en el taller.'),
+      detalleCand),
+    seccion('Estado y reparación', panelEstado(app, pi, refrescar), costoReparacion(datos, pi).total > 0),
+    seccion('Habilidades especiales', panelHabilidades(datos, pi), false));
 }
 
-// ---------- Editor de gambits ----------
+// Seccion que se abre y se cierra (asi el celular no es un scroll infinito)
+function seccion(titulo, contenido, abierta) {
+  return h('details', { class: 'seccion', ...(abierta ? { open: true } : {}) }, h('summary', {}, titulo), contenido);
+}
 
-function textoCondicion(c) { return c.texto.replace(/\{\w+\}/g, 'N'); }
+// ---------- Pasivas: lo que el piloto lleva puesto sin que se lo pidan ----------
+const NOMBRE_MOD = { punteria: 'Puntería', evasion: 'Evasión', moral: 'Moral', danio_pct: 'Daño %', recarga: 'Recarga', blindaje: 'Blindaje',
+  vision: 'Visión', iniciativa: 'Iniciativa', alcance: 'Alcance', cadencia: 'Cadencia', velocidad: 'Paso', estructura: 'Estructura', municion: 'Cargador' };
+function efectos(mods) {
+  return Object.entries(mods || {}).map(([k, v]) => (NOMBRE_MOD[k] || k) + ' ' + (v > 0 ? '+' : '') + v).join(' · ');
+}
+
+function panelPasivas(app, pi) {
+  const { datos } = app;
+  const p = app.partida;
+  const filas = [];
+  const fila = (icono, titulo, texto, clase = '') => filas.push(h('li', { class: clase }, ico(icono), h('div', {}, h('strong', {}, titulo), h('span', {}, texto))));
+  const pers = textoPersonalidad(datos, pi);
+  fila(pers.icono || 'evento', 'Personalidad: ' + pers.texto, pers.titulo + (pers.texto === '???' ? '' : ' A veces pasa por alto tus órdenes.'), 'personalidad');
+  const vinculo = pi.vinculo ? p.pilotos.find((x) => x.id === pi.vinculo) : null;
+  if (vinculo) fila('vinculo', 'Vínculo con «' + vinculo.apodo + '»', 'Cerca de su vínculo pelea mejor; si lo pierde, se derrumba.', 'bien');
+  for (const c of pi.cicatrices) fila('cicatriz', datos.cicatrices[c].nombre, datos.cicatrices[c].texto || efectos(datos.cicatrices[c].mods), 'mal');
+  for (const t of pi.traumas) fila('trauma', datos.traumas[t.id].nombre, (datos.traumas[t.id].texto || 'Le pesa en combate: puede quebrarse.') + ' ' + curaTexto(t) + '.', 'mal');
+  for (const m of pi.medallas) fila('medalla', datos.medallas[m].nombre, efectos(datos.medallas[m].mods), 'bien');
+  for (const [s, nombre] of SLOTS) {
+    const pz = normalizarPieza(pi.mecha[s]);
+    for (const a of (pz && pz.afijos) || []) if (datos.afijos[a]) fila('estrella', datos.afijos[a].nombre + ' (' + nombre.toLowerCase() + ')', efectos(datos.afijos[a].mods), 'bien');
+  }
+  return h('ul', { class: 'pasivas' }, ...filas);
+}
+
+// ---------- Editor de ordenes ----------
+// Cada orden se lee como una frase. Tocandola se abre: tres pasos (SI / HACER / A QUIEN) con todas las
+// opciones a la vista, lo que hace cada una, y lo que no se puede (con la parte que lo habilita).
+const ORDEN = { abierta: null, paso: 'condicion' };
+
+function textoCondicion(c, params) {
+  return c.texto.replace(/\{(\w+)\}/g, (_, k) => (params && params[k] !== undefined ? params[k] : c.parametros && c.parametros[k] ? c.parametros[k].defecto : 'N'));
+}
 
 function panelGambits(app, pi, refrescar) {
   const { datos } = app;
@@ -276,48 +400,65 @@ function panelGambits(app, pi, refrescar) {
   const guardar = (lista) => { guardarGambits(datos, app.partida, pi.id, lista); app.guardar(); refrescar(); };
   const lista = pi.gambits;
   const falta = disponibles(datos, pi);
+  if (ORDEN.abierta !== null && ORDEN.abierta >= lista.length) ORDEN.abierta = null;
 
   const filas = lista.map((g, i) => {
-    const cond = G.condiciones[g.condicion];
-    const params = Object.entries((cond && cond.parametros) || {});
+    const cond = G.condiciones[g.condicion], acc = G.acciones[g.accion], obj = G.objetivos[g.objetivo];
+    const bloqueo = falta['a:' + g.accion] || falta['c:' + g.condicion];
+    const abierta = ORDEN.abierta === i;
     const cambiar = (cambio) => { const nueva = lista.map((x) => ({ ...x })); Object.assign(nueva[i], cambio); guardar(nueva); };
-    return h('li', { class: 'gambit' },
+    const frase = h('button', { class: 'orden-frase', 'aria-expanded': abierta ? 'true' : 'false', onclick: () => { ORDEN.abierta = abierta ? null : i; ORDEN.paso = 'condicion'; refrescar(); } },
       h('span', { class: 'gambit-n' }, String(i + 1)),
-      h('div', { class: 'gambit-cuerpo' },
-        h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-si' }, 'SI'),
-          h('select', { 'aria-label': 'Condición ' + (i + 1), onchange: (e) => cambiar({ condicion: e.target.value, parametros: undefined }) },
-            ...Object.entries(G.condiciones).map(([id, c]) => h('option', { value: id, selected: id === g.condicion, disabled: !!falta['c:' + id] && id !== g.condicion },
-              (falta['c:' + id] ? '🔒 ' : c.requiere_parte ? '★ ' : '') + textoCondicion(c) + (falta['c:' + id] ? ' (' + falta['c:' + id] + ')' : '')))),
-          ...params.map(([pid, def]) => h('input', {
-            type: 'number', min: def.min, max: def.max, step: 1, class: 'gambit-num', 'aria-label': pid,
-            value: g.parametros && g.parametros[pid] !== undefined ? g.parametros[pid] : def.defecto,
-            onchange: (e) => {
-              const v = Math.max(def.min, Math.min(def.max, Math.round(Number(e.target.value) || def.defecto)));
-              cambiar({ parametros: { ...(g.parametros || {}), [pid]: v } });
-            }
-          }))),
-        h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-flecha' }, '→'),
-          h('select', { 'aria-label': 'Acción ' + (i + 1), onchange: (e) => cambiar({ accion: e.target.value }) },
-            ...Object.entries(G.acciones).map(([id, a]) => h('option', { value: id, selected: id === g.accion, disabled: !!falta['a:' + id] && id !== g.accion },
-              (falta['a:' + id] ? '🔒 ' : '') + a.texto + (falta['a:' + id] ? ' (' + falta['a:' + id] + ')' : ''))))),
-        h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-sobre' }, 'a'),
-          h('select', { 'aria-label': 'Objetivo ' + (i + 1), onchange: (e) => cambiar({ objetivo: e.target.value }) },
-            ...Object.entries(G.objetivos).map(([id, o]) => h('option', { value: id, selected: id === g.objetivo }, o.texto))))),
-      falta['a:' + g.accion] || falta['c:' + g.condicion]
-        ? h('p', { class: 'gambit-aviso' }, ico('trauma'), ' No la puede cumplir: le falta ' + (falta['a:' + g.accion] || falta['c:' + g.condicion]) + '.') : null,
-      h('div', { class: 'gambit-botones' },
-        botonIcono('arriba', 'Subir', () => { if (i === 0) return; const n = lista.slice(); [n[i - 1], n[i]] = [n[i], n[i - 1]]; guardar(n); }),
-        botonIcono('abajo', 'Bajar', () => { if (i === lista.length - 1) return; const n = lista.slice(); [n[i + 1], n[i]] = [n[i], n[i + 1]]; guardar(n); }),
-        botonIcono('cerrar', 'Borrar', () => guardar(lista.filter((_, k) => k !== i)), 'peligro')));
+      h('span', { class: 'of-texto' },
+        h('em', {}, 'SI '), cond ? textoCondicion(cond, g.parametros) : '?',
+        h('em', {}, ' → '), acc ? acc.texto : '?',
+        g.objetivo !== 'yo' && obj ? h('span', {}, h('em', {}, ' a '), obj.texto.toLowerCase()) : null),
+      bloqueo ? h('span', { class: 'of-bloqueo' }, '🔒') : null);
+    let editor = null;
+    if (abierta) {
+      const pasos = [['condicion', 'SI', G.condiciones, 'c'], ['accion', 'HACER', G.acciones, 'a'], ['objetivo', 'A QUIÉN', G.objetivos, 'o']];
+      const [campo, , catalogo, letra] = pasos.find((x) => x[0] === ORDEN.paso);
+      const opciones = Object.entries(catalogo).sort(([a], [b]) => (falta[letra + ':' + a] ? 1 : 0) - (falta[letra + ':' + b] ? 1 : 0));
+      const elegido = catalogo[g[campo]];
+      const params = campo === 'condicion' ? Object.entries((cond && cond.parametros) || {}) : [];
+      editor = h('div', { class: 'orden-editor' },
+        h('div', { class: 'orden-pasos', role: 'tablist' }, ...pasos.map(([c, t]) => h('button', {
+          class: 'orden-paso' + (ORDEN.paso === c ? ' activo' : ''), role: 'tab', onclick: () => { ORDEN.paso = c; refrescar(); }
+        }, t))),
+        h('div', { class: 'orden-opciones' }, ...opciones.map(([id, o]) => {
+          const bloq = falta[letra + ':' + id];
+          return h('button', {
+            class: 'orden-opcion' + (id === g[campo] ? ' elegida' : '') + (bloq ? ' bloqueada' : ''), disabled: !!bloq && id !== g[campo],
+            title: o.ayuda || '', onclick: () => cambiar(campo === 'condicion' ? { condicion: id, parametros: undefined } : { [campo]: id })
+          }, ico(existeIcono(o.icono) ? o.icono : 'evento'), h('span', {}, campo === 'condicion' ? textoCondicion(o) : o.texto),
+          bloq ? h('small', {}, '🔒 ' + bloq) : (o.requiere_parte || o.habilidad) && letra !== 'o' ? h('small', {}, '★') : null);
+        })),
+        h('p', { class: 'orden-ayuda' }, elegido ? (elegido.ayuda || '') : ''),
+        ...params.map(([pid, def]) => {
+          const v = g.parametros && g.parametros[pid] !== undefined ? g.parametros[pid] : def.defecto;
+          const poner = (n) => cambiar({ parametros: { ...(g.parametros || {}), [pid]: Math.max(def.min, Math.min(def.max, n)) } });
+          return h('div', { class: 'orden-param' }, h('span', {}, 'Distancia'),
+            botonIcono('menos', 'Menos', () => poner(v - 1)), h('strong', {}, v + ' casillas'), botonIcono('mas', 'Más', () => poner(v + 1)));
+        }),
+        bloqueo ? h('p', { class: 'gambit-aviso' }, ico('trauma'), ' No la puede cumplir: le falta ' + bloqueo + '.') : null,
+        h('div', { class: 'gambit-botones' },
+          botonIcono('arriba', 'Subir', () => { if (i === 0) return; const n = lista.slice(); [n[i - 1], n[i]] = [n[i], n[i - 1]]; ORDEN.abierta = i - 1; guardar(n); }),
+          botonIcono('abajo', 'Bajar', () => { if (i === lista.length - 1) return; const n = lista.slice(); [n[i + 1], n[i]] = [n[i], n[i + 1]]; ORDEN.abierta = i + 1; guardar(n); }),
+          botonIcono('cerrar', 'Borrar', () => { ORDEN.abierta = null; guardar(lista.filter((_, k) => k !== i)); }, 'peligro'),
+          boton('Listo', () => { ORDEN.abierta = null; refrescar(); }, { clase: 'secundario' })));
+    }
+    return h('li', { class: 'orden' + (abierta ? ' abierta' : '') + (bloqueo ? ' con-bloqueo' : '') }, frase, editor);
   });
 
-  return panel('Órdenes',
-    h('p', { class: 'ayuda' }, 'Se leen de arriba abajo: el mecha hace la primera que se cumpla y pueda hacer. Si ninguna sirve, se cubre. Ojo: la personalidad del piloto puede pasarlas por alto.'),
-    h('ol', { class: 'gambits' }, ...filas),
-    h('div', { class: 'gambit-acciones' },
-      boton('Orden', () => guardar([...lista, { condicion: 'enemigo_a_rango', accion: 'disparar', objetivo: 'enemigo_cercano' }]),
-        { iconoNombre: 'mas', deshabilitado: lista.length >= G.maximo_por_unidad }),
-      boton('De fábrica', () => guardar(datos.clases[pi.clase].gambits_de_fabrica), { iconoNombre: 'dado', clase: 'secundario' })));
+  return h('div', {},
+    panel('Órdenes',
+      h('p', { class: 'ayuda' }, 'Se leen de arriba abajo: hace la primera que se cumpla y pueda hacer. Tocá una para cambiarla.'),
+      h('ol', { class: 'ordenes' }, ...filas),
+      h('div', { class: 'gambit-acciones' },
+        boton('Orden', () => { ORDEN.abierta = lista.length; ORDEN.paso = 'condicion'; guardar([...lista, { condicion: 'enemigo_a_rango', accion: 'disparar', objetivo: 'enemigo_cercano' }]); },
+          { iconoNombre: 'mas', deshabilitado: lista.length >= G.maximo_por_unidad }),
+        boton('De fábrica', () => { ORDEN.abierta = null; guardar(datos.clases[pi.clase].gambits_de_fabrica); }, { iconoNombre: 'dado', clase: 'secundario' }))),
+    panel('Pasivas', h('p', { class: 'ayuda' }, 'Lo que lleva encima siempre, sin que se lo ordenes.'), panelPasivas(app, pi)));
 }
 
 // Lo que el piloto vivio: sus momentos, del mas nuevo al mas viejo
@@ -325,7 +466,7 @@ function panelGambits(app, pi, refrescar) {
 function panelRelaciones(app, pi) {
   const { amigos, rivales } = relaciones(app.datos, app.partida, pi);
   const fila = (r, icono, clase) => h('li', { class: clase }, ico(icono), h('strong', {}, r.piloto.apodo), ' ' + (r.valor > 0 ? '+' : '') + r.valor);
-  return panel('Relaciones',
+  return h('div', {},
     amigos.length || rivales.length
       ? h('ul', { class: 'relaciones' }, ...amigos.map((r) => fila(r, 'vinculo', 'amigo')), ...rivales.map((r) => fila(r, 'espadas', 'rival')))
       : h('p', { class: 'ayuda' }, 'Se lleva normal con todos. Lo que vivan juntos lo va a cambiar.'),
@@ -334,7 +475,7 @@ function panelRelaciones(app, pi) {
 
 function panelHoja(pi) {
   const hoja = (pi.hoja || []).slice().reverse();
-  return panel('Hoja de servicio',
+  return h('div', {},
     hoja.length
       ? h('ul', { class: 'hoja-servicio' }, ...hoja.map((t) => h('li', {}, t)))
       : h('p', { class: 'ayuda' }, 'Todavía no hay nada para contar. Ya va a haber.'));

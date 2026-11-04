@@ -3,8 +3,9 @@
   "condiciones": {
     "siempre": {
       "texto": "Siempre",
-      "icono": "infinito",
-      "expr": true
+      "icono": "estrella",
+      "expr": true,
+      "ayuda": "Se cumple siempre: ponela última, como plan por defecto."
     },
     "enemigo_a_rango": {
       "texto": "Enemigo a tiro",
@@ -14,11 +15,12 @@
         "donde": {
           "fn": "a_tiro"
         }
-      }
+      },
+      "ayuda": "Hay algún enemigo al alcance de sus armas y a la vista."
     },
     "enemigo_cerca": {
       "texto": "Enemigo a {casillas} casillas o menos",
-      "icono": "alerta",
+      "icono": "calavera",
       "parametros": {
         "casillas": {
           "tipo": "entero",
@@ -34,17 +36,19 @@
           "op": "<=",
           "param": "casillas"
         }
-      }
+      },
+      "ayuda": "Un enemigo a esa distancia o menos."
     },
     "enemigo_aislado": {
       "texto": "Enemigo sin aliados cerca",
-      "icono": "solo",
+      "icono": "daga",
       "expr": {
         "existe": "enemigo",
         "donde": {
           "fn": "aislado"
         }
-      }
+      },
+      "ayuda": "Un enemigo sin compañeros cerca."
     },
     "aliado_vida_bajo": {
       "texto": "Aliado con vida < {valor}%",
@@ -64,11 +68,12 @@
           "op": "<",
           "param": "valor"
         }
-      }
+      },
+      "ayuda": "Algún aliado está muy dañado."
     },
     "yo_vida_bajo": {
       "texto": "Mi vida < {valor}%",
-      "icono": "corazon",
+      "icono": "vida",
       "parametros": {
         "valor": {
           "tipo": "entero",
@@ -81,34 +86,38 @@
         "dato": "yo.vida_pct",
         "op": "<",
         "param": "valor"
-      }
+      },
+      "ayuda": "Su propio mecha está muy dañado."
     },
     "sin_municion": {
       "texto": "Sin munición",
-      "icono": "cargador",
+      "icono": "bala",
       "expr": {
         "dato": "yo.municion",
         "op": "==",
         "valor": 0
-      }
+      },
+      "ayuda": "Se le acabaron las balas."
     },
     "en_cobertura": {
       "texto": "Estoy a cubierto",
-      "icono": "muro",
+      "icono": "escudo",
       "expr": {
         "fn": "en_cobertura"
-      }
+      },
+      "ayuda": "Está detrás de algo que lo cubre."
     },
     "flanqueado": {
       "texto": "Me flanquean",
-      "icono": "flecha_lateral",
+      "icono": "espadas",
       "expr": {
         "fn": "flanqueado"
-      }
+      },
+      "ayuda": "Le están pegando por el costado o por la espalda."
     },
     "moral_baja": {
       "texto": "Moral < {valor}",
-      "icono": "craneo",
+      "icono": "trauma",
       "parametros": {
         "valor": {
           "tipo": "entero",
@@ -121,7 +130,8 @@
         "dato": "yo.moral",
         "op": "<",
         "param": "valor"
-      }
+      },
+      "ayuda": "Está asustado: le tiembla el pulso."
     },
     "vip_en_peligro": {
       "texto": "El VIP está en peligro",
@@ -137,7 +147,8 @@
             "valor": 50
           }
         ]
-      }
+      },
+      "ayuda": "El escoltado está en peligro."
     },
     "radar_oculto": {
       "texto": "Radar: enemigo oculto cerca",
@@ -145,7 +156,8 @@
       "requiere_parte": "radar",
       "expr": {
         "fn": "radar_oculto"
-      }
+      },
+      "ayuda": "Su radar detecta a un enemigo detrás de una pared."
     },
     "enemigo_marcado": {
       "texto": "Hay un enemigo marcado",
@@ -155,11 +167,12 @@
         "donde": {
           "fn": "esta_marcado"
         }
-      }
+      },
+      "ayuda": "Algún enemigo fue marcado por el radar de un compañero."
     },
     "enemigo_cerca_con_escolta": {
       "texto": "Enemigo a {casillas} casillas y la escolta peleando",
-      "icono": "alerta",
+      "icono": "calavera",
       "parametros": {
         "casillas": {
           "tipo": "entero",
@@ -182,7 +195,8 @@
             "fn": "escolta_peleando"
           }
         ]
-      }
+      },
+      "ayuda": "Hay enemigos cerca y la escolta está peleando."
     }
   },
   "acciones": {
@@ -194,7 +208,8 @@
       ],
       "requiere": [
         "arma_a_distancia"
-      ]
+      ],
+      "ayuda": "Le tira con sus armas de distancia. Si al elegido lo tapa una pared, le tira al más cercano que vea."
     },
     "atacar_cuerpo_a_cuerpo": {
       "texto": "Cuerpo a cuerpo",
@@ -205,7 +220,8 @@
       ],
       "requiere": [
         "arma_cuerpo_a_cuerpo"
-      ]
+      ],
+      "ayuda": "Se acerca y golpea. Necesita un arma de cuerpo a cuerpo (hoja, garra)."
     },
     "suprimir": {
       "texto": "Fuego de supresión",
@@ -214,7 +230,8 @@
         "ataque",
         "control"
       ],
-      "habilidad": "fuego_de_supresion"
+      "habilidad": "fuego_de_supresion",
+      "ayuda": "Ráfaga que hace agachar al enemigo: pierde puntería un rato. Necesita ametralladora."
     },
     "disparo_apuntado": {
       "texto": "Disparo apuntado",
@@ -222,30 +239,34 @@
       "etiquetas": [
         "ataque"
       ],
-      "habilidad": "disparo_apuntado"
+      "habilidad": "disparo_apuntado",
+      "ayuda": "Un tiro lento que pega el doble. Habilidad del tirador."
     },
     "avanzar": {
       "texto": "Avanzar",
-      "icono": "flecha",
+      "icono": "rapido",
       "etiquetas": [
         "avance",
         "movimiento"
-      ]
+      ],
+      "ayuda": "Camina hacia el objetivo."
     },
     "flanquear": {
       "texto": "Flanquear",
-      "icono": "flecha_lateral",
+      "icono": "espadas",
       "etiquetas": [
         "avance",
         "movimiento"
-      ]
+      ],
+      "ayuda": "Rodea al objetivo para pegarle por el costado, donde no tiene cobertura."
     },
     "seguir": {
       "texto": "Seguir",
-      "icono": "pasos",
+      "icono": "vinculo",
       "etiquetas": [
         "movimiento"
-      ]
+      ],
+      "ayuda": "Se queda cerca del objetivo. En combate, se planta a su lado."
     },
     "replegarse": {
       "texto": "Replegarse",
@@ -253,29 +274,33 @@
       "etiquetas": [
         "movimiento",
         "defensa"
-      ]
+      ],
+      "ayuda": "Retrocede, lejos de los enemigos."
     },
     "buscar_cobertura": {
       "texto": "Buscar cobertura",
-      "icono": "muro",
+      "icono": "escudo",
       "etiquetas": [
         "movimiento",
         "defensa"
-      ]
+      ],
+      "ayuda": "Busca la casilla con cobertura más cercana y se queda ahí."
     },
     "mantener": {
       "texto": "Mantener posición",
       "icono": "ancla",
       "etiquetas": [
         "defensa"
-      ]
+      ],
+      "ayuda": "Se queda quieto donde está."
     },
     "recargar": {
       "texto": "Recargar",
-      "icono": "cargador",
+      "icono": "bala",
       "etiquetas": [
         "defensa"
-      ]
+      ],
+      "ayuda": "Recarga aunque le queden balas."
     },
     "reparar": {
       "texto": "Reparar",
@@ -283,7 +308,8 @@
       "etiquetas": [
         "curacion"
       ],
-      "habilidad": "reparacion_de_campo"
+      "habilidad": "reparacion_de_campo",
+      "ayuda": "Repara a un aliado al lado. Usa el kit de la mochila."
     },
     "desplegar_torreta": {
       "texto": "Desplegar torreta",
@@ -291,7 +317,8 @@
       "etiquetas": [
         "apoyo"
       ],
-      "habilidad": "desplegar_torreta"
+      "habilidad": "desplegar_torreta",
+      "ayuda": "Deja una torreta que dispara sola."
     },
     "propulsion": {
       "texto": "Propulsión",
@@ -299,7 +326,8 @@
       "etiquetas": [
         "movimiento"
       ],
-      "habilidad": "propulsion"
+      "habilidad": "propulsion",
+      "ayuda": "Salta hasta 4 casillas por encima de todo."
     },
     "muro_de_escudos": {
       "texto": "Muro de escudos",
@@ -307,7 +335,8 @@
       "etiquetas": [
         "defensa"
       ],
-      "habilidad": "muro_de_escudos"
+      "habilidad": "muro_de_escudos",
+      "ayuda": "Se atrinchera detrás del escudo: mucho blindaje, no se mueve."
     },
     "marcar_objetivo": {
       "texto": "Marcar objetivo",
@@ -373,40 +402,64 @@
   },
   "objetivos": {
     "yo": {
-      "texto": "Yo mismo"
+      "texto": "Yo mismo",
+      "ayuda": "Él mismo.",
+      "icono": "piloto"
     },
     "enemigo_cercano": {
-      "texto": "Enemigo más cercano"
+      "texto": "Enemigo más cercano",
+      "ayuda": "El enemigo más cerca.",
+      "icono": "calavera"
     },
     "enemigo_mas_debil": {
-      "texto": "Enemigo con menos vida"
+      "texto": "Enemigo con menos vida",
+      "ayuda": "El enemigo con menos vida.",
+      "icono": "daga"
     },
     "enemigo_mas_peligroso": {
-      "texto": "Enemigo más peligroso"
+      "texto": "Enemigo más peligroso",
+      "ayuda": "El enemigo que más daño hace.",
+      "icono": "jefe"
     },
     "enemigo_aislado": {
-      "texto": "Enemigo aislado"
+      "texto": "Enemigo aislado",
+      "ayuda": "Un enemigo solo, lejos de los suyos.",
+      "icono": "daga"
     },
     "aliado_cercano": {
-      "texto": "Aliado más cercano"
+      "texto": "Aliado más cercano",
+      "ayuda": "El compañero más cerca.",
+      "icono": "piloto"
     },
     "aliado_mas_herido": {
-      "texto": "Aliado más herido"
+      "texto": "Aliado más herido",
+      "ayuda": "El compañero más dañado.",
+      "icono": "cruz"
     },
     "vinculo": {
-      "texto": "Su compañero de vínculo"
+      "texto": "Su compañero de vínculo",
+      "ayuda": "Su compañero de vínculo.",
+      "icono": "vinculo"
     },
     "vip": {
-      "texto": "El VIP"
+      "texto": "El VIP",
+      "ayuda": "El escoltado.",
+      "icono": "estrella"
     },
     "objetivo_mision": {
-      "texto": "Objetivo de la misión"
+      "texto": "Objetivo de la misión",
+      "ayuda": "Lo que pide la misión (una zona, un líder).",
+      "icono": "mision"
     },
     "lejos_de_enemigos": {
-      "texto": "Lejos de los enemigos"
+      "texto": "Lejos de los enemigos",
+      "ayuda": "Cualquier lugar lejos de los enemigos.",
+      "icono": "huida"
     },
     "enemigo_marcado": {
-      "texto": "Enemigo marcado"
+      "texto": "Enemigo marcado",
+      "ayuda": "El enemigo marcado por el radar.",
+      "icono": "mira"
     }
   },
   "funciones": [
