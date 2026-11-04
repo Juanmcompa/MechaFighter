@@ -20,7 +20,8 @@
     "voces",
     "condiciones_mision",
     "afinidad",
-    "dilemas"
+    "dilemas",
+    "generador_mapas"
   ],
   "mapas": [
     "puesto_01",

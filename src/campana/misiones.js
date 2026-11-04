@@ -2,6 +2,8 @@
 // Todo sale del azar de la campana, asi la misma partida ofrece siempre los mismos contratos.
 
 import { caminable } from '../motor/espacio.js';
+import { generarMapa } from './generar_mapa.js';
+import { mapaDe } from '../core/datos.js';
 
 function rango(azar, r) {
   return Array.isArray(r) ? azar.entero(r[0], r[1]) : r && r.min !== undefined ? azar.entero(r.min, r.max) : r;
@@ -18,8 +20,11 @@ function escuadra(datos, azar, lista, dificultad) {
 // cambios: para los jefes de sector, otro lider y otras escuadras que los de la plantilla.
 export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificultad, cambios = null) {
   const tpl = cambios ? { ...datos.misiones[plantillaId], ...cambios } : datos.misiones[plantillaId];
-  const mapaId = azar.elegir(tpl.mapas);
-  const mapa = datos.mapas[mapaId];
+  // la mayoria de las veces el mapa se arma al azar (ver generador_mapas.json); si no, uno hecho a mano
+  const G = datos.generador_mapas;
+  const plano = G && azar.tirada(G.chance) ? generarMapa(datos, azar.entero(1, 999999999)) : null;
+  const mapaId = plano ? 'generado' : azar.elegir(tpl.mapas);
+  const mapa = plano || datos.mapas[mapaId];
   const p = tpl.parametros || {};
   const m = {
     plantilla: plantillaId,
@@ -27,6 +32,7 @@ export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificu
     icono: tpl.icono,
     tipo: tpl.tipo,
     mapa: mapaId,
+    plano,
     nivel,
     dificultad,
     niebla: !!tpl.niebla,
@@ -123,7 +129,7 @@ function aplicarCondiciones(datos, m, ids, azar, tpl) {
 export function sumarCondicion(datos, m, id, azar, escuadras) {
   if (m.condiciones.includes(id)) return;
   m.condiciones.push(id);
-  const mapa = datos.mapas[m.mapa];
+  const mapa = mapaDe(datos, m);
   {
     const e = datos.condiciones_mision[id].efectos;
     if (e.vision) m.visionDelta += e.vision;

@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Unidades que no son de tu escuadron. Tres clases de cuerpo: 'mecha' (se arma con partes, como los tuyos), 'infanteria' y 'mutante' (numeros directos en 'stats'). Las 'escuadras' son los grupos que aparecen en las misiones. 'amenaza' sirve para armar misiones parejas. Infanteria: 'miembros' = cuantos soldaditos forman el peloton (caen a medida que pierde vida y pega menos), 'danio_pct' = cuanto pega su arma, 'figuras' = dibujos de assets/unidades.",
+  "_ayuda": "Unidades que no son de tu escuadron. Tres clases de cuerpo: 'mecha' (se arma con partes, como los tuyos), 'infanteria' y 'mutante' (numeros directos en 'stats'). Las 'escuadras' son los grupos que aparecen en las misiones. 'amenaza' sirve para armar misiones parejas. Infanteria: 'miembros' = cuantos soldaditos forman el peloton (caen a medida que pierde vida y pega menos; con 'miembros_rango' [min, max] cada peloton sale de un tamano distinto y la vida y el danio van en proporcion), 'danio_pct' = cuanto pega su arma, 'figuras' = dibujos de assets/unidades.",
   "unidades": {
     "saqueador": {
       "nombre": "Saqueador",
@@ -30,7 +30,7 @@
           "objetivo": "enemigo_cercano"
         }
       ],
-      "miembros": 4,
+      "miembros": 4, "miembros_rango": [2, 6],
       "danio_pct": 75,
       "figuras": [
         "pirata_01",
@@ -72,7 +72,7 @@
           "objetivo": "enemigo_mas_debil"
         }
       ],
-      "miembros": 3,
+      "miembros": 3, "miembros_rango": [2, 4],
       "danio_pct": 80,
       "figuras": [
         "pirata_06",
@@ -587,7 +587,7 @@
         "vision": 7
       },
       "arma": "brazo_rifle",
-      "miembros": 3,
+      "miembros": 3, "miembros_rango": [2, 5],
       "danio_pct": 70,
       "figuras": [
         "guerrilla_01",
@@ -628,7 +628,7 @@
         "vision": 7
       },
       "arma": "brazo_lanzamisiles",
-      "miembros": 2,
+      "miembros": 2, "miembros_rango": [1, 3],
       "danio_pct": 45,
       "figuras": [
         "guerrilla_06",

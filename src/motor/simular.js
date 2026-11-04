@@ -16,7 +16,7 @@ import { unidadDePiloto, unidadEnemiga } from './unidades.js';
 
 export function simular(datos, { mision, escuadron, semilla }) {
   const azar = crearAzar(semilla);
-  const mapa = datos.mapas[mision.mapa];
+  const mapa = mision.plano || datos.mapas[mision.mapa]; // plano: mapa generado al azar
   const registro = [];
   const B = {
     datos, mision, mapa,
@@ -29,6 +29,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
     azarDecision: azar.derivar('decision'),
     azarCombate: azar.derivar('combate'),
     azarPartes: azar.derivar('partes'),
+    azarTropa: azar.derivar('tropa'),
     eventosTick: [],
     vip: null,
     lider: null,
@@ -40,6 +41,14 @@ export function simular(datos, { mision, escuadron, semilla }) {
     const ocupada = (cx, cy) => B.unidades.some((o) => o.viva && o.x === cx && o.y === cy);
     const c = casillaLibreCerca(B.tablero, x, y, ocupada);
     if (!c) return null;
+    // infanteria: unos van de a dos, otros de a seis. La vida y el danio van con la cantidad.
+    if (plantilla.miembrosRango) {
+      const [a, b] = plantilla.miembrosRango;
+      const n = B.azarTropa.entero(a, b);
+      plantilla = { ...plantilla, miembros: n, miembrosRango: null,
+        vidaMax: Math.max(1, Math.trunc((plantilla.vidaMax * n) / plantilla.miembros)),
+        danioPct: Math.max(1, Math.trunc((plantilla.danioPct * n) / plantilla.miembros)) };
+    }
     const u = {
       ...plantilla,
       // tormenta / noche: todos ven menos (nunca menos de 2 casillas)

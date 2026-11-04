@@ -1,6 +1,7 @@
 // Antes de la mision: el briefing, el plano del mapa, contra que se enfrentan y quienes van.
 import { h, montar, ico, boton, panel, chip, barraCampana, retrato } from './comun.js';
 import { dibujarMapa } from './vistaMapa.js';
+import { mapaDe } from '../core/datos.js';
 import { escuadronParaMision, vidaDeSalida, partesRotas } from '../campana/partida.js';
 
 // Como llega cada uno (ver campana/animo.js)
@@ -46,7 +47,7 @@ export function preparacion(app, raiz) {
             const c = datos.condiciones_mision[id];
             return h('li', {}, ico(c.icono), h('div', {}, h('strong', {}, c.nombre), h('span', {}, c.descripcion)));
           }))) : null,
-        panel('Mapa · ' + datos.mapas[m.mapa].nombre, h('p', { class: 'ayuda' }, datos.mapas[m.mapa].descripcion || '')),
+        panel('Mapa · ' + mapaDe(datos, m).nombre, h('p', { class: 'ayuda' }, mapaDe(datos, m).descripcion || '')),
         (m.aliados || []).length ? panel('Apoyo',
           h('p', { class: 'ayuda' }, ico('vinculo'), ' La resistencia local pelea con ustedes: ' +
             m.aliados.map((id) => datos.enemigos.unidades[id].nombre.toLowerCase()).join(' y ') + '. Pocos, pero suman.')) : null,
@@ -67,5 +68,5 @@ export function preparacion(app, raiz) {
         h('li', {}, h('i', { style: 'background:#4a8fd1' }), 'ustedes'),
         h('li', {}, h('i', { style: 'background:#c4473b' }), 'entrada enemiga'),
         h('li', {}, h('i', { style: 'background:#e0a43a' }), 'zonas')))));
-  dibujarMapa(plano, datos.mapas[m.mapa]);
+  dibujarMapa(plano, mapaDe(datos, m));
 }

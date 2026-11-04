@@ -1,8 +1,8 @@
 // Reproduce el registro de una batalla en un canvas. No sabe nada de reglas: solo lee eventos y los dibuja.
 // La batalla ya se jugo entera en el motor; aca se la mira a la velocidad que uno quiera (o se salta al final).
 
-import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, posMiembro } from './dibujo.js';
-import { crearTablero, lineaDeTiro, distancia } from '../motor/espacio.js';
+import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro } from './dibujo.js';
+import { crearTablero, lineaDeTiro, distancia, caminable } from '../motor/espacio.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
@@ -20,7 +20,7 @@ export class Repeticion {
     this.ultimaVoz = -999;
     this.datos = datos;
     this.mision = mision;
-    this.mapa = datos.mapas[mision.mapa];
+    this.mapa = mision.plano || datos.mapas[mision.mapa];
     this.tablero = crearTablero(this.mapa);
     this.registro = registro;
     this.canvas = canvas;
@@ -145,16 +145,15 @@ export class Repeticion {
       const vivos = u.viva ? miembrosVivos(f, u.vida) : 0;
       const antes = u.vivosVista === undefined ? f.miembros || 1 : u.vivosVista;
       if (vivos >= antes) continue;
-      const cos = Math.cos(u.ang), sin = Math.sin(u.ang);
       const fuego = u.estados.has('en_llamas');
       for (let i = vivos; i < antes; i++) {
-        const [dx, dy] = posMiembro(i);
+        const [px, py] = posicionMiembro(u, i);
         const h = Number(u.id.slice(1)) * 7 + i * 13;
         const capas = [fuego ? 'mancha_quemado' : 'mancha_' + (1 + (h % 2)), fuego ? 'caido_quemado' : 'caido_0' + (1 + (h % 6))];
         const corridas = {};
         if (!fuego && h % 3 === 0) { capas.push('tirado_rifle'); corridas.tirado_rifle = [5, 3]; }
         if (!fuego && h % 5 === 1) { capas.push('tirado_casco'); corridas.tirado_casco = [-4, 4]; }
-        this.caidos.push({ x: u.x + 0.5 + (dx * cos - dy * sin) / 24, y: u.y + 0.5 + (dx * sin + dy * cos) / 24, ang: h * 1.3, capas, corridas });
+        this.caidos.push({ x: px, y: py, ang: h * 1.3, capas, corridas });
       }
       u.vivosVista = vivos;
     }
@@ -424,6 +423,7 @@ export class Repeticion {
           }
         }
       }
+      if (u.ficha.figuras && u.viva) moverTropa(u, this.T, dtTicks, (x, y) => caminable(this.tablero, x, y));
       if (u.retroceso > 0) u.retroceso = Math.max(0, u.retroceso - dtTicks / 2.5);
       if (u.golpe > 0) u.golpe = Math.max(0, u.golpe - ms / 180);
       if (u.grito && this.T > u.grito.hasta) u.grito = null;

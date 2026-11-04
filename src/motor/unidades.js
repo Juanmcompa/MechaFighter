@@ -212,6 +212,7 @@ export function unidadEnemiga(datos, id, nivel = 1) {
     variantes: def.sprites || null, // la vista elige una (mismo tipo, otro dibujo)
     // infanteria: un peloton de varios soldaditos; con menos vivos, pega menos
     miembros: def.miembros || 1,
+    miembrosRango: def.miembros_rango || null, // cada peloton sale de un tamano distinto (ver simular.js)
     danioPct: def.danio_pct || 100,
     figuras: def.figuras || null,
     amenaza: def.amenaza || 1,

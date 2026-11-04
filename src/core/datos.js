@@ -44,3 +44,6 @@ function congelar(o) {
   }
   return o;
 }
+
+// El mapa de una mision: el generado (guardado en la mision) o uno de data/mapas
+export const mapaDe = (datos, m) => m.plano || datos.mapas[m.mapa];

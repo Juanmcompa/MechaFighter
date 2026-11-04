@@ -2,6 +2,7 @@
 // enlazados de la columna siguiente; los demas quedan atras. Al final espera el jefe del sector.
 import { h, montar, ico, boton, botonIcono, panel, barraCampana, chip } from './comun.js';
 import { nodosSiguientes, elegirNodo } from '../campana/partida.js';
+import { mapaDe } from '../core/datos.js';
 
 const NODOS = {
   mision: { icono: 'mision', nombre: 'Contrato' },
@@ -93,7 +94,7 @@ export function sectores(app, raiz) {
         m.niebla ? chip('ojo', 'Niebla', 'No se ve lo que no tenés a la vista') : null,
         (m.aliados || []).length ? chip('vinculo', 'Milicia ×' + m.aliados.length, 'La resistencia local pelea con ustedes', 'chip-bien') : null,
         ...(m.condiciones || []).map((id) => chip(datos.condiciones_mision[id].icono, datos.condiciones_mision[id].nombre, datos.condiciones_mision[id].descripcion, 'chip-alerta'))) : null,
-      m ? h('p', { class: 'ayuda' }, ico('mapa'), ' ' + datos.mapas[m.mapa].nombre) : null,
+      m ? h('p', { class: 'ayuda' }, ico('mapa'), ' ' + mapaDe(datos, m).nombre) : null,
       m && m.jefe ? h('p', { class: 'ayuda' }, ico('ojo'), ' ' + textoInteligencia(datos, s)) : null,
       m && nodo.tipo === 'mision' && s.inteligencia !== undefined ? h('p', { class: 'ayuda' }, ico('ojo'), ' Ganarla suma inteligencia sobre ' + s.jefe + '.') : null,
       boton(m ? 'Aceptar contrato' : 'Ir', () => {

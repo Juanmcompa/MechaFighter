@@ -164,6 +164,8 @@ function bloque(ctx, x, y, w, h, base, luz, sombra) {
 // u: { ficha, x, y (en casillas, con decimales), ang, paso (0..1 del caminar), vida, viva, golpe (0..1) }
 export function dibujarUnidad(ctx, u, L, t) {
   const f = u.ficha;
+  // infanteria: cada soldadito se dibuja donde esta (no en la casilla del peloton)
+  if (f.figuras && UNI.imgs[f.figuras[0]]) { if (u.viva) dibujarPeloton(ctx, f, u, L); return; }
   ctx.save();
   ctx.translate((u.x + 0.5) * L, (u.y + 0.5) * L);
   // sombra
@@ -176,8 +178,7 @@ export function dibujarUnidad(ctx, u, L, t) {
   if (!u.viva) ctx.globalAlpha = 0.85;
   const s = L / 24; // todo se dibuja en una grilla de 24 y se escala (ocupa casi toda la casilla)
   ctx.scale(s, s);
-  if (f.figuras && UNI.imgs[f.figuras[0]]) { if (u.viva) dibujarPeloton(ctx, f, u, t); }
-  else if (!u.viva) dibujarRestos(ctx, f);
+  if (!u.viva) dibujarRestos(ctx, f);
   else if (UNI.imgs[f.sprite]) dibujarUnidadSprite(ctx, f, u, t);
   else if (f.cuerpo === 'dron') dibujarDronSimple(ctx, f);
   else if (f.cuerpo === 'mutante') dibujarMutante(ctx, f, u, t);
@@ -354,9 +355,9 @@ function dibujarTorreta(ctx, f, u) {
 }
 
 // ---------- Infanteria: pelotones de hormiguitas ----------
-// Donde va cada soldadito dentro de la casilla (en la grilla de 24, mirando a +x): una formacion suelta.
-const FORMACION = [[3, -4], [-3, 5], [-4, -5], [4, 4], [-8, 0], [8, 0]];
-export const posMiembro = (i) => FORMACION[i % FORMACION.length];
+// Cada soldadito tiene su propia posicion en el mapa (en casillas) y sigue al peloton a su ritmo: unos se
+// adelantan, otros quedan atras, se abren y se juntan. El motor solo sabe en que casilla esta el peloton.
+const ESCALA_SOLDADO = 0.72; // mas chiquitos que el dibujo original: son hormigas al lado de un mecha
 
 export function miembrosVivos(f, vida) {
   const m = f.miembros || 1;
@@ -369,23 +370,81 @@ export function figuraDe(f, u, i) {
   return f.figuras[(i + off) % f.figuras.length];
 }
 
-function dibujarPeloton(ctx, f, u, t) {
+// numero "al azar" fijo por unidad y soldadito (la vista no usa el azar del motor)
+const azarVista = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+
+// Donde le gustaria estar al soldadito i respecto del centro del peloton (en casillas, mirando a +x)
+function lugarMiembro(u, i, n) {
+  const id = Number(u.id.slice(1));
+  const radio = 0.18 + 0.09 * n;
+  const ang = (i / n) * Math.PI * 2 + azarVista(id, i) * 1.4;
+  const r = radio * (0.45 + 0.55 * azarVista(id + 3, i));
+  return { fx: Math.cos(ang) * r * 1.2, fy: Math.sin(ang) * r, ritmo: 0.1 + 0.16 * azarVista(id + 7, i), fase: azarVista(id + 11, i) * 6.28 };
+}
+
+// Se llama en cada cuadro: mueve a cada soldadito hacia su lugar (con su ritmo y un vaiven propio)
+export function moverTropa(u, T, dt, libre = null) {
+  const f = u.ficha;
+  const n = f.miembros || 1;
+  const cx = u.x + 0.5, cy = u.y + 0.5;
+  const cos = Math.cos(u.ang), sin = Math.sin(u.ang);
+  if (!u.tropa) {
+    u.tropa = [];
+    for (let i = 0; i < n; i++) {
+      const L = lugarMiembro(u, i, n);
+      u.tropa.push({ ...L, x: cx + L.fx * cos - L.fy * sin, y: cy + L.fx * sin + L.fy * cos, ang: u.ang, paso: L.fase });
+    }
+  }
+  const moviendo = u.dur && T < u.t0 + u.dur;
+  for (const m of u.tropa) {
+    // al avanzar se estiran en fila detras del que va adelante; quietos se abren y van y vienen un poco
+    const fx = moviendo ? m.fx * 0.6 - 0.25 : m.fx;
+    const fy = moviendo ? m.fy * 0.7 : m.fy;
+    const vx = Math.sin(T * 0.045 + m.fase) * 0.1, vy = Math.cos(T * 0.037 + m.fase * 1.3) * 0.1;
+    let tx = cx + fx * cos - fy * sin + vx, ty = cy + fx * sin + fy * cos + vy;
+    // no se meten adentro de paredes ni contenedores: si el lugar esta tapado, se pegan al centro
+    if (libre && !libre(Math.floor(tx), Math.floor(ty))) { tx = cx + (tx - cx) * 0.3; ty = cy + (ty - cy) * 0.3; }
+    const k = 1 - Math.pow(1 - m.ritmo, dt);
+    const dx = (tx - m.x) * k, dy = (ty - m.y) * k;
+    m.x += dx; m.y += dy;
+    const d = Math.hypot(dx, dy);
+    m.paso += d * 9;
+    // mira hacia donde camina; si esta quieto, hacia donde mira el peloton (con un poco de desorden)
+    const objetivo = d > 0.004 * Math.max(dt, 0.01) ? Math.atan2(dy, dx) : u.ang + Math.sin(m.fase * 3) * 0.35;
+    let dif = objetivo - m.ang;
+    while (dif > Math.PI) dif -= Math.PI * 2;
+    while (dif < -Math.PI) dif += Math.PI * 2;
+    m.ang += dif * Math.min(1, 0.25 * dt);
+  }
+}
+
+// Posicion actual (en casillas) del soldadito i, para dejar su cuerpo donde cayo
+export function posicionMiembro(u, i) {
+  const m = u.tropa && u.tropa[i];
+  return m ? [m.x, m.y] : [u.x + 0.5, u.y + 0.5];
+}
+
+function dibujarPeloton(ctx, f, u, L) {
   const vivos = miembrosVivos(f, u.vida);
+  if (!u.tropa) return;
   ctx.imageSmoothingEnabled = false;
-  for (let i = 0; i < vivos; i++) {
+  const s = (L / 24) * ESCALA_SOLDADO;
+  for (let i = 0; i < vivos && i < u.tropa.length; i++) {
     const id = figuraDe(f, u, i);
     const im = UNI.imgs[id];
     if (!im) continue;
-    const m = UNI.meta[id];
-    const w = m.w / UNI.escala, h = m.h / UNI.escala;
-    const [dx, dy] = posMiembro(i);
-    // cada uno con su paso (no marchan sincronizados)
-    const trote = Math.sin(u.paso * Math.PI * 2 + i * 1.9) * 0.6;
+    const meta = UNI.meta[id];
+    const w = meta.w / UNI.escala, h = meta.h / UNI.escala;
+    const m = u.tropa[i];
     ctx.save();
-    ctx.translate(dx + trote, dy);
+    ctx.translate(m.x * L, m.y * L);
+    ctx.scale(s, s);
+    // trote: un saltito al ritmo de sus pasos
+    const trote = Math.abs(Math.sin(m.paso)) * 0.5;
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.beginPath(); ctx.ellipse(0.6, 0.8, w * 0.32, h * 0.26, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.rotate(Math.PI / 2);
+    ctx.rotate(m.ang + Math.PI / 2);
+    ctx.translate(0, -trote);
     if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
     ctx.drawImage(im, -w / 2, -h * 0.62, w, h); // el arma sobresale adelante: el cuerpo queda en el centro
     ctx.filter = 'none';
