@@ -92,6 +92,12 @@ export function simular(datos, { mision, escuadron, semilla }) {
     B.vip = B.agregarUnidad(unidadEnemiga(datos, mision.vip, mision.nivel || 1), 0, x, y);
     B.vip.rol = 'vip';
   }
+  // milicia aliada: aparece detras del escuadron (no cuenta para ganar ni perder; solo ayuda)
+  (mision.aliados || []).forEach((id, i) => {
+    const [x, y] = ap.jugador[(i + 2) % ap.jugador.length];
+    const a = B.agregarUnidad({ ...unidadEnemiga(datos, id, mision.nivel || 1), tipo: 'aliado' }, 0, x, y);
+    if (a) a.rol = 'milicia';
+  });
   const oleadas = mision.oleadas || [];
   let siguienteOleada = 0, proximaOleadaEn = 0;
   const soltarOleada = () => {

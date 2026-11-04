@@ -568,6 +568,85 @@
           "objetivo": "enemigo_cercano"
         }
       ]
+    },
+    "miliciano": {
+      "nombre": "Milicia",
+      "cuerpo": "infanteria",
+      "personalidad": "leal",
+      "amenaza": 1,
+      "sprite": "soldado_rifle",
+      "aliado": true,
+      "stats": {
+        "estructura": 30,
+        "blindaje": 0,
+        "velocidad": 4,
+        "punteria": 50,
+        "evasion": 12,
+        "iniciativa": 5,
+        "moral": 60,
+        "vision": 7
+      },
+      "arma": "brazo_rifle",
+      "miembros": 3,
+      "danio_pct": 70,
+      "figuras": [
+        "guerrilla_01",
+        "guerrilla_02",
+        "guerrilla_05",
+        "guerrilla_07",
+        "guerrilla_09",
+        "guerrilla_10"
+      ],
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        }
+      ]
+    },
+    "miliciano_apoyo": {
+      "nombre": "Milicia pesada",
+      "cuerpo": "infanteria",
+      "personalidad": "leal",
+      "amenaza": 2,
+      "sprite": "soldado_rifle",
+      "aliado": true,
+      "stats": {
+        "estructura": 26,
+        "blindaje": 0,
+        "velocidad": 5,
+        "punteria": 45,
+        "evasion": 8,
+        "iniciativa": 4,
+        "moral": 60,
+        "vision": 7
+      },
+      "arma": "brazo_lanzamisiles",
+      "miembros": 2,
+      "danio_pct": 45,
+      "figuras": [
+        "guerrilla_06",
+        "guerrilla_08",
+        "guerrilla_03"
+      ],
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_peligroso"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        }
+      ]
     }
   },
   "escuadras": {

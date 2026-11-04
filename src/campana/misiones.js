@@ -79,6 +79,8 @@ export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificu
       if (tpl.vip) m.vip = tpl.vip;
     }
   }
+  // la resistencia: a veces la milicia local pelea con nosotros (pocos, pero suman)
+  m.aliados = tpl.aliados && azar.tirada(tpl.aliados.chance) ? tpl.aliados.unidades.slice() : [];
   aplicarCondiciones(datos, m, sortearCondiciones(datos, dificultad, azar), azar, tpl);
   m.descripcion = (tpl.descripcion || '').replace(/\{(\w+)\}/g, (_, k) => (m.parametros && m.parametros[k] !== undefined ? m.parametros[k] : k));
   m.cantidadEnemigos = m.oleadas.reduce((s, o) => s + o.length, 0) + m.emboscadas.reduce((s, e) => s + e.unidades.length, 0);

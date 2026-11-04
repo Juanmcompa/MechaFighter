@@ -1,7 +1,7 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 1,
-  "version_motor": 9,
+  "version_motor": 10,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
   "escuadra_maxima": 6,
@@ -74,7 +74,7 @@
   ],
   "peligro_danio_por_tick": 1,
   "enemigos": {
-    "mejora_por_nivel_pct": 22
+    "mejora_por_nivel_pct": 25
   },
   "campana": {
     "costo_reclutar": 90,

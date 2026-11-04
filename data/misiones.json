@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Plantillas de contrato. Una mision concreta se arma eligiendo un mapa, numeros dentro de los rangos y escuadras enemigas. Victoria y derrota son listas de condiciones: se gana si se cumple UNA de victoria, se pierde si se cumple UNA de derrota.",
+  "_ayuda": "Plantillas de contrato. Una mision concreta se arma eligiendo un mapa, numeros dentro de los rangos y escuadras enemigas. Victoria y derrota son listas de condiciones: se gana si se cumple UNA de victoria, se pierde si se cumple UNA de derrota. 'aliados': pelotones de la milicia local que pelean de nuestro lado (chance en %).",
   "defensa": {
     "nombre": "Resistir la posición",
     "tipo": "sobrevivencia",
@@ -49,6 +49,13 @@
       "por_baja": 10,
       "por_credito_ahorrado": 1,
       "por_superviviente": 50
+    },
+    "aliados": {
+      "chance": 80,
+      "unidades": [
+        "miliciano",
+        "miliciano"
+      ]
     }
   },
   "asalto": {
@@ -95,6 +102,12 @@
       "por_baja": 10,
       "por_superviviente": 50,
       "por_tick_restante": 0
+    },
+    "aliados": {
+      "chance": 40,
+      "unidades": [
+        "miliciano_apoyo"
+      ]
     }
   },
   "escolta": {
@@ -142,7 +155,13 @@
       "por_superviviente": 50,
       "vip_intacto": 100
     },
-    "vip_aparece": "jugador"
+    "vip_aparece": "jugador",
+    "aliados": {
+      "chance": 70,
+      "unidades": [
+        "miliciano"
+      ]
+    }
   },
   "patrulla": {
     "nombre": "Reconocimiento",

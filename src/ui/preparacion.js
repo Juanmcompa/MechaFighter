@@ -47,6 +47,9 @@ export function preparacion(app, raiz) {
             return h('li', {}, ico(c.icono), h('div', {}, h('strong', {}, c.nombre), h('span', {}, c.descripcion)));
           }))) : null,
         panel('Mapa · ' + datos.mapas[m.mapa].nombre, h('p', { class: 'ayuda' }, datos.mapas[m.mapa].descripcion || '')),
+        (m.aliados || []).length ? panel('Apoyo',
+          h('p', { class: 'ayuda' }, ico('vinculo'), ' La resistencia local pelea con ustedes: ' +
+            m.aliados.map((id) => datos.enemigos.unidades[id].nombre.toLowerCase()).join(' y ') + '. Pocos, pero suman.')) : null,
         panel('Hostiles', m.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
         p.nodo.animo && p.nodo.animo.notas.length ? panel('Ánimo del escuadrón',
           h('ul', { class: 'condiciones animo' }, ...p.nodo.animo.notas.map((n) => h('li', { class: 'animo-' + n.tipo }, ico(ICONO_NOTA[n.tipo] || 'piloto'), h('span', {}, n.texto)))),

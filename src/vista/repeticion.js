@@ -332,6 +332,8 @@ export class Repeticion {
       }
       case 'inicio': {
         this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ' + this.lineaControl('inicio', e.t), clase: 'control' });
+        const milicia = [...U.values()].filter((x) => x.ficha.rol === 'milicia').length;
+        if (milicia) this.alEvento({ texto: 'CONTROL › ESCUADRÓN: La milicia local pelea con ustedes (' + milicia + (milicia > 1 ? ' pelotones' : ' pelotón') + '). No los dejen solos.', clase: 'control' });
         if (this.mision && this.mision.jefe) {
           this.alEvento({ texto: 'CONTROL › ESCUADRÓN: Objetivo confirmado: ' + this.mision.jefe.nombre + '. No vuelvan sin su cabeza.', clase: 'control', importante: true });
           this.alEvento({ texto: this.mision.jefe.nombre.toUpperCase() + ' (canal abierto): «' + this.mision.jefe.frase + '»', clase: 'mal', importante: true });
