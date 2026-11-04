@@ -4,6 +4,7 @@ import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js
 import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot } from '../campana/partida.js';
 import { nombreDeMecha } from '../campana/reclutas.js';
+import { relaciones } from '../campana/animo.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
 
@@ -55,7 +56,7 @@ export function hangar(app, raiz, opciones = {}) {
     if (!pi) return;
     detalle.append(
       h('div', { class: 'columnas-hangar' },
-        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }), panelHoja(pi)),
+        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, () => { pintarLista(); pintarDetalle(); }), panelRelaciones(app, pi), panelHoja(pi)),
         h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
   };
 
@@ -233,6 +234,17 @@ function panelGambits(app, pi, refrescar) {
 }
 
 // Lo que el piloto vivio: sus momentos, del mas nuevo al mas viejo
+// Con quien se lleva bien y con quien no (afinidad)
+function panelRelaciones(app, pi) {
+  const { amigos, rivales } = relaciones(app.datos, app.partida, pi);
+  const fila = (r, icono, clase) => h('li', { class: clase }, ico(icono), h('strong', {}, r.piloto.apodo), ' ' + (r.valor > 0 ? '+' : '') + r.valor);
+  return panel('Relaciones',
+    amigos.length || rivales.length
+      ? h('ul', { class: 'relaciones' }, ...amigos.map((r) => fila(r, 'vinculo', 'amigo')), ...rivales.map((r) => fila(r, 'espadas', 'rival')))
+      : h('p', { class: 'ayuda' }, 'Se lleva normal con todos. Lo que vivan juntos lo va a cambiar.'),
+    h('p', { class: 'ayuda' }, 'Los amigos cerca apuntan mejor. Los rivales juntos discuten por radio.'));
+}
+
 function panelHoja(pi) {
   const hoja = (pi.hoja || []).slice().reverse();
   return panel('Hoja de servicio',

@@ -1,0 +1,13 @@
+{
+  "_ayuda": "Afinidad entre pilotos, de -100 (no se soportan) a 100 (hermanos). Arranca segun las personalidades ('base', la clave es alfabetica: 'cobarde|temerario') mas un poco de azar, y cambia con lo que viven juntos ('cambios'). Desde 'amigos' pelean mejor cerca; desde 'rivales' (para abajo) se distraen discutiendo y les cuesta mas la moral.",
+  "base": {
+    "cobarde|cobarde": 10, "cobarde|leal": 15, "cobarde|sanguinario": -25, "cobarde|temerario": -30,
+    "leal|leal": 25, "leal|sanguinario": -20, "leal|temerario": 5,
+    "sanguinario|sanguinario": -10, "sanguinario|temerario": 15, "temerario|temerario": -5
+  },
+  "azar": 20,
+  "umbrales": { "amigos": 45, "rivales": -35 },
+  "cambios": {
+    "salvo": 25, "cubrio": 12, "huyo": -10, "discusion": -6, "victoria_juntos": 4, "derrota_juntos": -2, "vinculo": 30
+  }
+}

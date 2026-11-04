@@ -54,6 +54,16 @@ export function resolverAcciones(B, intenciones) {
         B.log({ tipo: 'recarga', u: u.id });
         break;
       case 'reparar': reparar(B, u, porId(B, i.o)); break;
+      case 'discutir': {
+        // los dos se frenan un rato a pelearse por radio
+        const r = porId(B, i.con);
+        if (!r || !r.viva) break;
+        u.ocupado = Math.max(u.ocupado, 10); r.ocupado = Math.max(r.ocupado, 10);
+        r.discusionT = B.t;
+        evento(B, 'discusion', u); evento(B, 'discusion', r);
+        B.log({ tipo: 'discute', u: u.id, con: r.id });
+        break;
+      }
       case 'invocar': invocar(B, u, i); break;
       case 'habilidad_propia': {
         const h = B.datos.habilidades[i.habilidad];
@@ -84,7 +94,10 @@ function atacar(B, u, i) {
     const melee = a.alcance <= 1;
     const cob = melee || a.ignoraCobertura ? null : cobertura(B.tablero, o, u);
     const castigo = cob ? R.cobertura[cob] : 0;
-    let chance = a.punteria + (mu.punteria || 0) + (ef.punteria || 0) - o.evasion - (mo.evasion || 0) - castigo;
+    // pelear al lado de un amigo da confianza
+    const amigo = u.amigo ? porId(B, u.amigo) : null;
+    const bonusAmigo = amigo && amigo.viva && distancia(u, amigo) <= 3 ? B.datos.reglas.animo.bonus_amigo_punteria : 0;
+    let chance = a.punteria + (mu.punteria || 0) + (ef.punteria || 0) + bonusAmigo - o.evasion - (mo.evasion || 0) - castigo;
     chance = Math.max(R.punteria_minima, Math.min(R.punteria_maxima, chance));
     const acierta = az.tirada(chance);
     let danio = 0, bloqueo = false;

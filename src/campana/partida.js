@@ -8,10 +8,17 @@ import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision } from './misiones.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
+import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
 const MAX_HOJA_MEMORIAL = 6;
+
+// Azar aparte para afinidad y animo: no corre el contador de pasos, asi no cambia el resto de la campana
+// (mapas, botin, contratos) por sumar estas tiradas.
+function azarAparte(p, etiqueta) {
+  return crearAzar(p.semilla).derivar(etiqueta + ':' + p.misionesJugadas + ':' + p.sector + ':' + p.columna + ':' + p.pilotos.length);
+}
 
 function azarDe(p, etiqueta) {
   p.paso = (p.paso || 0) + 1;
@@ -36,6 +43,9 @@ export function nuevaPartida(datos, semilla) {
   for (const c of clases) p.pilotos.push(crearRecluta(datos, az, nuevoId(p), c, p.pilotos.map((x) => x.apodo), p.pilotos.map((x) => x.retrato)));
   // Vinculos de a pares: con alguien tienen que contar (y a alguien van a extranar)
   for (let i = 0; i + 1 < p.pilotos.length; i += 2) vincular(p.pilotos[i], p.pilotos[i + 1]);
+  p.afinidad = {};
+  const azAf = azarAparte(p, 'afinidad');
+  for (const pi of p.pilotos) presentar(datos, p, pi, azAf);
   p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] });
   generarSector(datos, p);
   return p;
@@ -96,6 +106,8 @@ export function elegirNodo(datos, p, i) {
     case 'mision':
     case 'jefe':
       p.estado = 'preparacion';
+      // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
+      p.nodo.animo = calcularAnimo(datos, p, nodo.mision, p.pilotos.slice(0, datos.reglas.escuadra_maxima), azarAparte(p, 'animo'));
       break;
     case 'taller': {
       const az = azarDe(p, 'taller');
@@ -217,6 +229,7 @@ export function contratar(datos, p, i) {
   const solo = p.pilotos.find((x) => !x.vinculo);
   if (solo) vincular(solo, nuevo);
   p.pilotos.push(nuevo);
+  presentar(datos, p, nuevo, azarAparte(p, 'afinidad:' + nuevo.id));
   return true;
 }
 
@@ -250,7 +263,11 @@ export function guardarGambits(datos, p, pilotoId, lista) {
 // ---------- Mision ----------
 
 export function escuadronParaMision(datos, p) {
-  return p.pilotos.slice(0, datos.reglas.escuadra_maxima).map((pi) => ({ piloto: pi, mecha: pi.mecha, gambits: pi.gambits }));
+  const animo = (p.nodo && p.nodo.animo && p.nodo.animo.porPiloto) || {};
+  return p.pilotos.slice(0, datos.reglas.escuadra_maxima).map((pi) => ({
+    piloto: pi, mecha: pi.mecha, gambits: pi.gambits,
+    estados: (animo[pi.id] || {}).estados || [], rival: (animo[pi.id] || {}).rival || null, amigo: (animo[pi.id] || {}).amigo || null
+  }));
 }
 
 // Despues de la batalla: aplica todo lo que paso y devuelve el informe para mostrar.
@@ -264,6 +281,9 @@ export function cerrarMision(datos, p, resultado) {
   // los momentos para recordar salen del registro, con los pilotos como estaban antes de la mision
   const sector = p.sector + 1;
   const donde = m.nombre + ' (sector ' + sector + ')';
+  const desplegados = p.pilotos.filter((x) => resultado.resumen.pilotos[x.id]);
+  const apodos = new Map(p.pilotos.map((x) => [x.id, x.apodo]));
+  const nombreDe = (id) => apodos.get(id) || '?';
   const hoja = momentosDeMision(resultado.registro || [], m, sector, new Map(p.pilotos.map((x) => [x.id, x])));
 
   for (const pi of p.pilotos.slice()) {
@@ -302,6 +322,8 @@ export function cerrarMision(datos, p, resultado) {
     }
 
     pi.misiones++;
+    // racha: misiones ganadas al hilo (y sin terminar herido de gravedad). Con racha, llegan confiados.
+    pi.racha = resultado.victoria && linea.estado === 'ok' ? (pi.racha || 0) + 1 : 0;
     if (linea.estado === 'herido') linea.momentos.push('Lo dieron por muerto en ' + donde + ', y volvió.');
     else if (s.vidaMinPct < 10) linea.momentos.push('Volvió de ' + donde + ' con el mecha hecho trizas.');
     if (s.quedoSolo) linea.momentos.push('Quedó solo contra todos en ' + donde + '.');
@@ -343,6 +365,10 @@ export function cerrarMision(datos, p, resultado) {
     }
     informe.pilotos.push(linea);
   }
+
+  // Afinidad: lo que vivieron juntos los acerca o los separa
+  informe.relaciones = actualizarAfinidad(datos, p, resultado.registro || [], desplegados, resultado.victoria)
+    .map((c) => ({ ...c, a: nombreDe(c.a), b: nombreDe(c.b) }));
 
   // Recompensa y puntaje
   const pz = m.puntaje || {};

@@ -107,5 +107,71 @@
       "punteria": 8,
       "evasion": 6
     }
+  },
+  "confiado": {
+    "nombre": "Confiado",
+    "icono": "rayo",
+    "duracion": 0,
+    "mods": {
+      "punteria": 6
+    },
+    "ganchos": [
+      {
+        "tipo": "ignorar_condicion",
+        "condicion": "en_cobertura",
+        "chance": 25
+      },
+      {
+        "tipo": "anular",
+        "prioridad": 55,
+        "cuando": {
+          "todos": [
+            {
+              "dato": "mision.tick",
+              "op": "<",
+              "valor": 120
+            },
+            {
+              "no": {
+                "existe": "enemigo",
+                "donde": {
+                  "fn": "a_tiro"
+                }
+              }
+            }
+          ]
+        },
+        "hacer": {
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        },
+        "registro": "se_manda"
+      }
+    ]
+  },
+  "nervioso": {
+    "nombre": "Nervioso",
+    "icono": "trauma",
+    "duracion": 0,
+    "mods": {
+      "punteria": -6
+    },
+    "ganchos": [
+      {
+        "tipo": "confusion",
+        "chance": 18
+      }
+    ]
+  },
+  "perdido": {
+    "nombre": "Desorientado",
+    "icono": "mapa",
+    "duracion": 0,
+    "ganchos": [
+      {
+        "tipo": "perdido",
+        "ticks": 160
+      }
+    ]
   }
 }

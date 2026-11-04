@@ -3,6 +3,9 @@ import { h, montar, ico, boton, panel, chip, barraCampana, retrato } from './com
 import { dibujarMapa } from './vistaMapa.js';
 import { escuadronParaMision } from '../campana/partida.js';
 
+// Como llega cada uno (ver campana/animo.js)
+const ICONO_NOTA = { confiado: 'rayo', nervioso: 'trauma', atento: 'ojo', perdido: 'mapa', rivales: 'espadas', amigos: 'vinculo' };
+
 export function preparacion(app, raiz) {
   const { datos } = app;
   const p = app.partida;
@@ -40,6 +43,9 @@ export function preparacion(app, raiz) {
           }))) : null,
         panel('Mapa · ' + datos.mapas[m.mapa].nombre, h('p', { class: 'ayuda' }, datos.mapas[m.mapa].descripcion || '')),
         panel('Hostiles', m.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
+        p.nodo.animo && p.nodo.animo.notas.length ? panel('Ánimo del escuadrón',
+          h('ul', { class: 'condiciones animo' }, ...p.nodo.animo.notas.map((n) => h('li', { class: 'animo-' + n.tipo }, ico(ICONO_NOTA[n.tipo] || 'piloto'), h('span', {}, n.texto)))),
+          h('p', { class: 'ayuda' }, 'Si no te convence cómo viene alguno, dejalo en el banco desde el hangar.')) : null,
         panel('Escuadrón',
           h('ul', { class: 'lista-escuadron' }, ...escuadron.map(({ piloto }) => h('li', {},
             retrato(datos, piloto, 'retrato-mini'), ico(datos.clases[piloto.clase].icono), h('strong', {}, piloto.apodo), ' · ' + datos.clases[piloto.clase].nombre + ' · niv ' + piloto.nivel,

@@ -1,6 +1,8 @@
 // Informe despues de la mision: quien volvio, quien no, que aprendieron y que se llevaron.
 import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 
+const MOTIVOS = { salvo: 'uno salvó al otro', cubrio: 'se cubrieron', huyo: 'alguien huyó', discusion: 'discutieron por radio' };
+
 export function informe(app, raiz, inf) {
   const { datos } = app;
   const p = app.partida;
@@ -25,6 +27,10 @@ export function informe(app, raiz, inf) {
         l.estado === 'muerto' ? h('p', { class: 'epitafio' }, l.nombre + '. ' + (l.epitafio || 'Cayó en combate.')) : null,
         l.estado !== 'muerto' && l.momentos && l.momentos.length ? h('ul', { class: 'hoja-servicio corta' }, ...l.momentos.map((t) => h('li', {}, t))) : null,
         l.nuevas.length ? h('div', { class: 'chips' }, ...l.nuevas.map(nuevaCosa)) : null)))),
+    inf.relaciones && inf.relaciones.length ? panel('Relaciones',
+      h('ul', { class: 'relaciones' }, ...inf.relaciones.map((c) => h('li', { class: c.delta >= 0 ? 'amigo' : 'rival' },
+        ico(c.delta >= 0 ? 'vinculo' : 'espadas'), h('strong', {}, c.a + ' y ' + c.b), ' ' + (c.delta > 0 ? '+' : '') + c.delta + ' · ' +
+        c.motivos.filter((m) => MOTIVOS[m]).map((m) => MOTIVOS[m]).join(', '))))) : null,
     panel('Botín',
       h('div', { class: 'chips' },
         chip('creditos', '+' + inf.creditos, 'Créditos'),

@@ -28,7 +28,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === 'g6g25b', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === 'pgy3hp', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {

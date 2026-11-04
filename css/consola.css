@@ -213,3 +213,14 @@ button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offse
 .condiciones span { color: var(--texto-tenue); font-size: 17px; }
 .chip-alerta { border-color: #6b5a26; } .chip-alerta .ico { color: var(--ambar); }
 .taclog .feed .control { color: var(--ambar); }
+
+/* Animo y relaciones */
+.condiciones.animo .animo-confiado .ico, .condiciones.animo .animo-perdido .ico { color: var(--ambar); }
+.condiciones.animo .animo-nervioso .ico, .condiciones.animo .animo-rivales .ico { color: #e06a5a; }
+.condiciones.animo .animo-atento .ico, .condiciones.animo .animo-amigos .ico { color: #7fd17a; }
+.condiciones.animo li span { display: block; }
+.relaciones { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.relaciones li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.relaciones .amigo .ico { color: #7fd17a; }
+.relaciones .rival .ico { color: #e06a5a; }
+.condiciones.animo li span:not(.ico-envoltura) { color: var(--texto); }

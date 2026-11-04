@@ -18,7 +18,8 @@
     "nombres",
     "textos",
     "voces",
-    "condiciones_mision"
+    "condiciones_mision",
+    "afinidad"
   ],
   "mapas": [
     "puesto_01",

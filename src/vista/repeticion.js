@@ -6,6 +6,9 @@ import { crearTablero, lineaDeTiro, distancia } from '../motor/espacio.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
+// Anulaciones que se cuentan por radio con la voz del piloto (ver voces.json)
+const VOZ_ANULA = new Set(['se_manda', 'se_le_pasa', 'perdido', 'reubicado', 'confusion', 'discute']);
+
 export class Repeticion {
   constructor({ datos, mision, registro, canvas, alEvento, alTerminar, pilotos }) {
     this.porPiloto = pilotos || new Map(); // id de piloto -> piloto (para voces, vinculos y marcas)
@@ -24,6 +27,7 @@ export class Repeticion {
     this.i = 0;
     this.velocidad = 1;
     this.temblor = 0; // sacudon de camara (explosiones, pasos pesados)
+    this.estatica = 0; // hasta cuando se ve estatica de radio (contacto, refuerzos)
     this.pausado = false;
     this.terminado = false;
     this.unidades = new Map();
@@ -217,6 +221,14 @@ export class Repeticion {
       }
       case 'anula': {
         if (!u) break;
+        // lo que se vive por radio (se manda, se pierde, discute...) lo dice el piloto con su voz
+        if (VOZ_ANULA.has(e.motivo)) {
+          // lo mismo no lo repite por radio a cada rato
+          u.vozAnula = u.vozAnula || {};
+          if (this.T - (u.vozAnula[e.motivo] ?? -999) < 150) break;
+          u.vozAnula[e.motivo] = this.T;
+          if (this.decir(u, e.motivo, true)) break;
+        }
         const texto = this.datos.textos.gritos[e.motivo] || '…';
         u.grito = { texto, hasta: this.T + 22 };
         // el mismo grito seguido no se repite en la lista
@@ -237,8 +249,24 @@ export class Repeticion {
         if (e.estado === 'moral_quebrada') this.alEvento({ texto: u.ficha.nombre + ' se quiebra', clase: 'aviso' });
         break;
       case 'habilidad': if (u) this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true); break;
-      case 'oleada': if (e.n > 1) this.alEvento({ texto: 'CONTROL: Oleada ' + e.n + ' de ' + e.de + ' en camino.', clase: 'control', importante: true }); break;
-      case 'refuerzos': this.alEvento({ texto: 'CONTROL: ¡Refuerzos enemigos por detrás! ' + e.cantidad + ' contactos.', clase: 'control', importante: true }); this.temblor = Math.max(this.temblor, 0.3); break;
+      case 'oleada': {
+        if (e.n <= 1) break;
+        this.alEvento({ texto: 'CONTROL › ESCUADRÓN: Oleada ' + e.n + ' de ' + e.de + ' en camino.', clase: 'control', importante: true });
+        const vivos = this.nuestros(true);
+        if (vivos.length) this.decir(vivos[this.azarVoz(e.t, vivos[0]) % vivos.length], 'oleada', true);
+        break;
+      }
+      case 'contacto': {
+        this.estatica = this.T + 8;
+        this.decir(u, 'contacto', true, { dir: e.dir, n: e.n });
+        break;
+      }
+      case 'discute': {
+        const o = U.get(e.con);
+        if (o) this.alEvento({ texto: 'CONTROL: ' + u.ficha.nombre + ', ' + o.ficha.nombre + ', ¡corten la radio y concéntrense!', clase: 'control' });
+        break;
+      }
+      case 'refuerzos': this.estatica = this.T + 10; this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ¡Refuerzos enemigos por detrás! ' + e.cantidad + ' contactos.', clase: 'control', importante: true }); this.temblor = Math.max(this.temblor, 0.3); break;
       case 'mina': {
         this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: 1.2, t0: this.T, dur: 10 });
         this.temblor = Math.max(this.temblor, 0.9);
@@ -248,11 +276,13 @@ export class Repeticion {
         break;
       }
       case 'inicio': {
-        const nuestros = [...U.values()].filter((x) => x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
+        this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ' + this.lineaControl('inicio', e.t), clase: 'control' });
+        const nuestros = this.nuestros(false);
         if (nuestros.length) this.decir(nuestros[(nuestros.length * 7 + this.registro.length) % nuestros.length], 'inicio', true);
         break;
       }
       case 'fin': {
+        this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ' + this.lineaControl(e.victoria ? 'victoria' : 'derrota', e.t), clase: 'control', importante: true });
         if (!e.victoria) break;
         const vivos = [...U.values()].filter((x) => x.viva && x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
         if (vivos.length) this.decir(vivos[this.azarVoz(e.t, vivos[0]) % vivos.length], 'victoria', true);
@@ -270,18 +300,32 @@ export class Repeticion {
 
   // Un piloto dice algo segun su personalidad. Para no llenar todo de globos: cada uno espera un rato entre
   // frase y frase, y entre todos tambien (salvo lo importante: forzar).
-  decir(u, momento, forzar = false) {
-    if (!u || !u.viva && momento !== 'vinculo_cae') return;
+  nuestros(soloVivos) {
+    return [...this.unidades.values()].filter((x) => x.ficha.bando === 0 && x.ficha.tipo === 'piloto' && (!soloVivos || x.viva));
+  }
+
+  // Lo que dice Control (el jugador) al abrir y cerrar la mision
+  lineaControl(momento, t) {
+    const lista = ((this.datos.voces || {}).control || {})[momento] || [];
+    return lista.length ? lista[(t * 7 + this.registro.length) % lista.length] : '';
+  }
+
+  decir(u, momento, forzar = false, vars = null) {
+    if (!u || !u.viva && momento !== 'vinculo_cae') return false;
     const V = this.datos.voces || {};
     const pers = u.ficha.personalidad;
     const lista = (V[pers] && V[pers][momento]) || (V.comun && V.comun[momento]);
-    if (!lista || !lista.length) return;
-    if (!forzar && (this.T - this.ultimaVoz < 14 || this.T - u.vozT < 45)) return;
-    if (u.grito && this.T < u.grito.hasta && !forzar) return;
-    const texto = lista[this.azarVoz(Math.floor(this.T), u) % lista.length];
+    if (!lista || !lista.length) return false;
+    if (!forzar && (this.T - this.ultimaVoz < 14 || this.T - u.vozT < 45)) return false;
+    if (u.grito && this.T < u.grito.hasta && !forzar) return false;
+    let texto = lista[this.azarVoz(Math.floor(this.T), u) % lista.length];
+    if (vars) texto = texto.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : k));
     u.grito = { texto, hasta: this.T + 24 };
     u.vozT = this.T; this.ultimaVoz = this.T;
-    this.alEvento({ texto: u.ficha.nombre + ': «' + texto + '»', clase: 'voz', importante: momento === 'vinculo_cae' });
+    // los nuestros hablan por radio con Control
+    const quien = u.ficha.bando === 0 ? u.ficha.nombre.toUpperCase() + ' › CONTROL' : u.ficha.nombre;
+    this.alEvento({ texto: quien + ': «' + texto + '»', clase: 'voz', importante: momento === 'vinculo_cae' || momento === 'contacto' });
+    return true;
   }
 
   flotante(u, texto, color, chico = false) {
@@ -502,6 +546,16 @@ export class Repeticion {
       ctx.globalAlpha = 1;
     }
     ctx.textAlign = 'start';
+    // estatica de radio: rayas que titilan unos instantes (determinista, segun el tiempo)
+    if (this.T < this.estatica) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const k = (this.estatica - this.T) / 8;
+      for (let i = 0; i < 14; i++) {
+        const h = ((Math.floor(this.T * 3) * 97 + i * 131) % 1000) / 1000;
+        ctx.fillStyle = i % 3 ? 'rgba(200,220,200,' + (0.08 * k) + ')' : 'rgba(0,0,0,' + (0.18 * k) + ')';
+        ctx.fillRect(0, h * this.H, this.W, 1 + (i % 4));
+      }
+    }
   }
 
   // Estado actual de los pilotos (para la lista al costado).

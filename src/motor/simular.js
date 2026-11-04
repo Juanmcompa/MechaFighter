@@ -7,7 +7,7 @@
 // Misma entrada = misma salida, en cualquier aparato. La vista solo reproduce el registro.
 
 import { crearAzar, huellaTexto } from '../core/azar.js';
-import { crearTablero, casillaLibreCerca, distancia, tipo as tipoCasilla } from './espacio.js';
+import { crearTablero, casillaLibreCerca, distancia, lineaDeTiro, tipo as tipoCasilla } from './espacio.js';
 import { ordenUnidades, percibir, vidaPct, evento, aliados, quitarEstado, ponerEstado } from './estado.js';
 import { decidir } from './decision.js';
 import { resolverMovimientos, resolverAcciones, herir } from './resolucion.js';
@@ -62,10 +62,17 @@ export function simular(datos, { mision, escuadron, semilla }) {
   const ap = mapa.aparicion;
   escuadron.forEach((m, i) => {
     const [x, y] = ap.jugador[i % ap.jugador.length];
-    B.agregarUnidad(unidadDePiloto(datos, m.piloto, m.mecha, m.gambits), 0, x, y);
+    const u = B.agregarUnidad(unidadDePiloto(datos, m.piloto, m.mecha, m.gambits), 0, x, y);
+    // como llega a la mision (confiado, nervioso, atento, desorientado) y con quien se lleva bien o mal
+    if (u) { u.rivalRef = m.rival || null; u.amigoRef = m.amigo || null; u.estadosIniciales = m.estados || []; }
   });
   // estados que lleva todo el escuadron por una condicion de la mision (interferencia, atento)
   for (const u of B.unidades) if (u.tipo === 'piloto') for (const est of mision.estadosEscuadron || []) ponerEstado(B, u, est, null);
+  for (const u of B.unidades) {
+    for (const est of u.estadosIniciales || []) ponerEstado(B, u, est, null);
+    const buscar = (ref) => (ref ? (B.unidades.find((o) => o.ref === ref && o.bando === u.bando) || {}).id || null : null);
+    u.rival = buscar(u.rivalRef); u.amigo = buscar(u.amigoRef);
+  }
   // vinculos: de ref de piloto a id de unidad
   for (const u of B.unidades) {
     if (u.vinculoRef) { const v = B.unidades.find((o) => o.ref === u.vinculoRef && o.bando === u.bando); if (v) u.vinculo = v.id; }
@@ -142,6 +149,23 @@ export function simular(datos, { mision, escuadron, semilla }) {
 
     // 2. percepcion
     percibir(B);
+    // primer contacto: el escuadron avisa a Control cuando ve enemigos nuevos
+    const nuevos = [];
+    let quienVe = null;
+    for (const o of B.unidades) {
+      if (!o.viva || o.bando !== 1 || o.avistado) continue;
+      const ojo = B.unidades.find((u) => u.viva && u.bando === 0 && u.tipo === 'piloto' && distancia(u, o) <= u.vision && lineaDeTiro(B.tablero, u, o));
+      if (ojo) { o.avistado = true; nuevos.push(o); quienVe = quienVe || ojo; }
+    }
+    // (si siguen apareciendo de a uno, no se repite el aviso enseguida: se cuentan en el proximo)
+    if (nuevos.length) B.sinAvisar = (B.sinAvisar || 0) + nuevos.length;
+    if (nuevos.length && B.t - (B.ultimoContacto ?? -999) >= 60) {
+      B.ultimoContacto = B.t;
+      const dx = nuevos.reduce((s, o) => s + o.x - quienVe.x, 0), dy = nuevos.reduce((s, o) => s + o.y - quienVe.y, 0);
+      const dir = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'este' : 'oeste') : (dy >= 0 ? 'sur' : 'norte');
+      B.log({ tipo: 'contacto', u: quienVe.id, n: B.sinAvisar, dir });
+      B.sinAvisar = 0;
+    }
 
     // 3. decision (nadie cambia nada todavia)
     const intenciones = [];
@@ -181,9 +205,18 @@ export function simular(datos, { mision, escuadron, semilla }) {
       for (const a of resto) {
         evento(B, 'aliado_muerto', a);
         if (a.vinculo === u.id) { evento(B, 'vinculo_muerto', a); a.s.vinculoMurio = true; }
+        if (a.amigo === u.id) evento(B, 'amigo_muerto', a);
       }
       const pilotosVivos = resto.filter((a) => a.tipo === 'piloto');
       if (pilotosVivos.length === 1 && !pilotosVivos[0].s.quedoSolo) { pilotosVivos[0].s.quedoSolo = true; evento(B, 'quedo_solo', pilotosVivos[0]); }
+    }
+
+    // al confiado se le pasa la confianza cuando lo lastiman en serio
+    for (const u of B.unidades) {
+      if (u.viva && u.vida > 0 && vidaPct(u) < 40 && u.estados.some((e) => e.id === 'confiado')) {
+        quitarEstado(B, u, 'confiado');
+        B.log({ tipo: 'anula', u: u.id, motivo: 'se_le_pasa' });
+      }
     }
 
     // 5. moral

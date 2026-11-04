@@ -36,6 +36,7 @@ function leerDato(B, ctx, dato) {
   }
   const quien = dato.slice(0, punto), prop = dato.slice(punto + 1);
   if (quien === 'yo') return propiedad(B, ctx.u, prop);
+  if (quien === 'mision') return prop === 'tick' ? B.t : null;
   const sel = elegirObjetivo(B, ctx.u, quien);
   return sel && sel.id ? propiedad(B, sel, prop) : null;
 }
@@ -155,7 +156,28 @@ export function elegirObjetivo(B, u, sel) {
   return null;
 }
 
+// Ticks que le quedan a u de estar desorientado (gancho "perdido"); 0 si no lo esta.
+function ticksPerdido(B, u) {
+  let t = 0;
+  for (const h of u.ganchos.concat(...u.estados.map((e) => (B.datos.estados[e.id] || {}).ganchos || []))) {
+    if (h.tipo === 'perdido') t = Math.max(t, h.ticks);
+  }
+  return t > B.t ? t : 0;
+}
+
 function objetivoMision(B, u) {
+  const m = B.mision;
+  const real = objetivoReal(B, u);
+  // Desorientado: va para el lado equivocado (el espejo del objetivo) hasta que se ubica
+  if (real && u.bando === 0 && ticksPerdido(B, u)) {
+    const [ancho, alto] = B.mapa.tamano;
+    const x = Math.max(1, Math.min(ancho - 2, ancho - 1 - real.x)), y = Math.max(1, Math.min(alto - 2, alto - 1 - real.y));
+    return { x, y, punto: true, falso: true };
+  }
+  return real;
+}
+
+function objetivoReal(B, u) {
   const m = B.mision;
   if (u.bando === 0) {
     // Escolta: el objetivo de los pilotos es acompanar al transporte, no meterse en la zona. Si la llenan,
@@ -421,6 +443,16 @@ export function decidir(B, u) {
   const paso = abrirPaso(B, u);
   if (paso) return paso;
 
+  // Rivales: si estan cerca y no hay tiros, a veces se ponen a discutir y pierden tiempo
+  // (como mucho una pelea por piloto en cada mision: despues se la guardan)
+  if (u.rival && !u.discutio && !enemigosConocidos(B, u).length) {
+    const r = porId(B, u.rival);
+    if (r && r.viva && !r.discutio && distancia(u, r) <= 3 && az.tirada(B.datos.reglas.animo.chance_discusion)) {
+      u.discutio = true; r.discutio = true;
+      return { tipo: 'discutir', con: r.id, anula: 'discute' };
+    }
+  }
+
   if (correa && distancia(u, correa.ancla) > correa.max) {
     const i = mover(B, u, correa.ancla.x, correa.ancla.y, null);
     if (i) return { ...i, anula: 'correa' };
@@ -468,6 +500,8 @@ export function decidir(B, u) {
     const meta = objetivoMision(B, u);
     if (meta) {
       const i = accion(B, u, 'avanzar', meta, correa);
+      if (meta.falso) { u.estuvoPerdido = true; if (i) return { ...i, anula: 'perdido' }; }
+      else if (u.estuvoPerdido && !u.reubicado) { u.reubicado = true; if (i) return { ...i, anula: 'reubicado' }; }
       if (i) return i;
     }
   }

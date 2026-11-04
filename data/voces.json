@@ -1,40 +1,252 @@
 {
-  "_ayuda": "Lo que dice cada piloto en la batalla, segun su personalidad y el momento. Si una personalidad no tiene frases para un momento, usa las de 'comun'. Frases cortas: entran en un globito. Momentos: inicio (arranca la mision), baja (derribo a alguien), herido (le queda poca vida), vinculo_cae (cayo su companero de vinculo), aliado_cae (cayo otro), victoria.",
+  "_ayuda": "Lo que dice cada piloto en la batalla, segun su personalidad y el momento. Si una personalidad no tiene frases para un momento, usa las de 'comun'. Frases cortas: entran en un globito. Momentos: inicio (arranca la mision), baja (derribo a alguien), herido (le queda poca vida), vinculo_cae (cayo su companero de vinculo), aliado_cae (cayo otro), victoria. Momentos de la radio: contacto (ve enemigos), se_manda (confiado, sale solo), se_le_pasa (al confiado lo lastimaron), perdido / reubicado (no encuentra el objetivo / lo encontro), confusion (entendio mal la orden), discute (con su rival), oleada (vienen mas).",
   "comun": {
-    "inicio": ["Sistemas en verde.", "Vamos, que se hace tarde.", "A trabajar.", "Escuadrón, en formación."],
-    "baja": ["Uno menos.", "Blanco abatido.", "Fuera de combate."],
-    "herido": ["¡Me dieron feo!", "Tengo el blindaje hecho un colador.", "¡Necesito apoyo!"],
-    "vinculo_cae": ["¡No! ¡NO!", "Esto lo van a pagar.", "Te voy a vengar, hermano."],
-    "aliado_cae": ["¡Perdimos uno!", "Cayó... sigan, sigan.", "Mantengan la línea."],
-    "victoria": ["Zona asegurada.", "Volvemos a casa.", "Otro día más vivos."]
+    "inicio": [
+      "Sistemas en verde.",
+      "Vamos, que se hace tarde.",
+      "A trabajar.",
+      "Escuadrón, en formación."
+    ],
+    "baja": [
+      "Uno menos.",
+      "Blanco abatido.",
+      "Fuera de combate."
+    ],
+    "herido": [
+      "¡Me dieron feo!",
+      "Tengo el blindaje hecho un colador.",
+      "¡Necesito apoyo!"
+    ],
+    "vinculo_cae": [
+      "¡No! ¡NO!",
+      "Esto lo van a pagar.",
+      "Te voy a vengar, hermano."
+    ],
+    "aliado_cae": [
+      "¡Perdimos uno!",
+      "Cayó... sigan, sigan.",
+      "Mantengan la línea."
+    ],
+    "victoria": [
+      "Zona asegurada.",
+      "Volvemos a casa.",
+      "Otro día más vivos."
+    ],
+    "contacto": [
+      "Control, contacto {dir}. {n} hostiles.",
+      "Control, los tengo a la vista. {n} al {dir}.",
+      "Contacto {dir}, Control. Son {n}."
+    ],
+    "se_manda": [
+      "Control, me encargo yo.",
+      "Tranquilos, esto lo resuelvo solo."
+    ],
+    "se_le_pasa": [
+      "Control... me confié.",
+      "Mala mía, Control. Me apuré."
+    ],
+    "perdido": [
+      "Control, no encuentro el objetivo. ¿Me repiten la posición?",
+      "Control, estoy dando vueltas. ¿Dónde es?",
+      "Control, el mapa no coincide con lo que veo."
+    ],
+    "reubicado": [
+      "Control, ya me ubiqué. Voy para allá.",
+      "Encontrado, Control. Corrijo rumbo."
+    ],
+    "confusion": [
+      "¿Qué? ¿Repetí, Control?",
+      "Control, no te copio bien.",
+      "Control, hay mucha estática..."
+    ],
+    "discute": [
+      "¡Cerrá la boca y cubrime!",
+      "¿Otra vez vos? Correte.",
+      "Si me volvés a cruzar, te dejo atrás."
+    ],
+    "oleada": [
+      "Control, vienen más.",
+      "¡Otra oleada, Control!",
+      "Control, nos están rodeando."
+    ]
   },
   "cobarde": {
-    "inicio": ["¿Seguro que esto está en el contrato?", "Yo me quedo atrás, por las dudas.", "Tengo un mal presentimiento."],
-    "baja": ["¿Le di? ¡Le di!", "Que no se levante, que no se levante...", "Ufff. Uno menos."],
-    "herido": ["¡Me van a matar! ¡Me van a matar!", "¡Esto no vale lo que pagan!", "¡Sáquenme de acá!"],
-    "aliado_cae": ["¡Soy el próximo!", "Nos van a liquidar a todos.", "No, no, no..."],
-    "victoria": ["¿Ya está? ¿Terminó?", "Sobreviví. No sé cómo.", "Nunca más. Hasta la próxima."]
+    "inicio": [
+      "¿Seguro que esto está en el contrato?",
+      "Yo me quedo atrás, por las dudas.",
+      "Tengo un mal presentimiento."
+    ],
+    "baja": [
+      "¿Le di? ¡Le di!",
+      "Que no se levante, que no se levante...",
+      "Ufff. Uno menos."
+    ],
+    "herido": [
+      "¡Me van a matar! ¡Me van a matar!",
+      "¡Esto no vale lo que pagan!",
+      "¡Sáquenme de acá!"
+    ],
+    "aliado_cae": [
+      "¡Soy el próximo!",
+      "Nos van a liquidar a todos.",
+      "No, no, no..."
+    ],
+    "victoria": [
+      "¿Ya está? ¿Terminó?",
+      "Sobreviví. No sé cómo.",
+      "Nunca más. Hasta la próxima."
+    ],
+    "contacto": [
+      "C-control... contacto {dir}. Son {n}. Son muchos.",
+      "Control, ¡hay {n} al {dir}! ¿Nos retiramos?"
+    ],
+    "perdido": [
+      "Control, me perdí. Me perdí. ¿Dónde están todos?"
+    ],
+    "oleada": [
+      "¡Control, son demasiados!"
+    ]
   },
   "temerario": {
-    "inicio": ["¡A los tiros!", "El último que llega paga la cerveza.", "¡Por fin un poco de acción!"],
-    "baja": ["¡Ja! ¡El que sigue!", "¡Demasiado fácil!", "¿Eso es todo lo que tienen?"],
-    "herido": ["¡Apenas un rasguño!", "¡Eso me hizo cosquillas!", "¡Ahora sí estoy enojado!"],
-    "aliado_cae": ["¡Lo vengo yo!", "¡Al frente, carajo!", "¡Vengan de a uno!"],
-    "victoria": ["¿Ya? Me quedé con ganas.", "Otra vez ganamos. Aburrido.", "¡Que traigan más!"]
+    "inicio": [
+      "¡A los tiros!",
+      "El último que llega paga la cerveza.",
+      "¡Por fin un poco de acción!"
+    ],
+    "baja": [
+      "¡Ja! ¡El que sigue!",
+      "¡Demasiado fácil!",
+      "¿Eso es todo lo que tienen?"
+    ],
+    "herido": [
+      "¡Apenas un rasguño!",
+      "¡Eso me hizo cosquillas!",
+      "¡Ahora sí estoy enojado!"
+    ],
+    "aliado_cae": [
+      "¡Lo vengo yo!",
+      "¡Al frente, carajo!",
+      "¡Vengan de a uno!"
+    ],
+    "victoria": [
+      "¿Ya? Me quedé con ganas.",
+      "Otra vez ganamos. Aburrido.",
+      "¡Que traigan más!"
+    ],
+    "contacto": [
+      "¡Contacto {dir}! ¡Al fin!",
+      "Control, {n} al {dir}. Voy.",
+      "¡Los veo, Control! ¡Son míos!"
+    ],
+    "se_manda": [
+      "¡Control, déjenmelo a mí!",
+      "¡Cúbranme, o no! ¡Voy igual!",
+      "¡Yo me encargo, Control! ¡Sigo en racha!"
+    ],
+    "se_le_pasa": [
+      "Control... capaz me apuré un poco.",
+      "Ok, ok. Me pasé."
+    ],
+    "discute": [
+      "¡Si no te gusta, quedate atrás!"
+    ]
   },
   "sanguinario": {
-    "inicio": ["Huelo miedo.", "Hoy alguien no vuelve. Y no voy a ser yo.", "Que empiece la cacería."],
-    "baja": ["Me encanta este trabajo.", "Hasta nunca.", "¿Quién sigue?", "Otro para la cuenta."],
-    "herido": ["Sangre... por fin algo interesante.", "Eso fue un error.", "Ahora me toca a mí."],
-    "aliado_cae": ["Más bajas para mí.", "Tendría que haber apuntado mejor.", "Lástima. Era útil."],
-    "victoria": ["Todavía tengo hambre.", "Dejaron muy poco para mí.", "Bien. ¿El próximo contrato?"]
+    "inicio": [
+      "Huelo miedo.",
+      "Hoy alguien no vuelve. Y no voy a ser yo.",
+      "Que empiece la cacería."
+    ],
+    "baja": [
+      "Me encanta este trabajo.",
+      "Hasta nunca.",
+      "¿Quién sigue?",
+      "Otro para la cuenta."
+    ],
+    "herido": [
+      "Sangre... por fin algo interesante.",
+      "Eso fue un error.",
+      "Ahora me toca a mí."
+    ],
+    "aliado_cae": [
+      "Más bajas para mí.",
+      "Tendría que haber apuntado mejor.",
+      "Lástima. Era útil."
+    ],
+    "victoria": [
+      "Todavía tengo hambre.",
+      "Dejaron muy poco para mí.",
+      "Bien. ¿El próximo contrato?"
+    ],
+    "contacto": [
+      "Control, {n} presas al {dir}.",
+      "Contacto {dir}. Que vengan."
+    ],
+    "se_manda": [
+      "Control, esos son míos. Que nadie se meta."
+    ],
+    "discute": [
+      "Hablá una vez más y sos el próximo."
+    ]
   },
   "leal": {
-    "inicio": ["Nadie se queda atrás.", "Cubro tu espalda.", "Volvemos todos o ninguno."],
-    "baja": ["¡Cubierto!", "Ese no te va a molestar más.", "Despejado. ¿Estás bien?"],
-    "herido": ["Estoy bien, sigan.", "Puedo aguantar. Cuídense ustedes.", "No es nada, no es nada."],
-    "vinculo_cae": ["¡Te prometí que volvíamos juntos!", "Perdoname. Perdoname.", "¿Y ahora qué hago sin vos?"],
-    "aliado_cae": ["¡No! Yo tenía que cubrirlo.", "Lo vamos a llevar a casa.", "Juntos, carajo. Juntos."],
-    "victoria": ["Estamos todos. ¿Estamos todos?", "Lo logramos, equipo.", "Vamos a casa."]
+    "inicio": [
+      "Nadie se queda atrás.",
+      "Cubro tu espalda.",
+      "Volvemos todos o ninguno."
+    ],
+    "baja": [
+      "¡Cubierto!",
+      "Ese no te va a molestar más.",
+      "Despejado. ¿Estás bien?"
+    ],
+    "herido": [
+      "Estoy bien, sigan.",
+      "Puedo aguantar. Cuídense ustedes.",
+      "No es nada, no es nada."
+    ],
+    "vinculo_cae": [
+      "¡Te prometí que volvíamos juntos!",
+      "Perdoname. Perdoname.",
+      "¿Y ahora qué hago sin vos?"
+    ],
+    "aliado_cae": [
+      "¡No! Yo tenía que cubrirlo.",
+      "Lo vamos a llevar a casa.",
+      "Juntos, carajo. Juntos."
+    ],
+    "victoria": [
+      "Estamos todos. ¿Estamos todos?",
+      "Lo logramos, equipo.",
+      "Vamos a casa."
+    ],
+    "contacto": [
+      "Control, contacto {dir}. Todos atentos.",
+      "Control, {n} al {dir}. Cierren filas."
+    ],
+    "perdido": [
+      "Control, perdí al grupo. ¿Dónde están?"
+    ],
+    "discute": [
+      "Basta. No es momento. Concentrate."
+    ]
+  },
+  "control": {
+    "inicio": [
+      "Escuadrón, tienen luz verde. Mantengan la radio abierta.",
+      "Acá Control. Entren, cumplan y vuelvan todos.",
+      "Control al escuadrón: los estoy mirando. Sin heroísmos.",
+      "Luz verde. Reporten contacto apenas lo tengan."
+    ],
+    "victoria": [
+      "Buen trabajo, escuadrón. Vuelvan a casa.",
+      "Objetivo cumplido. Control fuera.",
+      "Eso es todo. Junten los pedazos y repliéguense."
+    ],
+    "derrota": [
+      "¡Abortar! ¡Salgan de ahí como puedan!",
+      "Perdimos la posición. Repliéguense, repito, repliéguense.",
+      "Control a todos: misión fallida. Salgan vivos."
+    ]
   }
 }

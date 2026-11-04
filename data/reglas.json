@@ -1,7 +1,7 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 1,
-  "version_motor": 3,
+  "version_motor": 4,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
   "escuadra_maxima": 6,
@@ -22,7 +22,9 @@
       "recibio_impacto": -2,
       "quedo_solo": -10,
       "vip_herido": -5,
-      "oleada_nueva": -3
+      "oleada_nueva": -3,
+      "discusion": -4,
+      "amigo_muerto": -12
     }
   },
   "cobertura": {
@@ -64,7 +66,9 @@
     "recibio_impacto",
     "quedo_solo",
     "vip_herido",
-    "oleada_nueva"
+    "oleada_nueva",
+    "discusion",
+    "amigo_muerto"
   ],
   "peligro_danio_por_tick": 1,
   "enemigos": {
@@ -96,5 +100,15 @@
   },
   "arte": {
     "retratos": 6
+  },
+  "animo": {
+    "racha_confiado": 3,
+    "chance_confiado": 45,
+    "chance_nervioso_trauma": 45,
+    "chance_nervioso_cobarde": 15,
+    "chance_atento": 30,
+    "chance_perdido": 18,
+    "bonus_amigo_punteria": 6,
+    "chance_discusion": 4
   }
 }
