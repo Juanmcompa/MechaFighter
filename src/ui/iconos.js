@@ -49,6 +49,7 @@ const P = {
   cohete: '<path d="M12 3c3 2 4 6 4 10l-4 3-4-3c0-4 1-8 4-10z"/><path d="M8 13l-3 3v3l3-2M16 13l3 3v3l-3-2"/><circle cx="12" cy="9" r="1.5"/>',
   torreta: '<rect x="6" y="11" width="12" height="7" rx="1"/><path d="M12 11V8h7M8 18l-2 3M16 18l2 3"/>',
   rafaga: '<path d="M4 8h9M4 12h13M4 16h9"/><circle cx="18" cy="8" r="1" fill="currentColor"/><circle cx="21" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="16" r="1" fill="currentColor"/>',
+  combustible: '<path d="M6 4h9l3 3v13H6z"/><path d="M9 4V2h4M9 11h6M9 15h6"/>',
   llama: '<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 3 3 3 0-3-1-5 0-8z"/>',
 };
 

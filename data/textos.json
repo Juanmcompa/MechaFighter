@@ -39,5 +39,15 @@
       "texto": "Noche tranquila en la órbita. Los pilotos juegan al truco y se ríen un rato.",
       "moral": 10
     }
+  ],
+  "nombres_escuadron": [
+    "los Perros de Kessler",
+    "el Pelotón Chatarra",
+    "la Compañía Óxido",
+    "los Últimos del Muelle",
+    "el Escuadrón Ceniza",
+    "los Hijos del Vacío",
+    "la Brigada Remache",
+    "los Lobos de Órbita"
   ]
 }

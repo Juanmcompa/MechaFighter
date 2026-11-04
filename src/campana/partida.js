@@ -8,6 +8,8 @@ import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision, sumarCondicion } from './misiones.js';
 import { saquear } from './saqueo.js';
+import { sortearDilema, resolverDilema } from './dilemas.js';
+import { anotar, sumarStat } from './cronica.js';
 import { anotarDanios, vidaDeSalida, reparar, costoReparacion, vidaDelMecha, partesRotas } from './mantenimiento.js';
 export { reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida };
 import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana, misionEncuentro } from './legado.js';
@@ -60,6 +62,12 @@ export function nuevaPartida(datos, semilla, legado = null) {
   for (const pi of p.pilotos) presentar(datos, p, pi, azAf);
   // una parte especial para empezar a probar habilidades nuevas
   p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] }, { parte: 'cabeza_radar', afijos: [] });
+  // combustible, nombre y cronica del escuadron
+  p.combustible = R.combustible.inicial;
+  p.nombreEscuadron = az.elegir(datos.textos.nombres_escuadron);
+  p.cronica = []; p.stats = {};
+  anotar(p, 'Salieron del muelle ' + p.pilotos.map((x) => '«' + x.apodo + '»').join(', ') + '.' +
+    (legado && legado.veterano ? ' «' + legado.veterano.apodo + '» venía de la campaña anterior.' : ''), 'inicio');
   generarSector(datos, p);
   return p;
 }
@@ -169,6 +177,7 @@ export function elegirNodo(datos, p, i) {
   if (!nodo) return null;
   p.columna++;
   p.posicion = nodo.i;
+  gastarCombustible(datos, p);
   p.nodo = { ...nodo, indice: i };
   nodo.visitado = true;
   // al jefe se llega con lo que se averiguo en el camino
@@ -201,12 +210,9 @@ export function elegirNodo(datos, p, i) {
       break;
     }
     case 'evento': {
-      const az = azarDe(p, 'evento');
-      const ev = az.elegir(datos.textos.eventos);
-      const res = { texto: ev.texto };
-      if (ev.creditos) { res.creditos = az.entero(ev.creditos[0], ev.creditos[1]); p.creditos += res.creditos; }
-      if (ev.parte) { const pz = sortearParte(datos, az, p.sectores[p.sector].dificultad); p.inventario.push(pz); res.parte = nombrePieza(datos, pz); }
-      p.nodo.resultado = res;
+      // una señal: un dilema para decidir (ver dilemas.js); el resultado llega al elegir una opcion
+      p.nodo.dilema = sortearDilema(datos, p, azarDe(p, 'evento'));
+      p.nodo.resultado = null;
       p.estado = 'evento';
       break;
     }
@@ -243,8 +249,52 @@ function avanzar(datos, p) {
     if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; p.legado = legadoDeVictoria(p); return; }
     p.sector++;
     generarSector(datos, p);
+    if (p.combustible !== undefined) p.combustible = Math.min(datos.reglas.combustible.maximo, p.combustible + datos.reglas.combustible.por_sector);
+    anotar(p, 'Cruzaron a ' + p.sectores[p.sector].nombre + '.', 'sector');
   }
   p.estado = 'sectores';
+}
+
+// ---------- Combustible ----------
+
+// Cada salto gasta combustible. Sin combustible, los remolcan: cuesta creditos y los mechas sufren.
+function gastarCombustible(datos, p) {
+  if (p.combustible === undefined) return; // partida vieja
+  const C = datos.reglas.combustible;
+  p.remolque = null;
+  if (p.combustible >= C.por_salto) { p.combustible -= C.por_salto; return; }
+  const cobro = Math.min(p.creditos, C.remolque_creditos);
+  p.creditos -= cobro;
+  for (const x of p.pilotos) x.mechaVida = Math.max(0, (x.mechaVida === undefined ? 100 : x.mechaVida) - C.remolque_danio_pct);
+  p.remolque = { creditos: cobro, danio: C.remolque_danio_pct };
+  sumarStat(p, 'remolques');
+  if (p.stats.remolques === 1) anotar(p, 'Se quedaron sin combustible y tuvieron que pagar un remolque.', 'remolque');
+}
+
+export function comprarCombustible(datos, p) {
+  const C = datos.reglas.combustible;
+  if (p.combustible === undefined || p.creditos < C.precio || p.combustible >= C.maximo) return false;
+  p.creditos -= C.precio;
+  p.combustible++;
+  return true;
+}
+
+// Elegir una opcion del dilema de la señal
+export function elegirOpcion(datos, p, indice) {
+  if (!p.nodo || !p.nodo.dilema || p.nodo.resultado) return null;
+  return resolverDilema(datos, p, indice, azarDe(p, 'dilema'));
+}
+
+// Un recluta gratis (dilemas): si hay lugar
+export function contratarGratis(datos, p, azar) {
+  if (p.pilotos.length >= datos.reglas.escuadra_maxima) return null;
+  const usados = p.pilotos.map((x) => x.apodo).concat(p.caidos.map((x) => x.apodo));
+  const nuevo = crearRecluta(datos, azar, nuevoId(p), null, usados, p.pilotos.map((x) => x.retrato));
+  const solo = p.pilotos.find((x) => !x.vinculo);
+  if (solo) vincular(solo, nuevo);
+  p.pilotos.push(nuevo);
+  presentar(datos, p, nuevo, azarAparte(p, 'afinidad:' + nuevo.id));
+  return nuevo;
 }
 
 // ---------- Botin, taller y reclutamiento ----------
@@ -305,6 +355,7 @@ export function contratar(datos, p, i) {
   if (solo) vincular(solo, nuevo);
   p.pilotos.push(nuevo);
   presentar(datos, p, nuevo, azarAparte(p, 'afinidad:' + nuevo.id));
+  anotar(p, 'Contrataron a «' + nuevo.apodo + '».', 'recluta');
   return true;
 }
 
@@ -482,6 +533,25 @@ export function cerrarMision(datos, p, resultado) {
       presentar(datos, p, pi, azarAparte(p, 'afinidad:' + pi.id));
       informe.rescatado = pi.apodo;
     }
+  }
+
+  // Cronica: como fue esta mision, en una o dos lineas
+  sumarStat(p, 'jugadas');
+  if (resultado.victoria) sumarStat(p, 'ganadas');
+  sumarStat(p, 'bajas', resultado.resumen.bajasEnemigas || 0);
+  {
+    const jefe = p.nodo.tipo === 'jefe';
+    let linea = jefe
+      ? (resultado.victoria ? 'Derrotaron a ' + m.nombre + '.' : m.nombre + ' los hizo retroceder.')
+      : '«' + m.nombre + '»: ' + (resultado.victoria ? 'cumplida' : 'fallida') + '.';
+    if (jefe && resultado.victoria) { p.stats.jefes = (p.stats.jefes || []).concat(m.nombre); }
+    const figura = informe.pilotos.filter((l) => l.estado !== 'muerto' && l.bajas >= 3).sort((a, b) => b.bajas - a.bajas)[0];
+    if (figura) linea += ' «' + figura.apodo + '» abatió ' + figura.bajas + '.';
+    if (informe.caidos.length) linea += ' Cayó ' + informe.caidos.map((a) => '«' + a + '»').join(' y ') + '.';
+    const volvio = informe.pilotos.find((l) => l.estado === 'herido');
+    if (volvio) linea += ' A «' + volvio.apodo + '» lo dieron por muerto, y volvió.';
+    if (informe.rescatado) { linea += ' Rescataron a «' + informe.rescatado + '» de entre los restos.'; sumarStat(p, 'rescates'); }
+    anotar(p, linea, jefe ? 'jefe' : 'mision');
   }
 
   // Como quedaron los mechas: el daño queda hasta repararlo

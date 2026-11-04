@@ -147,3 +147,8 @@ export function actualizarAfinidad(datos, p, registro, desplegados, victoria) {
   }
   return [...cambios.values()].filter((c) => c.motivos.some((m) => m !== 'victoria' && m !== 'derrota'));
 }
+
+// Algo que vivieron todos juntos (un dilema): suma o resta afinidad a todos los pares
+export function sumarAfinidadTodos(p, delta) {
+  for (let i = 0; i < p.pilotos.length; i++) for (let j = i + 1; j < p.pilotos.length; j++) sumarAf(p, p.pilotos[i].id, p.pilotos[j].id, delta);
+}

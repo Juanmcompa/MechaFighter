@@ -232,6 +232,15 @@ export function validarDatos(d) {
   }
 
   // --- 8b. Condiciones de mision
+  for (const [id, dl] of Object.entries(d.dilemas || {})) {
+    if (id[0] === '_') continue;
+    const aqui = 'dilemas › ' + id;
+    if (!Array.isArray(dl.opciones) || dl.opciones.length < 2) err(aqui, 'necesita al menos 2 opciones');
+    for (const [k, op] of (dl.opciones || []).entries()) {
+      if (op.chance !== undefined ? !(op.exito && op.fracaso) : !op.efectos) err(aqui + ' › opcion ' + (k + 1), 'falta "efectos" (o "exito" y "fracaso" si tiene chance)');
+      if (op.requiere && op.requiere.clase && !existe(d.clases, op.requiere.clase)) err(aqui, 'clase "' + op.requiere.clase + '" no existe');
+    }
+  }
   for (const [id, c] of Object.entries(d.condiciones_mision || {})) {
     const aqui = 'condiciones_mision › ' + id;
     const e = c.efectos || {};

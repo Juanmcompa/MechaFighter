@@ -150,5 +150,15 @@
     "quintos_por_pct": 2,
     "parte_rota_pct": 50,
     "vida_minima_salida": 40
+  },
+  "combustible": {
+    "_ayuda": "Cada salto a un nodo gasta 'por_salto'. Al llegar a un sector nuevo se cargan 'por_sector'. Sin combustible, el remolque cobra 'remolque_creditos' y todos los mechas pierden 'remolque_danio_pct' de estructura. El taller vende a 'precio'.",
+    "inicial": 6,
+    "por_salto": 1,
+    "por_sector": 4,
+    "maximo": 12,
+    "remolque_creditos": 30,
+    "remolque_danio_pct": 15,
+    "precio": 18
   }
 }

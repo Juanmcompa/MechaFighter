@@ -113,7 +113,9 @@ export function sectores(app, raiz) {
       h('div', { class: 'intel' }, ico('ojo'), h('span', {}, 'Inteligencia sobre ' + s.jefe + ': '),
         h('span', { class: 'pips-intel' }, ...Array.from({ length: datos.sectores.campana_base.inteligencia.maxima }, (_, k) => h('i', { class: k < s.inteligencia ? 'lleno' : '' })))),
       h('p', { class: 'ayuda' }, textoInteligencia(datos, s))) : null,
-    h('p', { class: 'ayuda' }, 'Elegí el próximo destino siguiendo los caminos. Lo que no elijas queda atrás.'),
+    h('p', { class: 'ayuda' }, 'Elegí el próximo destino siguiendo los caminos. Cada salto gasta 1 de combustible. Lo que no elijas queda atrás.'),
+    p.combustible === 0 ? h('p', { class: 'aviso-inicial' }, ico('combustible'), ' Sin combustible: el próximo salto es remolcado (−' + datos.reglas.combustible.remolque_creditos +
+      ' créditos y los mechas pierden ' + datos.reglas.combustible.remolque_danio_pct + '%). Buscá combustible en un taller o en una señal.') : null,
     h('div', { class: 'mapa-envoltura' }, mapa),
     detalle,
     p.ultimoInforme && p.ultimoInforme.caidos.length

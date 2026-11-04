@@ -91,8 +91,12 @@ export function barraCampana(datos, p, acciones = []) {
       chip('creditos', String(p.creditos), 'Créditos'),
       chip('puntaje', String(p.puntaje), 'Puntaje'),
       chip('piloto', p.pilotos.length + '/' + datos.reglas.escuadra_maxima, 'Pilotos'),
+      p.combustible !== undefined ? chip('combustible', String(p.combustible), 'Combustible: cada salto gasta 1', p.combustible <= 1 ? 'chip-alerta' : '') : null,
       s ? chip('mision', 'Sector ' + (p.sector + 1), s.nombre) : null),
-    h('div', { class: 'hud-acciones' }, ...acciones));
+    h('div', { class: 'hud-acciones' }, ...acciones),
+    // recien remolcados (se quedaron sin combustible en el ultimo salto)
+    p.remolque && p.estado !== 'sectores' ? h('p', { class: 'aviso-remolque' }, ico('combustible'), ' Sin combustible: el remolque cobró ' + p.remolque.creditos +
+      ' créditos y los mechas perdieron ' + p.remolque.danio + '% de estructura.') : null);
 }
 
 // Retrato pixelado del piloto (los guardados viejos no lo tienen: se calcula del nombre).

@@ -1,0 +1,402 @@
+{
+  "_ayuda": "Dilemas entre misiones (nodo 'Señal'). Cada opcion tiene 'efectos' o, si lleva 'chance', 'exito' y 'fracaso'. 'requiere' muestra la opcion solo si se cumple: clase en el escuadron, creditos o combustible. Efectos: creditos (numero o [min,max]), combustible, parte (true), danio_mecha {pct, quien: uno|todos}, trauma {chance}, recluta, inteligencia, reparar_todo, xp, afinidad (a todos los pares), cronica (texto para la historia del escuadron). {piloto} se reemplaza por el apodo del elegido.",
+  "civiles": {
+    "titulo": "Carguero de civiles",
+    "texto": "Un transatlántico de civiles pide auxilio: piratas lo están abordando. Meterse cuesta combustible y expone a los pilotos, pero el capitán promete un procesador militar.",
+    "peso": 10,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Intervenir",
+        "chance": 65,
+        "exito": {
+          "texto": "Los piratas huyen. El capitán cumple: una parte de primera para el taller.",
+          "parte": true,
+          "combustible": -2,
+          "afinidad": 5,
+          "cronica": "Salvaron un carguero de civiles de un abordaje pirata."
+        },
+        "fracaso": {
+          "texto": "Los piratas eran más de los que parecía. Salen con el carguero a salvo, pero {piloto} vuelve con el mecha hecho pedazos.",
+          "combustible": -2,
+          "danio_mecha": {
+            "pct": 50,
+            "quien": "uno"
+          },
+          "cronica": "Defendieron un carguero de civiles; {piloto} pagó el precio."
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "efectos": {
+          "texto": "Apagan la radio. Nadie habla durante horas.",
+          "afinidad": -4,
+          "trauma": {
+            "chance": 15
+          },
+          "cronica": "Dejaron atrás a un carguero que pedía auxilio. Nadie volvió a hablar de eso."
+        }
+      }
+    ]
+  },
+  "desertor": {
+    "titulo": "Un desertor",
+    "texto": "Un piloto pirata se rinde por radio. Dice que conoce las defensas del jefe del sector, pero puede ser una trampa.",
+    "peso": 8,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Escucharlo",
+        "chance": 70,
+        "exito": {
+          "texto": "Lo que cuenta coincide con lo que ya sabían. Información valiosa.",
+          "inteligencia": 1,
+          "cronica": "Un desertor pirata les vendió los secretos de su jefe."
+        },
+        "fracaso": {
+          "texto": "Era una emboscada. Salen del paso con disparos encima.",
+          "danio_mecha": {
+            "pct": 25,
+            "quien": "todos"
+          },
+          "cronica": "Cayeron en la trampa de un falso desertor."
+        }
+      },
+      {
+        "texto": "Sumarlo al escuadrón",
+        "requiere": {
+          "creditos": 60
+        },
+        "efectos": {
+          "texto": "Firma el contrato. Habrá que ver si es leal.",
+          "creditos": -60,
+          "recluta": true,
+          "cronica": "Sumaron a un piloto pirata arrepentido."
+        }
+      },
+      {
+        "texto": "Cortar la comunicación",
+        "efectos": {
+          "texto": "No vale la pena el riesgo."
+        }
+      }
+    ]
+  },
+  "chatarrero": {
+    "titulo": "Cementerio de chatarra",
+    "texto": "Un campo de mechas destruidos flotando. Puede haber partes útiles, o minas olvidadas.",
+    "peso": 10,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Revolver a fondo",
+        "chance": 60,
+        "exito": {
+          "texto": "Entre los restos aparece una pieza en buen estado.",
+          "parte": true,
+          "combustible": -1,
+          "cronica": "Rescataron una parte de un cementerio de mechas."
+        },
+        "fracaso": {
+          "texto": "Una mina vieja. {piloto} sale con el mecha chamuscado.",
+          "danio_mecha": {
+            "pct": 35,
+            "quien": "uno"
+          },
+          "combustible": -1
+        }
+      },
+      {
+        "texto": "Mandar al ingeniero",
+        "requiere": {
+          "clase": "ingeniero"
+        },
+        "efectos": {
+          "texto": "{piloto} marca las minas una por una. Se llevan partes y chatarra sin un rasguño.",
+          "parte": true,
+          "creditos": [
+            30,
+            60
+          ],
+          "combustible": -1,
+          "cronica": "{piloto} desactivó las minas de un cementerio de chatarra."
+        }
+      },
+      {
+        "texto": "Juntar solo combustible",
+        "efectos": {
+          "texto": "Vacían los tanques de los restos.",
+          "combustible": 2
+        }
+      }
+    ]
+  },
+  "enfermo": {
+    "titulo": "Fiebre a bordo",
+    "texto": "Uno de los pilotos amaneció con fiebre alta. En la próxima estación hay un médico, pero queda fuera de ruta.",
+    "peso": 7,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Desviarse a la estación",
+        "requiere": {
+          "combustible": 2
+        },
+        "efectos": {
+          "texto": "Llegan a tiempo. {piloto} se recupera.",
+          "combustible": -2,
+          "afinidad": 4
+        }
+      },
+      {
+        "texto": "Que lo atienda el médico",
+        "requiere": {
+          "clase": "medico"
+        },
+        "efectos": {
+          "texto": "El médico del escuadrón no duerme en dos días, pero lo saca adelante.",
+          "afinidad": 6,
+          "xp": 10,
+          "cronica": "El médico del escuadrón salvó a un compañero de la fiebre."
+        }
+      },
+      {
+        "texto": "Aguantar",
+        "chance": 60,
+        "exito": {
+          "texto": "La fiebre baja sola."
+        },
+        "fracaso": {
+          "texto": "{piloto} sale de la fiebre, pero algo le quedó.",
+          "trauma": {
+            "chance": 100
+          },
+          "cronica": "{piloto} sobrevivió a la fiebre, pero no volvió a ser el mismo."
+        }
+      }
+    ]
+  },
+  "contrabando": {
+    "titulo": "Contrabandistas",
+    "texto": "Una nave de contrabandistas ofrece combustible barato. Hay que pagar por adelantado.",
+    "peso": 9,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Comprar 3 de combustible (45)",
+        "requiere": {
+          "creditos": 45
+        },
+        "chance": 80,
+        "exito": {
+          "texto": "Cumplen. Tanques llenos.",
+          "creditos": -45,
+          "combustible": 3
+        },
+        "fracaso": {
+          "texto": "Cobran y desaparecen. Una lección cara.",
+          "creditos": -45
+        }
+      },
+      {
+        "texto": "Robarles el combustible",
+        "chance": 50,
+        "exito": {
+          "texto": "Los toman por sorpresa: combustible gratis.",
+          "combustible": 3,
+          "cronica": "Asaltaron a unos contrabandistas."
+        },
+        "fracaso": {
+          "texto": "Estaban armados. Se van con las manos vacías y los mechas abollados.",
+          "danio_mecha": {
+            "pct": 20,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "No, gracias",
+        "efectos": {
+          "texto": "Siguen viaje."
+        }
+      }
+    ]
+  },
+  "apuesta": {
+    "titulo": "Torneo de pulseadas",
+    "texto": "En una estación minera organizan un torneo de mechas a puño limpio. Inscribirse cuesta 40 créditos; el premio es de 150.",
+    "peso": 6,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Mandar al más bruto",
+        "requiere": {
+          "creditos": 40
+        },
+        "chance": 45,
+        "exito": {
+          "texto": "{piloto} gana la final con el brazo izquierdo. La estación entera lo aplaude.",
+          "creditos": 110,
+          "xp": 15,
+          "afinidad": 5,
+          "cronica": "{piloto} ganó un torneo de pulseadas en una estación minera."
+        },
+        "fracaso": {
+          "texto": "{piloto} pierde en la segunda ronda y el mecha queda torcido.",
+          "creditos": -40,
+          "danio_mecha": {
+            "pct": 20,
+            "quien": "uno"
+          }
+        }
+      },
+      {
+        "texto": "Mirar desde la tribuna",
+        "efectos": {
+          "texto": "Una noche de gritos y apuestas. Los pilotos se ríen como hace mucho no se reían.",
+          "afinidad": 6
+        }
+      }
+    ]
+  },
+  "baliza": {
+    "titulo": "Baliza de un escuadrón caído",
+    "texto": "Una baliza de emergencia de otro escuadrón mercenario. Se escucha una respiración, débil.",
+    "peso": 7,
+    "desde": 2,
+    "opciones": [
+      {
+        "texto": "Rescatar",
+        "requiere": {
+          "combustible": 1
+        },
+        "chance": 55,
+        "exito": {
+          "texto": "Encuentran a una piloto viva entre los restos. Quiere pelear con ustedes.",
+          "combustible": -1,
+          "recluta": true,
+          "cronica": "Rescataron a una piloto de un escuadrón caído."
+        },
+        "fracaso": {
+          "texto": "Llegan tarde. Se llevan sus placas para la familia.",
+          "combustible": -1,
+          "trauma": {
+            "chance": 20
+          }
+        }
+      },
+      {
+        "texto": "Saquear los restos",
+        "efectos": {
+          "texto": "Nadie dice nada mientras desarman los mechas.",
+          "parte": true,
+          "afinidad": -5,
+          "cronica": "Saquearon los restos de otro escuadrón."
+        }
+      }
+    ]
+  },
+  "tormenta_ionica": {
+    "titulo": "Tormenta iónica",
+    "texto": "Una tormenta iónica corta la ruta. Rodearla lleva combustible; atravesarla, nervios de acero.",
+    "peso": 8,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Rodearla",
+        "requiere": {
+          "combustible": 2
+        },
+        "efectos": {
+          "texto": "Un día más de viaje, sin sobresaltos.",
+          "combustible": -2
+        }
+      },
+      {
+        "texto": "Atravesarla",
+        "chance": 55,
+        "exito": {
+          "texto": "Salen del otro lado con los sistemas zumbando, pero enteros.",
+          "xp": 10
+        },
+        "fracaso": {
+          "texto": "Los rayos queman circuitos. Todos los mechas salen dañados.",
+          "danio_mecha": {
+            "pct": 25,
+            "quien": "todos"
+          }
+        }
+      }
+    ]
+  },
+  "mecanico": {
+    "titulo": "El viejo mecánico",
+    "texto": "Un mecánico retirado vive en un asteroide. Ofrece arreglar los mechas a cambio de que le lleven un paquete al próximo sector.",
+    "peso": 7,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Aceptar el trato",
+        "chance": 75,
+        "exito": {
+          "texto": "Deja los mechas como nuevos. El paquete pesa más de lo que debería, pero no preguntan.",
+          "reparar_todo": true
+        },
+        "fracaso": {
+          "texto": "Los arregla... y en el paquete había un rastreador. Los piratas saben dónde están.",
+          "reparar_todo": true,
+          "inteligencia": -1
+        }
+      },
+      {
+        "texto": "Pagarle en efectivo (60)",
+        "requiere": {
+          "creditos": 60
+        },
+        "efectos": {
+          "texto": "Trato limpio.",
+          "creditos": -60,
+          "reparar_todo": true
+        }
+      },
+      {
+        "texto": "Seguir",
+        "efectos": {
+          "texto": "No hay tiempo."
+        }
+      }
+    ]
+  },
+  "truco": {
+    "titulo": "Noche de truco",
+    "texto": "Una noche tranquila en órbita. Alguien saca un mazo de cartas.",
+    "peso": 5,
+    "desde": 1,
+    "opciones": [
+      {
+        "texto": "Jugar por plata",
+        "chance": 50,
+        "exito": {
+          "texto": "{piloto} canta falta envido con 33. La mesa estalla.",
+          "creditos": [
+            20,
+            50
+          ],
+          "afinidad": 3
+        },
+        "fracaso": {
+          "texto": "{piloto} se va al mazo con todo perdido. Discuten hasta la madrugada.",
+          "creditos": -20,
+          "afinidad": -3
+        }
+      },
+      {
+        "texto": "Jugar por los porotos",
+        "efectos": {
+          "texto": "Nadie gana nada, pero se ríen un rato.",
+          "afinidad": 5
+        }
+      }
+    ]
+  }
+}

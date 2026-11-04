@@ -5,7 +5,8 @@ import { simular } from '../src/motor/simular.js';
 import { evaluar } from '../src/motor/decision.js';
 import { armarMision } from '../src/campana/misiones.js';
 import { crearRecluta } from '../src/campana/reclutas.js';
-import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector } from '../src/campana/partida.js';
+import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector, elegirOpcion } from '../src/campana/partida.js';
+import { relato } from '../src/campana/cronica.js';
 import { fotoPiloto } from '../src/campana/legado.js';
 import { saquear } from '../src/campana/saqueo.js';
 import { reparar, costoReparacion, partesRotas } from '../src/campana/mantenimiento.js';
@@ -159,6 +160,25 @@ console.log('Campana');
   const c = costoReparacion(datos, pi);
   const antes = p.creditos;
   ok(reparar(datos, p, pi.id, 'todo') && p.creditos === antes - c.total && !partesRotas(pi).length && pi.mechaVida === 100, 'reparar todo cobra y deja el mecha sano');
+}
+
+// Dilemas, combustible y cronica
+{
+  const p = nuevaPartida(datos, 123);
+  const comb = p.combustible;
+  elegirNodo(datos, p, 0);
+  ok(p.combustible === comb - datos.reglas.combustible.por_salto, 'cada salto gasta combustible');
+  p.nodo = { tipo: 'evento', dilema: 'chatarrero', resultado: null };
+  const r = elegirOpcion(datos, p, 2);
+  ok(r && r.cambios.some((c) => c.icono === 'combustible') && p.combustible > comb - 1, 'una opcion del dilema da combustible');
+  p.combustible = 0;
+  const cred = p.creditos;
+  p.nodo = null; seguir(datos, p);
+  elegirNodo(datos, p, 0);
+  ok(p.remolque && p.creditos < cred && p.pilotos.every((x) => x.mechaVida < 100), 'sin combustible, remolque: cobra y daña los mechas');
+  p.resultado = 'derrota';
+  const h = relato(datos, p);
+  ok(h.capitulos.length && h.cierre.includes('Ahí se terminó'), 'la cronica cuenta la historia del escuadron');
 }
 
 console.log(fallas ? '\n' + fallas + ' falla(s)' : '\nTodo bien');

@@ -295,3 +295,21 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .estado-mecha .fila-rep { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .estado-mecha .rota { color: #e06a5a; }
 .chip-danio { color: var(--ambar); border-color: var(--ambar); }
+
+/* Dilemas, combustible y cronica */
+.hud { flex-wrap: wrap; }
+.aviso-remolque { flex-basis: 100%; margin: 6px 0 0; color: var(--ambar); display: flex; gap: 6px; align-items: center; font-size: 16px; }
+.opciones-dilema { display: grid; gap: 8px; margin-top: 10px; }
+.opcion-dilema { display: grid; gap: 2px; text-align: left; padding: 10px 12px; background: var(--chapa); border: 2px solid var(--chapa-borde); color: var(--texto); font: inherit; cursor: pointer; }
+.opcion-dilema strong { font: 400 18px 'Pixelify Sans', sans-serif; color: var(--fosforo); font-weight: 400; }
+.opcion-dilema small { color: var(--texto-tenue); }
+.opcion-dilema:hover:not(:disabled) { border-color: var(--fosforo-tenue); }
+.opcion-dilema.especial { border-left: 4px solid var(--ambar); }
+.opcion-dilema:disabled { opacity: .45; cursor: default; }
+.cronica h3 { font: 400 17px 'Pixelify Sans', sans-serif; color: var(--ambar); margin: 14px 0 6px; }
+.cronica ul { list-style: none; margin: 0; padding: 0 0 0 12px; border-left: 2px solid var(--chapa-borde); display: grid; gap: 6px; }
+.cronica li { line-height: 1.35; }
+.cronica li.jefe, .cronica li.sector { color: var(--fosforo); }
+.cronica li.dilema { color: #c9b98a; }
+.cronica .cierre { margin-top: 14px; font-size: 19px; }
+.cronica .logros { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }

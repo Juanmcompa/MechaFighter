@@ -1,11 +1,38 @@
 // Nodos que no son misiones: taller, reclutamiento y eventos (incluye el descanso).
 import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato } from './comun.js';
-import { comprar, vender, contratar, seguir, precioPieza } from '../campana/partida.js';
+import { comprar, vender, contratar, seguir, precioPieza, elegirOpcion, comprarCombustible } from '../campana/partida.js';
+import { opcionDisponible } from '../campana/dilemas.js';
 
 function pie(app) {
   return h('div', { class: 'acciones' },
     boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),
     boton('Seguir viaje', () => { seguir(app.datos, app.partida); app.guardar(); app.continuar(); }, { iconoNombre: 'play', clase: 'principal' }));
+}
+
+// Una señal: el dilema y sus opciones; despues de elegir, lo que paso
+function dilema(app, raiz) {
+  const { datos } = app;
+  const p = app.partida;
+  const d = datos.dilemas[p.nodo.dilema];
+  const r = p.nodo.resultado;
+  const opciones = d.opciones.map((op, i) => ({ op, i, disp: opcionDisponible(datos, p, op) })).filter((x) => x.disp.visible);
+  montar(raiz,
+    barraCampana(datos, p, []),
+    h('h1', { class: 'titulo-pantalla' }, ico('evento'), ' ' + d.titulo),
+    panel(null, h('p', { class: 'briefing' }, d.texto),
+      r ? null : h('div', { class: 'opciones-dilema' }, ...opciones.map(({ op, i, disp }) => h('button', {
+        class: 'opcion-dilema' + (op.requiere && op.requiere.clase ? ' especial' : ''), disabled: !disp.ok,
+        onclick: () => { elegirOpcion(datos, p, i); app.guardar(); app.ir('evento'); }
+      }, h('strong', {}, op.texto),
+      h('small', {}, [
+        op.requiere && op.requiere.clase ? '★ ' + datos.clases[op.requiere.clase].nombre + ' en el escuadrón' : null,
+        op.chance !== undefined ? 'Riesgo: sale bien ' + (op.chance >= 70 ? 'casi siempre' : op.chance >= 50 ? 'a veces' : 'pocas veces') : null,
+        disp.motivo || null].filter(Boolean).join(' · ')))))),
+    r ? panel(r.salio === false ? 'Salió mal' : r.salio ? 'Salió bien' : 'Decidido',
+      h('p', { class: 'ayuda' }, '«' + r.opcion + '»'),
+      h('p', { class: 'briefing' }, r.texto),
+      r.cambios.length ? h('div', { class: 'chips' }, ...r.cambios.map((c) => chip(c.icono, c.texto, '', c.bien ? 'chip-bien' : 'chip-alerta'))) : null) : null,
+    r ? pie(app) : null);
 }
 
 export function taller(app, raiz) {
@@ -21,6 +48,10 @@ export function taller(app, raiz) {
         o.vendida ? h('span', { class: 'ayuda' }, 'Vendida')
           : boton(String(o.precio), () => { comprar(datos, p, i); app.guardar(); pintar(); }, { iconoNombre: 'creditos', deshabilitado: p.creditos < o.precio, titulo: 'Comprar por ' + o.precio })))),
       ),
+      p.combustible !== undefined ? panel('Combustible',
+        h('p', { class: 'ayuda' }, 'Tenés ' + p.combustible + '. Cada salto gasta 1; sin combustible, el remolque sale caro.'),
+        boton('+1 combustible · ' + datos.reglas.combustible.precio, () => { comprarCombustible(datos, p); app.guardar(); pintar(); },
+          { iconoNombre: 'combustible', deshabilitado: p.creditos < datos.reglas.combustible.precio || p.combustible >= datos.reglas.combustible.maximo })) : null,
       panel('Tu depósito', p.inventario.length ? h('ul', { class: 'lista-partes' }, ...p.inventario.map((pz, i) => h('li', { class: 'rareza-' + datos.partes[pz.parte].rareza },
         h('div', {}, h('strong', {}, nombrePieza(datos, pz)), h('small', {}, describirParte(datos, pz))),
         boton('+' + Math.trunc((precioPieza(datos, pz) * datos.reglas.campana.venta_pct) / 100), () => { vender(datos, p, i); app.guardar(); pintar(); }, { clase: 'secundario', titulo: 'Vender' }))))
@@ -62,6 +93,7 @@ export function reclutamiento(app, raiz) {
 export function evento(app, raiz) {
   const { datos } = app;
   const p = app.partida;
+  if (p.nodo.dilema) return dilema(app, raiz);
   const r = p.nodo.resultado || {};
   montar(raiz, 
     barraCampana(datos, p, []),

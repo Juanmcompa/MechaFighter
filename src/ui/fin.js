@@ -2,6 +2,7 @@
 import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 import { elegirVeterano } from '../campana/partida.js';
 import { guardarLegado } from '../campana/guardado.js';
+import { relato } from '../campana/cronica.js';
 
 export function fin(app, raiz) {
   const { datos } = app;
@@ -32,6 +33,7 @@ export function fin(app, raiz) {
         h('span', {}, h('strong', {}, '«' + L.veterano.apodo + '»'), ' apareció entre los restos, vivo. Va a estar en la próxima campaña.')) : null,
       L.escuadron.length ? h('p', { class: 'legado-linea' }, ico('calavera'),
         h('span', {}, 'Nunca encontraron los cuerpos de ' + L.escuadron.map((f) => '«' + f.apodo + '»').join(', ') + '.')) : null) : null,
+    panelCronica(datos, p),
     p.caidos.length ? panel('Memorial', h('ul', { class: 'memorial' }, ...p.caidos.map((c) => h('li', {},
       retrato(datos, c, 'retrato-chico caido') || ico('lapida'),
       h('div', {},
@@ -44,4 +46,16 @@ export function fin(app, raiz) {
     h('div', { class: 'acciones' },
       boton('Nueva campaña', () => { app.borrarGuardada(); app.ir('portada'); }, { iconoNombre: 'mas', clase: 'principal' }))
   );
+}
+
+// La historia del escuadron, capitulo por capitulo (sector por sector)
+function panelCronica(datos, p) {
+  if (!p.cronica || !p.cronica.length) return null;
+  const r = relato(datos, p);
+  return panel(r.titulo,
+    h('div', { class: 'cronica' },
+      ...r.capitulos.flatMap((c) => [h('h3', {}, c.titulo), h('ul', {}, ...c.hechos.map((e) => h('li', { class: e.tipo }, e.texto)))]),
+      h('p', { class: 'cierre' }, r.cierre),
+      r.destacado ? h('p', {}, ico('calavera'), ' ' + r.destacado) : null,
+      h('div', { class: 'logros' }, ...r.logros.map((t) => chip('medalla', t, '')))));
 }
