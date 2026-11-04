@@ -22,7 +22,8 @@
     "afinidad",
     "dilemas",
     "generador_mapas",
-    "version"
+    "version",
+    "charlas"
   ],
   "mapas": [
     "puesto_01",

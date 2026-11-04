@@ -1,0 +1,131 @@
+{
+  "_ayuda": "Lo que se dicen los pilotos mientras bajan a la mision (pantalla de despliegue). Cada lista es de frases posibles; sale una al azar y no se repite en la misma charla. {yo} = quien habla, {mision}, {jefe}, {caido} = el ultimo que cayo, {mecha} = nombre del mecha de quien habla. En 'rivales' y 'amigos' (pares de frases): {a} = el que arranca, {b} = el que contesta. 'control' es la base (el jugador).",
+  "control_abre": [
+    "Escuadrón: compuertas en sesenta. Repasen sus órdenes.",
+    "Bajamos sobre «{mision}». Radios abiertas, cháchara mínima.",
+    "A todos: último chequeo de sistemas. Después no hay vuelta."
+  ],
+  "control_cierra": [
+    "Compuertas abiertas. Suerte allá abajo.",
+    "Contacto con el suelo en tres, dos...",
+    "Se terminó la charla. A trabajar."
+  ],
+  "tipo": {
+    "defensa": [
+      "Hay que aguantar. Nadie se mueve del núcleo sin avisar.",
+      "Defender no es esconderse. Esperen a que se acerquen."
+    ],
+    "asalto": [
+      "Entramos, rompemos todo y salimos. Fácil.",
+      "Ellos están atrincherados. Nosotros tenemos hambre."
+    ],
+    "escolta": [
+      "El camión primero. Si el camión cae, caemos todos.",
+      "Ojo con el transporte: no corre, no dobla, no pelea."
+    ],
+    "patrulla": [
+      "Recorrido largo. Mantengan la vista abierta.",
+      "Patrulla. Lo más peligroso es aburrirse."
+    ],
+    "duelo": [
+      "Mecha contra mecha. Que gane el que piense mejor.",
+      "Esto es personal, aunque no los conozcamos."
+    ]
+  },
+  "personalidad": {
+    "temerario": [
+      "Mi {mecha} está con ganas. Yo voy adelante.",
+      "Si alguien se queda atrás, lo espero en el medio del tiroteo.",
+      "¿Cuántos son? No importa."
+    ],
+    "cobarde": [
+      "¿Alguien más tiene el estómago dado vuelta?",
+      "Yo cubro desde atrás. Bien atrás.",
+      "Repasé el plan de escape tres veces."
+    ],
+    "sanguinario": [
+      "Quiero contarlos de a uno cuando caigan.",
+      "Que no quede ni la chatarra.",
+      "Mi {mecha} tiene sed."
+    ],
+    "leal": [
+      "Nadie se queda solo hoy. Nadie.",
+      "Si me necesitan, griten. Llego.",
+      "Volvemos todos o no vuelve nadie."
+    ]
+  },
+  "estado": {
+    "confiado": [
+      "Llevamos una racha. Hoy tampoco perdemos.",
+      "Esto ya lo hicimos mil veces. Relájense."
+    ],
+    "nervioso": [
+      "Me tiemblan las manos en los controles...",
+      "No me pidan cosas raras hoy, ¿sí?"
+    ],
+    "atento": [
+      "Dormí como un bebé. Estoy afilado.",
+      "Veo todo. Ni un ruido se me escapa."
+    ],
+    "perdido": [
+      "Control, ¿me repiten las coordenadas? ...Otra vez.",
+      "¿El objetivo era al norte o al sur?"
+    ]
+  },
+  "novato": [
+    "Primera vez que bajo de verdad. ¿Es siempre así de ruidoso?",
+    "Hice el simulador doscientas veces. Esto no se parece.",
+    "¿Alguien me dice qué hago si me dan?"
+  ],
+  "veterano": [
+    "Novatos: quédense cerca y hagan lo que yo haga.",
+    "Ya perdí la cuenta de cuántas veces bajé así.",
+    "El truco es no pensar en el truco."
+  ],
+  "trauma": [
+    "No puedo sacarme de la cabeza la última vez...",
+    "Si escucho otra explosión así, no sé qué hago."
+  ],
+  "recuerdo": [
+    "Esto va por «{caido}».",
+    "«{caido}» se hubiera reído de este plan.",
+    "Le guardé el lugar a «{caido}»."
+  ],
+  "rivales": [
+    [
+      "{b}, si me tapás la línea de tiro otra vez, te disparo a vos.",
+      "Probá, {a}. Te espero."
+    ],
+    [
+      "¿Otra vez con {b}? ¿No había nadie más?",
+      "Tranquilo, {a}. Yo tampoco te elegí."
+    ],
+    [
+      "{b}, esta vez seguí el plan.",
+      "El plan era tuyo, {a}. Por eso no lo sigo."
+    ]
+  ],
+  "amigos": [
+    [
+      "{b}, ¿me cubrís la izquierda?",
+      "Siempre, {a}. Como la otra vez."
+    ],
+    [
+      "El que baja más enemigos invita la cena, {b}.",
+      "Andá juntando plata, {a}."
+    ],
+    [
+      "{b}, si me pasa algo...",
+      "No te va a pasar nada, {a}. Callate y bajá."
+    ]
+  ],
+  "jefe": [
+    "Ahí abajo está {jefe}. Por fin.",
+    "Hoy se termina lo de {jefe}.",
+    "Todo el sector depende de que bajemos a {jefe}."
+  ],
+  "rivales_viejos": [
+    "Esos mechas tienen nuestras marcas... no puede ser.",
+    "Si de verdad son ellos, que alguien me explique cómo."
+  ]
+}

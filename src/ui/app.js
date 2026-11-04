@@ -8,11 +8,12 @@ import { sectores } from './sectores.js';
 import { hangar } from './hangar.js';
 import { preparacion } from './preparacion.js';
 import { batalla } from './batalla.js';
+import { despliegue } from './despliegue.js';
 import { informe } from './informe.js';
 import { taller, reclutamiento, evento } from './nodos.js';
 import { fin } from './fin.js';
 
-const PANTALLAS = { portada, sectores, hangar, preparacion, batalla, informe, taller, reclutamiento, evento, fin };
+const PANTALLAS = { portada, sectores, hangar, preparacion, despliegue, batalla, informe, taller, reclutamiento, evento, fin };
 
 export function crearApp(datos, raiz) {
   const app = {
