@@ -1,5 +1,5 @@
 // Nodos que no son misiones: taller, reclutamiento y eventos (incluye el descanso).
-import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato } from './comun.js';
+import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato, iconoParte, NOMBRE_RAREZA } from './comun.js';
 import { comprar, vender, contratar, seguir, precioPieza, elegirOpcion, comprarCombustible } from '../campana/partida.js';
 import { opcionDisponible } from '../campana/dilemas.js';
 
@@ -44,7 +44,8 @@ export function taller(app, raiz) {
       barraCampana(datos, p, []),
       h('h1', { class: 'titulo-pantalla' }, ico('taller'), ' Taller'),
       panel('En venta', h('ul', { class: 'lista-partes' }, ...p.nodo.oferta.map((o, i) => h('li', { class: 'rareza-' + datos.partes[o.pieza.parte].rareza + (o.vendida ? ' vendida' : '') },
-        h('div', {}, h('strong', {}, nombrePieza(datos, o.pieza)), h('small', {}, describirParte(datos, o.pieza))),
+        iconoParte(datos, o.pieza.parte, 'icono-lista'),
+        h('div', {}, h('strong', {}, nombrePieza(datos, o.pieza)), h('small', {}, NOMBRE_RAREZA[datos.partes[o.pieza.parte].rareza] + ' · ' + describirParte(datos, o.pieza))),
         o.vendida ? h('span', { class: 'ayuda' }, 'Vendida')
           : boton(String(o.precio), () => { comprar(datos, p, i); app.guardar(); pintar(); }, { iconoNombre: 'creditos', deshabilitado: p.creditos < o.precio, titulo: 'Comprar por ' + o.precio })))),
       ),
@@ -53,7 +54,8 @@ export function taller(app, raiz) {
         boton('+1 combustible · ' + datos.reglas.combustible.precio, () => { comprarCombustible(datos, p); app.guardar(); pintar(); },
           { iconoNombre: 'combustible', deshabilitado: p.creditos < datos.reglas.combustible.precio || p.combustible >= datos.reglas.combustible.maximo })) : null,
       panel('Tu depósito', p.inventario.length ? h('ul', { class: 'lista-partes' }, ...p.inventario.map((pz, i) => h('li', { class: 'rareza-' + datos.partes[pz.parte].rareza },
-        h('div', {}, h('strong', {}, nombrePieza(datos, pz)), h('small', {}, describirParte(datos, pz))),
+        iconoParte(datos, pz.parte, 'icono-lista'),
+        h('div', {}, h('strong', {}, nombrePieza(datos, pz)), h('small', {}, NOMBRE_RAREZA[datos.partes[pz.parte].rareza] + ' · ' + describirParte(datos, pz))),
         boton('+' + Math.trunc((precioPieza(datos, pz) * datos.reglas.campana.venta_pct) / 100), () => { vender(datos, p, i); app.guardar(); pintar(); }, { clase: 'secundario', titulo: 'Vender' }))))
         : h('p', { class: 'ayuda' }, 'No tenés partes sueltas. Lo que está montado en los mechas se cambia en el hangar.')),
       pie(app));

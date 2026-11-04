@@ -75,6 +75,13 @@ export function describirParte(datos, pieza) {
 export { nombrePieza };
 
 export const rarezaDe = (datos, pieza) => datos.partes[normalizarPieza(pieza).parte].rareza;
+// Icono de una parte (assets/iconos, ya pintado del color de su rareza). Si no hay, el sprite del mecha.
+export function iconoParte(datos, id, clase = 'img-parte') {
+  const sprite = (datos.partes[id] && datos.partes[id].sprite) || id;
+  return h('img', { class: clase, src: 'assets/iconos/' + id + '.png', alt: '', loading: 'lazy',
+    onerror: (e) => { if (!e.target.dataset.otra) { e.target.dataset.otra = '1'; e.target.src = 'assets/mecha/azul/' + sprite + '.png'; } else e.target.style.visibility = 'hidden'; } });
+}
+
 export const NOMBRE_RAREZA = { normal: 'Normal', raro: 'Rara', muy_raro: 'Muy rara', legendario: 'Legendaria', unico: 'Única' };
 
 export function textoPersonalidad(datos, piloto) {

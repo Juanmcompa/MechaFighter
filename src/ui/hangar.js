@@ -1,5 +1,5 @@
 // Hangar: el escuadron, el mecha de cada piloto (partes por encaje) y sus ordenes (gambits).
-import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato, NOMBRE_RAREZA } from './comun.js';
+import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato, NOMBRE_RAREZA, iconoParte } from './comun.js';
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot, reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida } from '../campana/partida.js';
@@ -240,7 +240,6 @@ function diferencias(a, b) {
   return out.sort((x, y) => y.peso - x.peso);
 }
 
-const imgParte = (id) => h('img', { class: 'img-parte', src: 'assets/mecha/azul/' + id + '.png', alt: '', onerror: (e) => { e.target.style.visibility = 'hidden'; } });
 
 function panelMecha(app, pi, refrescar) {
   const { datos } = app;
@@ -262,7 +261,8 @@ function panelMecha(app, pi, refrescar) {
       class: 'slot-boton' + (vacio ? '' : ' rareza-' + datos.partes[pz.parte].rareza) + (s === slot ? ' activo' : '') + (rotas.includes(s) ? ' rota' : '') + (vacio ? ' vacio' : '') + (!vacio && datos.partes[pz.parte].habilidad ? ' especial' : ''),
       'aria-pressed': s === slot ? 'true' : 'false',
       onclick: () => { ARMADO.slot = s; ARMADO.cand = null; refrescar(); }
-    }, h('small', {}, nombre), h('strong', {}, vacio ? '— vacío —' : datos.partes[pz.parte].nombre + (rotas.includes(s) ? ' ✕' : '')));
+    }, vacio ? h('span', { class: 'slot-icono' }) : iconoParte(datos, pz.parte, 'slot-icono'),
+    h('span', { class: 'slot-textos' }, h('small', {}, nombre), h('strong', {}, vacio ? '— vacío —' : datos.partes[pz.parte].nombre + (rotas.includes(s) ? ' ✕' : ''))));
   };
   const izq = [SLOTS[0], SLOTS[3], SLOTS[5]], der = [SLOTS[1], SLOTS[4], SLOTS[2]]; // cabeza, brazo izq, mochila | torso, brazo der, piernas
 
@@ -292,7 +292,7 @@ function panelMecha(app, pi, refrescar) {
       class: 'tarjeta-parte rareza-' + (pp ? pp.rareza : 'normal') + (ARMADO.cand === cand ? ' elegida' : '') + (cand === null ? ' puesta' : ''),
       onclick: () => { ARMADO.cand = cand === ARMADO.cand ? null : cand; refrescar(); }
     },
-    pz ? imgParte(pz.parte) : h('span', { class: 'img-parte' }, ico('cerrar')),
+    pz ? iconoParte(datos, pz.parte) : h('span', { class: 'img-parte' }, ico('cerrar')),
     h('strong', {}, titulo),
     pp ? h('small', { class: 'tp-rareza' }, NOMBRE_RAREZA[pp.rareza]) : null,
     extra ? h('small', { class: 'tp-extra' }, extra) : null,
@@ -313,6 +313,7 @@ function panelMecha(app, pi, refrescar) {
     const habNueva = prueba.habilidades.filter((x) => !actual.habilidades.includes(x));
     const habPierde = actual.habilidades.filter((x) => !prueba.habilidades.includes(x));
     detalleCand = h('div', { class: 'armado-detalle' + (pp ? ' rareza-' + pp.rareza : '') },
+      pz ? iconoParte(datos, pz.parte, 'icono-detalle') : null,
       h('strong', { class: pp ? 'rareza-' + pp.rareza : '' }, pz ? nombrePieza(datos, pz) : 'Dejar el encaje vacío', pp ? h('small', { class: 'tp-rareza' }, ' · ' + NOMBRE_RAREZA[pp.rareza]) : null),
       pz ? h('p', {}, (pp.descripcion ? pp.descripcion + ' ' : '') + describirParte(datos, pz)) : null,
       habNueva.length ? h('p', { class: 'bien' }, '★ Gana: ' + habNueva.map((x) => datos.habilidades[x].nombre).join(', ') + ' (y sus órdenes)') : null,

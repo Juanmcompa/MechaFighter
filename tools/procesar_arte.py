@@ -343,6 +343,96 @@ def unidades():
     return len(man) - 1
 
 
+# ---------- Iconos de partes (menu del hangar, estilo Medabots) ----------
+# Hojas en grilla (varias filas). Cada parte: (fila, columna) en la hoja. Vienen en plata neutra y se pintan
+# con el color de su rareza (data/partes.json). Si una parte cambia de rareza, se vuelve a correr el script.
+ICONOS = {
+    'iconos-cabezas-mochilas': {
+        'cabeza_sensor': (0, 0), 'cabeza_optica': (0, 1), 'cabeza_radar': (0, 2), 'cabeza_ojo_de_varga': (0, 3),
+        'mochila_reparacion': (1, 0), 'mochila_propulsor': (1, 1), 'mochila_municion': (1, 2), 'mochila_torreta': (1, 4),
+        'mochila_senuelo': (2, 4),
+    },
+    'iconos-brazos': {
+        'brazo_rifle': (0, 0), 'brazo_rotativa': (0, 1), 'brazo_canon_riel': (0, 2), 'brazo_lanzallamas': (0, 3),
+        'brazo_hoja': (1, 0), 'brazo_lanzamisiles': (1, 1), 'brazo_escudo': (1, 2), 'brazo_gancho': (1, 3),
+        'brazo_emp': (2, 0), 'brazo_riel_valquiria': (2, 2), 'brazo_tormenta': (2, 3),
+    },
+    'iconos-torsos-piernas': {
+        'torso_ligero': (0, 0), 'torso_medio': (0, 1), 'torso_pesado': (0, 2), 'torso_reactor': (0, 3), 'torso_bastion': (0, 4),
+        'piernas_bipode': (1, 0), 'piernas_orugas': (1, 1), 'piernas_saltarinas': (1, 2), 'piernas_estabilizadoras': (1, 3),
+        'piernas_fantasma': (1, 4),
+    },
+}
+LADO_ICONO = 48  # pixeles del png (se ve a ~44 en las tarjetas)
+# (tono base, tono de los brillos, saturacion); None = plata sin teñir
+TINTE_RAREZA = {'normal': None, 'raro': (0.40, 0.36, 0.62), 'muy_raro': (0.60, 0.52, 0.78),
+                'legendario': (0.76, 0.87, 0.66), 'unico': (0.12, 0.09, 0.85)}
+
+
+def por_filas(cajas):
+    # agrupa las cajas en filas (por su centro vertical) y ordena cada fila de izquierda a derecha
+    cs = sorted(cajas, key=lambda c: (c[1] + c[3]) / 2)
+    filas, actual, ultimo = [], [], None
+    for c in cs:
+        cy = (c[1] + c[3]) / 2
+        if ultimo is not None and cy - ultimo > (c[3] - c[1]) * 0.6:
+            filas.append(sorted(actual)); actual = []
+        actual.append(c); ultimo = cy
+    if actual:
+        filas.append(sorted(actual))
+    return filas
+
+
+def teñir(img, tinte):
+    if tinte is None:
+        return img
+    tono, brillo, sat = tinte
+    out = img.copy()
+    for y in range(out.shape[0]):
+        for x in range(out.shape[1]):
+            r, g, b, al = out[y, x]
+            if not al:
+                continue
+            h, s_, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if s_ > 0.3 or v < 0.2:  # contornos oscuros y detalles de color quedan como estan
+                continue
+            t = brillo if v > 0.85 else tono
+            nr, ng, nb = colorsys.hsv_to_rgb(t, sat * (1.15 - v * 0.55), min(1, v * 1.02))
+            out[y, x, :3] = [round(nr * 255), round(ng * 255), round(nb * 255)]
+    return out
+
+
+def iconos():
+    out = os.path.join(SALIDA, 'iconos')
+    with open(os.path.join(RAIZ, 'data', 'partes.json')) as f:
+        partes = json.load(f)
+    n = 0
+    for nombre, mapa in ICONOS.items():
+        if not any(os.path.exists(os.path.join(FUENTES, nombre + ext)) for ext in ('.jpg', '.png')):
+            continue
+        a, solido, cajas = piezas(nombre, 6)
+        filas = por_filas(cajas)
+        os.makedirs(out, exist_ok=True)
+        for pid, (fi, co) in mapa.items():
+            x0, y0, x1, y1 = filas[fi][co]
+            ys, xs = np.nonzero(solido[y0:y1, x0:x1])
+            x0, y0, x1, y1 = x0 + xs.min(), y0 + ys.min(), x0 + xs.max() + 1, y0 + ys.max() + 1
+            recorte = a[y0:y1, x0:x1].copy()
+            m = solido[y0:y1, x0:x1]
+            recorte[~m] = (10, 12, 20)
+            h, w = m.shape
+            k = (LADO_ICONO - 4) / max(w, h)
+            img = a_pixeles(recorte, m, max(1, round(w * k)), max(1, round(h * k)), colores=12)
+            img = limpiar(img)
+            img = teñir(img, TINTE_RAREZA.get(partes.get(pid, {}).get('rareza', 'normal')))
+            lienzo = np.zeros((LADO_ICONO, LADO_ICONO, 4), np.uint8)
+            oy, ox = (LADO_ICONO - img.shape[0]) // 2, (LADO_ICONO - img.shape[1]) // 2
+            lienzo[oy:oy + img.shape[0], ox:ox + img.shape[1]] = img
+            Image.fromarray(lienzo, 'RGBA').save(os.path.join(out, pid + '.png'))
+            n += 1
+    return n
+
+
 def main():
     manifiesto = {'_escala': ESCALA}
     for nombre, lista in HOJAS.items():
@@ -365,7 +455,7 @@ def main():
             print('  %-20s %2dx%-2d ancla %s' % (pid, base.shape[1], base.shape[0], manifiesto[pid]['ancla']))
     with open(os.path.join(SALIDA, 'mecha', 'sprites.json'), 'w') as f:
         json.dump(manifiesto, f, indent=1, sort_keys=True)
-    print(len(manifiesto) - 1, 'partes ·', retratos(), 'retratos ·', terreno(), 'piezas de terreno ·', unidades(), 'unidades')
+    print(len(manifiesto) - 1, 'partes ·', retratos(), 'retratos ·', terreno(), 'piezas de terreno ·', unidades(), 'unidades ·', iconos(), 'iconos')
 
 
 if __name__ == '__main__':
