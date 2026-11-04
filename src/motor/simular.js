@@ -8,7 +8,7 @@
 
 import { crearAzar, huellaTexto } from '../core/azar.js';
 import { crearTablero, casillaLibreCerca, distancia, tipo as tipoCasilla } from './espacio.js';
-import { ordenUnidades, percibir, vidaPct, evento, aliados, quitarEstado } from './estado.js';
+import { ordenUnidades, percibir, vidaPct, evento, aliados, quitarEstado, ponerEstado } from './estado.js';
 import { decidir } from './decision.js';
 import { resolverMovimientos, resolverAcciones, herir } from './resolucion.js';
 import { procesarMoral } from './moral.js';
@@ -41,6 +41,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
     if (!c) return null;
     const u = {
       ...plantilla,
+      // tormenta / noche: todos ven menos (nunca menos de 2 casillas)
+      vision: Math.max(2, plantilla.vision + (mision.visionDelta || 0)),
       armas: plantilla.armas.map((a) => ({ ...a })),
       mochila: plantilla.mochila ? { ...plantilla.mochila } : null,
       id: 'u' + num, num: num++, bando,
@@ -62,6 +64,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
     const [x, y] = ap.jugador[i % ap.jugador.length];
     B.agregarUnidad(unidadDePiloto(datos, m.piloto, m.mecha, m.gambits), 0, x, y);
   });
+  // estados que lleva todo el escuadron por una condicion de la mision (interferencia, atento)
+  for (const u of B.unidades) if (u.tipo === 'piloto') for (const est of mision.estadosEscuadron || []) ponerEstado(B, u, est, null);
   // vinculos: de ref de piloto a id de unidad
   for (const u of B.unidades) {
     if (u.vinculoRef) { const v = B.unidades.find((o) => o.ref === u.vinculoRef && o.bando === u.bando); if (v) u.vinculo = v.id; }
@@ -94,7 +98,9 @@ export function simular(datos, { mision, escuadron, semilla }) {
 
   // --- Bucle de ticks
   const ticksMax = Math.min(datos.reglas.ticks_maximos, mision.tiempo || Infinity);
-  let fin = null, zonaPerdidaTicks = 0;
+  let fin = null, zonaPerdidaTicks = 0, refuerzosLlegaron = false;
+  // minas escondidas: explotan con lo primero que las pise
+  const minas = new Set((mision.minas || []).map(([x, y]) => x + ',' + y));
   for (B.t = 1; B.t <= ticksMax && !fin; B.t++) {
     B.eventosTick = [];
 
@@ -119,6 +125,16 @@ export function simular(datos, { mision, escuadron, semilla }) {
         if (dot) { herir(B, u, dot, null); B.log({ tipo: 'vida', u: u.id, vida: Math.max(0, u.vida), dot }); }
       }
     }
+    // refuerzos: otra escuadra que llega por detras a mitad de la mision
+    if (mision.refuerzos && !refuerzosLlegaron && B.t >= mision.refuerzos.tick) {
+      refuerzosLlegaron = true;
+      mision.refuerzos.unidades.forEach((id, i) => {
+        const [x, y] = ap.enemigo[(i + 2) % ap.enemigo.length];
+        B.agregarUnidad(unidadEnemiga(datos, id, mision.nivel || 1), 1, x, y);
+      });
+      for (const u of B.unidades) if (u.viva && u.bando === 0) evento(B, 'oleada_nueva', u);
+      B.log({ tipo: 'refuerzos', cantidad: mision.refuerzos.unidades.length });
+    }
     if (siguienteOleada < oleadas.length) {
       const quedan = B.unidades.some((u) => u.viva && u.bando === 1);
       if (B.t >= proximaOleadaEn || !quedan) soltarOleada();
@@ -139,6 +155,17 @@ export function simular(datos, { mision, escuadron, semilla }) {
 
     // 4. resolucion: movimientos, acciones y muertes al final
     resolverMovimientos(B, intenciones);
+    if (minas.size) {
+      for (const u of ordenUnidades(B)) {
+        const k = u.x + ',' + u.y;
+        if (!u.viva || !minas.has(k)) continue;
+        minas.delete(k);
+        const danio = Math.max(datos.reglas.danio_minimo, 30 - (u.blindaje >> 1));
+        B.log({ tipo: 'mina', x: u.x, y: u.y, u: u.id, danio });
+        herir(B, u, danio, null);
+        for (const v of B.unidades) if (v.viva && distancia(v, u) <= 2) { evento(B, 'explosion_cerca', v); v.s.explosiones++; }
+      }
+    }
     resolverAcciones(B, intenciones);
     for (const u of ordenUnidades(B)) {
       if (!u.viva || u.vida > 0) continue;
@@ -163,7 +190,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
     procesarMoral(B);
 
     // 6. objetivos
-    const res = revisarObjetivos(B, oleadas.length - siguienteOleada, () => zonaPerdidaTicks, (v) => { zonaPerdidaTicks = v; });
+    const pendientes = oleadas.length - siguienteOleada + (mision.refuerzos && !refuerzosLlegaron ? 1 : 0);
+    const res = revisarObjetivos(B, pendientes, () => zonaPerdidaTicks, (v) => { zonaPerdidaTicks = v; });
     if (res) fin = res;
   }
   if (!fin) fin = { victoria: false, motivo: 'tiempo_agotado' };

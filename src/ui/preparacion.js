@@ -33,6 +33,12 @@ export function preparacion(app, raiz) {
             chip('estrella', m.recompensa.botin + ' partes', 'Botín si ganan'),
             m.niebla ? chip('ojo', 'Niebla', 'Solo ven lo que tienen a la vista') : null,
             m.oleadas.length > 1 ? chip('calavera', m.oleadas.length + ' oleadas', 'Oleadas') : null)),
+        (m.condiciones || []).length ? panel('Atención',
+          h('ul', { class: 'condiciones' }, ...m.condiciones.map((id) => {
+            const c = datos.condiciones_mision[id];
+            return h('li', {}, ico(c.icono), h('div', {}, h('strong', {}, c.nombre), h('span', {}, c.descripcion)));
+          }))) : null,
+        panel('Mapa · ' + datos.mapas[m.mapa].nombre, h('p', { class: 'ayuda' }, datos.mapas[m.mapa].descripcion || '')),
         panel('Hostiles', m.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
         panel('Escuadrón',
           h('ul', { class: 'lista-escuadron' }, ...escuadron.map(({ piloto }) => h('li', {},

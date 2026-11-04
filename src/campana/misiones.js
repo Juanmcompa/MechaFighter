@@ -78,6 +78,7 @@ export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificu
       if (tpl.vip) m.vip = tpl.vip;
     }
   }
+  aplicarCondiciones(datos, m, sortearCondiciones(datos, dificultad, azar), azar, tpl);
   m.descripcion = (tpl.descripcion || '').replace(/\{(\w+)\}/g, (_, k) => (m.parametros && m.parametros[k] !== undefined ? m.parametros[k] : k));
   m.cantidadEnemigos = m.oleadas.reduce((s, o) => s + o.length, 0) + m.emboscadas.reduce((s, e) => s + e.unidades.length, 0);
   return m;
@@ -87,4 +88,54 @@ function tiposDe(mapa) {
   const out = [];
   for (const fila of mapa.filas) for (const letra of fila) out.push(mapa.leyenda[letra]);
   return out;
+}
+
+// Cuantas condiciones le tocan a una mision segun la dificultad, sin repetir ni juntar las que chocan.
+// Chances (en %): una condicion y una segunda, por dificultad.
+const CHANCE_CONDICIONES = { 1: [35, 0], 2: [60, 20], 3: [80, 40], 4: [90, 55] };
+
+function sortearCondiciones(datos, dificultad, azar) {
+  const todas = datos.condiciones_mision || {};
+  const [c1, c2] = CHANCE_CONDICIONES[Math.min(4, dificultad)] || [0, 0];
+  const cantidad = azar.tirada(c1) ? (azar.tirada(c2) ? 2 : 1) : 0;
+  const elegidas = [];
+  for (let k = 0; k < cantidad; k++) {
+    const aptas = Object.entries(todas).filter(([id, c]) => c.desde <= dificultad && !elegidas.includes(id) &&
+      !elegidas.some((e) => (c.choca || []).includes(e) || (todas[e].choca || []).includes(id)));
+    if (!aptas.length) break;
+    elegidas.push(azar.elegirConPeso(aptas.map(([id, c]) => [id, c.peso])));
+  }
+  return elegidas;
+}
+
+// Pasa las condiciones a datos concretos de la mision, que el motor entiende.
+function aplicarCondiciones(datos, m, ids, azar, tpl) {
+  m.condiciones = ids;
+  m.estadosEscuadron = [];
+  m.visionDelta = 0;
+  const mapa = datos.mapas[m.mapa];
+  for (const id of ids) {
+    const e = datos.condiciones_mision[id].efectos;
+    if (e.vision) m.visionDelta += e.vision;
+    if (e.niebla !== undefined) m.niebla = e.niebla;
+    if (e.estado_escuadron) m.estadosEscuadron.push(e.estado_escuadron);
+    if (e.refuerzos) m.refuerzos = { tick: e.refuerzos, unidades: escuadra(datos, azar, tpl.enemigos, m.dificultad) };
+    if (e.unidad_extra) {
+      if (m.oleadas.length) m.oleadas[0].push(e.unidad_extra);
+      else m.emboscadas.push({ unidades: [e.unidad_extra], casilla: mapa.aparicion.enemigo[0] });
+    }
+    if (e.minas) {
+      // en el medio del mapa (ni en las entradas ni en las zonas), sobre piso
+      m.minas = [];
+      const [ancho, alto] = mapa.tamano;
+      const enZona = (x, y) => Object.values(mapa.zonas || {}).some(([[x1, y1], [x2, y2]]) => x >= x1 && x <= x2 && y >= y1 && y <= y2);
+      for (let intento = 0; intento < 200 && m.minas.length < e.minas; intento++) {
+        const x = azar.entero(5, ancho - 6), y = azar.entero(1, alto - 2);
+        if (mapa.leyenda[mapa.filas[y][x]] !== 'piso' || enZona(x, y) || m.minas.some(([a, b]) => a === x && b === y)) continue;
+        m.minas.push([x, y]);
+      }
+    }
+  }
+  m.cantidadEnemigos = m.oleadas.reduce((s, o) => s + o.length, 0) + m.emboscadas.reduce((s, e) => s + e.unidades.length, 0) +
+    (m.refuerzos ? m.refuerzos.unidades.length : 0);
 }

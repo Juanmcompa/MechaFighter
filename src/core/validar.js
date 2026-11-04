@@ -6,7 +6,7 @@ const ENCAJES = ['cabeza', 'torso', 'piernas', 'brazo', 'mochila'];
 const ENCAJES_MECHA = { cabeza: 'cabeza', torso: 'torso', piernas: 'piernas', brazo_izq: 'brazo', brazo_der: 'brazo', mochila: 'mochila' };
 const RAREZAS = ['comun', 'poco_comun', 'raro', 'epico'];
 const OPERADORES = ['<', '<=', '>', '>=', '==', '!='];
-const GANCHOS = ['anular', 'correr_umbral', 'subir_prioridad', 'ignorar_condicion', 'cambiar_objetivo', 'correa', 'moral'];
+const GANCHOS = ['anular', 'correr_umbral', 'subir_prioridad', 'ignorar_condicion', 'cambiar_objetivo', 'correa', 'moral', 'confusion', 'perdido'];
 const CUERPOS = ['mecha', 'infanteria', 'mutante'];
 const VICTORIA_DERROTA = ['sobrevivir_oleadas', 'escuadron_eliminado', 'enemigos_eliminados', 'zona_perdida', 'unidad_muerta',
   'unidad_llega_a_zona', 'escuadron_llega_a_zona', 'tiempo_agotado'];
@@ -118,6 +118,12 @@ export function validarDatos(d) {
         case 'moral':
           if (!eventos.includes(h.evento)) err(aqui, 'evento "' + h.evento + '" no esta en reglas.eventos');
           break;
+        case 'confusion':
+          if (!Number.isInteger(h.chance)) err(aqui, 'confusion necesita "chance" (0 a 100)');
+          break;
+        case 'perdido':
+          if (!Number.isInteger(h.ticks)) err(aqui, 'perdido necesita "ticks" (cuanto tarda en ubicarse)');
+          break;
       }
     });
   }
@@ -223,6 +229,15 @@ export function validarDatos(d) {
     for (const [z, [[x1, y1], [x2, y2]]] of Object.entries(m.zonas || {})) {
       if (x1 < 0 || y1 < 0 || x2 >= ancho || y2 >= alto || x1 > x2 || y1 > y2) err(aqui, 'la zona "' + z + '" se sale del mapa');
     }
+  }
+
+  // --- 8b. Condiciones de mision
+  for (const [id, c] of Object.entries(d.condiciones_mision || {})) {
+    const aqui = 'condiciones_mision › ' + id;
+    const e = c.efectos || {};
+    if (e.estado_escuadron && !existe(d.estados, e.estado_escuadron)) err(aqui, 'estado "' + e.estado_escuadron + '" no existe');
+    if (e.unidad_extra && !existe(unidades, e.unidad_extra)) err(aqui, 'unidad "' + e.unidad_extra + '" no existe');
+    for (const o of c.choca || []) if (!existe(d.condiciones_mision, o)) err(aqui, 'choca con "' + o + '", que no existe');
   }
 
   // --- 9. Misiones y sectores

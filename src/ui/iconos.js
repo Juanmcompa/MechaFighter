@@ -36,6 +36,7 @@ const P = {
   piloto: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   peso: '<path d="M6 8h12l2 12H4zM9 8a3 3 0 0 1 6 0"/>',
   mapa: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
+  explosion: '<path d="M12 2l2 6 6-3-3 6 6 2-6 2 3 6-6-3-2 6-2-6-6 3 3-6-6-2 6-2-3-6 6 3z"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   bala: '<path d="M5 19l9-9M14 4h6v6l-6 4-4-4z"/>',
   dado: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/>',

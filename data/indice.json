@@ -17,9 +17,14 @@
     "sectores",
     "nombres",
     "textos",
-    "voces"
+    "voces",
+    "condiciones_mision"
   ],
   "mapas": [
-    "puesto_01"
+    "puesto_01",
+    "refineria_02",
+    "hangar_03",
+    "desfiladero_04",
+    "colonia_05"
   ]
 }

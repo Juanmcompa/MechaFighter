@@ -6,7 +6,10 @@
     "icono": "escudo",
     "descripcion": "Aguanten {oleadas} oleadas sin perder el núcleo.",
     "mapas": [
-      "puesto_01"
+      "puesto_01",
+      "refineria_02",
+      "desfiladero_04",
+      "colonia_05"
     ],
     "parametros": {
       "oleadas": {
@@ -52,7 +55,11 @@
     "icono": "mira",
     "descripcion": "Eliminen al líder enemigo.",
     "mapas": [
-      "puesto_01"
+      "puesto_01",
+      "refineria_02",
+      "hangar_03",
+      "desfiladero_04",
+      "colonia_05"
     ],
     "victoria": [
       {
@@ -92,7 +99,10 @@
     "icono": "estrella",
     "descripcion": "Lleven el transporte hasta la extracción.",
     "mapas": [
-      "puesto_01"
+      "puesto_01",
+      "refineria_02",
+      "hangar_03",
+      "desfiladero_04"
     ],
     "vip": "transporte",
     "victoria": [
@@ -134,7 +144,10 @@
     "icono": "ojo",
     "descripcion": "Crucen el sector. Hay niebla y emboscadas.",
     "mapas": [
-      "puesto_01"
+      "colonia_05",
+      "hangar_03",
+      "puesto_01",
+      "refineria_02"
     ],
     "niebla": true,
     "parametros": {
@@ -176,7 +189,10 @@
     "icono": "espadas",
     "descripcion": "Escuadrón contra escuadrón.",
     "mapas": [
-      "puesto_01"
+      "hangar_03",
+      "desfiladero_04",
+      "puesto_01",
+      "colonia_05"
     ],
     "simetrico": true,
     "victoria": [

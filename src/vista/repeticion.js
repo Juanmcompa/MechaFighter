@@ -237,7 +237,16 @@ export class Repeticion {
         if (e.estado === 'moral_quebrada') this.alEvento({ texto: u.ficha.nombre + ' se quiebra', clase: 'aviso' });
         break;
       case 'habilidad': if (u) this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true); break;
-      case 'oleada': if (e.n > 1) this.alEvento({ texto: 'Oleada ' + e.n + ' de ' + e.de, clase: 'aviso', importante: true }); break;
+      case 'oleada': if (e.n > 1) this.alEvento({ texto: 'CONTROL: Oleada ' + e.n + ' de ' + e.de + ' en camino.', clase: 'control', importante: true }); break;
+      case 'refuerzos': this.alEvento({ texto: 'CONTROL: ¡Refuerzos enemigos por detrás! ' + e.cantidad + ' contactos.', clase: 'control', importante: true }); this.temblor = Math.max(this.temblor, 0.3); break;
+      case 'mina': {
+        this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: 1.2, t0: this.T, dur: 10 });
+        this.temblor = Math.max(this.temblor, 0.9);
+        const v = U.get(e.u);
+        if (v) { v.vida -= e.danio; v.golpe = 1; this.flotante(v, '-' + e.danio, '#ff7a6a'); }
+        this.alEvento({ texto: '¡MINA! ' + (v ? v.ficha.nombre + ' pisó una mina.' : ''), clase: v && v.ficha.bando === 0 ? 'mal' : 'aviso', importante: true });
+        break;
+      }
       case 'inicio': {
         const nuestros = [...U.values()].filter((x) => x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
         if (nuestros.length) this.decir(nuestros[(nuestros.length * 7 + this.registro.length) % nuestros.length], 'inicio', true);
@@ -329,7 +338,7 @@ export class Repeticion {
       for (let x = 0; x < ancho; x++) {
         for (const o of ojos) {
           const p = { x: o.hacia[0], y: o.hacia[1] };
-          if (distancia(p, { x, y }) <= 7 && lineaDeTiro(this.tablero, p, { x, y })) { vistas.add(y * ancho + x); break; }
+          if (distancia(p, { x, y }) <= Math.max(2, 7 + (this.mision.visionDelta || 0)) && lineaDeTiro(this.tablero, p, { x, y })) { vistas.add(y * ancho + x); break; }
         }
       }
     }

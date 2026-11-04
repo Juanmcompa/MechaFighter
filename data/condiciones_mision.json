@@ -1,0 +1,38 @@
+{
+  "_ayuda": "Condiciones que pueden tocarle a una mision y cambian a que hay que prestarle atencion. Se ven en el briefing. 'peso' = que tan seguido sale; 'desde' = dificultad minima; 'choca' = no salen juntas. Efectos: vision (casillas de mas o de menos para todos), niebla (true: solo se ve lo que esta a la vista; false: se sabe donde estan todos), estado_escuadron (estado que lleva todo tu escuadron), refuerzos (tick en que llega otra escuadra enemiga), unidad_extra (enemigo que se suma), minas (cuantas minas escondidas hay).",
+  "tormenta": {
+    "nombre": "Tormenta de polvo", "icono": "ojo", "peso": 10, "desde": 1, "choca": ["inteligencia", "noche"],
+    "descripcion": "Nadie ve a más de unas casillas. Hay niebla para todos.",
+    "efectos": { "vision": -3, "niebla": true }
+  },
+  "noche": {
+    "nombre": "Operación nocturna", "icono": "descanso", "peso": 8, "desde": 1, "choca": ["inteligencia", "tormenta"],
+    "descripcion": "De noche: niebla y menos vista. Los enemigos tampoco ven mucho.",
+    "efectos": { "vision": -1, "niebla": true }
+  },
+  "interferencia": {
+    "nombre": "Interferencia de radio", "icono": "trauma", "peso": 9, "desde": 1, "choca": [],
+    "descripcion": "Las órdenes llegan cortadas: a veces los pilotos hacen otra cosa.",
+    "efectos": { "estado_escuadron": "interferido" }
+  },
+  "refuerzos": {
+    "nombre": "Refuerzos enemigos", "icono": "calavera", "peso": 8, "desde": 1, "choca": [],
+    "descripcion": "A mitad de la misión llega otra escuadra enemiga por detrás.",
+    "efectos": { "refuerzos": 220 }
+  },
+  "francotirador": {
+    "nombre": "Francotirador", "icono": "mira", "peso": 7, "desde": 2, "choca": [],
+    "descripcion": "Un tirador enemigo de largo alcance espera atrás. Busquen cobertura.",
+    "efectos": { "unidad_extra": "francotirador_pirata" }
+  },
+  "minas": {
+    "nombre": "Terreno minado", "icono": "explosion", "peso": 6, "desde": 2, "choca": [],
+    "descripcion": "Hay minas escondidas. Explotan con lo que las pise, de cualquier bando.",
+    "efectos": { "minas": 6 }
+  },
+  "inteligencia": {
+    "nombre": "Buena inteligencia", "icono": "estrella", "peso": 6, "desde": 1, "choca": ["tormenta", "noche"],
+    "descripcion": "Se sabe dónde está cada enemigo y el escuadrón va atento.",
+    "efectos": { "niebla": false, "estado_escuadron": "atento" }
+  }
+}

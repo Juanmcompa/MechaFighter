@@ -87,5 +87,25 @@
         "registro": "se_quiebra"
       }
     ]
+  },
+  "interferido": {
+    "nombre": "Interferido",
+    "icono": "trauma",
+    "duracion": 0,
+    "ganchos": [
+      {
+        "tipo": "confusion",
+        "chance": 12
+      }
+    ]
+  },
+  "atento": {
+    "nombre": "Atento",
+    "icono": "ojo",
+    "duracion": 0,
+    "mods": {
+      "punteria": 8,
+      "evasion": 6
+    }
   }
 }

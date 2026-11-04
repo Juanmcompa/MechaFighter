@@ -1,0 +1,111 @@
+{
+  "_ayuda": "Cada letra de 'filas' es una casilla (ver 'leyenda'). Coordenadas [columna, fila] desde arriba a la izquierda, empezando en 0. Zonas: rectangulos [[col1, fila1], [col2, fila2]]. 'descripcion' es lo que se lee en el briefing.",
+  "nombre": "Desfiladero del Eco",
+  "tamano": [
+    24,
+    16
+  ],
+  "ambiente": "canon",
+  "leyenda": {
+    ".": "piso",
+    "#": "muro",
+    "h": "media_cobertura",
+    "H": "cobertura_total",
+    "~": "peligro"
+  },
+  "filas": [
+    "########################",
+    "########################",
+    "########################",
+    "####..############..####",
+    "#...........H..........#",
+    "#............h.........#",
+    "#.......H........h.....#",
+    "#........~.............#",
+    "#.............~........#",
+    "#.....h........H.......#",
+    "#.........h............#",
+    "#...........H..........#",
+    "####..############..####",
+    "########################",
+    "########################",
+    "########################"
+  ],
+  "aparicion": {
+    "jugador": [
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        7
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        2,
+        10
+      ],
+      [
+        3,
+        6
+      ],
+      [
+        3,
+        8
+      ]
+    ],
+    "enemigo": [
+      [
+        21,
+        5
+      ],
+      [
+        21,
+        7
+      ],
+      [
+        21,
+        9
+      ],
+      [
+        21,
+        10
+      ],
+      [
+        20,
+        6
+      ],
+      [
+        20,
+        8
+      ]
+    ]
+  },
+  "zonas": {
+    "nucleo": [
+      [
+        4,
+        6
+      ],
+      [
+        6,
+        9
+      ]
+    ],
+    "extraccion": [
+      [
+        20,
+        6
+      ],
+      [
+        22,
+        9
+      ]
+    ]
+  },
+  "descripcion": "Un corredor largo y abierto, con poca cobertura. Gana el que pega de lejos; acercarse cuesta caro."
+}

@@ -204,6 +204,44 @@
           "objetivo": "objetivo_mision"
         }
       ]
+    },
+    "francotirador_pirata": {
+      "nombre": "Francotirador",
+      "cuerpo": "infanteria",
+      "personalidad": "sanguinario",
+      "amenaza": 3,
+      "sprite": "soldado_rifle",
+      "stats": {
+        "estructura": 45,
+        "blindaje": 0,
+        "velocidad": 6,
+        "punteria": 75,
+        "evasion": 15,
+        "iniciativa": 6,
+        "moral": 60,
+        "vision": 11
+      },
+      "arma": "brazo_canon_riel",
+      "gambits": [
+        {
+          "condicion": "enemigo_cerca",
+          "parametros": {
+            "casillas": 3
+          },
+          "accion": "replegarse",
+          "objetivo": "lejos_de_enemigos"
+        },
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_debil"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        }
+      ]
     }
   },
   "escuadras": {

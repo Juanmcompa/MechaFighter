@@ -107,8 +107,26 @@ export function centroZona(z) {
 
 // La casilla libre de la zona mas cercana a u (si ya esta adentro, la suya): asi cada uno ocupa su lugar.
 function casillaDeZona(B, u, z) {
-  if (u.x >= z[0][0] && u.x <= z[1][0] && u.y >= z[0][1] && u.y <= z[1][1]) return { x: u.x, y: u.y, punto: true };
   const ocupada = ocupadaPara(B, u);
+  if (u.x >= z[0][0] && u.x <= z[1][0] && u.y >= z[0][1] && u.y <= z[1][1]) {
+    // Ya adentro: se corre hacia el fondo de la zona (la esquina mas lejos de donde arranco el escuadron),
+    // asi deja libre la entrada para los que vienen atras.
+    const [sx, sy] = B.mapa.aparicion.jugador[0];
+    let fondo = null, lejos = -1;
+    for (const cx of [z[0][0], z[1][0]]) for (const cy of [z[0][1], z[1][1]]) {
+      const d = distancia({ x: cx, y: cy }, { x: sx, y: sy });
+      if (d > lejos) { fondo = { x: cx, y: cy }; lejos = d; }
+    }
+    let mejor = { x: u.x, y: u.y, punto: true }, mejorD = distancia(u, fondo);
+    for (let y = z[0][1]; y <= z[1][1]; y++) {
+      for (let x = z[0][0]; x <= z[1][0]; x++) {
+        if (!caminable(B.tablero, x, y) || ocupada(x, y) || distancia({ x, y }, u) > 1) continue;
+        const d = distancia({ x, y }, fondo);
+        if (d < mejorD) { mejor = { x, y, punto: true }; mejorD = d; }
+      }
+    }
+    return mejor;
+  }
   let mejor = null, mejorD = 32767;
   for (let y = z[0][1]; y <= z[1][1]; y++) {
     for (let x = z[0][0]; x <= z[1][0]; x++) {
@@ -149,7 +167,10 @@ function objetivoMision(B, u) {
     if (B.vip && B.vip.viva) return B.vip;
     if (m.zonaDefender) return centroZona(B.mapa.zonas[m.zonaDefender]);
   }
-  return null;
+  // Sin nada mas que hacer y sin enemigos a la vista (tormenta, noche): salir a buscarlos hacia donde entraron.
+  const lado = B.mapa.aparicion[u.bando === 0 ? 'enemigo' : 'jugador'];
+  const [x, y] = lado[u.num % lado.length];
+  return { x, y, punto: true, explorar: true };
 }
 
 // ---------- Acciones: si se pueden hacer, devuelven la intencion ----------
@@ -418,8 +439,10 @@ export function decidir(B, u) {
   });
   claves.sort((a, b) => a.k - b.k || a.i - b.i);
 
-  // C. De arriba abajo
+  // C. De arriba abajo. Con "confusion" (interferencia, nervios) a veces entiende mal una orden y se la saltea.
   const ctx = { u, corrimientos };
+  const confusion = lista.filter((h) => h.tipo === 'confusion').reduce((s, h) => s + h.chance, 0);
+  let confundido = false;
   for (const { g, i } of claves) {
     const cond = G.condiciones[g.condicion];
     if (!cond) continue;
@@ -436,7 +459,8 @@ export function decidir(B, u) {
       }
     }
     const intencion = accion(B, u, g.accion, elegirObjetivo(B, u, sel), correa);
-    if (intencion) return { ...intencion, gambit: i };
+    if (intencion && confusion && intencion.tipo !== 'esperar' && az.tirada(confusion)) { confundido = true; continue; }
+    if (intencion) return confundido ? { ...intencion, gambit: i, anula: 'confusion' } : { ...intencion, gambit: i };
   }
 
   // D. Por defecto

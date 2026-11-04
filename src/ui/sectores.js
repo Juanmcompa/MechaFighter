@@ -53,7 +53,9 @@ export function sectores(app, raiz) {
         chip('mira', 'Nivel ' + m.nivel, 'Nivel de los enemigos'),
         chip('creditos', '+' + m.recompensa.creditos, 'Pago'),
         chip('estrella', m.recompensa.botin + ' partes', 'Botín'),
-        m.niebla ? chip('ojo', 'Niebla', 'No se ve lo que no tenés a la vista') : null) : null,
+        m.niebla ? chip('ojo', 'Niebla', 'No se ve lo que no tenés a la vista') : null,
+        ...(m.condiciones || []).map((id) => chip(datos.condiciones_mision[id].icono, datos.condiciones_mision[id].nombre, datos.condiciones_mision[id].descripcion, 'chip-alerta'))) : null,
+      m ? h('p', { class: 'ayuda' }, ico('mapa'), ' ' + datos.mapas[m.mapa].nombre) : null,
       boton(m ? 'Aceptar contrato' : 'Ir', () => {
         elegirNodo(datos, p, i);
         app.guardar();

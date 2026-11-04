@@ -1,0 +1,111 @@
+{
+  "_ayuda": "Cada letra de 'filas' es una casilla (ver 'leyenda'). Coordenadas [columna, fila] desde arriba a la izquierda, empezando en 0. Zonas: rectangulos [[col1, fila1], [col2, fila2]]. 'descripcion' es lo que se lee en el briefing.",
+  "nombre": "Colonia Esperanza",
+  "tamano": [
+    24,
+    16
+  ],
+  "ambiente": "ruinas",
+  "leyenda": {
+    ".": "piso",
+    "#": "muro",
+    "h": "media_cobertura",
+    "H": "cobertura_total",
+    "~": "peligro"
+  },
+  "filas": [
+    "########################",
+    "#......................#",
+    "#....#####.....#####...#",
+    "#....#...#..~..#.h.#...#",
+    "#..~.#.h...........#...#",
+    "#....#...#.....##.##...#",
+    "#....##.###.##.........#",
+    "#............#.....h...#",
+    "#..h......#.........~..#",
+    "#.........##.###.##....#",
+    "#...##.##.....#...#....#",
+    "#...#...........h.#....#",
+    "#...#.h.#..~..#...#.h..#",
+    "#...#####.....#####....#",
+    "#......................#",
+    "########################"
+  ],
+  "aparicion": {
+    "jugador": [
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        2,
+        12
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        3,
+        11
+      ]
+    ],
+    "enemigo": [
+      [
+        21,
+        3
+      ],
+      [
+        21,
+        6
+      ],
+      [
+        21,
+        9
+      ],
+      [
+        21,
+        12
+      ],
+      [
+        20,
+        4
+      ],
+      [
+        20,
+        10
+      ]
+    ]
+  },
+  "zonas": {
+    "nucleo": [
+      [
+        11,
+        7
+      ],
+      [
+        12,
+        8
+      ]
+    ],
+    "extraccion": [
+      [
+        20,
+        1
+      ],
+      [
+        22,
+        3
+      ]
+    ]
+  },
+  "descripcion": "Una colonia en ruinas: casas con puertas, cuartos y esquinas. Mucha cobertura y poca vista: ideal para emboscadas."
+}
