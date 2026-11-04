@@ -109,7 +109,7 @@ body { background: radial-gradient(ellipse at center, #0c140f 0%, #040604 80%); 
 .tarjeta-piloto { scroll-snap-align: center; width: 104px; background: var(--navy); border: 3px solid #2e55c9; border-radius: 4px; }
 .tarjeta-piloto.activa { background: #13301a; border-color: var(--fosforo); box-shadow: 0 0 0 2px rgba(143, 220, 90, .2); }
 .tarjeta-piloto .retrato { border-color: #1b2f7a; }
-.pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pestanas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .pestana {
   min-height: 52px; padding: 6px; cursor: pointer; border-radius: 5px;
   font: 400 17px 'Pixelify Sans', sans-serif; text-transform: uppercase;
@@ -117,10 +117,6 @@ body { background: radial-gradient(ellipse at center, #0c140f 0%, #040604 80%); 
 }
 .pestana.activa { color: #0b120d; background: linear-gradient(#9cec6e, #6fca47); border-color: #a9f27d; box-shadow: 0 4px 0 #3f6b2a; }
 .pestana:focus-visible { outline: 2px solid var(--ambar); outline-offset: 2px; }
-@media (max-width: 899px) {
-  .ver-piloto .col-ordenes, .ver-ordenes .col-piloto { display: none; }
-}
-@media (min-width: 900px) { .pestanas { display: none; } }
 
 .stats { grid-template-columns: auto auto auto auto; column-gap: 12px; font-size: 20px; }
 .mecha-grande { width: 120px; height: 120px; }
@@ -222,3 +218,46 @@ button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offse
 .relaciones .amigo .ico { color: #7fd17a; }
 .relaciones .rival .ico { color: #e06a5a; }
 .condiciones.animo li span:not(.ico-envoltura) { color: var(--texto); }
+
+/* =================== HANGAR: cabecera fija, tira de pilotos y accesos rapidos =================== */
+.hangar-fijo { position: sticky; top: 0; z-index: 6; display: grid; gap: 6px; padding: 6px 0 8px;
+  background: linear-gradient(var(--consola, #0e1712) 85%, transparent); margin: -6px 0 0; }
+.hangar-fijo > * { min-width: 0; }
+.hangar-fijo .hud { position: static; flex-wrap: nowrap; gap: 6px; }
+.hangar-fijo .hud-datos { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.hangar-fijo .hud-datos::-webkit-scrollbar { display: none; }
+.hangar-fijo .hud-datos .chip { white-space: nowrap; flex: none; font-size: 16px; padding: 2px 5px; gap: 3px; }
+.boton.compacto { min-height: 38px; padding: 4px 10px; font-size: 15px; white-space: nowrap; }
+.boton.compacto .ico { width: 16px; height: 16px; }
+.tira-pilotos { display: flex; gap: 6px; overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 1px 4px; scrollbar-width: thin; }
+.tp-mini { position: relative; flex: none; width: 128px; display: flex; gap: 6px; align-items: center; padding: 4px 6px; cursor: pointer;
+  scroll-snap-align: start; text-align: left; color: var(--texto); font: inherit;
+  background: #16221a; border: 2px solid var(--chapa-borde); border-radius: 4px; }
+.tp-mini.activa { background: #13301a; border-color: var(--fosforo); box-shadow: 0 0 0 2px rgba(143, 220, 90, .2); }
+.tp-mini.con-tarea { border-style: dashed; }
+.tp-mini.con-tarea:not(.activa) .retrato { opacity: .6; }
+.tp-mini .barra { height: 6px; }
+.tp-mini .barra.baja > * { background: var(--ambar); }
+.tp-mini .tp-nivel { position: absolute; top: 1px; right: 4px; font-size: 13px; color: var(--fosforo); }
+.tp-tarea { display: flex; gap: 3px; align-items: center; font-size: 13px; color: var(--ambar); white-space: nowrap; overflow: hidden; }
+.tp-tarea .ico { width: 12px; height: 12px; flex: none; }
+.hangar-fijo .pestana { min-height: 40px; font-size: 15px; display: flex; gap: 6px; align-items: center; justify-content: center; }
+.hangar-fijo .pestana .ico { width: 16px; height: 16px; }
+.rapido { display: grid; gap: 8px; padding: 8px; background: var(--visor); border: 2px solid var(--chapa-borde); border-radius: 5px; }
+.rapido-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rapido-cabecera strong { font: 400 16px 'Pixelify Sans', sans-serif; text-transform: uppercase; color: var(--fosforo); }
+.boton.urgente:not([disabled]) { border-color: var(--ambar); color: var(--ambar); }
+.tareas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.tarea { display: grid; justify-items: center; gap: 2px; min-height: 52px; padding: 5px 2px; cursor: pointer; font: inherit; font-size: 13px;
+  color: var(--texto-tenue); background: #111a14; border: 2px solid var(--chapa-borde); border-radius: 4px; }
+.tarea .ico { width: 20px; height: 20px; }
+.tarea.activa { color: #0b120d; background: linear-gradient(#e9c06a, #d29a35); border-color: #f2d08a; }
+.tarea:first-child.activa { background: linear-gradient(#9cec6e, #6fca47); border-color: #a9f27d; }
+.tarea[disabled] { opacity: .4; cursor: not-allowed; }
+.tarea:focus-visible, .tp-mini:focus-visible { outline: 2px solid var(--ambar); outline-offset: 2px; }
+.rapido-ayuda { margin: 0; font-size: 15px; }
+.detalle-piloto { display: grid; gap: 12px; }
+@media (min-width: 900px) {
+  .detalle-piloto { max-width: 820px; }
+  .tp-mini { width: 150px; }
+}

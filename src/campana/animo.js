@@ -65,7 +65,11 @@ export function calcularAnimo(datos, p, mision, pilotos, azar) {
       est.push('nervioso');
       notas.push({ id: pi.id, tipo: 'nervioso', texto: pi.apodo + ' está nervioso' + (pi.traumas.length ? ' (arrastra un trauma)' : '') + '. Puede entender mal las órdenes.' });
     }
-    if (!est.length && (pi.medallas.length || pi.nivel >= 3) && azar.tirada(R.chance_atento)) {
+    if (!est.length && pi.descansado) {
+      est.push('atento');
+      notas.push({ id: pi.id, tipo: 'atento', texto: pi.apodo + ' viene descansado: atento y con buenos reflejos.' });
+    }
+    else if (!est.length && (pi.medallas.length || pi.nivel >= 3) && azar.tirada(R.chance_atento)) {
       est.push('atento');
       notas.push({ id: pi.id, tipo: 'atento', texto: pi.apodo + ' está atento: mejor puntería y reflejos.' });
     }

@@ -15,6 +15,7 @@ export { reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida };
 import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana, misionEncuentro } from './legado.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
+import { desplegables, cumplirTareas } from './tareas.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
@@ -188,7 +189,7 @@ export function elegirNodo(datos, p, i) {
     case 'jefe':
       p.estado = 'preparacion';
       // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
-      p.nodo.animo = calcularAnimo(datos, p, nodo.mision, p.pilotos.slice(0, datos.reglas.escuadra_maxima), azarAparte(p, 'animo'));
+      p.nodo.animo = calcularAnimo(datos, p, nodo.mision, desplegables(datos, p), azarAparte(p, 'animo'));
       break;
     case 'taller': {
       const az = azarDe(p, 'taller');
@@ -395,7 +396,7 @@ export function guardarGambits(datos, p, pilotoId, lista) {
 
 export function escuadronParaMision(datos, p) {
   const animo = (p.nodo && p.nodo.animo && p.nodo.animo.porPiloto) || {};
-  return p.pilotos.slice(0, datos.reglas.escuadra_maxima).map((pi) => ({
+  return desplegables(datos, p).map((pi) => ({
     piloto: pi, mecha: pi.mecha, gambits: pi.gambits, vidaPct: vidaDeSalida(datos, pi),
     estados: (animo[pi.id] || {}).estados || [], rival: (animo[pi.id] || {}).rival || null, amigo: (animo[pi.id] || {}).amigo || null
   }));
@@ -454,6 +455,7 @@ export function cerrarMision(datos, p, resultado) {
     }
 
     pi.misiones++;
+    pi.descansado = false; // el descanso ya lo aprovecho
     // racha: misiones ganadas al hilo (y sin terminar herido de gravedad). Con racha, llegan confiados.
     pi.racha = resultado.victoria && linea.estado === 'ok' ? (pi.racha || 0) + 1 : 0;
     if (linea.estado === 'herido') linea.momentos.push('Lo dieron por muerto en ' + donde + ', y volvió.');
@@ -572,6 +574,9 @@ export function cerrarMision(datos, p, resultado) {
     const pi = p.pilotos.find((x) => x.id === l.id);
     if (pi) { l.mechaVida = vidaDelMecha(pi); l.rotas = partesRotas(pi); l.costoReparar = costoReparacion(datos, pi).total; }
   }
+
+  // Los que se quedaron haciendo otra cosa
+  informe.tareas = cumplirTareas(datos, p, az);
 
   informe.puntaje = puntos;
   p.puntaje += puntos;

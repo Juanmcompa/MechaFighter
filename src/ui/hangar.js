@@ -5,6 +5,7 @@ import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot, reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida } from '../campana/partida.js';
 import { nombreDeMecha } from '../campana/reclutas.js';
 import { relaciones } from '../campana/animo.js';
+import { asignarTarea, puedeQuedarse } from '../campana/tareas.js';
 import { existeIcono } from './iconos.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
@@ -13,87 +14,108 @@ export function hangar(app, raiz, opciones = {}) {
   const { datos } = app;
   const p = app.partida;
   let sel = opciones.piloto && p.pilotos.find((x) => x.id === opciones.piloto) ? opciones.piloto : (p.pilotos[0] || {}).id;
-
   const volver = () => (p.estado === 'preparacion' ? app.ir('preparacion') : app.continuar());
-  const lista = h('div', { class: 'lista-pilotos', role: 'tablist', 'aria-label': 'Pilotos' });
+
+  // Arriba, fijo: los numeros de la campana, la tira de pilotos y las pestanas. Abajo, lo del piloto elegido.
+  const tira = h('div', { class: 'tira-pilotos', role: 'tablist', 'aria-label': 'Pilotos' });
   const detalle = h('div', { class: 'detalle-piloto' });
-  // En el celular se ve una cosa por vez: el piloto y su mecha, o sus ordenes. En la compu, las dos juntas.
-  let pestana = opciones.pestana || 'piloto';
+  let pestana = { piloto: 'mecha' }[opciones.pestana] || opciones.pestana || PESTANA.ultima || 'mecha';
   const pestanas = h('div', { class: 'pestanas', role: 'tablist', 'aria-label': 'Secciones' });
   const pintarPestanas = () => {
-    pestanas.innerHTML = '';
-    for (const [id, texto] of [['piloto', 'Piloto y mecha'], ['ordenes', 'Órdenes']]) {
-      pestanas.append(h('button', {
+    pestanas.replaceChildren(...[['mecha', 'Mecha', 'hangar'], ['ordenes', 'Órdenes', 'menu'], ['info', 'Info', 'piloto']].map(([id, texto, icono]) =>
+      h('button', {
         class: 'pestana' + (pestana === id ? ' activa' : ''), role: 'tab', 'aria-selected': pestana === id ? 'true' : 'false',
-        onclick: () => { pestana = id; pintarPestanas(); detalle.className = 'detalle-piloto ver-' + pestana; }
-      }, '[ ' + texto + ' ]'));
-    }
-  };
-  const mover = (paso) => {
-    const i = p.pilotos.findIndex((x) => x.id === sel);
-    sel = p.pilotos[(i + paso + p.pilotos.length) % p.pilotos.length].id;
-    pintarLista(); pintarDetalle();
+        onclick: () => { pestana = PESTANA.ultima = id; pintarPestanas(); pintarDetalle(); window.scrollTo(0, 0); }
+      }, ico(icono), texto)));
   };
 
-  const pintarLista = () => {
-    lista.innerHTML = '';
-    for (const pi of p.pilotos) {
-      lista.append(h('button', {
-        class: 'tarjeta-piloto' + (pi.id === sel ? ' activa' : ''), role: 'tab', 'aria-selected': pi.id === sel ? 'true' : 'false',
-        onclick: () => { sel = pi.id; pintarLista(); pintarDetalle(); }
-      }, retrato(datos, pi, 'retrato-tarjeta'),
-      h('span', { class: 'tp-apodo' }, pi.apodo),
-      h('span', { class: 'tp-clase' }, ico(datos.clases[pi.clase].icono), datos.clases[pi.clase].nombre),
-      h('span', { class: 'tp-nivel', title: 'Nivel' }, String(pi.nivel))));
-    }
-    // centra la tarjeta elegida solo en horizontal (scrollIntoView movia toda la pagina)
-    const activa = lista.querySelector('.activa');
-    if (activa) lista.scrollLeft = activa.offsetLeft - (lista.clientWidth - activa.clientWidth) / 2;
+  const pintarTira = () => {
+    const x = tira.scrollLeft;
+    tira.replaceChildren(...p.pilotos.map((pi) => {
+      const T = pi.tarea ? datos.reglas.tareas[pi.tarea] : null;
+      const vida = vidaDelMecha(pi);
+      return h('button', {
+        class: 'tp-mini' + (pi.id === sel ? ' activa' : '') + (T ? ' con-tarea' : ''), role: 'tab', 'aria-selected': pi.id === sel ? 'true' : 'false',
+        'aria-label': pi.apodo + (T ? ' (' + T.nombre + ')' : ''),
+        onclick: () => { if (sel === pi.id) return; sel = pi.id; pintarTira(); pintarDetalle(); }
+      }, retrato(datos, pi, 'retrato-plantel'),
+      h('span', { class: 'pl-datos' },
+        h('span', { class: 'pl-nombre' }, pi.apodo),
+        T ? h('span', { class: 'tp-tarea' }, ico(T.icono), T.nombre) : barra(vida, 100, vida < 50 ? 'baja' : '')),
+      h('span', { class: 'tp-nivel', title: 'Nivel' }, String(pi.nivel)));
+    }));
+    tira.scrollLeft = x;
+    const activa = tira.querySelector('.activa');
+    if (activa && (activa.offsetLeft < tira.scrollLeft || activa.offsetLeft + activa.offsetWidth > tira.scrollLeft + tira.clientWidth))
+      tira.scrollLeft = activa.offsetLeft - (tira.clientWidth - activa.offsetWidth) / 2;
   };
 
-  // Redibuja sin que se note: arma todo nuevo y lo cambia de una (sin quedar vacio en el medio),
-  // y deja la pagina y las listas con scroll horizontal donde estaban. Asi tocar una parte no "recarga".
+  // Redibuja sin que se note: arma todo nuevo y lo cambia de una, y deja los scrolls donde estaban.
   const pintarDetalle = () => {
     const y = window.scrollY;
     const scrolls = [...detalle.querySelectorAll('[data-scroll]')].map((el) => [el.dataset.scroll, el.scrollLeft, el.scrollTop]);
     detalle.className = 'detalle-piloto ver-' + pestana;
     const pi = p.pilotos.find((x) => x.id === sel);
     if (!pi) { detalle.replaceChildren(); return; }
-    const refrescar = () => { pintarTarjetaPiloto(); pintarDetalle(); };
-    detalle.replaceChildren(
-      h('div', { class: 'columnas-hangar' },
-        h('div', { class: 'col-piloto' }, panelPiloto(app, pi), panelMecha(app, pi, refrescar),
-          seccion('Relaciones', panelRelaciones(app, pi), false), seccion('Hoja de servicio', panelHoja(pi), false)),
-        h('div', { class: 'col-ordenes' }, panelGambits(app, pi, () => pintarDetalle()))));
+    const refrescar = () => { pintarTira(); pintarDetalle(); };
+    const contenido = pestana === 'ordenes' ? [panelGambits(app, pi, () => pintarDetalle())]
+      : pestana === 'info' ? [panelPiloto(app, pi), panel('Relaciones', panelRelaciones(app, pi)), panel('Hoja de servicio', panelHoja(pi))]
+      : [panelMecha(app, pi, refrescar)];
+    detalle.replaceChildren(panelRapido(app, pi, refrescar), ...contenido);
     for (const [id, x, yy] of scrolls) {
       const el = detalle.querySelector('[data-scroll="' + id + '"]');
       if (el) { el.scrollLeft = x; el.scrollTop = yy; }
     }
     window.scrollTo(0, y);
   };
-  // la tarjeta del piloto (nivel, nombre) sin redibujar todo el carrusel
-  const pintarTarjetaPiloto = () => {
-    const x = lista.scrollLeft;
-    pintarLista();
-    lista.scrollLeft = x;
-  };
 
-  montar(raiz, 
-    barraCampana(datos, p, [
-      boton(p.estado === 'preparacion' ? 'A la misión' : 'Al mapa', volver, { iconoNombre: 'atras', clase: 'principal' })
-    ]),
-    h('h1', { class: 'titulo-pantalla' }, 'Hangar'),
+  montar(raiz,
+    h('div', { class: 'hangar-fijo' },
+      barraCampana(datos, p, [
+        boton(p.estado === 'preparacion' ? 'Misión' : 'Mapa', volver, { iconoNombre: 'atras', clase: 'principal compacto', titulo: p.estado === 'preparacion' ? 'Volver a la misión' : 'Volver al mapa' })
+      ]),
+      tira, pestanas),
     opciones.primeraVez
-      ? h('p', { class: 'aviso-inicial' }, ico('estrella'), ' Este es tu escuadrón. Revisá a cada piloto: su mecha y sus órdenes. Cuando estés, volvé al mapa y elegí un contrato.')
+      ? h('p', { class: 'aviso-inicial' }, ico('estrella'), ' Este es tu escuadrón. Tocá cada piloto arriba: armá su mecha, revisá sus órdenes y conocelo en Info. Cuando estés, volvé al mapa.')
       : null,
-    h('div', { class: 'carrusel' },
-      botonIcono('atras', 'Piloto anterior', () => mover(-1), 'flecha'),
-      lista,
-      botonIcono('atras', 'Piloto siguiente', () => mover(1), 'flecha flecha-der')),
-    pestanas, detalle);
+    detalle);
   pintarPestanas();
-  pintarLista();
+  pintarTira();
   pintarDetalle();
+}
+const PESTANA = { ultima: null }; // se recuerda entre visitas al hangar
+
+// Accesos rapidos del piloto elegido: reparar todo y que hace en la proxima mision
+function panelRapido(app, pi, refrescar) {
+  const { datos } = app;
+  const p = app.partida;
+  const T = datos.reglas.tareas;
+  const c = costoReparacion(datos, pi);
+  const reparo = boton(c.total ? 'Reparar · ' + c.total + ' cr' : 'Sin daños', () => {
+    if (!reparar(datos, p, pi.id, 'todo')) return;
+    app.guardar(); actualizarCreditos(app); refrescar();
+  }, { iconoNombre: 'llave', clase: 'secundario compacto' + (c.total ? ' urgente' : ''), deshabilitado: !c.total || p.creditos < c.total,
+    titulo: c.total ? (p.creditos < c.total ? 'No alcanzan los créditos' : 'Reparar todo el mecha') : 'El mecha está sano' });
+  const opcion = (id, nombre, icono, desc) => {
+    const activa = (pi.tarea || null) === id;
+    const bloqueada = id && !puedeQuedarse(p, pi);
+    return h('button', {
+      class: 'tarea' + (activa ? ' activa' : ''), 'aria-pressed': activa ? 'true' : 'false', disabled: bloqueada && !activa,
+      title: bloqueada ? 'Alguien tiene que salir a la misión' : desc,
+      onclick: () => { if (activa) return; if (asignarTarea(datos, p, pi.id, id)) { app.guardar(); refrescar(); } }
+    }, ico(icono), h('span', {}, nombre));
+  };
+  const actual = pi.tarea ? T[pi.tarea] : null;
+  return h('section', { class: 'rapido' },
+    h('div', { class: 'rapido-cabecera' },
+      h('strong', {}, 'Próxima misión'),
+      reparo),
+    h('div', { class: 'tareas', role: 'group', 'aria-label': 'Qué hace en la próxima misión' },
+      opcion(null, 'Sale', 'espadas', 'Sale a pelear con el escuadrón'),
+      ...Object.entries(T).filter(([id]) => id[0] !== '_').map(([id, t]) => opcion(id, t.nombre, t.icono, t.descripcion))),
+    h('p', { class: 'ayuda rapido-ayuda' }, actual
+      ? actual.descripcion + ' No sale a pelear.'
+      : 'Sale a pelear. ' + (vidaDelMecha(pi) < 100 ? 'Mecha al ' + vidaDeSalida(datos, pi) + '%.' : 'Mecha entero.')));
 }
 
 export function fichaDe(datos, pi) {

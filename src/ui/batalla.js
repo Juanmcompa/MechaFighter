@@ -3,11 +3,12 @@ import { h, montar, ico, botonIcono, boton, barra, retrato, version } from './co
 import { simular } from '../motor/simular.js';
 import { Repeticion } from '../vista/repeticion.js';
 import { escuadronParaMision, cerrarMision } from '../campana/partida.js';
+import { misionConTareas } from '../campana/tareas.js';
 
 export function batalla(app, raiz) {
   const { datos } = app;
   const p = app.partida;
-  const m = p.nodo.mision;
+  const m = misionConTareas(datos, p, p.nodo.mision);
   const escuadron = escuadronParaMision(datos, p);
   const pilotoDe = new Map(escuadron.map(({ piloto }) => [piloto.id, piloto]));
   const resultado = simular(datos, { mision: m, escuadron, semilla: m.semilla });

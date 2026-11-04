@@ -3,6 +3,7 @@ import { h, montar, ico, boton, panel, chip, barraCampana, retrato } from './com
 import { dibujarMapa } from './vistaMapa.js';
 import { mapaDe } from '../core/datos.js';
 import { escuadronParaMision, vidaDeSalida, partesRotas } from '../campana/partida.js';
+import { misionConTareas } from '../campana/tareas.js';
 
 // Como llega cada uno (ver campana/animo.js)
 const ICONO_NOTA = { confiado: 'rayo', nervioso: 'trauma', atento: 'ojo', perdido: 'mapa', rivales: 'espadas', amigos: 'vinculo' };
@@ -11,6 +12,7 @@ export function preparacion(app, raiz) {
   const { datos } = app;
   const p = app.partida;
   const m = p.nodo.mision;
+  const mj = misionConTareas(datos, p, m); // como se juega (si alguien exploro, sin niebla)
   const plano = h('canvas', { width: 480, height: 320, class: 'plano', 'aria-label': 'Plano del mapa' });
 
   // Cuantos de cada enemigo
@@ -20,11 +22,14 @@ export function preparacion(app, raiz) {
   const enemigos = Object.entries(cuenta).map(([id, n]) => {
     const u = datos.enemigos.unidades[id];
     const icono = u.cuerpo === 'mutante' ? 'colmillo' : u.cuerpo === 'mecha' ? 'jefe' : 'piloto';
-    return chip(icono, (m.niebla ? '?' : n) + ' × ' + u.nombre + (m.lider === id ? ' (líder)' : ''), u.nombre);
+    return chip(icono, (mj.niebla ? '?' : n) + ' × ' + u.nombre + (m.lider === id ? ' (líder)' : ''), u.nombre);
   });
   // el escuadron de la campana anterior, ahora enemigo
   for (const r of m.rivales || []) enemigos.push(chip('calavera', '«' + r.piloto.apodo + '» · ' + datos.clases[r.piloto.clase].nombre + ' niv ' + r.piloto.nivel, 'Tu escuadrón anterior', 'chip-alerta'));
   const escuadron = escuadronParaMision(datos, p);
+  const salen = new Set(escuadron.map((e) => e.piloto.id));
+  const quedan = p.pilotos.filter((pi) => pi.tarea);
+  const notasAnimo = p.nodo.animo ? p.nodo.animo.notas.filter((n) => salen.has(n.id)) : [];
 
   montar(raiz, 
     barraCampana(datos, p, []),
@@ -40,7 +45,8 @@ export function preparacion(app, raiz) {
             chip('mira', 'Nivel ' + m.nivel, 'Nivel de los enemigos'),
             chip('creditos', '+' + m.recompensa.creditos, 'Pago si ganan'),
             chip('estrella', m.recompensa.botin + ' partes', 'Botín si ganan'),
-            m.niebla ? chip('ojo', 'Niebla', 'Solo ven lo que tienen a la vista') : null,
+            mj.niebla ? chip('ojo', 'Niebla', 'Solo ven lo que tienen a la vista') : null,
+            mj.explorada ? chip('ojo', 'Explorada', 'Alguien fue adelante: sin niebla') : null,
             m.oleadas.length > 1 ? chip('calavera', m.oleadas.length + ' oleadas', 'Oleadas') : null)),
         (m.condiciones || []).length ? panel('Atención',
           h('ul', { class: 'condiciones' }, ...m.condiciones.map((id) => {
@@ -51,16 +57,17 @@ export function preparacion(app, raiz) {
         (m.aliados || []).length ? panel('Apoyo',
           h('p', { class: 'ayuda' }, ico('vinculo'), ' La resistencia local pelea con ustedes: ' +
             m.aliados.map((id) => datos.enemigos.unidades[id].nombre.toLowerCase()).join(' y ') + '. Pocos, pero suman.')) : null,
-        panel('Hostiles', m.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
-        p.nodo.animo && p.nodo.animo.notas.length ? panel('Ánimo del escuadrón',
-          h('ul', { class: 'condiciones animo' }, ...p.nodo.animo.notas.map((n) => h('li', { class: 'animo-' + n.tipo }, ico(ICONO_NOTA[n.tipo] || 'piloto'), h('span', {}, n.texto)))),
-          h('p', { class: 'ayuda' }, 'Si no te convence cómo viene alguno, dejalo en el banco desde el hangar.')) : null,
+        panel('Hostiles', mj.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
+        notasAnimo.length ? panel('Ánimo del escuadrón',
+          h('ul', { class: 'condiciones animo' }, ...notasAnimo.map((n) => h('li', { class: 'animo-' + n.tipo }, ico(ICONO_NOTA[n.tipo] || 'piloto'), h('span', {}, n.texto)))),
+          h('p', { class: 'ayuda' }, 'Si no te convence cómo viene alguno, dejalo haciendo otra cosa desde el hangar.')) : null,
         panel('Escuadrón',
           h('ul', { class: 'lista-escuadron' }, ...escuadron.map(({ piloto }) => h('li', {},
             retrato(datos, piloto, 'retrato-mini'), ico(datos.clases[piloto.clase].icono), h('strong', {}, piloto.apodo), ' · ' + datos.clases[piloto.clase].nombre + ' · niv ' + piloto.nivel,
             piloto.traumas.length ? chip('trauma', String(piloto.traumas.length), 'Con traumas', 'chip-trauma') : null,
             vidaDeSalida(datos, piloto) < 100 || partesRotas(piloto).length
-              ? chip('llave', vidaDeSalida(datos, piloto) + '%' + (partesRotas(piloto).length ? ' · ' + partesRotas(piloto).length + ' rota' + (partesRotas(piloto).length > 1 ? 's' : '') : ''), 'Mecha dañado: reparalo en el hangar', 'chip-danio') : null)))),
+              ? chip('llave', vidaDeSalida(datos, piloto) + '%' + (partesRotas(piloto).length ? ' · ' + partesRotas(piloto).length + ' rota' + (partesRotas(piloto).length > 1 ? 's' : '') : ''), 'Mecha dañado: reparalo en el hangar', 'chip-danio') : null))),
+          quedan.length ? h('p', { class: 'ayuda' }, 'Se quedan: ' + quedan.map((pi) => '«' + pi.apodo + '» (' + datos.reglas.tareas[pi.tarea].nombre.toLowerCase() + ')').join(', ') + '.') : null),
         h('div', { class: 'acciones' },
           boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),
           boton('Desplegar', () => app.ir('batalla'), { iconoNombre: 'play', clase: 'principal' }))),
