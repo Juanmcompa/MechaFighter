@@ -181,6 +181,25 @@ para las fichas. Esos packs son de Envato y las vistas previas tienen marca de a
 licencia; si no, se generan propios con el método de BeastMixer (`tools/procesar_arte.py`: fondo magenta, recorte por
 pieza y anclajes calculados). Mientras tanto la vista dibuja formas simples por código.
 
+## Misión viva y campaña con rumbo (noviembre 2026)
+
+| Pieza | Dónde | Qué hace |
+| --- | --- | --- |
+| Mapas | `data/mapas/` (5) | Puesto, Refinería, Hangar, Desfiladero, Colonia. Cada plantilla de misión lista varios |
+| Condiciones | `data/condiciones_mision.json`, `campana/misiones.js` | Tormenta, noche, interferencia, refuerzos, francotirador, minas, inteligencia. Más chance con la dificultad |
+| Afinidad | `data/afinidad.json`, `campana/animo.js` | Un número por par de pilotos. Amigos cerca apuntan mejor; rivales discuten por radio (una vez por misión) |
+| Ánimo | `campana/animo.js`, estados `confiado`, `nervioso`, `atento`, `perdido` | Se decide al elegir la misión y se ve en la preparación |
+| Radio | `vista/repeticion.js`, `data/voces.json` (incluye `control`) | Los pilotos le hablan a Control: contacto con dirección, se pierden, se mandan. Estática en pantalla |
+| Caminos | `campana/partida.js` (`nodo.sig`, `p.posicion`) | Cada nodo lleva a 1 o 2 de la columna siguiente |
+| Jefes | `data/sectores.json › sectores_def`, `data/enemigos.json` | Varga «La Grúa», La Madre, coronel Ostrova. La inteligencia juntada en el sector cambia cómo se llega |
+| Legado | `campana/legado.js`, `guardado.js` (clave aparte) | Veterano elegido (o sobreviviente), y el escuadrón perdido vuelve como enemigo en «Viejos conocidos» |
+
+Balance con piloto automático (`node tools/campana.mjs 300`): ~10% de campañas ganadas sin legado, ~16% encadenando
+legado (`tools/campana.mjs 100 legado`). El piloto automático no deja en el banco a los confiados ni a los nerviosos; una
+persona sí.
+
+Pendiente: escuadrones de amigos como enemigos (necesita servidor).
+
 ## Orden de trabajo
 
 1. `core/` (azar, datos, validación) ✓
