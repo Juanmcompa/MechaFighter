@@ -172,7 +172,10 @@ export function romperParte(B, o, zona, inicial = false) {
 function golpear(B, u, o, a, multPct, cabina = false) {
   const R = B.datos.reglas;
   // sobrecarga y similares: el atacante pega un % mas
-  const extra = 100 + (mods(B, u).danio_pct || 0);
+  let extra = 100 + (mods(B, u).danio_pct || 0);
+  // peloton: pega segun cuantos quedan en pie (y su arma pega menos que la de un mecha)
+  if (u.danioPct && u.danioPct !== 100) extra = Math.trunc((extra * u.danioPct) / 100);
+  if (u.miembros > 1) extra = Math.trunc((extra * miembrosVivos(u)) / u.miembros);
   const base = Math.trunc((Math.trunc((a.danio * multPct) / 100) * extra) / 100);
   const blindaje = Math.max(0, o.blindaje + (mods(B, o).blindaje || 0) - a.perfora);
   let danio = Math.max(R.danio_minimo, base - blindaje);
@@ -268,4 +271,10 @@ function invocar(B, u, i) {
   usarHabilidad(B, u, i.habilidad);
   B.agregarUnidad(unidadEnemiga(B.datos, h.efecto.invoca, 1), u.bando, x, y, u.id);
   u.ocupado = h.demora || 0;
+}
+
+// Cuantos soldaditos del peloton quedan en pie (segun la vida)
+export function miembrosVivos(u) {
+  if (!u.miembros || u.miembros <= 1) return u.vida > 0 ? 1 : 0;
+  return Math.max(0, Math.ceil((Math.max(0, u.vida) * u.miembros) / u.vidaMax));
 }

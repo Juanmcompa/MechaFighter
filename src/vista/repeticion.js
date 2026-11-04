@@ -1,7 +1,7 @@
 // Reproduce el registro de una batalla en un canvas. No sabe nada de reglas: solo lee eventos y los dibuja.
 // La batalla ya se jugo entera en el motor; aca se la mira a la velocidad que uno quiera (o se salta al final).
 
-import { dibujarMapa, dibujarUnidad, COLORES } from './dibujo.js';
+import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, posMiembro } from './dibujo.js';
 import { crearTablero, lineaDeTiro, distancia } from '../motor/espacio.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
@@ -37,6 +37,7 @@ export class Repeticion {
     this.terminado = false;
     this.unidades = new Map();
     this.efectos = [];
+    this.caidos = []; // soldaditos muertos en el piso
     this.flotantes = [];
     this.ultimoTick = registro.length ? registro[registro.length - 1].t : 0;
     // Camara (en pixeles del mapa): centro y zoom. modo 'auto' se acerca a donde estan peleando;
@@ -134,6 +135,29 @@ export class Repeticion {
     this.actualizarUnidades(ms);
     this.moverCamara(ms);
     if (this.i >= this.registro.length && !this.terminado) { this.terminado = true; this.alTerminar(); }
+  }
+
+  // Cada soldadito que cae deja su cuerpo: se calcula comparando cuantos quedan en pie con los que habia
+  anotarCaidos() {
+    for (const u of this.unidades.values()) {
+      const f = u.ficha;
+      if (!f.figuras) continue;
+      const vivos = u.viva ? miembrosVivos(f, u.vida) : 0;
+      const antes = u.vivosVista === undefined ? f.miembros || 1 : u.vivosVista;
+      if (vivos >= antes) continue;
+      const cos = Math.cos(u.ang), sin = Math.sin(u.ang);
+      const fuego = u.estados.has('en_llamas');
+      for (let i = vivos; i < antes; i++) {
+        const [dx, dy] = posMiembro(i);
+        const h = Number(u.id.slice(1)) * 7 + i * 13;
+        const capas = [fuego ? 'mancha_quemado' : 'mancha_' + (1 + (h % 2)), fuego ? 'caido_quemado' : 'caido_0' + (1 + (h % 6))];
+        const corridas = {};
+        if (!fuego && h % 3 === 0) { capas.push('tirado_rifle'); corridas.tirado_rifle = [5, 3]; }
+        if (!fuego && h % 5 === 1) { capas.push('tirado_casco'); corridas.tirado_casco = [-4, 4]; }
+        this.caidos.push({ x: u.x + 0.5 + (dx * cos - dy * sin) / 24, y: u.y + 0.5 + (dx * sin + dy * cos) / 24, ang: h * 1.3, capas, corridas });
+      }
+      u.vivosVista = vivos;
+    }
   }
 
   saltarAlFinal() {
@@ -468,6 +492,9 @@ export class Repeticion {
       }
       ctx.globalAlpha = 1;
     }
+    // los caidos de la infanteria, en el piso (debajo de todos)
+    this.anotarCaidos();
+    for (const c of this.caidos) dibujarCaido(ctx, c, L);
     for (const u of lista) if (seVe(u)) dibujarUnidad(ctx, u, L, this.T);
     // fogonazos en la boca del arma
     for (const f of this.efectos) {

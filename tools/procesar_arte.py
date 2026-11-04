@@ -75,7 +75,7 @@ def fondo_magenta(a):
     return (r > 140) & (b > 140) & (g < 130) & (np.abs(r - b) < 100) & (r - g > 60)
 
 
-def piezas(nombre):
+def piezas(nombre, dilatar=None):
     ruta = os.path.join(FUENTES, nombre + '.jpg')
     if not os.path.exists(ruta):
         ruta = ruta[:-4] + '.png'
@@ -83,7 +83,7 @@ def piezas(nombre):
     a = np.asarray(img)
     alto, ancho = a.shape[:2]
     solido = ndimage.binary_opening(~fondo_magenta(a), iterations=2)
-    lab, n = ndimage.label(ndimage.binary_dilation(solido, iterations=int(ancho * 0.006)))
+    lab, n = ndimage.label(ndimage.binary_dilation(solido, iterations=dilatar if dilatar is not None else int(ancho * 0.006)))
     cajas = []
     for i, s in enumerate(ndimage.find_objects(lab)):
         if (lab[s] == i + 1).sum() < ancho * ancho * 0.0004:
@@ -105,7 +105,8 @@ def reducir(a, solido, caja, spec):
     mascara = Image.fromarray((solido[y0:y1, x0:x1] * 255).astype(np.uint8))
     w, h = rgb.size
     # ESCALA: las medidas de HOJAS estan en pixeles de una grilla de 24 por casilla; se guarda al doble de detalle
-    escala = ESCALA * (spec['ancho'] / w if 'ancho' in spec else spec['alto'] / h)
+    # 'factor': escala fija de la hoja (pixeles de juego por pixel de la hoja), asi las piezas guardan su tamano relativo
+    escala = ESCALA * (spec['factor'] if 'factor' in spec else spec['ancho'] / w if 'ancho' in spec else spec['alto'] / h)
     nw, nh = max(1, round(w * escala)), max(1, round(h * escala))
     chico = rgb.resize((nw, nh), Image.BOX)
     m = np.asarray(mascara.resize((nw, nh), Image.BOX)) > 110
@@ -299,13 +300,26 @@ def limpiar(img):
     return img
 
 
+# Infanteria: hormiguitas (unos 7 px de juego) con una escala fija por hoja; los caidos, cuerpos y manchas.
+FIGURA = 0.033
+CAIDO = 0.03
+UNIDADES['infanteria-piratas'] = [('pirata_%02d' % (i + 1), {'factor': FIGURA, 'frente': 'arriba'}) for i in range(10)]
+UNIDADES['infanteria-guerrilla'] = [('guerrilla_%02d' % (i + 1), {'factor': FIGURA, 'frente': 'arriba'}) for i in range(10)]
+UNIDADES['infanteria-caidos'] = [('caido_%02d' % (i + 1), {'factor': CAIDO, 'frente': 'arriba'}) for i in range(6)] + [
+    ('caido_quemado', {'factor': CAIDO, 'frente': 'arriba'}), ('tirado_rifle', {'factor': CAIDO, 'frente': 'arriba'}),
+    ('tirado_casco', {'factor': CAIDO, 'frente': 'arriba'}), ('mancha_1', {'factor': CAIDO, 'frente': 'arriba'}),
+    ('mancha_2', {'factor': CAIDO, 'frente': 'arriba'}), ('mancha_quemado', {'factor': CAIDO, 'frente': 'arriba'})]
+# hojas con las piezas muy juntas: se separan con menos dilatacion
+DILATAR = {'infanteria-piratas': 4, 'infanteria-guerrilla': 4, 'infanteria-caidos': 4}
+
+
 def unidades():
     out = os.path.join(SALIDA, 'unidades')
     man = {'_escala': ESCALA}
     for nombre, lista in UNIDADES.items():
         if not any(os.path.exists(os.path.join(FUENTES, nombre + ext)) for ext in ('.jpg', '.png')):
             continue
-        a, solido, cajas = piezas(nombre)
+        a, solido, cajas = piezas(nombre, DILATAR.get(nombre))
         if len(cajas) != len(lista):
             sys.exit('%s: encontre %d piezas y esperaba %d.' % (nombre, len(cajas), len(lista)))
         os.makedirs(out, exist_ok=True)

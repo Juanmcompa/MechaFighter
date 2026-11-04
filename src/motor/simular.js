@@ -302,6 +302,7 @@ function ficha(u) {
     // si el tipo tiene varios dibujos, cada unidad usa uno (fijo por su numero)
     sprite: u.variantes ? u.variantes[Number(u.id.slice(1)) % u.variantes.length] : u.sprite || null,
     apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto, vida: u.vida,
+    miembros: u.miembros || 1, figuras: u.figuras || null,
     armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual }))
   };
 }

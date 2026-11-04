@@ -209,6 +209,10 @@ export function unidadEnemiga(datos, id, nivel = 1) {
     cuerpo: def.cuerpo,
     sprite: def.sprite || id,
     variantes: def.sprites || null, // la vista elige una (mismo tipo, otro dibujo)
+    // infanteria: un peloton de varios soldaditos; con menos vivos, pega menos
+    miembros: def.miembros || 1,
+    danioPct: def.danio_pct || 100,
+    figuras: def.figuras || null,
     amenaza: def.amenaza || 1,
     vidaMax: escala(s.estructura),
     blindaje: s.blindaje,

@@ -176,7 +176,8 @@ export function dibujarUnidad(ctx, u, L, t) {
   if (!u.viva) ctx.globalAlpha = 0.85;
   const s = L / 24; // todo se dibuja en una grilla de 24 y se escala (ocupa casi toda la casilla)
   ctx.scale(s, s);
-  if (!u.viva) dibujarRestos(ctx, f);
+  if (f.figuras && UNI.imgs[f.figuras[0]]) { if (u.viva) dibujarPeloton(ctx, f, u, t); }
+  else if (!u.viva) dibujarRestos(ctx, f);
   else if (UNI.imgs[f.sprite]) dibujarUnidadSprite(ctx, f, u, t);
   else if (f.cuerpo === 'dron') dibujarDronSimple(ctx, f);
   else if (f.cuerpo === 'mutante') dibujarMutante(ctx, f, u, t);
@@ -350,6 +351,65 @@ function dibujarTorreta(ctx, f, u) {
   rect(ctx, -6, -6, 12, 12, c.base, '#000');
   rect(ctx, 2, -1.5, 13, 3, '#222', '#000');
   if (u.golpe > 0) { ctx.fillStyle = `rgba(255,255,255,${u.golpe * 0.7})`; ctx.fillRect(-9, -9, 18, 18); }
+}
+
+// ---------- Infanteria: pelotones de hormiguitas ----------
+// Donde va cada soldadito dentro de la casilla (en la grilla de 24, mirando a +x): una formacion suelta.
+const FORMACION = [[3, -4], [-3, 5], [-4, -5], [4, 4], [-8, 0], [8, 0]];
+export const posMiembro = (i) => FORMACION[i % FORMACION.length];
+
+export function miembrosVivos(f, vida) {
+  const m = f.miembros || 1;
+  return m <= 1 ? (vida > 0 ? 1 : 0) : Math.max(0, Math.ceil((Math.max(0, vida) * m) / f.vidaMax));
+}
+
+// Que dibujo usa el soldadito i de la unidad (fijo por unidad)
+export function figuraDe(f, u, i) {
+  const off = Math.floor(u.semilla * 10);
+  return f.figuras[(i + off) % f.figuras.length];
+}
+
+function dibujarPeloton(ctx, f, u, t) {
+  const vivos = miembrosVivos(f, u.vida);
+  ctx.imageSmoothingEnabled = false;
+  for (let i = 0; i < vivos; i++) {
+    const id = figuraDe(f, u, i);
+    const im = UNI.imgs[id];
+    if (!im) continue;
+    const m = UNI.meta[id];
+    const w = m.w / UNI.escala, h = m.h / UNI.escala;
+    const [dx, dy] = posMiembro(i);
+    // cada uno con su paso (no marchan sincronizados)
+    const trote = Math.sin(u.paso * Math.PI * 2 + i * 1.9) * 0.6;
+    ctx.save();
+    ctx.translate(dx + trote, dy);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(0.6, 0.8, w * 0.32, h * 0.26, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.rotate(Math.PI / 2);
+    if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
+    ctx.drawImage(im, -w / 2, -h * 0.62, w, h); // el arma sobresale adelante: el cuerpo queda en el centro
+    ctx.filter = 'none';
+    ctx.restore();
+  }
+}
+
+// Los caidos quedan en el piso: cuerpo (o quemado), su mancha y a veces el arma o el casco
+export function dibujarCaido(ctx, c, L) {
+  const s = L / 24;
+  ctx.save();
+  ctx.translate(c.x * L, c.y * L);
+  ctx.scale(s, s);
+  ctx.rotate(c.ang);
+  ctx.imageSmoothingEnabled = false;
+  for (const id of c.capas) {
+    const im = UNI.imgs[id];
+    if (!im) continue;
+    const m = UNI.meta[id];
+    const w = m.w / UNI.escala, h = m.h / UNI.escala;
+    const o = c.corridas[id] || [0, 0];
+    ctx.drawImage(im, o[0] - w / 2, o[1] - h / 2, w, h);
+  }
+  ctx.restore();
 }
 
 // Camion y drones: una imagen entera (assets/unidades), mirando para adelante.
