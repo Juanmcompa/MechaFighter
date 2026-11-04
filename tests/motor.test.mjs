@@ -8,6 +8,7 @@ import { crearRecluta } from '../src/campana/reclutas.js';
 import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector } from '../src/campana/partida.js';
 import { fotoPiloto } from '../src/campana/legado.js';
 import { saquear } from '../src/campana/saqueo.js';
+import { reparar, costoReparacion, partesRotas } from '../src/campana/mantenimiento.js';
 import { leerDisco } from '../tools/leer-disco.mjs';
 
 let fallas = 0;
@@ -30,7 +31,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === 'xgy1lm', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === '51kohw', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {
@@ -143,6 +144,21 @@ console.log('Campana');
   }
   ok(rotos > 0 && dispararonRotos === 0, 'un brazo roto deja de disparar (' + rotos + ' partes rotas)');
   ok(limpios > 0 && piezas > 0, 'tiro a la cabina: mechas enteros para saquear (' + piezas + ' piezas)');
+}
+
+// Mantenimiento: el daño queda, se paga para arreglarlo y el mecha sale como quedo
+{
+  const p = nuevaPartida(datos, 91);
+  const pi = p.pilotos[0];
+  pi.mechaVida = 50;
+  pi.mecha.brazo_der = { ...pi.mecha.brazo_der, rota: true };
+  const esc = escuadronParaMision(datos, p);
+  const r = simular(datos, { mision: armarMision(datos, 'defensa', 1, crearAzar(3)), escuadron: esc, semilla: 3 });
+  const ap = r.registro.find((e) => e.tipo === 'aparece' && e.ficha.ref === pi.id);
+  ok(ap.ficha.vida < ap.ficha.vidaMax && r.registro.some((e) => e.tipo === 'parte_rota' && e.u === ap.u && e.inicial), 'el mecha sale dañado y con el brazo roto');
+  const c = costoReparacion(datos, pi);
+  const antes = p.creditos;
+  ok(reparar(datos, p, pi.id, 'todo') && p.creditos === antes - c.total && !partesRotas(pi).length && pi.mechaVida === 100, 'reparar todo cobra y deja el mecha sano');
 }
 
 console.log(fallas ? '\n' + fallas + ' falla(s)' : '\nTodo bien');

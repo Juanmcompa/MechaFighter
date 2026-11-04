@@ -10,7 +10,7 @@ import { crearAzar, huellaTexto } from '../core/azar.js';
 import { crearTablero, casillaLibreCerca, distancia, lineaDeTiro, tipo as tipoCasilla } from './espacio.js';
 import { ordenUnidades, percibir, vidaPct, evento, aliados, quitarEstado, ponerEstado } from './estado.js';
 import { decidir } from './decision.js';
-import { resolverMovimientos, resolverAcciones, herir } from './resolucion.js';
+import { resolverMovimientos, resolverAcciones, herir, romperParte } from './resolucion.js';
 import { procesarMoral } from './moral.js';
 import { unidadDePiloto, unidadEnemiga } from './unidades.js';
 
@@ -52,7 +52,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
       mochila: plantilla.mochila ? { ...plantilla.mochila } : null,
       id: 'u' + num, num: num++, bando,
       x: c[0], y: c[1], mx: bando === 0 ? 1 : -1, my: 0,
-      vida: plantilla.vidaMax, viva: true,
+      vida: plantilla.vidaInicial || plantilla.vidaMax, viva: true,
       moralActual: plantilla.moral,
       estados: [], cds: {}, ocupado: 0, mover: 0, vinculo: null, ultimoAtacante: null,
       s: { bajas: 0, danioHecho: 0, danioRecibido: 0, vidaMinPct: 100, reparado: 0, explosiones: 0, quedoSolo: false, vinculoMurio: false }
@@ -67,7 +67,11 @@ export function simular(datos, { mision, escuadron, semilla }) {
   const ap = mapa.aparicion;
   escuadron.forEach((m, i) => {
     const [x, y] = ap.jugador[i % ap.jugador.length];
-    const u = B.agregarUnidad(unidadDePiloto(datos, m.piloto, m.mecha, m.gambits), 0, x, y);
+    const base = unidadDePiloto(datos, m.piloto, m.mecha, m.gambits);
+    // el mecha puede venir golpeado de la mision anterior (ver reglas.mantenimiento)
+    if (m.vidaPct && m.vidaPct < 100) base.vidaInicial = Math.max(1, Math.trunc((base.vidaMax * m.vidaPct) / 100));
+    const u = B.agregarUnidad(base, 0, x, y);
+    if (u && u.slots) for (const [z, s] of Object.entries(u.slots)) if (s.rota) romperParte(B, u, z, true);
     // como llega a la mision (confiado, nervioso, atento, desorientado) y con quien se lleva bien o mal
     if (u) { u.rivalRef = m.rival || null; u.amigoRef = m.amigo || null; u.estadosIniciales = m.estados || []; }
   });
@@ -295,7 +299,7 @@ function revisarObjetivos(B, oleadasPendientes, leerZona, guardarZona) {
 function ficha(u) {
   return {
     bando: u.bando, nombre: u.nombre, tipo: u.tipo, cuerpo: u.cuerpo, clase: u.clase, personalidad: u.personalidad, sprite: u.sprite || null,
-    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto,
+    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto, vida: u.vida,
     armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual }))
   };
 }

@@ -1,7 +1,7 @@
 // Antes de la mision: el briefing, el plano del mapa, contra que se enfrentan y quienes van.
 import { h, montar, ico, boton, panel, chip, barraCampana, retrato } from './comun.js';
 import { dibujarMapa } from './vistaMapa.js';
-import { escuadronParaMision } from '../campana/partida.js';
+import { escuadronParaMision, vidaDeSalida, partesRotas } from '../campana/partida.js';
 
 // Como llega cada uno (ver campana/animo.js)
 const ICONO_NOTA = { confiado: 'rayo', nervioso: 'trauma', atento: 'ojo', perdido: 'mapa', rivales: 'espadas', amigos: 'vinculo' };
@@ -54,7 +54,9 @@ export function preparacion(app, raiz) {
         panel('Escuadrón',
           h('ul', { class: 'lista-escuadron' }, ...escuadron.map(({ piloto }) => h('li', {},
             retrato(datos, piloto, 'retrato-mini'), ico(datos.clases[piloto.clase].icono), h('strong', {}, piloto.apodo), ' · ' + datos.clases[piloto.clase].nombre + ' · niv ' + piloto.nivel,
-            piloto.traumas.length ? chip('trauma', String(piloto.traumas.length), 'Con traumas', 'chip-trauma') : null)))),
+            piloto.traumas.length ? chip('trauma', String(piloto.traumas.length), 'Con traumas', 'chip-trauma') : null,
+            vidaDeSalida(datos, piloto) < 100 || partesRotas(piloto).length
+              ? chip('llave', vidaDeSalida(datos, piloto) + '%' + (partesRotas(piloto).length ? ' · ' + partesRotas(piloto).length + ' rota' + (partesRotas(piloto).length > 1 ? 's' : '') : ''), 'Mecha dañado: reparalo en el hangar', 'chip-danio') : null)))),
         h('div', { class: 'acciones' },
           boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),
           boton('Desplegar', () => app.ir('batalla'), { iconoNombre: 'play', clase: 'principal' }))),

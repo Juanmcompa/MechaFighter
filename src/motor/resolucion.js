@@ -143,7 +143,7 @@ function zonaDelGolpe(B, o, danio, cabina) {
   if (o.danioSlot[zona] * 100 >= o.vidaMax * P.aguante_pct[zona]) romperParte(B, o, zona);
 }
 
-export function romperParte(B, o, zona) {
+export function romperParte(B, o, zona, inicial = false) {
   const P = B.datos.reglas.partes_mecha;
   const s = o.slots[zona];
   o.rotas.push(zona);
@@ -163,8 +163,9 @@ export function romperParte(B, o, zona) {
   for (const [z, x] of Object.entries(o.slots)) if (!o.rotas.includes(z)) for (const e of x.etiquetas) quedan.add(e);
   o.etiquetasPartes = o.etiquetasPartes.filter((e) => quedan.has(e) || !Object.values(o.slots).some((x) => x.etiquetas.includes(e)));
   if (s.habilidad && !o.clasesHabilidades.includes(s.habilidad)) o.habilidades = o.habilidades.filter((h) => h !== s.habilidad);
-  B.log({ tipo: 'parte_rota', u: o.id, zona, parte: s.parte });
-  evento(B, 'parte_rota', o);
+  // inicial: ya venia rota de la mision anterior (no hay explosion ni susto)
+  B.log({ tipo: 'parte_rota', u: o.id, zona, parte: s.parte, ...(inicial ? { inicial: true } : {}) });
+  if (!inicial) evento(B, 'parte_rota', o);
 }
 
 function golpear(B, u, o, a, multPct, cabina = false) {

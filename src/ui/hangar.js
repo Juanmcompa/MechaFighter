@@ -2,7 +2,7 @@
 import { h, montar, ico, boton, botonIcono, panel, chip, barra, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato } from './comun.js';
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha } from '../vista/dibujo.js';
-import { equipar, guardarGambits, encajeDeSlot } from '../campana/partida.js';
+import { equipar, guardarGambits, encajeDeSlot, reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida } from '../campana/partida.js';
 import { nombreDeMecha } from '../campana/reclutas.js';
 import { relaciones } from '../campana/animo.js';
 import { existeIcono } from './iconos.js';
@@ -161,6 +161,33 @@ function parteQueDaEtiqueta(datos, etq) {
   return p ? p.nombre : etq;
 }
 
+// Estado del mecha y reparaciones (ver campana/mantenimiento.js)
+const ZONA_NOMBRE = { brazo_izq: 'Brazo izq.', brazo_der: 'Brazo der.', piernas: 'Piernas', cabeza: 'Cabeza' };
+function panelEstado(app, pi, refrescar) {
+  const { datos } = app;
+  const p = app.partida;
+  const vida = vidaDelMecha(pi), rotas = partesRotas(pi), c = costoReparacion(datos, pi);
+  // redibuja el hangar entero: tambien cambian los creditos de arriba
+  const hacer = (que) => {
+    if (!reparar(datos, p, pi.id, que)) return;
+    app.guardar();
+    const y = window.scrollY;
+    app.ir('hangar', { piloto: pi.id, pestana: 'piloto' });
+    window.scrollTo(0, y);
+  };
+  const btn = (texto, que, costo) => boton(texto + ' · ' + costo + ' cr', () => hacer(que),
+    { iconoNombre: 'llave', clase: 'secundario', deshabilitado: p.creditos < costo });
+  const salida = vidaDeSalida(datos, pi);
+  return h('div', { class: 'estado-mecha' + (c.total ? ' danado' : '') },
+    h('div', { class: 'fila-rep' }, ico('vida'), h('span', {}, 'Estructura ' + vida + '%'), barra(vida, 100),
+      vida < salida ? h('small', {}, 'Sale igual, pegado con cinta: ' + salida + '%') : null),
+    rotas.length ? h('div', { class: 'fila-rep rota' }, ico('trauma'), 'Roto: ' + rotas.map((z) => ZONA_NOMBRE[z]).join(', ') + ' — no funciona hasta repararlo o cambiarlo.') : null,
+    c.total ? h('div', { class: 'fila-rep' },
+      c.estructura ? btn('Estructura', 'estructura', c.estructura) : null,
+      ...c.partes.map((x) => btn(ZONA_NOMBRE[x.slot], x.slot, x.costo)),
+      (c.estructura ? 1 : 0) + c.partes.length > 1 ? btn('Todo', 'todo', c.total) : null) : h('small', {}, 'Sin daños.'));
+}
+
 function panelHabilidades(datos, pi) {
   const lista = habilidadesDe(datos, pi);
   return h('div', { class: 'habilidades' },
@@ -233,6 +260,7 @@ function panelMecha(app, pi, refrescar) {
     h('div', { class: 'peso' + (peso > capacidad ? ' sobrepeso' : '') },
       h('span', {}, ico('peso'), 'Carga ' + peso + ' / ' + capacidad),
       barra(peso, capacidad), peso > capacidad ? h('small', {}, 'Sobrepeso: el mecha camina más lento.') : null),
+    panelEstado(app, pi, refrescar),
     ...filas,
     panelHabilidades(datos, pi),
     h('p', { class: 'ayuda' }, ico('estrella'), ' Partes en depósito: ' + p.inventario.length + '. Las ganás en las misiones o las comprás en el taller.'));

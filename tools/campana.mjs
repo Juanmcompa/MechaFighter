@@ -3,7 +3,7 @@
 //   node tools/campana.mjs [cantidad] [legado]   (con 'legado', cada campana arranca con lo que dejo la anterior)
 import { cargarDatos } from '../src/core/datos.js';
 import { simular } from '../src/motor/simular.js';
-import { nuevaPartida, nodosSiguientes, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar } from '../src/campana/partida.js';
+import { nuevaPartida, nodosSiguientes, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar, reparar, costoReparacion } from '../src/campana/partida.js';
 import { leerDisco } from './leer-disco.mjs';
 
 const datos = await cargarDatos(leerDisco());
@@ -34,6 +34,11 @@ for (let n = 0; n < N; n++) {
       if (p.estado === 'taller') p.nodo.oferta.forEach((_, k) => comprar(datos, p, k));
       if (p.estado === 'reclutamiento') p.nodo.candidatos.forEach((_, k) => contratar(datos, p, k));
       seguir(datos, p);
+    }
+    // reparar lo que alcance (primero las partes rotas, despues la estructura)
+    if (process.argv[4] !== 'sinreparar') for (const pi of p.pilotos) {
+      for (const x of costoReparacion(datos, pi).partes) reparar(datos, p, pi.id, x.slot);
+      reparar(datos, p, pi.id, 'estructura');
     }
     // equipar lo mejor del inventario de forma tonta: armas nuevas en brazos vacios
     for (const pi of p.pilotos) for (const slot of ['brazo_izq', 'brazo_der']) {

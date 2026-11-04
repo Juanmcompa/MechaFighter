@@ -1,7 +1,7 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 1,
-  "version_motor": 5,
+  "version_motor": 6,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
   "escuadra_maxima": 6,
@@ -144,5 +144,11 @@
     },
     "castigo_cabina": 20,
     "chatarra_creditos": 15
+  },
+  "mantenimiento": {
+    "_ayuda": "El daño de los mechas queda de una mision a la otra. Reparar la estructura cuesta 'creditos_por_pct' por cada % (en quintos: 3 = 0,6 por %); una parte rota, su 'parte_rota_pct' del costo. Si sale muy roto, arranca con 'vida_minima_salida' % (pegado con cinta).",
+    "quintos_por_pct": 2,
+    "parte_rota_pct": 50,
+    "vida_minima_salida": 40
   }
 }

@@ -8,6 +8,8 @@ import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision, sumarCondicion } from './misiones.js';
 import { saquear } from './saqueo.js';
+import { anotarDanios, vidaDeSalida, reparar, costoReparacion, vidaDelMecha, partesRotas } from './mantenimiento.js';
+export { reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida };
 import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana, misionEncuentro } from './legado.js';
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
@@ -216,7 +218,10 @@ export function elegirNodo(datos, p, i) {
         pi.traumas = pi.traumas.filter((t) => t.cura !== 'misiones_de_descanso' || t.resta > 0);
         if (pi.traumas.length < antes) curados.push(pi.apodo);
       }
-      p.nodo.resultado = { texto: 'Una semana en el muelle orbital. Se reparan los mechas y se ordenan las cabezas.', curados };
+      // en el muelle se reparan los mechas gratis
+      const reparados = [];
+      for (const pi of p.pilotos) if (costoReparacion(datos, pi).total && reparar(datos, p, pi.id, 'todo', true)) reparados.push(pi.apodo);
+      p.nodo.resultado = { texto: 'Una semana en el muelle orbital. Se reparan los mechas y se ordenan las cabezas.', curados, reparados };
       p.estado = 'evento';
       break;
     }
@@ -335,7 +340,7 @@ export function guardarGambits(datos, p, pilotoId, lista) {
 export function escuadronParaMision(datos, p) {
   const animo = (p.nodo && p.nodo.animo && p.nodo.animo.porPiloto) || {};
   return p.pilotos.slice(0, datos.reglas.escuadra_maxima).map((pi) => ({
-    piloto: pi, mecha: pi.mecha, gambits: pi.gambits,
+    piloto: pi, mecha: pi.mecha, gambits: pi.gambits, vidaPct: vidaDeSalida(datos, pi),
     estados: (animo[pi.id] || {}).estados || [], rival: (animo[pi.id] || {}).rival || null, amigo: (animo[pi.id] || {}).amigo || null
   }));
 }
@@ -477,6 +482,13 @@ export function cerrarMision(datos, p, resultado) {
       presentar(datos, p, pi, azarAparte(p, 'afinidad:' + pi.id));
       informe.rescatado = pi.apodo;
     }
+  }
+
+  // Como quedaron los mechas: el daño queda hasta repararlo
+  anotarDanios(datos, p, resultado, new Set(informe.pilotos.filter((l) => l.estado === 'herido').map((l) => l.id)));
+  for (const l of informe.pilotos) {
+    const pi = p.pilotos.find((x) => x.id === l.id);
+    if (pi) { l.mechaVida = vidaDelMecha(pi); l.rotas = partesRotas(pi); l.costoReparar = costoReparacion(datos, pi).total; }
   }
 
   informe.puntaje = puntos;

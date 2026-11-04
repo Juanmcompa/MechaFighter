@@ -7,7 +7,7 @@ export const ENCAJES = ['cabeza', 'torso', 'piernas', 'brazo_izq', 'brazo_der', 
 // Una parte equipada puede venir como "brazo_rifle" o como { parte: "brazo_rifle", afijos: ["calibrado"] }.
 export function normalizarPieza(p) {
   if (!p) return null;
-  return typeof p === 'string' ? { parte: p, afijos: [] } : { parte: p.parte, afijos: p.afijos || [] };
+  return typeof p === 'string' ? { parte: p, afijos: [] } : { parte: p.parte, afijos: p.afijos || [], ...(p.rota ? { rota: true } : {}) };
 }
 
 function sumarMods(destino, mods, mult = 1) {
@@ -26,7 +26,7 @@ export function nombrePieza(datos, pieza) {
   const base = datos.partes[p.parte] ? datos.partes[p.parte].nombre : p.parte;
   const pre = p.afijos.map((a) => datos.afijos[a]).filter((a) => a && a.tipo === 'prefijo').map((a) => a.nombre);
   const suf = p.afijos.map((a) => datos.afijos[a]).filter((a) => a && a.tipo === 'sufijo').map((a) => a.nombre);
-  return [base, ...pre, ...suf].join(' ');
+  return [base, ...pre, ...suf].join(' ') + (p.rota ? ' (rota)' : '');
 }
 
 function armaDesde(def, mods, punteriaBase, municionPct, slot, extra = {}) {
@@ -157,7 +157,7 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
     etiquetasPartes: [...new Set(ENCAJES.flatMap((e) => (parte(e) ? parte(e).etiquetas : [])))],
     // zonas que se pueden romper (ver reglas.partes_mecha): que parte hay y que trae
     slots: Object.fromEntries(['brazo_izq', 'brazo_der', 'piernas', 'cabeza'].filter((e) => parte(e)).map((e) => [e, {
-      parte: piezas[e].parte, etiquetas: parte(e).etiquetas, habilidad: parte(e).habilidad || null,
+      parte: piezas[e].parte, etiquetas: parte(e).etiquetas, habilidad: parte(e).habilidad || null, rota: !!piezas[e].rota,
       escudoBlindaje: parte(e).escudo ? parte(e).escudo.blindaje + (mods(e).blindaje || 0) : 0,
       punteria: e === 'cabeza' ? (parte(e).punteria || 0) + (mods('cabeza').punteria || 0) : 0
     }])),

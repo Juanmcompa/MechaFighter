@@ -71,6 +71,7 @@ export function evento(app, raiz) {
       h('div', { class: 'chips' },
         r.creditos ? chip('creditos', '+' + r.creditos, 'Créditos') : null,
         r.parte ? chip('estrella', r.parte, 'Parte nueva en el depósito') : null,
-        ...(r.curados || []).map((n) => chip('trauma', n + ' se recupera', 'Trauma curado', 'chip-bien')))),
+        ...(r.curados || []).map((n) => chip('trauma', n + ' se recupera', 'Trauma curado', 'chip-bien')),
+        ...(r.reparados || []).map((n) => chip('llave', 'Mecha de ' + n + ' reparado', 'Reparación gratis', 'chip-bien')))),
     pie(app));
 }

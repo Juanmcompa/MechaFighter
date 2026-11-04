@@ -1,6 +1,7 @@
 // Informe despues de la mision: quien volvio, quien no, que aprendieron y que se llevaron.
 import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 
+const ZONA_TXT = { brazo_izq: 'brazo izq.', brazo_der: 'brazo der.', piernas: 'piernas', cabeza: 'cabeza' };
 const MOTIVOS = { salvo: 'uno salvó al otro', cubrio: 'se cubrieron', huyo: 'alguien huyó', discusion: 'discutieron por radio' };
 
 export function informe(app, raiz, inf) {
@@ -24,6 +25,8 @@ export function informe(app, raiz, inf) {
           h('span', { class: 'ip-estado' }, l.estado === 'muerto' ? 'Caído en combate' : l.estado === 'herido' ? 'Herido de gravedad, sobrevive' : 'Vuelve'),
           l.estado !== 'muerto' ? h('span', { class: 'ip-xp' }, '+' + l.xp + ' XP' + (l.subioNivel ? ' · ¡sube de nivel!' : '')) : null,
           l.bajas ? h('span', { class: 'ip-bajas' }, ico('calavera'), String(l.bajas)) : null),
+        l.estado !== 'muerto' && l.mechaVida !== undefined && (l.mechaVida < 100 || l.rotas.length) ? h('p', { class: 'ip-mecha' + (l.mechaVida < 40 || l.rotas.length ? ' grave' : '') },
+          ico('llave'), ' Mecha al ' + l.mechaVida + '%' + (l.rotas.length ? ' · roto: ' + l.rotas.map((z) => ZONA_TXT[z]).join(', ') : '') + ' · reparar: ' + l.costoReparar + ' cr') : null,
         l.estado === 'muerto' ? h('p', { class: 'epitafio' }, l.nombre + '. ' + (l.epitafio || 'Cayó en combate.')) : null,
         l.estado !== 'muerto' && l.momentos && l.momentos.length ? h('ul', { class: 'hoja-servicio corta' }, ...l.momentos.map((t) => h('li', {}, t))) : null,
         l.nuevas.length ? h('div', { class: 'chips' }, ...l.nuevas.map(nuevaCosa)) : null)))),
