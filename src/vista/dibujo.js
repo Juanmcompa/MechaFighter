@@ -180,6 +180,7 @@ export function dibujarUnidad(ctx, u, L, t) {
   else if (f.cuerpo === 'mutante') dibujarMutante(ctx, f, u, t);
   else if (f.cuerpo === 'infanteria') dibujarSoldado(ctx, f, u);
   else if (f.sprite === 'torreta') dibujarTorreta(ctx, f, u);
+  else if (f.sprite === 'senuelo') dibujarSenuelo(ctx, f, u, t);
   else if (f.sprite === 'transporte') dibujarTransporte(ctx, f, u);
   else dibujarMecha(ctx, f, u);
   ctx.restore();
@@ -347,6 +348,19 @@ function dibujarTorreta(ctx, f, u) {
   rect(ctx, -6, -6, 12, 12, c.base, '#000');
   rect(ctx, 2, -1.5, 13, 3, '#222', '#000');
   if (u.golpe > 0) { ctx.fillStyle = `rgba(255,255,255,${u.golpe * 0.7})`; ctx.fillRect(-9, -9, 18, 18); }
+}
+
+// Holograma: silueta de mecha en lineas, que titila
+function dibujarSenuelo(ctx, f, u, t) {
+  const titila = 0.45 + 0.25 * Math.sin((t || 0) / 90 + u.semilla);
+  ctx.globalAlpha = titila;
+  ctx.strokeStyle = '#7fe8ff'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(-8, -9, 16, 18);
+  ctx.strokeRect(-12, -6, 4, 12); ctx.strokeRect(8, -6, 4, 12);
+  ctx.strokeRect(-3, -3, 6, 6);
+  ctx.fillStyle = 'rgba(127,232,255,0.18)'; ctx.fillRect(-8, -9, 16, 18);
+  for (let y = -9; y < 9; y += 3) { ctx.fillStyle = 'rgba(127,232,255,0.25)'; ctx.fillRect(-8, y, 16, 1); }
+  ctx.globalAlpha = 1;
 }
 
 function dibujarTransporte(ctx, f, u) {

@@ -9,7 +9,8 @@
     "efecto": {
       "estado_propio": "atrincherado"
     },
-    "requiere_parte": "escudo"
+    "requiere_parte": "escudo",
+    "descripcion": "Se atrinchera detrás del escudo: más blindaje, pero no se mueve."
   },
   "disparo_apuntado": {
     "nombre": "Disparo apuntado",
@@ -21,7 +22,8 @@
       "multiplica_danio_pct": 200,
       "punteria": 25
     },
-    "requiere_parte": "arma"
+    "requiere_parte": "arma",
+    "descripcion": "Un disparo lento que pega el doble y acierta más."
   },
   "fuego_de_supresion": {
     "nombre": "Fuego de supresión",
@@ -34,7 +36,8 @@
       "chance": 70,
       "area": 1
     },
-    "requiere_parte": "supresion"
+    "requiere_parte": "supresion",
+    "descripcion": "Ráfaga que hace agachar al enemigo: pierde puntería."
   },
   "reparacion_de_campo": {
     "nombre": "Reparación de campo",
@@ -49,7 +52,8 @@
         "en_llamas"
       ]
     },
-    "consume_mochila": true
+    "consume_mochila": true,
+    "descripcion": "Repara a un aliado al lado y le apaga el fuego."
   },
   "propulsion": {
     "nombre": "Propulsión",
@@ -60,7 +64,8 @@
     "efecto": {
       "salto": 4
     },
-    "consume_mochila": true
+    "consume_mochila": true,
+    "descripcion": "Salta hasta 4 casillas por encima de todo."
   },
   "desplegar_torreta": {
     "nombre": "Desplegar torreta",
@@ -71,6 +76,85 @@
     "efecto": {
       "invoca": "torreta_ligera"
     },
-    "consume_mochila": true
+    "consume_mochila": true,
+    "descripcion": "Deja una torreta automática al lado."
+  },
+  "marcar_objetivo": {
+    "nombre": "Marcar objetivo",
+    "icono": "mira",
+    "enfriamiento": 30,
+    "demora": 2,
+    "alcance": 10,
+    "ve_sin_linea": true,
+    "efecto": {
+      "estado": "marcado",
+      "chance": 100,
+      "area": 0
+    },
+    "requiere_parte": "radar",
+    "descripcion": "Marca a un enemigo: todos lo ven, aunque haya niebla, y le cuesta esquivar."
+  },
+  "enganchar": {
+    "nombre": "Enganchar",
+    "icono": "lazo",
+    "enfriamiento": 35,
+    "demora": 3,
+    "alcance": 5,
+    "efecto": {
+      "arrastra": 4,
+      "aturde": 6
+    },
+    "requiere_parte": "gancho",
+    "descripcion": "Arrastra a un enemigo de hasta 5 casillas hasta pegarlo al mecha. Queda aturdido un momento."
+  },
+  "anclarse": {
+    "nombre": "Anclarse",
+    "icono": "ancla",
+    "enfriamiento": 45,
+    "demora": 2,
+    "alcance": 0,
+    "efecto": {
+      "estado_propio": "anclado"
+    },
+    "requiere_parte": "estabilizador",
+    "descripcion": "Clava las anclas: +20 de puntería y más blindaje, pero no se mueve por un rato."
+  },
+  "desplegar_senuelo": {
+    "nombre": "Desplegar señuelo",
+    "icono": "ojo",
+    "enfriamiento": 20,
+    "demora": 2,
+    "alcance": 2,
+    "efecto": {
+      "invoca": "senuelo"
+    },
+    "consume_mochila": true,
+    "descripcion": "Proyecta un holograma entre el mecha y los enemigos: atrae los disparos."
+  },
+  "pulso_emp": {
+    "nombre": "Pulso EMP",
+    "icono": "rayo",
+    "enfriamiento": 40,
+    "demora": 3,
+    "alcance": 5,
+    "efecto": {
+      "estado": "emp",
+      "chance": 80,
+      "area": 1
+    },
+    "requiere_parte": "emp",
+    "descripcion": "Apaga las habilidades y la puntería del objetivo y los que tiene al lado."
+  },
+  "sobrecarga": {
+    "nombre": "Sobrecarga",
+    "icono": "explosion",
+    "enfriamiento": 60,
+    "demora": 1,
+    "alcance": 0,
+    "efecto": {
+      "estado_propio": "sobrecargado"
+    },
+    "requiere_parte": "reactor",
+    "descripcion": "Durante un rato pega 40% más fuerte y apunta mejor. Después queda recalentado."
   }
 }

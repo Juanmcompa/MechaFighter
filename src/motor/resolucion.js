@@ -1,7 +1,7 @@
 // Aplica las intenciones de un tick. Primero todos los movimientos, despues todas las acciones, y las muertes al
 // final (en simular.js): asi dos unidades pueden matarse a la vez y el orden de proceso no da ventajas escondidas.
 
-import { distancia, cobertura } from './espacio.js';
+import { distancia, cobertura, vecinos } from './espacio.js';
 import { vidaPct, porId, mods, ponerEstado, quitarEstado, evento, aliados } from './estado.js';
 import { unidadEnemiga } from './unidades.js';
 
@@ -65,6 +65,8 @@ export function resolverAcciones(B, intenciones) {
         break;
       }
       case 'invocar': invocar(B, u, i); break;
+      case 'aplicar': aplicar(B, u, i); break;
+      case 'enganchar': enganchar(B, u, i); break;
       case 'habilidad_propia': {
         const h = B.datos.habilidades[i.habilidad];
         usarHabilidad(B, u, i.habilidad);
@@ -128,7 +130,9 @@ function atacar(B, u, i) {
 // Aplica el danio de un golpe y devuelve cuanto hizo (negativo si el escudo lo freno a la mitad).
 function golpear(B, u, o, a, multPct) {
   const R = B.datos.reglas;
-  const base = Math.trunc((a.danio * multPct) / 100);
+  // sobrecarga y similares: el atacante pega un % mas
+  const extra = 100 + (mods(B, u).danio_pct || 0);
+  const base = Math.trunc((Math.trunc((a.danio * multPct) / 100) * extra) / 100);
   const blindaje = Math.max(0, o.blindaje + (mods(B, o).blindaje || 0) - a.perfora);
   let danio = Math.max(R.danio_minimo, base - blindaje);
   let bloqueo = false;
@@ -174,6 +178,44 @@ function reparar(B, u, o) {
   for (const est of h.efecto.quita_estados || []) quitarEstado(B, o, est);
   u.ocupado = h.demora || 0;
   B.log({ tipo: 'repara', u: u.id, o: o.id, cant, vida: o.vida });
+}
+
+// Habilidad que pone un estado a un enemigo (y a los de al lado): marcar, EMP
+function aplicar(B, u, i) {
+  const o = porId(B, i.o);
+  if (!o || !o.viva) return;
+  const h = B.datos.habilidades[i.habilidad];
+  usarHabilidad(B, u, i.habilidad);
+  encarar(u, o.x, o.y);
+  B.log({ tipo: 'habilidad', u: u.id, h: i.habilidad, o: o.id });
+  u.ocupado = h.demora || 0;
+  const ef = h.efecto;
+  if (!B.azarCombate.tirada(ef.chance || 100)) return;
+  for (const v of B.unidades) if (v.viva && v.bando === o.bando && distancia(v, o) <= (ef.area || 0)) ponerEstado(B, v, ef.estado, u.id);
+}
+
+// Garra con cable: arrastra al enemigo hasta pegarlo al mecha, paso a paso, y lo deja aturdido
+function enganchar(B, u, i) {
+  const o = porId(B, i.o);
+  if (!o || !o.viva) return;
+  const h = B.datos.habilidades[i.habilidad];
+  usarHabilidad(B, u, i.habilidad);
+  encarar(u, o.x, o.y);
+  B.log({ tipo: 'habilidad', u: u.id, h: i.habilidad, o: o.id });
+  u.ocupado = h.demora || 0;
+  for (let k = 0; k < h.efecto.arrastra && distancia(o, u) > 1; k++) {
+    let mejor = null, mejorD = distancia(o, u);
+    for (const [x, y] of vecinos(B.tablero, o.x, o.y)) {
+      if (ocupada(B, x, y)) continue;
+      const d = distancia({ x, y }, u);
+      if (d < mejorD) { mejor = [x, y]; mejorD = d; }
+    }
+    if (!mejor) break;
+    o.x = mejor[0]; o.y = mejor[1]; o.mover = 0;
+    B.log({ tipo: 'mueve', u: o.id, a: mejor, d: 1, arrastrado: true });
+  }
+  o.ocupado = Math.max(o.ocupado, h.efecto.aturde || 0);
+  ponerEstado(B, o, 'aturdido', u.id);
 }
 
 function invocar(B, u, i) {

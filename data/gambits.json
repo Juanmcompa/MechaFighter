@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Catalogo de lo que el jugador combina en el editor: SI condicion -> ACCION sobre OBJETIVO. Las condiciones son arboles: todos / alguno / no / dato / existe / fn. 'param' toma el valor que eligio el jugador. Las 'fn' son funciones del motor (src/motor/decision/funciones.js): una nueva necesita codigo y prueba.",
+  "_ayuda": "Catalogo de lo que el jugador combina en el editor: SI condicion -> ACCION sobre OBJETIVO. Las condiciones son arboles: todos / alguno / no / dato / existe / fn. 'param' toma el valor que eligio el jugador. Las 'fn' son funciones del motor (src/motor/decision/funciones.js): una nueva necesita codigo y prueba. Una condicion con 'requiere_parte' solo la puede usar un mecha que tenga una parte con esa etiqueta; las acciones con 'habilidad' piden esa habilidad (de la clase o de una parte).",
   "condiciones": {
     "siempre": {
       "texto": "Siempre",
@@ -138,6 +138,24 @@
           }
         ]
       }
+    },
+    "radar_oculto": {
+      "texto": "Radar: enemigo oculto cerca",
+      "icono": "ojo",
+      "requiere_parte": "radar",
+      "expr": {
+        "fn": "radar_oculto"
+      }
+    },
+    "enemigo_marcado": {
+      "texto": "Hay un enemigo marcado",
+      "icono": "mira",
+      "expr": {
+        "existe": "enemigo",
+        "donde": {
+          "fn": "esta_marcado"
+        }
+      }
     }
   },
   "acciones": {
@@ -263,6 +281,56 @@
         "defensa"
       ],
       "habilidad": "muro_de_escudos"
+    },
+    "marcar_objetivo": {
+      "texto": "Marcar objetivo",
+      "icono": "mira",
+      "etiquetas": [
+        "control"
+      ],
+      "habilidad": "marcar_objetivo"
+    },
+    "enganchar": {
+      "texto": "Enganchar",
+      "icono": "lazo",
+      "etiquetas": [
+        "ataque",
+        "control"
+      ],
+      "habilidad": "enganchar"
+    },
+    "anclarse": {
+      "texto": "Anclarse",
+      "icono": "ancla",
+      "etiquetas": [
+        "defensa"
+      ],
+      "habilidad": "anclarse"
+    },
+    "desplegar_senuelo": {
+      "texto": "Desplegar señuelo",
+      "icono": "ojo",
+      "etiquetas": [
+        "apoyo",
+        "defensa"
+      ],
+      "habilidad": "desplegar_senuelo"
+    },
+    "pulso_emp": {
+      "texto": "Pulso EMP",
+      "icono": "rayo",
+      "etiquetas": [
+        "control"
+      ],
+      "habilidad": "pulso_emp"
+    },
+    "sobrecarga": {
+      "texto": "Sobrecarga",
+      "icono": "explosion",
+      "etiquetas": [
+        "ataque"
+      ],
+      "habilidad": "sobrecarga"
     }
   },
   "objetivos": {
@@ -298,6 +366,9 @@
     },
     "lejos_de_enemigos": {
       "texto": "Lejos de los enemigos"
+    },
+    "enemigo_marcado": {
+      "texto": "Enemigo marcado"
     }
   },
   "funciones": [
@@ -305,7 +376,9 @@
     "aislado",
     "en_cobertura",
     "flanqueado",
-    "hay_vip"
+    "hay_vip",
+    "radar_oculto",
+    "esta_marcado"
   ],
   "maximo_por_unidad": 8
 }

@@ -115,7 +115,8 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
 
   const clase = datos.clases[piloto.clase];
   const habilidades = [...(clase.habilidades_iniciales || [])];
-  if (mochila && mochila.habilidad && !habilidades.includes(mochila.habilidad)) habilidades.push(mochila.habilidad);
+  // Cualquier parte puede traer su habilidad especial (radar, garra, anclas, reactor...): ver partes.json
+  for (const e of ENCAJES) { const pp = parte(e); if (pp && pp.habilidad && !habilidades.includes(pp.habilidad)) habilidades.push(pp.habilidad); }
   // Algunas partes traen su habilidad: la rotativa permite suprimir y el escudo, atrincherarse.
   const etiquetasTodas = ENCAJES.flatMap((e) => (parte(e) ? parte(e).etiquetas : []));
   for (const [etq, hab] of [['supresion', 'fuego_de_supresion'], ['escudo', 'muro_de_escudos']]) {
@@ -143,6 +144,7 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
     blindaje,
     velocidad: piernas.velocidad + (peso > capacidad ? 2 : 0),
     vision: (cabeza ? cabeza.vision : 6) + (ps.vision || 0),
+    radar: (cabeza && cabeza.radar) || 0,
     punteria,
     evasion: ps.evasion + ((piernas && piernas.evasion) || 0),
     iniciativa: ps.iniciativa,

@@ -344,5 +344,119 @@
     "costo": 70,
     "recuperable": true,
     "sprite": "mochila_torreta"
+  },
+  "cabeza_radar": {
+    "nombre": "Radar táctico",
+    "encaje": "cabeza",
+    "rareza": "poco_comun",
+    "etiquetas": [
+      "sensor",
+      "radar"
+    ],
+    "peso": 3,
+    "vision": 6,
+    "punteria": 0,
+    "radar": 6,
+    "habilidad": "marcar_objetivo",
+    "costo": 70,
+    "recuperable": true,
+    "descripcion": "Detecta enemigos a 6 casillas aunque haya paredes. Habilita «Marcar objetivo» y la condición «Radar: enemigo oculto»."
+  },
+  "brazo_gancho": {
+    "nombre": "Garra con cable",
+    "encaje": "brazo",
+    "rareza": "poco_comun",
+    "etiquetas": [
+      "arma",
+      "cuerpo_a_cuerpo",
+      "gancho"
+    ],
+    "peso": 6,
+    "arma": {
+      "danio": 12,
+      "alcance": 1,
+      "cadencia": 3,
+      "municion": 0,
+      "recarga": 0,
+      "punteria": 10
+    },
+    "habilidad": "enganchar",
+    "ranuras_afijo": 1,
+    "costo": 65,
+    "recuperable": true,
+    "descripcion": "Dispara un cable y arrastra a un enemigo hasta el mecha, aturdido. Habilita «Enganchar»."
+  },
+  "piernas_estabilizadoras": {
+    "nombre": "Piernas con anclas",
+    "encaje": "piernas",
+    "rareza": "poco_comun",
+    "etiquetas": [
+      "piernas",
+      "estabilizador"
+    ],
+    "peso": 9,
+    "velocidad": 5,
+    "evasion": 0,
+    "blindaje": 1,
+    "habilidad": "anclarse",
+    "costo": 60,
+    "recuperable": true,
+    "descripcion": "Clava anclas en el piso: no se mueve, pero apunta mucho mejor y aguanta más. Habilita «Anclarse»."
+  },
+  "mochila_senuelo": {
+    "nombre": "Proyector de señuelos",
+    "encaje": "mochila",
+    "rareza": "poco_comun",
+    "etiquetas": [
+      "senuelo",
+      "consumible"
+    ],
+    "peso": 4,
+    "usos": 2,
+    "habilidad": "desplegar_senuelo",
+    "costo": 55,
+    "recuperable": true,
+    "descripcion": "Proyecta un holograma que atrae los disparos enemigos. Dos usos. Habilita «Desplegar señuelo»."
+  },
+  "brazo_emp": {
+    "nombre": "Emisor EMP",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "energia",
+      "emp"
+    ],
+    "peso": 7,
+    "arma": {
+      "danio": 6,
+      "alcance": 5,
+      "cadencia": 3,
+      "municion": 10,
+      "recarga": 12,
+      "punteria": 10
+    },
+    "habilidad": "pulso_emp",
+    "ranuras_afijo": 1,
+    "costo": 120,
+    "recuperable": true,
+    "descripcion": "Un pulso que apaga habilidades y desarma la puntería de un grupo. Habilita «Pulso EMP»."
+  },
+  "torso_reactor": {
+    "nombre": "Torso con reactor",
+    "encaje": "torso",
+    "rareza": "raro",
+    "etiquetas": [
+      "medio",
+      "reactor"
+    ],
+    "peso": 13,
+    "estructura": 120,
+    "blindaje": 3,
+    "capacidad": 45,
+    "habilidad": "sobrecarga",
+    "costo": 130,
+    "recuperable": true,
+    "descripcion": "Puede sobrecargarse: un rato pega más fuerte y apunta mejor, después queda recalentado. Habilita «Sobrecarga»."
   }
 }

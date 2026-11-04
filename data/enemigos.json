@@ -312,6 +312,31 @@
         "brazo_der": "brazo_rifle",
         "mochila": "mochila_vacia"
       }
+    },
+    "senuelo": {
+      "nombre": "Señuelo",
+      "cuerpo": "mecha",
+      "invocacion": true,
+      "amenaza": 9,
+      "sprite": "senuelo",
+      "senuelo": true,
+      "stats": {
+        "estructura": 50,
+        "blindaje": 0,
+        "velocidad": 0,
+        "punteria": 0,
+        "evasion": 10,
+        "iniciativa": 1,
+        "moral": 100,
+        "vision": 1
+      },
+      "gambits": [
+        {
+          "condicion": "siempre",
+          "accion": "mantener",
+          "objetivo": "yo"
+        }
+      ]
     }
   },
   "escuadras": {

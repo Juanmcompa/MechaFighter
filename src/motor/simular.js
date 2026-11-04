@@ -128,7 +128,11 @@ export function simular(datos, { mision, escuadron, semilla }) {
       if (u.ocupado > 0) u.ocupado--;
       if (u.mover > 0) u.mover--;
       for (const e of u.estados.slice()) {
-        if (e.resta > 0 && --e.resta === 0) quitarEstado(B, u, e.id);
+        if (e.resta > 0 && --e.resta === 0) {
+          quitarEstado(B, u, e.id);
+          const sigue = (datos.estados[e.id] || {}).al_terminar; // sobrecargado -> recalentado
+          if (sigue) ponerEstado(B, u, sigue, null);
+        }
       }
       // danio continuo (llamas, fugas, casillas peligrosas): se aplica cada 5 ticks para no llenar el registro
       if (B.t % 5 === 0) {

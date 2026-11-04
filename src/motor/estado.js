@@ -35,7 +35,9 @@ export function percibir(B) {
     for (const u of B.unidades) {
       if (!u.viva || u.bando !== b) continue;
       for (const o of B.unidades) {
-        if (o.viva && o.bando !== b && !s.has(o.id) && distancia(u, o) <= u.vision && lineaDeTiro(B.tablero, u, o)) s.add(o.id);
+        if (!o.viva || o.bando === b || s.has(o.id)) continue;
+        // a la vista; o por radar (atraviesa paredes); o marcado (lo ve todo el bando)
+        if ((distancia(u, o) <= u.vision && lineaDeTiro(B.tablero, u, o)) || (u.radar && distancia(u, o) <= u.radar) || mods(B, o).visible) s.add(o.id);
       }
     }
   }

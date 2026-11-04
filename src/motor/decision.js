@@ -72,7 +72,11 @@ const FUNCIONES = {
     if (!FUNCIONES.en_cobertura(B, ctx)) return false;
     return enemigosConocidos(B, ctx.u).some((e) => distancia(e, ctx.u) <= 8 && lineaDeTiro(B.tablero, e, ctx.u) && cobertura(B.tablero, ctx.u, e) === null);
   },
-  hay_vip: (B) => !!B.vip && B.vip.viva
+  hay_vip: (B) => !!B.vip && B.vip.viva,
+  // radar: hay un enemigo cerca que no se ve (detras de una pared)
+  radar_oculto: (B, ctx) => !!ctx.u.radar && B.unidades.some((o) => o.viva && o.bando !== ctx.u.bando && o.tipo !== 'invocacion' &&
+    distancia(ctx.u, o) <= ctx.u.radar && !lineaDeTiro(B.tablero, ctx.u, o)),
+  esta_marcado: (B, ctx) => !!ctx.otro && tieneEstado(ctx.otro, 'marcado')
 };
 
 // ---------- Evaluar el arbol de una condicion ----------
@@ -152,6 +156,7 @@ export function elegirObjetivo(B, u, sel) {
     case 'vip': return B.vip && B.vip.viva ? B.vip : null;
     case 'objetivo_mision': return objetivoMision(B, u);
     case 'lejos_de_enemigos': return { especial: 'lejos' };
+    case 'enemigo_marcado': return enemigosConocidos(B, u).filter((o) => tieneEstado(o, 'marcado')).sort(masCerca(u))[0] || null;
   }
   return null;
 }
@@ -369,6 +374,52 @@ function accion(B, u, id, obj, correa) {
       return mejor ? { tipo: 'saltar', a: mejor, habilidad: 'propulsion' } : null;
     }
 
+    // ---- Habilidades especiales de las partes (ver partes.json › habilidad) ----
+    case 'marcar_objetivo':
+    case 'pulso_emp': {
+      const hid = id;
+      if (!esUnidad || obj.bando === u.bando || !puedeHabilidad(B, u, hid)) return null;
+      if (obj.tipo === 'invocacion' || (hid === 'marcar_objetivo' && tieneEstado(obj, 'marcado')) || (hid === 'pulso_emp' && tieneEstado(obj, 'emp'))) return null;
+      const h = H[hid];
+      if (distancia(u, obj) > h.alcance) return null;
+      if (!h.ve_sin_linea && !lineaDeTiro(B.tablero, u, obj)) return null;
+      return { tipo: 'aplicar', o: obj.id, habilidad: hid };
+    }
+
+    case 'enganchar': {
+      if (!esUnidad || obj.bando === u.bando || obj.tipo === 'invocacion' || !puedeHabilidad(B, u, 'enganchar')) return null;
+      const d = distancia(u, obj);
+      if (d <= 1 || d > H.enganchar.alcance || !lineaDeTiro(B.tablero, u, obj)) return null;
+      return { tipo: 'enganchar', o: obj.id, habilidad: 'enganchar' };
+    }
+
+    case 'anclarse':
+    case 'sobrecarga': {
+      const hid = id;
+      const est = H[hid].efecto.estado_propio;
+      if (!puedeHabilidad(B, u, hid) || tieneEstado(u, est) || !enemigosConocidos(B, u).length) return null;
+      // anclarse solo sirve si ya tiene a quien tirarle
+      if (hid === 'anclarse' && !enemigosConocidos(B, u).some((e) => u.armas.some((a) => a.alcance > 1 && enAlcance(B, u, e, a)))) return null;
+      return { tipo: 'habilidad_propia', habilidad: hid };
+    }
+
+    case 'desplegar_senuelo': {
+      if (!puedeHabilidad(B, u, 'desplegar_senuelo')) return null;
+      const e = elegirObjetivo(B, u, 'enemigo_cercano');
+      if (!e) return null;
+      // el holograma va entre el mecha y el enemigo, a 1 o 2 casillas
+      const ocupada = ocupadaPara(B, u);
+      let mejor = null, mejorD = 32767;
+      for (let y = u.y - 2; y <= u.y + 2; y++) {
+        for (let x = u.x - 2; x <= u.x + 2; x++) {
+          if (!caminable(B.tablero, x, y) || ocupada(x, y) || (x === u.x && y === u.y)) continue;
+          const d = distancia({ x, y }, e);
+          if (d < mejorD) { mejor = [x, y]; mejorD = d; }
+        }
+      }
+      return mejor ? { tipo: 'invocar', habilidad: 'desplegar_senuelo', a: mejor } : null;
+    }
+
     case 'muro_de_escudos': {
       if (!puedeHabilidad(B, u, 'muro_de_escudos') || tieneEstado(u, 'atrincherado') || !enemigosConocidos(B, u).length) return null;
       return { tipo: 'habilidad_propia', habilidad: 'muro_de_escudos' };
@@ -478,6 +529,8 @@ export function decidir(B, u) {
   for (const { g, i } of claves) {
     const cond = G.condiciones[g.condicion];
     if (!cond) continue;
+    // condiciones que da una parte (el radar): sin esa parte, el mecha no sabe leerlas
+    if (cond.requiere_parte && !u.etiquetasPartes.includes(cond.requiere_parte)) continue;
     const ignora = lista.some((h) => h.tipo === 'ignorar_condicion' && h.condicion === g.condicion && az.tirada(h.chance));
     if (ignora) continue;
     const params = {};

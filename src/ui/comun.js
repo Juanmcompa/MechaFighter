@@ -57,6 +57,8 @@ export function describirParte(datos, pieza) {
   if (!pz) return '';
   const p = datos.partes[pz.parte];
   const out = [];
+  if (p.habilidad && datos.habilidades[p.habilidad]) out.push('★ ' + datos.habilidades[p.habilidad].nombre);
+  if (p.radar) out.push('Radar ' + p.radar);
   if (p.encaje === 'torso') out.push('Estructura ' + p.estructura, 'Blindaje ' + p.blindaje, 'Carga ' + p.capacidad);
   if (p.encaje === 'piernas') out.push('Paso ' + p.velocidad, 'Evasión ' + p.evasion + (p.blindaje ? ' · Blindaje +' + p.blindaje : ''));
   if (p.encaje === 'cabeza') out.push('Visión ' + p.vision + (p.punteria ? ' · Puntería +' + p.punteria : ''));

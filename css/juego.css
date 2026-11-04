@@ -273,3 +273,16 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .tarjeta-veterano:hover { border-color: var(--fosforo-tenue); }
 .tarjeta-veterano.elegido { border-color: var(--fosforo); box-shadow: 0 0 0 3px rgba(143,220,90,.2); }
 .tarjeta-veterano small { color: var(--texto-tenue); }
+
+/* Habilidades especiales del mecha */
+.habilidades { margin-top: 10px; }
+.habilidades .sub-panel { font: 400 16px 'Pixelify Sans', sans-serif; color: var(--fosforo); margin: 6px 0; display: flex; align-items: center; gap: 6px; }
+.habilidades ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.habilidades li { display: flex; gap: 10px; align-items: flex-start; padding: 6px 8px; background: #11140e; border-left: 3px solid var(--chapa-borde); }
+.habilidades li.de-parte { border-left-color: var(--ambar); }
+.habilidades li.de-parte > .ico-envoltura .ico { color: var(--ambar); }
+.habilidades li.bloqueada { opacity: .55; }
+.habilidades li div { display: grid; }
+.habilidades li small { color: var(--texto-tenue); }
+.habilidades li span:not(.ico-envoltura) { font-size: 15px; }
+.gambit-aviso { grid-column: 1 / -1; margin: 4px 0 0; color: #e06a5a; font-size: 15px; display: flex; gap: 6px; align-items: center; }

@@ -173,5 +173,51 @@
         "ticks": 160
       }
     ]
+  },
+  "marcado": {
+    "nombre": "Marcado",
+    "icono": "mira",
+    "duracion": 30,
+    "mods": {
+      "evasion": -20,
+      "visible": true
+    }
+  },
+  "anclado": {
+    "nombre": "Anclado",
+    "icono": "ancla",
+    "duracion": 30,
+    "mods": {
+      "punteria": 20,
+      "blindaje": 3,
+      "inmovil": true
+    }
+  },
+  "sobrecargado": {
+    "nombre": "Sobrecargado",
+    "icono": "explosion",
+    "duracion": 25,
+    "mods": {
+      "danio_pct": 40,
+      "punteria": 10
+    },
+    "al_terminar": "recalentado"
+  },
+  "recalentado": {
+    "nombre": "Recalentado",
+    "icono": "llama",
+    "duracion": 20,
+    "mods": {
+      "punteria": -20,
+      "sin_habilidades": true
+    }
+  },
+  "aturdido": {
+    "nombre": "Aturdido",
+    "icono": "temblor",
+    "duracion": 6,
+    "mods": {
+      "evasion": -15
+    }
   }
 }

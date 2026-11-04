@@ -5,6 +5,7 @@ import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot } from '../campana/partida.js';
 import { nombreDeMecha } from '../campana/reclutas.js';
 import { relaciones } from '../campana/animo.js';
+import { existeIcono } from './iconos.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
 
@@ -120,6 +121,58 @@ function curaTexto(t) {
   return t.cura === 'nuevo_vinculo' ? 'Se cura con un vínculo nuevo' : 'Se cura descansando (' + Math.max(0, t.resta) + ' más)';
 }
 
+// Habilidades especiales del mecha: de donde salen (clase o parte) y si las puede usar con lo que tiene puesto
+const ETIQUETA_HABILIDAD = { supresion: 'fuego_de_supresion', escudo: 'muro_de_escudos' };
+function habilidadesDe(datos, pi) {
+  const u = unidadDePiloto(datos, pi, pi.mecha, pi.gambits);
+  return u.habilidades.map((id) => {
+    const hab = datos.habilidades[id];
+    let origen = null;
+    for (const [slot] of SLOTS) {
+      const pz = normalizarPieza(pi.mecha[slot]);
+      const pp = pz && datos.partes[pz.parte];
+      if (pp && (pp.habilidad === id || (pp.etiquetas || []).some((e) => ETIQUETA_HABILIDAD[e] === id))) { origen = pp.nombre; break; }
+    }
+    const falta = hab.requiere_parte && !u.etiquetasPartes.includes(hab.requiere_parte) ? hab.requiere_parte : null;
+    return { id, hab, origen: origen || 'Clase ' + datos.clases[pi.clase].nombre.toLowerCase(), deParte: !!origen, falta };
+  });
+}
+
+// Que acciones y condiciones puede cumplir este mecha (las demas se ven con candado en el editor)
+function disponibles(datos, pi) {
+  const u = unidadDePiloto(datos, pi, pi.mecha, pi.gambits);
+  const habs = new Set(habilidadesDe(datos, pi).filter((x) => !x.falta).map((x) => x.id));
+  const G = datos.gambits;
+  const falta = {};
+  for (const [id, a] of Object.entries(G.acciones)) if (a.habilidad && !habs.has(a.habilidad)) falta['a:' + id] = parteQueDa(datos, a.habilidad);
+  for (const [id, c] of Object.entries(G.condiciones)) if (c.requiere_parte && !u.etiquetasPartes.includes(c.requiere_parte)) falta['c:' + id] = parteQueDaEtiqueta(datos, c.requiere_parte);
+  return falta;
+}
+function parteQueDa(datos, hab) {
+  const p = Object.values(datos.partes).find((x) => x && x.habilidad === hab);
+  if (p) return p.nombre;
+  const clase = Object.values(datos.clases).find((c) => c && (c.habilidades_iniciales || []).includes(hab));
+  if (clase) return 'clase ' + clase.nombre;
+  const req = datos.habilidades[hab].requiere_parte;
+  return req ? parteQueDaEtiqueta(datos, req) : 'otra clase';
+}
+function parteQueDaEtiqueta(datos, etq) {
+  const p = Object.values(datos.partes).find((x) => x && (x.etiquetas || []).includes(etq));
+  return p ? p.nombre : etq;
+}
+
+function panelHabilidades(datos, pi) {
+  const lista = habilidadesDe(datos, pi);
+  return h('div', { class: 'habilidades' },
+    h('h3', { class: 'sub-panel' }, ico('estrella'), ' Habilidades especiales'),
+    lista.length ? h('ul', {}, ...lista.map((x) => h('li', { class: (x.deParte ? 'de-parte' : '') + (x.falta ? ' bloqueada' : '') },
+      ico(existeIcono(x.hab.icono) ? x.hab.icono : 'estrella'),
+      h('div', {},
+        h('strong', {}, x.hab.nombre), h('small', {}, x.origen + (x.falta ? ' · le falta: ' + parteQueDaEtiqueta(datos, x.falta) : '')),
+        h('span', {}, x.hab.descripcion || ''))))) : h('p', { class: 'ayuda' }, 'Ninguna.'),
+    h('p', { class: 'ayuda' }, 'Algunas partes traen habilidades y órdenes nuevas (★). Si las equipás, aparecen en el editor de órdenes.'));
+}
+
 function panelMecha(app, pi, refrescar) {
   const { datos } = app;
   const p = app.partida;
@@ -137,7 +190,7 @@ function panelMecha(app, pi, refrescar) {
     const opciones = [h('option', { value: 'actual', selected: true }, actual && actual.parte !== 'mochila_vacia' ? nombrePieza(datos, actual) : '— vacío —')];
     if (actual && actual.parte !== 'mochila_vacia' && slot !== 'torso' && slot !== 'piernas') opciones.push(h('option', { value: 'sacar' }, '✕ Sacar'));
     p.inventario.forEach((pz, idx) => {
-      if (datos.partes[pz.parte].encaje === encajeDeSlot(slot)) opciones.push(h('option', { value: String(idx) }, '↺ ' + nombrePieza(datos, pz)));
+      if (datos.partes[pz.parte].encaje === encajeDeSlot(slot)) opciones.push(h('option', { value: String(idx) }, '↺ ' + nombrePieza(datos, pz) + (datos.partes[pz.parte].habilidad ? ' ★' : '')));
     });
     const elegir = h('select', {
       'aria-label': nombre,
@@ -181,6 +234,7 @@ function panelMecha(app, pi, refrescar) {
       h('span', {}, ico('peso'), 'Carga ' + peso + ' / ' + capacidad),
       barra(peso, capacidad), peso > capacidad ? h('small', {}, 'Sobrepeso: el mecha camina más lento.') : null),
     ...filas,
+    panelHabilidades(datos, pi),
     h('p', { class: 'ayuda' }, ico('estrella'), ' Partes en depósito: ' + p.inventario.length + '. Las ganás en las misiones o las comprás en el taller.'));
 }
 
@@ -193,6 +247,7 @@ function panelGambits(app, pi, refrescar) {
   const G = datos.gambits;
   const guardar = (lista) => { guardarGambits(datos, app.partida, pi.id, lista); app.guardar(); refrescar(); };
   const lista = pi.gambits;
+  const falta = disponibles(datos, pi);
 
   const filas = lista.map((g, i) => {
     const cond = G.condiciones[g.condicion];
@@ -203,7 +258,8 @@ function panelGambits(app, pi, refrescar) {
       h('div', { class: 'gambit-cuerpo' },
         h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-si' }, 'SI'),
           h('select', { 'aria-label': 'Condición ' + (i + 1), onchange: (e) => cambiar({ condicion: e.target.value, parametros: undefined }) },
-            ...Object.entries(G.condiciones).map(([id, c]) => h('option', { value: id, selected: id === g.condicion }, textoCondicion(c)))),
+            ...Object.entries(G.condiciones).map(([id, c]) => h('option', { value: id, selected: id === g.condicion, disabled: !!falta['c:' + id] && id !== g.condicion },
+              (falta['c:' + id] ? '🔒 ' : c.requiere_parte ? '★ ' : '') + textoCondicion(c) + (falta['c:' + id] ? ' (' + falta['c:' + id] + ')' : '')))),
           ...params.map(([pid, def]) => h('input', {
             type: 'number', min: def.min, max: def.max, step: 1, class: 'gambit-num', 'aria-label': pid,
             value: g.parametros && g.parametros[pid] !== undefined ? g.parametros[pid] : def.defecto,
@@ -214,10 +270,13 @@ function panelGambits(app, pi, refrescar) {
           }))),
         h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-flecha' }, '→'),
           h('select', { 'aria-label': 'Acción ' + (i + 1), onchange: (e) => cambiar({ accion: e.target.value }) },
-            ...Object.entries(G.acciones).map(([id, a]) => h('option', { value: id, selected: id === g.accion }, a.texto)))),
+            ...Object.entries(G.acciones).map(([id, a]) => h('option', { value: id, selected: id === g.accion, disabled: !!falta['a:' + id] && id !== g.accion },
+              (falta['a:' + id] ? '🔒 ' : '') + a.texto + (falta['a:' + id] ? ' (' + falta['a:' + id] + ')' : ''))))),
         h('label', { class: 'gambit-parte' }, h('span', { class: 'gambit-sobre' }, 'a'),
           h('select', { 'aria-label': 'Objetivo ' + (i + 1), onchange: (e) => cambiar({ objetivo: e.target.value }) },
             ...Object.entries(G.objetivos).map(([id, o]) => h('option', { value: id, selected: id === g.objetivo }, o.texto))))),
+      falta['a:' + g.accion] || falta['c:' + g.condicion]
+        ? h('p', { class: 'gambit-aviso' }, ico('trauma'), ' No la puede cumplir: le falta ' + (falta['a:' + g.accion] || falta['c:' + g.condicion]) + '.') : null,
       h('div', { class: 'gambit-botones' },
         botonIcono('arriba', 'Subir', () => { if (i === 0) return; const n = lista.slice(); [n[i - 1], n[i]] = [n[i], n[i - 1]]; guardar(n); }),
         botonIcono('abajo', 'Bajar', () => { if (i === lista.length - 1) return; const n = lista.slice(); [n[i + 1], n[i]] = [n[i], n[i + 1]]; guardar(n); }),

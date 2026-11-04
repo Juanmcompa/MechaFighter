@@ -55,7 +55,8 @@ export function nuevaPartida(datos, semilla, legado = null) {
   p.afinidad = {};
   const azAf = azarAparte(p, 'afinidad');
   for (const pi of p.pilotos) presentar(datos, p, pi, azAf);
-  p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] });
+  // una parte especial para empezar a probar habilidades nuevas
+  p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] }, { parte: 'cabeza_radar', afijos: [] });
   generarSector(datos, p);
   return p;
 }

@@ -44,8 +44,15 @@ const P = {
   huida: '<path d="M13 4a2 2 0 1 1 0 .1M9 21l3-7 3 3v5M6 12l3-4 4 1 3 3h3"/>',
   rayo: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
   colmillo: '<path d="M4 5h16l-3 6-2-3-3 10-3-10-2 3z"/>',
-  lazo: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
+  lazo: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  ancla: '<circle cx="12" cy="5" r="2"/><path d="M12 7v13M8 10h8M5 14a7 7 0 0 0 14 0"/>',
+  cohete: '<path d="M12 3c3 2 4 6 4 10l-4 3-4-3c0-4 1-8 4-10z"/><path d="M8 13l-3 3v3l3-2M16 13l3 3v3l-3-2"/><circle cx="12" cy="9" r="1.5"/>',
+  torreta: '<rect x="6" y="11" width="12" height="7" rx="1"/><path d="M12 11V8h7M8 18l-2 3M16 18l2 3"/>',
+  rafaga: '<path d="M4 8h9M4 12h13M4 16h9"/><circle cx="18" cy="8" r="1" fill="currentColor"/><circle cx="21" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="16" r="1" fill="currentColor"/>',
+  llama: '<path d="M12 3c1 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 3 3 3 0-3-1-5 0-8z"/>',
 };
+
+export const existeIcono = (n) => n in P;
 
 export function icono(nombre, clase = '') {
   const d = P[nombre] || P.evento;

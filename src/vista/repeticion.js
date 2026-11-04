@@ -159,7 +159,7 @@ export class Repeticion {
           grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6,
           peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0,
           marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
-        if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + ' despliega una torreta', clase: 'info' });
+        if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + (f.sprite === 'senuelo' ? ' proyecta un señuelo' : ' despliega una torreta'), clase: 'info' });
         // el escuadron de la campana anterior, del otro lado
         if (f.exPiloto) this.alEvento({ texto: f.nombre.toUpperCase() + ' (canal abierto): «' + EX_PILOTO[Number(e.u.slice(1)) % EX_PILOTO.length] + '»', clase: 'mal', importante: true });
         break;
@@ -253,7 +253,18 @@ export class Repeticion {
         u.moral = e.estado;
         if (e.estado === 'moral_quebrada') this.alEvento({ texto: u.ficha.nombre + ' se quiebra', clase: 'aviso' });
         break;
-      case 'habilidad': if (u) this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true); break;
+      case 'habilidad': {
+        if (!u) break;
+        this.flotante(u, (this.datos.habilidades[e.h] || {}).nombre || e.h, '#9fd7ff', true);
+        // las que van a un enemigo (marcar, EMP, garra) se ven como un haz hasta el objetivo
+        const o = e.o ? U.get(e.o) : null;
+        if (o) {
+          this.efectos.push({ tipo: 'riel', de: [u.x, u.y], a: [o.hacia[0], o.hacia[1]], t0: this.T, dur: 4 });
+          this.efectos.push({ tipo: 'fijado', id: o.id, t0: this.T, dur: 8, propio: o.ficha.bando === 0 });
+          u.angObj = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
+        }
+        break;
+      }
       case 'oleada': {
         if (e.n <= 1) break;
         this.alEvento({ texto: 'CONTROL › ESCUADRÓN: Oleada ' + e.n + ' de ' + e.de + ' en camino.', clase: 'control', importante: true });
