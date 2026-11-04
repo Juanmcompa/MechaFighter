@@ -159,7 +159,7 @@ def retratos():
         lab, k = ndimage.label(ndimage.binary_opening(~fondo_magenta(a), iterations=3))
         cajas = []
         for i, s in enumerate(ndimage.find_objects(lab)):
-            if (lab[s] == i + 1).sum() > a.shape[0] * a.shape[1] * 0.05:
+            if (lab[s] == i + 1).sum() > a.shape[0] * a.shape[1] * 0.008:
                 cajas.append((s[0].start // 100, s[1].start, s))  # filas primero, despues columnas
         cajas.sort()
         for _, _, s in cajas:

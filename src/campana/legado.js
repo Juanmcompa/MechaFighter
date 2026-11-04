@@ -13,7 +13,7 @@ import { armarMision } from './misiones.js';
 // Lo que se guarda de un piloto (sin referencias a ids de esta campana)
 export function fotoPiloto(pi) {
   return {
-    id: pi.id, nombre: pi.nombre, apodo: pi.apodo, retrato: pi.retrato, clase: pi.clase, personalidad: pi.personalidad,
+    id: pi.id, nombre: pi.nombre, apodo: pi.apodo, retrato: pi.retrato, genero: pi.genero, clase: pi.clase, personalidad: pi.personalidad,
     nivel: pi.nivel, xp: pi.xp || 0, medallas: (pi.medallas || []).slice(), cicatrices: (pi.cicatrices || []).slice(),
     traumas: JSON.parse(JSON.stringify(pi.traumas || [])), hoja: (pi.hoja || []).slice(-8), bajas: pi.bajas || 0, misiones: pi.misiones || 0,
     mecha: JSON.parse(JSON.stringify(pi.mecha)), mechaNombre: pi.mechaNombre || null, gambits: JSON.parse(JSON.stringify(pi.gambits || []))
@@ -40,7 +40,7 @@ export function legadoDeVictoria(p) {
 // Un piloto de otra campana entra a esta: id nuevo, mecha de fabrica (el suyo quedo atras), sin vinculo.
 export function sumarPilotoDeOtraCampana(datos, p, foto, nuevoId, lineaHoja) {
   const pi = {
-    id: nuevoId, nombre: foto.nombre, apodo: foto.apodo, retrato: foto.retrato, clase: foto.clase, personalidad: foto.personalidad,
+    id: nuevoId, nombre: foto.nombre, apodo: foto.apodo, retrato: foto.retrato, genero: foto.genero, clase: foto.clase, personalidad: foto.personalidad,
     nivel: foto.nivel, xp: foto.xp, medallas: foto.medallas.slice(), cicatrices: foto.cicatrices.slice(),
     traumas: JSON.parse(JSON.stringify(foto.traumas)), hoja: foto.hoja.concat(lineaHoja ? [lineaHoja] : []),
     bajas: foto.bajas, misiones: foto.misiones, vinculo: null, racha: 0, veterano: true,

@@ -27,6 +27,23 @@ export function validarDatos(d) {
     for (const id of Object.keys(d[tabla] || {})) if (!ID_VALIDO.test(id)) err(tabla + ' › ' + id, 'el id solo puede tener minusculas, numeros y _');
   }
 
+  // --- Caras de pilotos: cada retrato anotado una sola vez como h, m, a o x
+  const N = d.nombres || {};
+  if (N.retratos) {
+    const total = (d.reglas && d.reglas.arte && d.reglas.arte.retratos) || 0;
+    const visto = {};
+    for (const [gen, lista] of Object.entries(N.retratos)) {
+      if (!['h', 'm', 'a', 'x'].includes(gen)) err('nombres › retratos › ' + gen, 'tiene que ser h, m, a o x');
+      for (const n of lista) {
+        if (visto[n]) err('nombres › retratos', 'la cara ' + n + ' esta en ' + visto[n] + ' y en ' + gen);
+        if (n < 1 || n > total) err('nombres › retratos', 'la cara ' + n + ' no existe (hay ' + total + ')');
+        visto[n] = gen;
+      }
+      if (gen !== 'x' && (!N.nombres || !(N.nombres[gen] || []).length)) err('nombres › nombres › ' + gen, 'faltan nombres para las caras ' + gen);
+    }
+    for (let n = 1; n <= total; n++) if (!visto[n]) err('nombres › retratos', 'la cara ' + n + ' no dice si es h, m, a o x');
+  }
+
   const g = d.gambits || {};
   const condiciones = g.condiciones || {};
   const acciones = g.acciones || {};
