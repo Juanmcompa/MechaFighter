@@ -191,9 +191,9 @@
       },
       "gambits": [
         {
-          "condicion": "enemigo_cerca",
+          "condicion": "enemigo_cerca_con_escolta",
           "parametros": {
-            "casillas": 4
+            "casillas": 3
           },
           "accion": "mantener",
           "objetivo": "yo"

@@ -22,6 +22,7 @@ export function resolverMovimientos(B, intenciones) {
       const [x, y] = i.a;
       if (ocupada(B, x, y)) continue; // otro mas rapido llego primero
       encarar(u, x, y);
+      u.antes = [u.x, u.y]; // de donde viene (para no volver enseguida: ver replegarse)
       u.x = x; u.y = y;
       u.mover = velocidadDe(B, u);
       B.log({ tipo: 'mueve', u: u.id, a: [x, y], d: u.mover });

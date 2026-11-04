@@ -156,6 +156,33 @@
           "fn": "esta_marcado"
         }
       }
+    },
+    "enemigo_cerca_con_escolta": {
+      "texto": "Enemigo a {casillas} casillas y la escolta peleando",
+      "icono": "alerta",
+      "parametros": {
+        "casillas": {
+          "tipo": "entero",
+          "min": 1,
+          "max": 8,
+          "defecto": 3
+        }
+      },
+      "expr": {
+        "todos": [
+          {
+            "existe": "enemigo",
+            "donde": {
+              "dato": "distancia",
+              "op": "<=",
+              "param": "casillas"
+            }
+          },
+          {
+            "fn": "escolta_peleando"
+          }
+        ]
+      }
     }
   },
   "acciones": {
@@ -389,7 +416,8 @@
     "flanqueado",
     "hay_vip",
     "radar_oculto",
-    "esta_marcado"
+    "esta_marcado",
+    "escolta_peleando"
   ],
   "maximo_por_unidad": 8
 }

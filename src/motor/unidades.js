@@ -212,6 +212,7 @@ export function unidadEnemiga(datos, id, nivel = 1) {
     vidaMax: escala(s.estructura),
     blindaje: s.blindaje,
     velocidad: s.velocidad,
+    fijo: s.velocidad === 0, // torretas y señuelos: no se mueven nunca
     vision: s.vision,
     punteria: s.punteria,
     evasion: s.evasion,

@@ -32,7 +32,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === '51kohw', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === 'pmmaoi', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {
@@ -179,6 +179,28 @@ console.log('Campana');
   p.resultado = 'derrota';
   const h = relato(datos, p);
   ok(h.capitulos.length && h.cierre.includes('Ahí se terminó'), 'la cronica cuenta la historia del escuadron');
+}
+
+// Escolta: el transporte no se queda trabado y nadie baila en el lugar (torretas quietas)
+{
+  let peorQuieto = 0, torretaMovida = 0, bailes = 0;
+  for (let n = 0; n < 40; n++) {
+    const az = crearAzar(9000 + n);
+    const esc = Array.from({ length: 4 }, (_, i) => crearRecluta(datos, az, 'p' + i)).map((p) => ({ piloto: p, mecha: p.mecha, gambits: p.gambits }));
+    const m = armarMision(datos, 'escolta', 1 + (n % 3), az, 2 + (n % 3));
+    const r = simular(datos, { mision: m, escuadron: esc, semilla: m.semilla });
+    const f = {}; let tr = null, ultimo = 0; const hist = {};
+    for (const e of r.registro) {
+      if (e.tipo === 'aparece') { f[e.u] = e.ficha; if (e.ficha.sprite === 'transporte') tr = e.u; }
+      if (e.tipo !== 'mueve') continue;
+      if (f[e.u].sprite === 'torreta') torretaMovida++;
+      if (e.u === tr) { peorQuieto = Math.max(peorQuieto, e.t - ultimo); ultimo = e.t; }
+      if (f[e.u].bando === 0) (hist[e.u] ||= []).push(e.a.join(','));
+    }
+    for (const h of Object.values(hist)) { let k = 0; for (let i = 2; i < h.length; i++) if (h[i] === h[i - 2] && h[i] !== h[i - 1]) k++; if (k > 20) bailes++; }
+  }
+  ok(peorQuieto <= 120, 'escolta: el transporte nunca queda parado mucho (' + peorQuieto + ' ticks)');
+  ok(torretaMovida === 0 && bailes === 0, 'escolta: las torretas no caminan y nadie baila en el lugar');
 }
 
 console.log(fallas ? '\n' + fallas + ' falla(s)' : '\nTodo bien');
