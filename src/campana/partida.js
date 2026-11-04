@@ -17,6 +17,7 @@ import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { desplegables, cumplirTareas } from './tareas.js';
 import { armarLore } from './lore.js';
+import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
@@ -58,7 +59,13 @@ export function nuevaPartida(datos, semilla, legado = null) {
       ? 'Sobrevivió a la caída de su escuadrón en ' + (legado.sectorNombre || 'la campaña anterior') + '. Volvió a firmar.'
       : 'Veterano de la campaña anterior. Eligió seguir.');
   }
-  if (legado && legado.escuadron && legado.escuadron.length) p.encuentro = { escuadron: legado.escuadron, sectorNombre: legado.sectorNombre, hecho: false };
+  if (legado && legado.escuadron && legado.escuadron.length) {
+    // el de mas nivel del escuadron perdido no murio: vuelve como nemesis (con bronca contra el veterano, si hay)
+    const [primero, ...resto] = legado.escuadron;
+    const veterano = p.pilotos.find((x) => x.veterano) || null;
+    nemesisDelLegado(datos, p, primero, legado.sectorNombre, veterano, azarAparte(p, 'nemesis'));
+    if (resto.length) p.encuentro = { escuadron: resto, sectorNombre: legado.sectorNombre, hecho: false };
+  }
   p.afinidad = {};
   const azAf = azarAparte(p, 'afinidad');
   for (const pi of p.pilotos) presentar(datos, p, pi, azAf);
@@ -191,6 +198,11 @@ export function elegirNodo(datos, p, i) {
     case 'mision':
     case 'jefe':
       p.estado = 'preparacion';
+      // quizas aparece un nemesis (la mision se copia: el cambio es solo para esta)
+      if (nodo.tipo === 'mision') {
+        p.nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
+        quizasAparece(datos, p, p.nodo.mision, desplegables(datos, p), azarAparte(p, 'nemesis'));
+      }
       // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
       p.nodo.animo = calcularAnimo(datos, p, nodo.mision, desplegables(datos, p), azarAparte(p, 'animo'));
       break;
@@ -541,10 +553,10 @@ export function cerrarMision(datos, p, resultado) {
     p.creditos += sq.chatarra;
   }
   // Contra el escuadron de la campana anterior: si se gana, a veces se rescata a uno de entre los restos
-  if (m.rivales) {
+  if (m.encuentro && p.encuentro) {
     p.encuentro.hecho = true;
     if (resultado.victoria && az.tirada(R.legado.chance_rescate)) {
-      const f = m.rivales.map((r) => r.piloto).sort((a, b) => b.nivel - a.nivel)[0];
+      const f = m.rivales.filter((r) => !r.nemesis).map((r) => r.piloto).sort((a, b) => b.nivel - a.nivel)[0];
       const viejo = p.encuentro.escuadron.find((x) => x.id === f.id) || f;
       const pi = sumarPilotoDeOtraCampana(datos, p, viejo, nuevoId(p), 'Rescatado de entre los restos en ' + donde + '. Volvió a casa.');
       presentar(datos, p, pi, azarAparte(p, 'afinidad:' + pi.id));
@@ -580,6 +592,17 @@ export function cerrarMision(datos, p, resultado) {
 
   // Los que se quedaron haciendo otra cosa
   informe.tareas = cumplirTareas(datos, p, az);
+
+  // Nemesis: como termino el de esta mision, y si nace uno nuevo
+  const azN = azarAparte(p, 'nemesis:fin');
+  informe.nemesis = resolverNemesis(datos, p, resultado, m, azN);
+  if (informe.nemesis) anotar(p, informe.nemesis.muerto ? 'Terminaron con «' + informe.nemesis.apodo + '», su némesis.' : '«' + informe.nemesis.apodo + '» se les volvió a escapar.', 'mision');
+  const nace = quizasNace(datos, p, resultado, m, azN);
+  if (nace) {
+    informe.nemesisNuevo = { apodo: nace.apodo, retrato: nace.retrato, intro: nace.intro };
+    anotar(p, 'Nació un némesis: «' + nace.apodo + '».', 'mision');
+  }
+  reasignarObjetivos(p);
 
   informe.puntaje = puntos;
   p.puntaje += puntos;

@@ -34,7 +34,15 @@ export function armarCharla(datos, p, m, pilotos) {
   const lider = pilotos.slice().sort((a, b) => b.nivel - a.nivel)[0];
   if (m.jefe && C.jefe) dice(lider, elegir(C.jefe));
   else if (C.tipo[m.plantilla]) dice(lider, elegir(C.tipo[m.plantilla]));
-  if (m.rivales && m.rivales.length) dice(quien(), elegir(C.rivales_viejos));
+  // un nemesis abre el canal antes de que toquen tierra
+  const nem = (m.rivales || []).find((r) => r.nemesis);
+  if (nem) {
+    charla.push({ piloto: nem.piloto, enemigo: true, texto: nem.frase });
+    const blanco = pilotos.find((pi) => pi.id === nem.odia);
+    if (blanco) dice(blanco, elegir(C.nemesis_reaccion).replace(/\{nemesis\}/g, nem.piloto.apodo));
+    else dice(quien(), elegir(C.nemesis_otro));
+  }
+  if ((m.rivales || []).some((r) => !r.nemesis)) dice(quien(), elegir(C.rivales_viejos));
 
   // cada uno dice algo segun como viene (como mucho cinco; de los novatos habla uno solo)
   let novatoHablo = false;
@@ -104,9 +112,9 @@ export function despliegue(app, raiz) {
       return;
     }
     const l = charla[i++];
-    const li = h('li', { class: l.piloto ? 'piloto' : 'control' },
+    const li = h('li', { class: l.enemigo ? 'enemigo' : l.piloto ? 'piloto' : 'control' },
       l.piloto ? retrato(datos, l.piloto, 'retrato-plantel') : h('span', { class: 'radio-control' }, ico('mision')),
-      h('div', {}, h('strong', {}, l.piloto ? l.piloto.apodo : 'Control'), h('span', {}, l.texto)));
+      h('div', {}, h('strong', {}, l.piloto ? (l.enemigo ? '«' + l.piloto.apodo + '» · canal abierto' : l.piloto.apodo) : 'Control'), h('span', {}, l.texto)));
     radio.append(li);
     radio.scrollTop = radio.scrollHeight;
     const frac = i / charla.length;

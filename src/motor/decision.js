@@ -147,6 +147,11 @@ function casillaDeZona(B, u, z) {
 }
 
 export function elegirObjetivo(B, u, sel) {
+  // un nemesis va a buscar a su objetivo apenas lo ve (ver campana/nemesis.js)
+  if (u.odia && sel.startsWith('enemigo_')) {
+    const o = enemigosConocidos(B, u).find((x) => x.ref === u.odia);
+    if (o) return o;
+  }
   switch (sel) {
     case 'yo': return u;
     case 'enemigo_cercano': return enemigosConocidos(B, u).sort(masCerca(u))[0] || null;

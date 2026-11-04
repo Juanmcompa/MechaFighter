@@ -6,6 +6,7 @@ import { equipar, guardarGambits, encajeDeSlot, reparar, costoReparacion, vidaDe
 import { nombreDeMecha } from '../campana/reclutas.js';
 import { relaciones } from '../campana/animo.js';
 import { asignarTarea, puedeQuedarse } from '../campana/tareas.js';
+import { loBuscan } from '../campana/nemesis.js';
 import { existeIcono } from './iconos.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
@@ -143,7 +144,8 @@ function panelPiloto(app, pi) {
     h('div', { class: 'chips' },
       chip(clase.icono, clase.nombre, clase.descripcion, 'chip-clase'),
       chip(pers.icono || 'evento', pers.texto, pers.titulo, 'chip-personalidad'),
-      vinculo ? chip('vinculo', vinculo.apodo, 'Vínculo: pelean mejor cerca y les duele perderse') : chip('vinculo', 'Sin vínculo', 'No tiene a nadie cercano en el escuadrón', 'apagado')),
+      vinculo ? chip('vinculo', vinculo.apodo, 'Vínculo: pelean mejor cerca y les duele perderse') : chip('vinculo', 'Sin vínculo', 'No tiene a nadie cercano en el escuadrón', 'apagado'),
+      ...loBuscan(p, pi.id).map((n) => chip('calavera', 'Lo busca «' + n.apodo + '»', n.intro, 'chip-alerta'))),
     (pi.cicatrices.length || pi.traumas.length || pi.medallas.length)
       ? h('div', { class: 'chips' },
         ...pi.cicatrices.map((c) => chip('cicatriz', datos.cicatrices[c].nombre, datos.cicatrices[c].texto || modsTexto(datos.cicatrices[c].mods), 'chip-cicatriz')),

@@ -186,7 +186,11 @@ export class Repeticion {
           marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
         if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + (f.sprite === 'senuelo' ? ' proyecta un señuelo' : ' despliega una torreta'), clase: 'info' });
         // el escuadron de la campana anterior, del otro lado
-        if (f.exPiloto) this.alEvento({ texto: f.nombre.toUpperCase() + ' (canal abierto): «' + EX_PILOTO[Number(e.u.slice(1)) % EX_PILOTO.length] + '»', clase: 'mal', importante: true });
+        if (f.exPiloto) {
+          const r = (this.mision.rivales || []).find((x) => 'ex:' + x.piloto.id === f.ref);
+          const frase = r && r.frase ? r.frase : EX_PILOTO[Number(e.u.slice(1)) % EX_PILOTO.length];
+          this.alEvento({ texto: (f.nemesis ? 'NÉMESIS · ' : '') + f.nombre.toUpperCase() + ' (canal abierto): «' + frase + '»', clase: 'mal', importante: true });
+        }
         break;
       }
       case 'mueve':

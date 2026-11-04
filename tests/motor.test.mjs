@@ -11,6 +11,8 @@ import { fotoPiloto } from '../src/campana/legado.js';
 import { saquear } from '../src/campana/saqueo.js';
 import { reparar, costoReparacion, partesRotas } from '../src/campana/mantenimiento.js';
 import { leerDisco } from '../tools/leer-disco.mjs';
+import { nemesisDelLegado, quizasAparece, resolverNemesis } from '../src/campana/nemesis.js';
+import { normalizarPieza } from '../src/motor/unidades.js';
 
 let fallas = 0;
 function ok(cond, msg) { console.log((cond ? '  ✓ ' : '  ✗ ') + msg); if (!cond) fallas++; }
@@ -32,7 +34,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === '2s14lw', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === 'gj1bwk', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {
@@ -121,9 +123,32 @@ console.log('Campana');
   p.sector = datos.reglas.legado.sector_encuentro;
   generarSector(datos, p);
   const nodo = p.sectores[p.sector].columnas.flat().find((n) => n.encuentro);
-  ok(!!nodo && nodo.mision.rivales.length === 3, 'el escuadron anterior aparece en un contrato');
+  ok(!!nodo && nodo.mision.rivales.length === 2, 'el escuadron anterior aparece en un contrato');
+  ok(p.nemesis && p.nemesis.length === 1 && p.nemesis[0].origen === 'caido' && p.nemesis[0].apodo === fotos[1].apodo, 'el de mas nivel del escuadron perdido vuelve como nemesis');
   const r = simular(datos, { mision: nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: nodo.mision.semilla });
   ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.exPiloto && e.ficha.bando === 1), 'pelean del otro lado');
+}
+
+// Nemesis: aparece en un contrato, va a buscar a su objetivo, y si escapa vuelve preparado contra lo que lo bajo
+{
+  const p = nuevaPartida(datos, 91);
+  const objetivo = p.pilotos[0];
+  const az = crearAzar(3);
+  p.nemesis = [];
+  const n = nemesisDelLegado(datos, p, { ...fotoPiloto(p.pilotos[1]), apodo: 'Prueba', id: 'x9' }, 'acá', objetivo, az);
+  n.ultima = -10;
+  const m = armarMision(datos, 'asalto', 2, crearAzar(4), 2);
+  const dn = { ...datos, nemesis: { ...datos.nemesis, chance_aparece: 100, chance_muere: 0, chance_muere_por_derrota: 0 } }; // (solo para la prueba)
+  quizasAparece(dn, p, m, p.pilotos, crearAzar(5));
+  ok(m.nemesis === n.id && m.rivales.some((r) => r.nemesis && r.odia === objetivo.id), 'el nemesis aparece en el contrato y busca a su objetivo');
+  const r = simular(datos, { mision: m, escuadron: p.pilotos.map((x) => ({ piloto: x, mecha: x.mecha, gambits: x.gambits })), semilla: m.semilla });
+  ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.ref === 'ex:' + n.id), 'el nemesis pelea en la batalla');
+  // lo bajan a riel desde lejos y escapa: vuelve con escudo y propulsores
+  const uid = 'u99';
+  const reg = [{ tipo: 'aparece', u: uid, ficha: { ref: 'ex:' + n.id, bando: 1, cuerpo: 'mecha' } }, { tipo: 'aparece', u: 'u1', ficha: { ref: objetivo.id, bando: 0, cuerpo: 'mecha' } },
+    { tipo: 'dispara', u: 'u1', o: uid, arma: 'riel', acierta: true, danio: 90 }, { tipo: 'muere', u: uid, por: 'u1' }];
+  const out = resolverNemesis(dn, p, { registro: reg }, m, crearAzar(6));
+  ok(!out.muerto && n.estado === 'activo' && n.clase === 'infiltrador' && normalizarPieza(n.mecha.brazo_izq).parte === 'brazo_escudo', 'escapa y vuelve preparado contra el riel');
 }
 
 // Daño por partes: un brazo roto no vuelve a disparar; un tiro a la cabina deja el mecha para saquear

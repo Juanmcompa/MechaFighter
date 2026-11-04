@@ -24,7 +24,8 @@
     "generador_mapas",
     "version",
     "charlas",
-    "lore"
+    "lore",
+    "nemesis"
   ],
   "mapas": [
     "puesto_01",

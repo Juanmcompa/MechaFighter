@@ -51,6 +51,7 @@ export function preparacion(app, raiz) {
             mj.niebla ? chip('ojo', 'Niebla', 'Solo ven lo que tienen a la vista') : null,
             mj.explorada ? chip('ojo', 'Explorada', 'Alguien fue adelante: sin niebla') : null,
             m.oleadas.length > 1 ? chip('calavera', m.oleadas.length + ' oleadas', 'Oleadas') : null)),
+        panelNemesis(datos, p, m, salen),
         m.lore && (m.lore.conviene.length || m.lore.evitar.length) ? panel('Qué llevar',
           h('ul', { class: 'condiciones consejos' },
             ...m.lore.conviene.map((c) => h('li', { class: 'conviene' }, ico('arriba'), h('div', {}, h('strong', {}, 'Conviene: ' + c.arma), h('span', {}, c.porque)))),
@@ -84,4 +85,24 @@ export function preparacion(app, raiz) {
         h('li', {}, h('i', { style: 'background:#c4473b' }), 'entrada enemiga'),
         h('li', {}, h('i', { style: 'background:#e0a43a' }), 'zonas')))));
   dibujarMapa(plano, mapaDe(datos, m));
+}
+
+// El nemesis que aparece en este contrato: quien es, que historia tiene y a quien busca
+function panelNemesis(datos, p, m, salen) {
+  if (!m.nemesis) return null;
+  const n = (p.nemesis || []).find((x) => x.id === m.nemesis);
+  if (!n) return null;
+  const O = datos.nemesis.origenes[n.origen];
+  const busca = n.objetivo ? p.pilotos.find((x) => x.id === n.objetivo) : null;
+  return panel('Némesis',
+    h('div', { class: 'nemesis' },
+      retrato(datos, n, 'retrato-grande nemesis-retrato'),
+      h('div', {},
+        h('h3', { class: 'apodo' }, '«' + n.apodo + '»'),
+        h('div', { class: 'chips' },
+          chip('calavera', O.nombre, 'Por qué los odia', 'chip-alerta'),
+          chip('mira', 'Nivel ' + n.nivel, 'Nivel'),
+          n.derrotas ? chip('espadas', n.derrotas + (n.derrotas > 1 ? ' derrotas' : ' derrota'), 'Veces que lo bajaron y escapó') : null))),
+    h('ul', { class: 'hoja-servicio' }, ...n.historia.slice(-3).map((t) => h('li', {}, t))),
+    busca ? h('p', { class: 'aviso-nemesis' }, ico('mira'), ' Busca a «' + busca.apodo + '»' + (salen.has(busca.id) ? ': va a ir directo a buscarlo.' : ', que se queda en la base esta vez.')) : null);
 }

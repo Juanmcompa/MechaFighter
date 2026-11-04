@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Lo que se dicen los pilotos mientras bajan a la mision (pantalla de despliegue). Cada lista es de frases posibles; sale una al azar y no se repite en la misma charla. {yo} = quien habla, {mision}, {jefe}, {caido} = el ultimo que cayo, {mecha} = nombre del mecha de quien habla. En 'rivales' y 'amigos' (pares de frases): {a} = el que arranca, {b} = el que contesta. 'control' es la base (el jugador).",
+  "_ayuda": "Lo que se dicen los pilotos mientras bajan a la mision (pantalla de despliegue). Cada lista es de frases posibles; sale una al azar y no se repite en la misma charla. {yo} = quien habla, {mision}, {jefe}, {caido} = el ultimo que cayo, {mecha} = nombre del mecha de quien habla. En 'rivales' y 'amigos' (pares de frases): {a} = el que arranca, {b} = el que contesta. 'control' es la base (el jugador). 'nemesis_reaccion': lo que dice el piloto al que busca un némesis ({nemesis} = su apodo).",
   "control_abre": [
     "Escuadrón: compuertas en sesenta. Repasen sus órdenes.",
     "Bajamos sobre «{mision}». Radios abiertas, cháchara mínima.",
@@ -127,5 +127,15 @@
   "rivales_viejos": [
     "Esos mechas tienen nuestras marcas... no puede ser.",
     "Si de verdad son ellos, que alguien me explique cómo."
+  ],
+  "nemesis_reaccion": [
+    "Es «{nemesis}». Viene por mí.",
+    "Otra vez «{nemesis}»... Esta vez no se escapa.",
+    "Conozco esa voz. Cúbranme.",
+    "«{nemesis}». Sabía que iba a volver."
+  ],
+  "nemesis_otro": [
+    "¿Quién es ese? ¿Por qué sabe nuestros nombres?",
+    "Un canal abierto del otro lado. Esto es personal para alguien."
   ]
 }

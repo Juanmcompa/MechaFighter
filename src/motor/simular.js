@@ -126,7 +126,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
   (mision.rivales || []).forEach((r, i) => {
     const [x, y] = ap.enemigo[(i + 1) % ap.enemigo.length];
     const base = unidadDePiloto(datos, r.piloto, r.mecha, r.gambits);
-    B.agregarUnidad({ ...base, tipo: 'enemigo', ref: 'ex:' + r.piloto.id, vinculoRef: null, amenaza: 3, exPiloto: true }, 1, x, y);
+    // nemesis: odia = el piloto nuestro que va a buscar
+    B.agregarUnidad({ ...base, tipo: 'enemigo', ref: 'ex:' + r.piloto.id, vinculoRef: null, amenaza: 3, exPiloto: true, nemesis: !!r.nemesis, odia: r.odia || null }, 1, x, y);
   });
   for (const em of mision.emboscadas || []) {
     em.unidades.forEach((id) => B.agregarUnidad(unidadEnemiga(datos, id, mision.nivel || 1), 1, em.casilla[0], em.casilla[1]));
@@ -316,7 +317,7 @@ function ficha(u) {
     bando: u.bando, nombre: u.nombre, tipo: u.tipo, cuerpo: u.cuerpo, clase: u.clase, personalidad: u.personalidad,
     // si el tipo tiene varios dibujos, cada unidad usa uno (fijo por su numero)
     sprite: u.variantes ? u.variantes[Number(u.id.slice(1)) % u.variantes.length] : u.sprite || null,
-    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto, vida: u.vida,
+    apariencia: u.apariencia, x: u.x, y: u.y, vidaMax: u.vidaMax, rol: u.rol || null, ref: u.ref, exPiloto: !!u.exPiloto, nemesis: !!u.nemesis, vida: u.vida,
     miembros: u.miembros || 1, figuras: u.figuras || null,
     armas: u.armas.map((a) => ({ slot: a.slot, tipoVisual: a.tipoVisual }))
   };
