@@ -1,6 +1,7 @@
 #!/bin/sh
-# Suma la version del juego en cada commit: numero + 1 y el titulo del commit como "que cambio".
-# Queda en data/version.json y se ve en la portada. Lo activa: git config core.hooksPath tools/hooks
+# Suma la version del juego en cada commit: numero + 1, el titulo del commit como "que cambio" y lo agrega
+# arriba de las novedades (se ven pasando en la portada). Queda en data/version.json.
+# Se activa una vez con: git config core.hooksPath tools/hooks
 # (el commit se re-escribe una vez con --amend para llevar la version adentro; MF_VERSION evita el bucle)
 [ -n "$MF_VERSION" ] && exit 0
 f=data/version.json
@@ -8,9 +9,13 @@ f=data/version.json
 n=$(sed -n 's/.*"numero": *\([0-9][0-9]*\).*/\1/p' "$f")
 mayor=$(sed -n 's/.*"mayor": *\([0-9][0-9]*\).*/\1/p' "$f")
 ayuda=$(sed -n 's/.*"_ayuda": *"\(.*\)",$/\1/p' "$f")
+viejas=$(grep '^    "v' "$f" | sed 's/,$//' | head -5)
 n=$((n + 1))
 titulo=$(git log -1 --pretty=%s | sed 's/\\/\\\\/g; s/"/\\"/g')
-printf '{\n  "_ayuda": "%s",\n  "mayor": %s,\n  "numero": %s,\n  "cambio": "%s"\n}\n' "$ayuda" "$mayor" "$n" "$titulo" > "$f"
+nueva="    \"v$mayor.$n · $titulo\""
+lista=$(printf '%s\n%s\n' "$nueva" "$viejas" | grep -v '^$' | sed '$!s/$/,/')
+printf '{\n  "_ayuda": "%s",\n  "mayor": %s,\n  "numero": %s,\n  "cambio": "%s",\n  "novedades": [\n%s\n  ]\n}\n' \
+  "$ayuda" "$mayor" "$n" "$titulo" "$lista" > "$f"
 git add "$f"
 MF_VERSION=1 git commit --amend --no-edit --no-verify -q
 exit 0

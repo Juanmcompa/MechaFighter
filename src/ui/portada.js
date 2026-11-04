@@ -15,6 +15,7 @@ export function portada(app, raiz) {
   };
   montar(raiz, 
     h('div', { class: 'portada' },
+      noticias(app.datos),
       h('div', { class: 'marquesina' },
         h('h1', {}, 'MECHA', h('span', {}, 'FIGHTER')),
         h('p', { class: 'sub' }, 'Escuadrón táctico autónomo')),
@@ -46,6 +47,22 @@ export function portada(app, raiz) {
           h('li', {}, h('strong', {}, 'En el hangar'), ' cambiá partes y programá cada mecha: SI pasa algo → HACÉ algo.'),
           h('li', {}, h('strong', {}, 'Mirá la batalla.'), ' No hay control: lo que programaste, y lo que el piloto decida, es lo que pasa.'),
           h('li', {}, h('strong', {}, 'Cuidá a tu gente.'), ' Ganan experiencia, cicatrices y medallas. La muerte es permanente.'))),
-      h('p', { class: 'firma' }, 'App en desarrollo · Early Access'),
-      app.datos.version ? h('p', { class: 'version' }, h('strong', {}, 'v' + version(app.datos)), ' · ' + app.datos.version.cambio) : null));
+      h('p', { class: 'firma' }, 'App en desarrollo · Early Access')));
+}
+
+// Cinta de noticias arriba de todo: las ultimas versiones pasando de derecha a izquierda (data/version.json)
+function noticias(datos) {
+  const V = datos.version;
+  if (!V) return null;
+  const lista = V.novedades && V.novedades.length ? V.novedades : ['v' + version(datos) + ' · ' + V.cambio];
+  // dos copias seguidas: cuando la primera termina de pasar, la segunda ocupa su lugar y no se nota el salto
+  const tira = () => h('span', { class: 'noticias-tira' }, ...lista.map((t) => {
+    const [v, ...resto] = t.split(' · ');
+    return h('span', { class: 'noticia' }, h('strong', {}, v), ' ' + resto.join(' · '));
+  }));
+  const pista = h('div', { class: 'noticias-pista' }, tira(), tira());
+  pista.style.setProperty('--duracion', Math.max(20, lista.join('').length * 0.22) + 's');
+  return h('div', { class: 'noticias', role: 'marquee', 'aria-label': 'Novedades: ' + lista.join('. ') },
+    h('span', { class: 'noticias-titulo' }, 'NOVEDADES'),
+    h('div', { class: 'noticias-ventana', 'aria-hidden': 'true' }, pista));
 }
