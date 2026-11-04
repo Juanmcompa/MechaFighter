@@ -132,6 +132,7 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
   }
   for (const e of ENCAJES) if (piezas[e]) for (const a of piezas[e].afijos) if (datos.afijos[a] && datos.afijos[a].ganchos) ganchos.push(...datos.afijos[a].ganchos);
 
+  const dibujoDe = (pz) => (pz ? datos.partes[pz.parte].sprite || pz.parte : null);
   return {
     tipo: 'piloto',
     ref: piloto.id,
@@ -165,9 +166,9 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
     ganchos,
     gambits: gambits && gambits.length ? gambits : clase.gambits_de_fabrica,
     apariencia: {
-      torso: piezas.torso.parte, piernas: piezas.piernas.parte, cabeza: piezas.cabeza ? piezas.cabeza.parte : null,
-      brazo_izq: piezas.brazo_izq ? piezas.brazo_izq.parte : null, brazo_der: piezas.brazo_der ? piezas.brazo_der.parte : null,
-      mochila: piezas.mochila ? piezas.mochila.parte : null
+      // cada parte se dibuja con su sprite (las especiales reusan el de otra parecida)
+      torso: dibujoDe(piezas.torso), piernas: dibujoDe(piezas.piernas), cabeza: dibujoDe(piezas.cabeza),
+      brazo_izq: dibujoDe(piezas.brazo_izq), brazo_der: dibujoDe(piezas.brazo_der), mochila: dibujoDe(piezas.mochila)
     }
   };
 }

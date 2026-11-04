@@ -81,10 +81,11 @@
     "costo_descanso": 0,
     "venta_pct": 40,
     "precio_parte_por_rareza": {
-      "comun": 60,
-      "poco_comun": 110,
-      "raro": 180,
-      "epico": 260
+      "normal": 60,
+      "raro": 110,
+      "muy_raro": 180,
+      "legendario": 280,
+      "unico": 400
     },
     "partes_en_taller": 4,
     "botin_chance_afijo": 45,
@@ -95,10 +96,11 @@
     ]
   },
   "rarezas": {
-    "comun": 60,
-    "poco_comun": 28,
-    "raro": 10,
-    "epico": 2
+    "normal": 58,
+    "raro": 28,
+    "muy_raro": 10,
+    "legendario": 3,
+    "unico": 1
   },
   "arte": {
     "retratos": 6
@@ -160,5 +162,6 @@
     "remolque_creditos": 30,
     "remolque_danio_pct": 15,
     "precio": 18
-  }
+  },
+  "_rarezas": "Normal (blanco), Raro (verde esmeralda), Muy raro (azul cobalto), Legendario (violeta), Único (dorado: hay una sola por campaña). Los jefes siempre dejan una legendaria o única."
 }

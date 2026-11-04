@@ -42,6 +42,7 @@ export function informe(app, raiz, inf) {
       h('div', { class: 'chips' },
         chip('creditos', '+' + inf.creditos, 'Créditos'),
         chip('puntaje', '+' + inf.puntaje, 'Puntaje')),
+      inf.trofeo ? h('p', { class: 'trofeo' }, ico('estrella'), ' Trofeo del jefe: ' + inf.trofeo) : null,
       inf.botin.length ? h('ul', { class: 'lista-simple' }, ...inf.botin.map((b) => h('li', {}, ico('estrella'), ' ' + b))) : h('p', { class: 'ayuda' }, inf.victoria ? 'Sin partes esta vez.' : 'Sin pago ni botín.'),
       inf.partesRescatadas.length ? h('p', { class: 'ayuda' }, 'Rescatado de los caídos: ' + inf.partesRescatadas.join(', ') + '.') : null,
       inf.saqueo && inf.saqueo.length ? h('ul', { class: 'lista-simple saqueo' }, ...inf.saqueo.map((b) => h('li', {}, ico('mira'), ' Saqueado entero: ' + b))) : null,

@@ -132,8 +132,6 @@ body { background: radial-gradient(ellipse at center, #0c140f 0%, #040604 80%); 
 }
 .selector strong { font-size: 20px; font-weight: 400; color: var(--texto); }
 .selector small { font-size: 15px; color: var(--texto-tenue); }
-.selector.rareza-poco_comun strong { color: #7fb6ea; }
-.selector.rareza-raro strong { color: var(--ambar); }
 .selector-flecha { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--fosforo); font-size: 14px; }
 .selector select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; min-height: 0; }
 .selector:focus-within { outline: 2px solid var(--ambar); outline-offset: 2px; }

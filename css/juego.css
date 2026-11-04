@@ -145,8 +145,6 @@ h1:focus, h2:focus { outline: none; }
 .fila-slot { display: grid; grid-template-columns: 90px 1fr; gap: 2px 8px; align-items: center; padding: 6px 0; border-top: 1px solid #22281c; }
 .slot-nombre { color: var(--texto-tenue); }
 .slot-datos { grid-column: 2; color: var(--texto-tenue); font-size: 16px; }
-.rareza-poco_comun strong, .slot-datos.rareza-poco_comun { color: #7fb6ea; }
-.rareza-raro strong, .slot-datos.rareza-raro { color: #e0a43a; }
 select, input {
   min-height: 40px; width: 100%; padding: 4px 8px; font: 19px 'VT323', monospace;
   color: var(--texto); background: #0b0d09; border: 1px solid var(--chapa-borde); border-radius: 0;
@@ -339,8 +337,6 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 .tarjeta-parte { flex: 0 0 132px; scroll-snap-align: start; display: grid; justify-items: center; align-content: start; gap: 2px; padding: 8px 6px; min-height: 150px;
   background: var(--chapa); border: 2px solid var(--chapa-borde); color: var(--texto); font: inherit; cursor: pointer; text-align: center; }
 .tarjeta-parte strong { font-weight: 400; font-size: 16px; line-height: 1.05; }
-.tarjeta-parte.rareza-poco_comun { border-color: #36597a; }
-.tarjeta-parte.rareza-raro { border-color: #7a5a22; }
 .tarjeta-parte.elegida { border-color: var(--fosforo); box-shadow: 0 0 0 2px rgba(143,220,90,.3); }
 .tarjeta-parte.puesta { opacity: .8; }
 .img-parte { width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; display: grid; place-items: center; }
@@ -395,3 +391,24 @@ details.seccion > *:not(summary) { margin: 0 10px 10px; }
 .armado-stats { grid-template-columns: 1fr 1fr; column-gap: 14px; }
 .armado-stats .carga, .armado-stats .barra, .armado-stats .aviso-peso { grid-column: 1 / -1; }
 .stat-fila { font-size: 16px; }
+
+/* ---------- Rarezas: Normal (plata), Rara (esmeralda), Muy rara (cobalto), Legendaria (violeta), Unica (oro) ---------- */
+:root { --r-normal: #d8dde3; --r-raro: #3fcf7a; --r-muy_raro: #3d8bff; --r-muy_raro-luz: #5fd4ff;
+  --r-legendario: #a861ff; --r-legendario-luz: #ff5fd8; --r-unico: #ffc531; --r-unico-luz: #ff8a1f; }
+.rareza-normal { --r: var(--r-normal); --rl: var(--r-normal); }
+.rareza-raro { --r: var(--r-raro); --rl: #8affb4; }
+.rareza-muy_raro { --r: var(--r-muy_raro); --rl: var(--r-muy_raro-luz); }
+.rareza-legendario { --r: var(--r-legendario); --rl: var(--r-legendario-luz); }
+.rareza-unico { --r: var(--r-unico); --rl: var(--r-unico-luz); }
+[class*="rareza-"] strong { color: var(--r); }
+.tarjeta-parte[class*="rareza-"] { border-color: color-mix(in srgb, var(--r) 55%, var(--chapa-borde)); }
+.tarjeta-parte.rareza-legendario, .tarjeta-parte.rareza-unico, .armado-detalle.rareza-legendario, .armado-detalle.rareza-unico {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rl) 35%, transparent), inset 0 0 12px color-mix(in srgb, var(--r) 18%, transparent); }
+.tarjeta-parte.elegida { border-color: var(--fosforo); }
+.tp-rareza { color: var(--r, var(--texto-tenue)); text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+.slot-boton[class*="rareza-"] { border-left: 4px solid var(--r); }
+.slot-boton[class*="rareza-"] strong { color: var(--r); }
+.slot-boton.rota strong { color: #e06a5a; }
+.lista-partes li[class*="rareza-"] { border-left: 4px solid var(--r); }
+.armado-detalle[class*="rareza-"] { border-color: color-mix(in srgb, var(--r) 60%, var(--chapa-borde)); }
+.trofeo { color: var(--r-unico); }

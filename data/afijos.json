@@ -8,7 +8,7 @@
       "energia"
     ],
     "peso": 10,
-    "rareza_minima": "poco_comun",
+    "rareza_minima": "raro",
     "mods": {
       "danio_pct": 15,
       "recarga": 2
@@ -21,7 +21,7 @@
       "arma"
     ],
     "peso": 14,
-    "rareza_minima": "comun",
+    "rareza_minima": "normal",
     "mods": {
       "punteria": 8
     }
@@ -36,7 +36,7 @@
       "escudo"
     ],
     "peso": 12,
-    "rareza_minima": "comun",
+    "rareza_minima": "normal",
     "mods": {
       "blindaje": 2,
       "peso": 2
@@ -49,7 +49,7 @@
       "balistico"
     ],
     "peso": 10,
-    "rareza_minima": "comun",
+    "rareza_minima": "normal",
     "mods": {
       "municion_pct": 50
     }
@@ -62,7 +62,7 @@
       "fuego"
     ],
     "peso": 6,
-    "rareza_minima": "raro",
+    "rareza_minima": "muy_raro",
     "mods": {
       "danio_pct": 25
     },

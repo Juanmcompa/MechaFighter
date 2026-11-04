@@ -75,6 +75,7 @@ export function describirParte(datos, pieza) {
 export { nombrePieza };
 
 export const rarezaDe = (datos, pieza) => datos.partes[normalizarPieza(pieza).parte].rareza;
+export const NOMBRE_RAREZA = { normal: 'Normal', raro: 'Rara', muy_raro: 'Muy rara', legendario: 'Legendaria', unico: 'Única' };
 
 export function textoPersonalidad(datos, piloto) {
   const pe = datos.personalidades[piloto.personalidad];

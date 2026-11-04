@@ -4,7 +4,7 @@
 
 const ENCAJES = ['cabeza', 'torso', 'piernas', 'brazo', 'mochila'];
 const ENCAJES_MECHA = { cabeza: 'cabeza', torso: 'torso', piernas: 'piernas', brazo_izq: 'brazo', brazo_der: 'brazo', mochila: 'mochila' };
-const RAREZAS = ['comun', 'poco_comun', 'raro', 'epico'];
+const RAREZAS = ['normal', 'raro', 'muy_raro', 'legendario', 'unico'];
 const OPERADORES = ['<', '<=', '>', '>=', '==', '!='];
 const GANCHOS = ['anular', 'correr_umbral', 'subir_prioridad', 'ignorar_condicion', 'cambiar_objetivo', 'correa', 'moral', 'confusion', 'perdido'];
 const CUERPOS = ['mecha', 'infanteria', 'mutante', 'dron'];

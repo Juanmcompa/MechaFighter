@@ -194,7 +194,7 @@ export function elegirNodo(datos, p, i) {
       const az = azarDe(p, 'taller');
       p.nodo.oferta = [];
       for (let k = 0; k < R.partes_en_taller; k++) {
-        const pieza = sortearParte(datos, az, p.sectores[p.sector].dificultad);
+        const pieza = sortearParte(datos, az, p.sectores[p.sector].dificultad, p);
         p.nodo.oferta.push({ pieza, precio: precioPieza(datos, pieza), vendida: false });
       }
       p.estado = 'taller';
@@ -299,14 +299,19 @@ export function contratarGratis(datos, p, azar) {
 
 // ---------- Botin, taller y reclutamiento ----------
 
-export function sortearParte(datos, az, dificultad = 1) {
+// p (opcional): la partida, para no repetir las unicas. minima: rareza minima (los jefes dejan legendarias o unicas).
+export function sortearParte(datos, az, dificultad = 1, p = null, minima = null) {
   const R = datos.reglas;
-  const pesos = Object.entries(R.rarezas).map(([r, w], i) => [r, i === 0 ? Math.max(10, w - dificultad * 10) : w + dificultad * 3]);
-  const rareza = az.elegirConPeso(pesos);
   const orden = Object.keys(R.rarezas);
-  let candidatas = Object.entries(datos.partes).filter(([id, pt]) => pt.rareza === rareza && pt.costo > 0);
+  const pesos = Object.entries(R.rarezas).map(([r, w], i) => [r, i === 0 ? Math.max(10, w - dificultad * 10) : w + dificultad * 3])
+    .filter(([r]) => !minima || orden.indexOf(r) >= orden.indexOf(minima));
+  const rareza = az.elegirConPeso(pesos);
+  // una unica que ya tenga el escuadron no vuelve a salir
+  const tiene = new Set(p ? p.inventario.map((x) => x.parte).concat(p.pilotos.flatMap((pi) => Object.values(pi.mecha).filter(Boolean).map((x) => x.parte || x))) : []);
+  const sirve = (id, pt) => pt.costo > 0 && !(pt.rareza === 'unico' && tiene.has(id));
+  let candidatas = Object.entries(datos.partes).filter(([id, pt]) => pt.rareza === rareza && sirve(id, pt));
   for (let k = orden.indexOf(rareza); !candidatas.length && k >= 0; k--) {
-    candidatas = Object.entries(datos.partes).filter(([, pt]) => pt.rareza === orden[k] && pt.costo > 0);
+    candidatas = Object.entries(datos.partes).filter(([id, pt]) => pt.rareza === orden[k] && sirve(id, pt));
   }
   const [id, parte] = az.elegir(candidatas);
   const afijos = [];
@@ -513,9 +518,16 @@ export function cerrarMision(datos, p, resultado) {
     informe.creditos = m.recompensa.creditos;
     p.creditos += informe.creditos;
     for (let k = 0; k < m.recompensa.botin; k++) {
-      const pieza = sortearParte(datos, az, m.dificultad);
+      const pieza = sortearParte(datos, az, m.dificultad, p);
       p.inventario.push(pieza);
       informe.botin.push(nombrePieza(datos, pieza));
+    }
+    // el jefe del sector siempre deja algo legendario (o unico)
+    if (p.nodo.tipo === 'jefe') {
+      const trofeo = sortearParte(datos, az, m.dificultad, p, 'legendario');
+      p.inventario.push(trofeo);
+      informe.botin.push(nombrePieza(datos, trofeo));
+      informe.trofeo = nombrePieza(datos, trofeo);
     }
     // saqueo de los mechas enemigos: entero si cayo por la cabina, chatarra si no
     const sq = saquear(datos, resultado.registro || [], m, az);

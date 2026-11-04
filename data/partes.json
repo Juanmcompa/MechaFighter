@@ -3,7 +3,7 @@
   "torso_ligero": {
     "nombre": "Torso Gacela",
     "encaje": "torso",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "ligero"
     ],
@@ -18,7 +18,7 @@
   "torso_medio": {
     "nombre": "Torso Mula",
     "encaje": "torso",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "medio"
     ],
@@ -33,7 +33,7 @@
   "torso_pesado": {
     "nombre": "Torso Bunker",
     "encaje": "torso",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "pesado"
     ],
@@ -48,7 +48,7 @@
   "piernas_bipode": {
     "nombre": "Bípode estándar",
     "encaje": "piernas",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "piernas"
     ],
@@ -62,7 +62,7 @@
   "piernas_orugas": {
     "nombre": "Orugas",
     "encaje": "piernas",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "orugas",
       "estable"
@@ -78,7 +78,7 @@
   "piernas_saltarinas": {
     "nombre": "Patas de salto",
     "encaje": "piernas",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "salto"
     ],
@@ -92,7 +92,7 @@
   "cabeza_sensor": {
     "nombre": "Sensor básico",
     "encaje": "cabeza",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "sensor"
     ],
@@ -106,7 +106,7 @@
   "cabeza_optica": {
     "nombre": "Óptica de precisión",
     "encaje": "cabeza",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "sensor",
       "precision"
@@ -121,7 +121,7 @@
   "brazo_rifle": {
     "nombre": "Rifle M7",
     "encaje": "brazo",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "arma",
       "balistico",
@@ -144,7 +144,7 @@
   "brazo_rotativa": {
     "nombre": "Ametralladora rotativa",
     "encaje": "brazo",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "arma",
       "balistico",
@@ -168,7 +168,7 @@
   "brazo_canon_riel": {
     "nombre": "Cañón de riel",
     "encaje": "brazo",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "arma",
       "energia",
@@ -192,7 +192,7 @@
   "brazo_lanzallamas": {
     "nombre": "Lanzallamas",
     "encaje": "brazo",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "arma",
       "fuego",
@@ -218,7 +218,7 @@
   "brazo_hoja": {
     "nombre": "Hoja vibratoria",
     "encaje": "brazo",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "arma",
       "cuerpo_a_cuerpo"
@@ -240,7 +240,7 @@
   "brazo_lanzamisiles": {
     "nombre": "Lanzamisiles",
     "encaje": "brazo",
-    "rareza": "raro",
+    "rareza": "muy_raro",
     "etiquetas": [
       "arma",
       "explosivo",
@@ -264,7 +264,7 @@
   "brazo_escudo": {
     "nombre": "Escudo de placas",
     "encaje": "brazo",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "escudo",
       "defensivo"
@@ -281,7 +281,7 @@
   "mochila_vacia": {
     "nombre": "Sin mochila",
     "encaje": "mochila",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [],
     "peso": 0,
     "costo": 0,
@@ -291,7 +291,7 @@
   "mochila_reparacion": {
     "nombre": "Kit de reparación",
     "encaje": "mochila",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "reparacion",
       "consumible"
@@ -306,7 +306,7 @@
   "mochila_propulsor": {
     "nombre": "Propulsor",
     "encaje": "mochila",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "movilidad"
     ],
@@ -320,7 +320,7 @@
   "mochila_municion": {
     "nombre": "Cargador extra",
     "encaje": "mochila",
-    "rareza": "comun",
+    "rareza": "normal",
     "etiquetas": [
       "municion"
     ],
@@ -333,7 +333,7 @@
   "mochila_torreta": {
     "nombre": "Torreta plegable",
     "encaje": "mochila",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "torreta",
       "consumible"
@@ -348,7 +348,7 @@
   "cabeza_radar": {
     "nombre": "Radar táctico",
     "encaje": "cabeza",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "sensor",
       "radar"
@@ -360,12 +360,13 @@
     "habilidad": "marcar_objetivo",
     "costo": 70,
     "recuperable": true,
-    "descripcion": "Detecta enemigos a 6 casillas aunque haya paredes. Habilita «Marcar objetivo» y la condición «Radar: enemigo oculto»."
+    "descripcion": "Detecta enemigos a 6 casillas aunque haya paredes. Habilita «Marcar objetivo» y la condición «Radar: enemigo oculto».",
+    "sprite": "cabeza_sensor"
   },
   "brazo_gancho": {
     "nombre": "Garra con cable",
     "encaje": "brazo",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "arma",
       "cuerpo_a_cuerpo",
@@ -384,12 +385,13 @@
     "ranuras_afijo": 1,
     "costo": 65,
     "recuperable": true,
-    "descripcion": "Dispara un cable y arrastra a un enemigo hasta el mecha, aturdido. Habilita «Enganchar»."
+    "descripcion": "Dispara un cable y arrastra a un enemigo hasta el mecha, aturdido. Habilita «Enganchar».",
+    "sprite": "brazo_hoja"
   },
   "piernas_estabilizadoras": {
     "nombre": "Piernas con anclas",
     "encaje": "piernas",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "piernas",
       "estabilizador"
@@ -401,12 +403,13 @@
     "habilidad": "anclarse",
     "costo": 60,
     "recuperable": true,
-    "descripcion": "Clava anclas en el piso: no se mueve, pero apunta mucho mejor y aguanta más. Habilita «Anclarse»."
+    "descripcion": "Clava anclas en el piso: no se mueve, pero apunta mucho mejor y aguanta más. Habilita «Anclarse».",
+    "sprite": "piernas_bipode"
   },
   "mochila_senuelo": {
     "nombre": "Proyector de señuelos",
     "encaje": "mochila",
-    "rareza": "poco_comun",
+    "rareza": "raro",
     "etiquetas": [
       "senuelo",
       "consumible"
@@ -416,12 +419,13 @@
     "habilidad": "desplegar_senuelo",
     "costo": 55,
     "recuperable": true,
-    "descripcion": "Proyecta un holograma que atrae los disparos enemigos. Dos usos. Habilita «Desplegar señuelo»."
+    "descripcion": "Proyecta un holograma que atrae los disparos enemigos. Dos usos. Habilita «Desplegar señuelo».",
+    "sprite": "mochila_torreta"
   },
   "brazo_emp": {
     "nombre": "Emisor EMP",
     "encaje": "brazo",
-    "rareza": "raro",
+    "rareza": "muy_raro",
     "etiquetas": [
       "arma",
       "energia",
@@ -440,12 +444,13 @@
     "ranuras_afijo": 1,
     "costo": 120,
     "recuperable": true,
-    "descripcion": "Un pulso que apaga habilidades y desarma la puntería de un grupo. Habilita «Pulso EMP»."
+    "descripcion": "Un pulso que apaga habilidades y desarma la puntería de un grupo. Habilita «Pulso EMP».",
+    "sprite": "brazo_rifle"
   },
   "torso_reactor": {
     "nombre": "Torso con reactor",
     "encaje": "torso",
-    "rareza": "raro",
+    "rareza": "muy_raro",
     "etiquetas": [
       "medio",
       "reactor"
@@ -457,6 +462,108 @@
     "habilidad": "sobrecarga",
     "costo": 130,
     "recuperable": true,
-    "descripcion": "Puede sobrecargarse: un rato pega más fuerte y apunta mejor, después queda recalentado. Habilita «Sobrecarga»."
+    "descripcion": "Puede sobrecargarse: un rato pega más fuerte y apunta mejor, después queda recalentado. Habilita «Sobrecarga».",
+    "sprite": "torso_medio"
+  },
+  "brazo_riel_valquiria": {
+    "nombre": "Riel Valquiria",
+    "encaje": "brazo",
+    "rareza": "legendario",
+    "etiquetas": [
+      "arma",
+      "energia",
+      "precision"
+    ],
+    "arma": {
+      "danio": 52,
+      "alcance": 11,
+      "cadencia": 11,
+      "municion": 5,
+      "recarga": 14,
+      "punteria": 20,
+      "perfora": 6
+    },
+    "ranuras_afijo": 3,
+    "peso": 12,
+    "costo": 220,
+    "recuperable": true,
+    "sprite": "brazo_canon_riel",
+    "descripcion": "Un cañón de riel de colección: más daño, más alcance y tres ranuras de afijo."
+  },
+  "torso_bastion": {
+    "nombre": "Torso Bastión",
+    "encaje": "torso",
+    "rareza": "legendario",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 220,
+    "blindaje": 10,
+    "capacidad": 68,
+    "peso": 19,
+    "costo": 230,
+    "recuperable": true,
+    "sprite": "torso_pesado",
+    "descripcion": "Blindaje de crucero reciclado. Aguanta como ningún otro y carga de todo."
+  },
+  "piernas_fantasma": {
+    "nombre": "Patas Fantasma",
+    "encaje": "piernas",
+    "rareza": "legendario",
+    "etiquetas": [
+      "salto"
+    ],
+    "velocidad": 2,
+    "evasion": 26,
+    "peso": 5,
+    "costo": 210,
+    "recuperable": true,
+    "sprite": "piernas_saltarinas",
+    "descripcion": "Saltan y corren como nada. Muy difíciles de acertar."
+  },
+  "brazo_tormenta": {
+    "nombre": "La Tormenta de Kessler",
+    "encaje": "brazo",
+    "rareza": "unico",
+    "etiquetas": [
+      "arma",
+      "balistico",
+      "supresion"
+    ],
+    "arma": {
+      "danio": 9,
+      "alcance": 6,
+      "cadencia": 1,
+      "municion": 60,
+      "recarga": 12,
+      "punteria": -4,
+      "suprime": 25
+    },
+    "ranuras_afijo": 2,
+    "peso": 9,
+    "costo": 320,
+    "recuperable": true,
+    "sprite": "brazo_rotativa",
+    "habilidad": "sobrecarga",
+    "descripcion": "La rotativa de la coronel Ostrova. Una sola en todo el cinturón. Trae Sobrecarga."
+  },
+  "cabeza_ojo_de_varga": {
+    "nombre": "El Ojo de Varga",
+    "encaje": "cabeza",
+    "rareza": "unico",
+    "etiquetas": [
+      "sensor",
+      "precision",
+      "radar"
+    ],
+    "vision": 11,
+    "punteria": 18,
+    "peso": 3,
+    "costo": 300,
+    "recuperable": true,
+    "sprite": "cabeza_optica",
+    "radar": 7,
+    "habilidad": "marcar_objetivo",
+    "descripcion": "La óptica que Varga le arrancó a un crucero. Ve todo, a través de todo. Trae Marcar objetivo y radar."
   }
 }
