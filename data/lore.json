@@ -1,0 +1,396 @@
+{
+  "_ayuda": "Lore de las misiones: quien nos contrata, por que estamos ahi, que buscamos y que armas convienen. Se arma solo para cada mision (ver campana/lore.js). 'clientes': quien paga, en que sectores aparece (0, 1, 2) y para que tipos de mision. 'encargos': por tipo de mision, situaciones posibles; {cliente}, {lugar}, {enemigo}, {jefe} se reemplazan. 'enemigos': como se nombra al enemigo segun lo que mas hay. 'consejos': que armas convienen y cuales no, por estilo de mapa y por tipo de enemigo, con el porque. Un encargo con 'solo' sale nada mas para esos clientes.",
+  "clientes": {
+    "cooperativa": {
+      "nombre": "Cooperativa Hierro Viejo",
+      "quien": "la cooperativa de chatarreros",
+      "sectores": [
+        0
+      ],
+      "tipos": [
+        "defensa",
+        "escolta",
+        "patrulla"
+      ]
+    },
+    "transportistas": {
+      "nombre": "Gremio de Transportistas",
+      "quien": "el gremio de camioneros",
+      "sectores": [
+        0,
+        2
+      ],
+      "tipos": [
+        "escolta",
+        "patrulla",
+        "asalto"
+      ]
+    },
+    "resistencia": {
+      "nombre": "La Resistencia",
+      "quien": "la resistencia local",
+      "sectores": [
+        0,
+        1,
+        2
+      ],
+      "tipos": [
+        "defensa",
+        "asalto",
+        "escolta",
+        "patrulla",
+        "duelo"
+      ]
+    },
+    "colonos": {
+      "nombre": "Sobrevivientes de Nueva Esperanza",
+      "quien": "la colonia de Nueva Esperanza",
+      "sectores": [
+        1
+      ],
+      "tipos": [
+        "defensa",
+        "escolta",
+        "patrulla"
+      ]
+    },
+    "hospital": {
+      "nombre": "Hospital de campaña Santa Brígida",
+      "quien": "el hospital de Santa Brígida",
+      "sectores": [
+        1,
+        2
+      ],
+      "tipos": [
+        "escolta",
+        "defensa"
+      ]
+    },
+    "dorn": {
+      "nombre": "Dorn, contrabandista",
+      "quien": "Dorn, el contrabandista",
+      "sectores": [
+        0,
+        2
+      ],
+      "tipos": [
+        "asalto",
+        "duelo",
+        "escolta"
+      ]
+    },
+    "desertores": {
+      "nombre": "Desertores de la flota",
+      "quien": "un grupo de desertores de la flota",
+      "sectores": [
+        2
+      ],
+      "tipos": [
+        "asalto",
+        "duelo",
+        "patrulla"
+      ]
+    },
+    "anonimo": {
+      "nombre": "Contratista sin nombre",
+      "quien": "un contratista sin nombre",
+      "sectores": [
+        0,
+        1,
+        2
+      ],
+      "tipos": [
+        "asalto",
+        "duelo",
+        "patrulla"
+      ]
+    }
+  },
+  "encargos": {
+    "defensa": [
+      {
+        "porque": "{enemigo} vienen a quedarse con {lugar}, y {cliente} no tiene con qué pararlos.",
+        "buscamos": "Aguantar el núcleo hasta que se cansen de venir."
+      },
+      {
+        "porque": "En {lugar} está el único generador que le queda a {cliente}. Si cae, se apaga todo.",
+        "buscamos": "Que el generador siga en pie cuando termine la noche.",
+        "solo": [
+          "colonos",
+          "hospital",
+          "cooperativa",
+          "resistencia",
+          "transportistas"
+        ]
+      },
+      {
+        "porque": "{cliente} evacúa por {lugar} y alguien tiene que cubrir la retirada.",
+        "buscamos": "Ganar tiempo. Cada oleada que frenemos es gente que se salva.",
+        "solo": [
+          "colonos",
+          "hospital",
+          "cooperativa",
+          "resistencia",
+          "transportistas"
+        ]
+      }
+    ],
+    "asalto": [
+      {
+        "porque": "{enemigo} usan {lugar} de base para atacar las rutas de {cliente}.",
+        "buscamos": "Al que los manda. Sin cabeza, el resto se desbanda."
+      },
+      {
+        "porque": "{cliente} quiere un mensaje claro: {lugar} ya no es de ellos.",
+        "buscamos": "Bajar al líder delante de todos."
+      },
+      {
+        "porque": "Hay un cabecilla en {lugar} que tiene precio, y {cliente} lo paga.",
+        "buscamos": "La cabeza del líder. El resto es ruido."
+      }
+    ],
+    "escolta": [
+      {
+        "porque": "{cliente} necesita pasar un camión por {lugar} y {enemigo} controlan el camino.",
+        "buscamos": "Que el camión llegue a la extracción. Entero."
+      },
+      {
+        "porque": "El transporte lleva medicamentos para {cliente}. Sin eso, no pasan la semana.",
+        "buscamos": "Llevar la carga hasta la extracción, cueste lo que cueste.",
+        "solo": [
+          "hospital",
+          "colonos",
+          "resistencia",
+          "cooperativa"
+        ]
+      },
+      {
+        "porque": "{cliente} saca de {lugar} lo último que tiene antes de que {enemigo} lo saqueen.",
+        "buscamos": "Que el camión salga del mapa antes que nosotros."
+      }
+    ],
+    "patrulla": [
+      {
+        "porque": "Hace días que no se sabe nada de {lugar} y {cliente} quiere saber por qué.",
+        "buscamos": "Cruzar, ver qué hay y volver a contarlo."
+      },
+      {
+        "porque": "{cliente} va a mover gente por {lugar} y necesita la ruta limpia.",
+        "buscamos": "Barrer el camino y marcar lo que quede escondido."
+      },
+      {
+        "porque": "Algo se mueve en la niebla de {lugar}. {cliente} prefiere que lo encontremos nosotros primero.",
+        "buscamos": "Cruzar el sector sin quedar enterrados en una emboscada."
+      }
+    ],
+    "duelo": [
+      {
+        "porque": "Un escuadrón de {enemigo} le viene ganando a {cliente} hace semanas. Quieren un escuadrón igual enfrente.",
+        "buscamos": "Ganarle mecha a mecha. Que se corra la voz."
+      },
+      {
+        "porque": "{cliente} apostó por nosotros contra los mechas de {enemigo} en {lugar}.",
+        "buscamos": "No dejar a nadie de ellos en pie."
+      }
+    ]
+  },
+  "enemigos": {
+    "infanteria": "los piratas de a pie",
+    "mecha": "los mechas piratas",
+    "dron": "los drones de la flota",
+    "mutante": "los mutantes",
+    "mixto": "piratas con apoyo de drones"
+  },
+  "estilo_de_mapa": {
+    "puesto_01": "campo",
+    "refineria_02": "rio",
+    "hangar_03": "deposito",
+    "desfiladero_04": "canon",
+    "colonia_05": "ruinas"
+  },
+  "armas": {
+    "rifle": "rifles",
+    "rotativa": "rotativas",
+    "riel": "cañones de riel",
+    "lanzallamas": "lanzallamas",
+    "misiles": "lanzamisiles",
+    "hoja": "hojas",
+    "escudo": "escudos"
+  },
+  "consejos": {
+    "estilo": {
+      "campo": {
+        "conviene": [
+          [
+            "riel",
+            "Terreno abierto: el que pega de lejos dispara primero."
+          ],
+          [
+            "rifle",
+            "Buena distancia y nada que tape la línea de tiro."
+          ]
+        ],
+        "evitar": [
+          [
+            "hoja",
+            "Hasta llegar cuerpo a cuerpo te bajan cruzando el campo."
+          ]
+        ]
+      },
+      "rio": {
+        "conviene": [
+          [
+            "misiles",
+            "Pegan del otro lado del ácido sin tener que cruzar."
+          ],
+          [
+            "riel",
+            "Para cubrir los puentes desde lejos."
+          ]
+        ],
+        "evitar": [
+          [
+            "lanzallamas",
+            "Si hay que cruzar el puente para usarlo, sos un blanco fácil."
+          ]
+        ]
+      },
+      "ruinas": {
+        "conviene": [
+          [
+            "lanzallamas",
+            "Se pelea a la vuelta de la esquina: corto alcance, mucho daño."
+          ],
+          [
+            "hoja",
+            "Entre paredes, el que llega primero gana."
+          ]
+        ],
+        "evitar": [
+          [
+            "riel",
+            "Las paredes cortan la vista: el alcance largo no sirve de mucho."
+          ]
+        ]
+      },
+      "canon": {
+        "conviene": [
+          [
+            "escudo",
+            "Hay que empujar de frente: el que va adelante necesita aguantar."
+          ],
+          [
+            "rotativa",
+            "En un pasillo angosto, el fuego de supresión los frena."
+          ]
+        ],
+        "evitar": []
+      },
+      "deposito": {
+        "conviene": [
+          [
+            "rotativa",
+            "Pasillos entre contenedores: aparecen de golpe y de cerca."
+          ],
+          [
+            "escudo",
+            "Mucha cobertura, poca vista: conviene tener con qué aguantar la sorpresa."
+          ]
+        ],
+        "evitar": [
+          [
+            "misiles",
+            "Los contenedores se comen las explosiones."
+          ]
+        ]
+      },
+      "crater": {
+        "conviene": [
+          [
+            "misiles",
+            "Pegan por encima del pozo sin tener que rodearlo."
+          ],
+          [
+            "rifle",
+            "Desde el borde se controla todo el cráter."
+          ]
+        ],
+        "evitar": []
+      }
+    },
+    "enemigo": {
+      "infanteria": {
+        "conviene": [
+          [
+            "rotativa",
+            "Vienen en manada: el fuego continuo los desarma."
+          ],
+          [
+            "lanzallamas",
+            "Un chorro barre a un pelotón entero."
+          ]
+        ],
+        "evitar": [
+          [
+            "riel",
+            "Un tiro lento y caro por cada soldadito es tirar munición."
+          ]
+        ]
+      },
+      "dron": {
+        "conviene": [
+          [
+            "rifle",
+            "Los drones esquivan: hace falta puntería, no fuerza."
+          ],
+          [
+            "rotativa",
+            "Con tanto disparo, alguno los alcanza."
+          ]
+        ],
+        "evitar": [
+          [
+            "hoja",
+            "Vuelan. No los vas a alcanzar con una hoja."
+          ]
+        ]
+      },
+      "mutante": {
+        "conviene": [
+          [
+            "lanzallamas",
+            "El fuego es lo único que los hace dudar."
+          ],
+          [
+            "escudo",
+            "Se tiran encima: hay que aguantar el primer choque."
+          ]
+        ],
+        "evitar": [
+          [
+            "riel",
+            "Son rápidos y muchos: el riel carga muy lento."
+          ]
+        ]
+      },
+      "mecha": {
+        "conviene": [
+          [
+            "riel",
+            "Atraviesa blindaje como si fuera lata."
+          ],
+          [
+            "misiles",
+            "Daño pesado contra blancos pesados."
+          ]
+        ],
+        "evitar": [
+          [
+            "rotativa",
+            "Rebota en el blindaje de un mecha."
+          ]
+        ]
+      }
+    }
+  }
+}

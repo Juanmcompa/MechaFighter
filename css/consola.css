@@ -302,3 +302,10 @@ button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offse
   .bahia, .mecha-baja, .llama, .radio li, .despliegue-cabecera small { animation: none; }
 }
 .boton.oculto { display: none; }
+
+/* lore de la mision: quien manda y que llevar */
+.cliente { margin: 0; color: var(--ambar); font-size: 16px; display: flex; gap: 6px; align-items: center; }
+.cliente strong { color: var(--texto); }
+.consejos .conviene .ico { color: var(--fosforo); }
+.consejos .evitar .ico { color: var(--alarma); }
+.consejos .evitar strong { color: #e0a090; }

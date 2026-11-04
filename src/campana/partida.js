@@ -16,6 +16,7 @@ import { fotoPiloto, legadoDeDerrota, legadoDeVictoria, sumarPilotoDeOtraCampana
 import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { desplegables, cumplirTareas } from './tareas.js';
+import { armarLore } from './lore.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
@@ -120,6 +121,8 @@ export function generarSector(datos, p) {
     const k = Math.max(0, col.findIndex((n) => n.tipo === 'mision'));
     col[k] = { tipo: 'mision', i: col[k].i, encuentro: true, mision: misionEncuentro(datos, p, az, dif, nivel) };
   }
+  // Lore: quien manda cada contrato y que conviene llevar
+  for (const col of columnas) for (const nodo of col) if (nodo.mision) nodo.mision.lore = armarLore(datos, nodo.mision, p.sector);
   // Caminos: cada nodo lleva a 1 o 2 de la columna siguiente (los de enfrente), y a cada nodo llega al menos uno.
   for (let c = 0; c < columnas.length - 1; c++) {
     const a = columnas[c], b = columnas[c + 1];

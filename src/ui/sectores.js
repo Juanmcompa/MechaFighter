@@ -85,7 +85,9 @@ export function sectores(app, raiz) {
     const info = NODOS[nodo.tipo];
     const m = nodo.mision;
     detalle.append(panel(m ? m.nombre : info.nombre,
-      m ? h('p', {}, m.descripcion) : h('p', {}, textoNodo(nodo.tipo, datos)),
+      m && m.lore ? h('p', { class: 'cliente' }, ico('creditos'), ' Contrato de ', h('strong', {}, m.lore.cliente)) : null,
+      m && m.lore ? h('p', {}, m.lore.porque) : null,
+      m ? h('p', { class: m.lore ? 'ayuda' : '' }, m.descripcion) : h('p', {}, textoNodo(nodo.tipo, datos)),
       m ? h('div', { class: 'chips' },
         chip('calavera', m.cantidadEnemigos + ' hostiles', 'Enemigos'),
         chip('mira', 'Nivel ' + m.nivel, 'Nivel de los enemigos'),

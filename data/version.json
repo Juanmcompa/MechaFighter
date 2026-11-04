@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 33,
-  "cambio": "Despliegue: los mechas bajan y los pilotos charlan antes de pelear",
+  "numero": 34,
+  "cambio": "Cada contrato con su historia: quién paga, por qué y qué armas llevar",
   "novedades": [
+    "v0.34 · Cada contrato con su historia: quién paga, por qué y qué armas llevar",
     "v0.33 · Despliegue: los mechas bajan y los pilotos charlan antes de pelear",
     "v0.32 · Hangar nuevo en el celu: pilotos arriba y tareas entre misiones",
     "v0.31 · Cinta de novedades en la portada con los últimos cambios",
     "v0.30 · Versión del juego en la portada, se suma sola en cada commit",
-    "v0.29 · Mapas generados al azar y pelotones de infantería sueltos",
-    "v0.28 · 66 caras de pilotos, y cada cara con un nombre que le va"
+    "v0.29 · Mapas generados al azar y pelotones de infantería sueltos"
   ]
 }

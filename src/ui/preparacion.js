@@ -37,7 +37,10 @@ export function preparacion(app, raiz) {
     h('div', { class: 'columnas-prep' },
       h('div', {},
         panel('Briefing',
-          h('p', { class: 'briefing' }, m.descripcion),
+          m.lore ? h('p', { class: 'cliente' }, ico('creditos'), ' Contrato de ', h('strong', {}, m.lore.cliente)) : null,
+          m.lore ? h('p', { class: 'briefing' }, m.lore.porque) : null,
+          m.lore ? h('p', { class: 'briefing' }, h('strong', {}, 'Buscamos: '), m.lore.buscamos) : null,
+          h('p', { class: m.lore ? 'ayuda' : 'briefing' }, ico('mision'), ' ' + m.descripcion),
           m.jefe ? h('p', { class: 'cita-jefe' }, '«' + m.jefe.frase + '»') : null,
           m.jefe ? h('p', { class: 'ayuda' }, ico('ojo'), ' Inteligencia reunida: ' + (m.inteligencia || 0) + '. ' +
             (!m.inteligencia ? 'Llegan a ciegas: los esperan con refuerzos.' : m.condiciones.includes('inteligencia') ? 'Saben dónde está: sin niebla y atentos.' : 'Datos sueltos.')) : null,
@@ -48,6 +51,11 @@ export function preparacion(app, raiz) {
             mj.niebla ? chip('ojo', 'Niebla', 'Solo ven lo que tienen a la vista') : null,
             mj.explorada ? chip('ojo', 'Explorada', 'Alguien fue adelante: sin niebla') : null,
             m.oleadas.length > 1 ? chip('calavera', m.oleadas.length + ' oleadas', 'Oleadas') : null)),
+        m.lore && (m.lore.conviene.length || m.lore.evitar.length) ? panel('Qué llevar',
+          h('ul', { class: 'condiciones consejos' },
+            ...m.lore.conviene.map((c) => h('li', { class: 'conviene' }, ico('arriba'), h('div', {}, h('strong', {}, 'Conviene: ' + c.arma), h('span', {}, c.porque)))),
+            ...m.lore.evitar.map((c) => h('li', { class: 'evitar' }, ico('abajo'), h('div', {}, h('strong', {}, 'Mejor no: ' + c.arma), h('span', {}, c.porque))))),
+          h('p', { class: 'ayuda' }, 'Cambiá las armas en el hangar antes de desplegar.')) : null,
         (m.condiciones || []).length ? panel('Atención',
           h('ul', { class: 'condiciones' }, ...m.condiciones.map((id) => {
             const c = datos.condiciones_mision[id];
