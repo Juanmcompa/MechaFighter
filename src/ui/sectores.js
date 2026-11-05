@@ -1,7 +1,7 @@
 // Mapa del sector: columnas de nodos unidas por caminos. Desde donde esta el escuadron se puede ir a los nodos
 // enlazados de la columna siguiente; los demas quedan atras. Al final espera el jefe del sector.
-import { h, montar, ico, boton, botonIcono, panel, barraCampana, chip } from './comun.js';
-import { nodosSiguientes, elegirNodo } from '../campana/partida.js';
+import { h, montar, ico, boton, botonIcono, panel, barraCampana, chip, retrato } from './comun.js';
+import { nodosSiguientes, elegirNodo, nemesisDelMapa } from '../campana/partida.js';
 import { mapaDe } from '../core/datos.js';
 
 const NODOS = {
@@ -26,11 +26,14 @@ export function sectores(app, raiz) {
   lineas.setAttribute('class', 'caminos');
   lineas.setAttribute('aria-hidden', 'true');
   const botones = []; // [columna][i] -> boton, para trazar los caminos
+  let acecho = {}; // nemesis vistos en los contratos que siguen
+  const alcanzablesAhora = () => nodosSiguientes(p);
 
   const pintar = () => {
     mapa.innerHTML = '';
     mapa.append(lineas);
     const alcanzables = nodosSiguientes(p);
+    acecho = nemesisDelMapa(datos, p);
     s.columnas.forEach((col, c) => {
       const disponible = c === p.columna + 1;
       const columna = h('div', { class: 'columna-sector' + (disponible ? ' disponible' : c <= p.columna ? ' pasada' : '') });
@@ -47,7 +50,8 @@ export function sectores(app, raiz) {
           title: info.nombre + (nodo.mision ? ': ' + nodo.mision.nombre : ''),
           onclick: () => { elegido = { c, i }; pintar(); mostrar(nodo, i); }
         }, ico(nodo.mision && nodo.tipo === 'mision' ? nodo.mision.icono : info.icono),
-        nodo.mision ? h('span', { class: 'pips' }, '▮'.repeat(nodo.mision.dificultad)) : null);
+        nodo.mision ? h('span', { class: 'pips' }, '▮'.repeat(nodo.mision.dificultad)) : null,
+        llega && acecho[nodo.i] ? h('span', { class: 'marca-nemesis', title: 'Se vio a un némesis' }, ico('calavera')) : null);
         botones[c][i] = b;
         columna.append(b);
       });
@@ -84,7 +88,13 @@ export function sectores(app, raiz) {
     detalle.innerHTML = '';
     const info = NODOS[nodo.tipo];
     const m = nodo.mision;
+    const nem = acecho[nodo.i] && alcanzablesAhora().includes(nodo) ? (p.nemesis || []).find((x) => x.id === acecho[nodo.i]) : null;
+    const busca = nem && nem.objetivo ? p.pilotos.find((x) => x.id === nem.objetivo) : null;
     detalle.append(panel(m ? m.nombre : info.nombre,
+      nem ? h('div', { class: 'aviso-nemesis-mapa' }, retrato(datos, nem, 'retrato-mini nemesis-retrato'),
+        h('div', {}, h('strong', {}, 'Se vio a «' + nem.apodo + '» en la zona'),
+          h('span', {}, busca ? 'Anda buscando a «' + busca.apodo + '».' : 'Viene por el escuadrón.'),
+          nem.aviso ? h('span', { class: 'ayuda' }, nem.aviso) : null)) : null,
       m && m.lore ? h('p', { class: 'cliente' }, ico('creditos'), ' Contrato de ', h('strong', {}, m.lore.cliente)) : null,
       m && m.lore ? h('p', {}, m.lore.porque) : null,
       m ? h('p', { class: m.lore ? 'ayuda' : '' }, m.descripcion) : h('p', {}, textoNodo(nodo.tipo, datos)),

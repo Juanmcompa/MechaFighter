@@ -61,6 +61,8 @@ export function nemesisDelLegado(datos, p, foto, sectorNombre, veterano, az) {
 export function quizasNace(datos, p, resultado, m, az) {
   const N = datos.nemesis;
   if (activos(p).length >= N.max_activos) return null;
+  // el primero de la campana nace seguro (si no, hay campanas enteras sin ninguno)
+  const chance = (p.nemesis || []).length === 0 && p.misionesJugadas >= 1 ? 100 : N.chance_nace;
   const reg = resultado.registro || [];
   const fichas = new Map();
   for (const e of reg) if (e.tipo === 'aparece' && e.ficha) fichas.set(e.u, e.ficha);
@@ -70,21 +72,37 @@ export function quizasNace(datos, p, resultado, m, az) {
     if (!f || !k || f.bando !== 1 || f.cuerpo !== 'mecha' || f.exPiloto || f.rol === 'vip' || k.bando !== 0) continue;
     if (['torreta_ligera', 'transporte', 'senuelo'].includes(f.ref)) continue;
     const objetivo = p.pilotos.find((x) => x.id === k.ref);
-    if (!objetivo || !az.tirada(N.chance_nace)) continue;
+    if (!objetivo || !az.tirada(chance)) continue;
     const lugar = '«' + m.nombre + '»';
     return nuevo(datos, p, az, az.tirada(50) ? 'bronca' : 'familiar', objetivo, lugar, (m.nivel || 1) + 1);
   }
   return null;
 }
 
-// Al aceptar un contrato: quizas aparece un nemesis (mas seguido si va el que busca)
-export function quizasAparece(datos, p, m, desplegados, az) {
+// En el mapa: en que contratos de la columna que viene se vio a un nemesis ({ indiceDelNodo: idNemesis }).
+// Se decide antes de elegir (azar fijo por nodo), asi el jugador lo ve y puede ir a buscarlo o esquivarlo.
+export function nemesisEnNodos(datos, p, nodos, azarDeNodo) {
   const N = datos.nemesis;
+  const res = {};
   const cand = activos(p).filter((n) => p.misionesJugadas - n.ultima >= N.misiones_entre_apariciones);
-  if (!cand.length || m.encuentro || m.jefe) return null;
-  const n = cand.find((x) => desplegados.some((pi) => pi.id === x.objetivo)) || cand[0];
+  for (const nodo of nodos) {
+    const libres = cand.filter((n) => !Object.values(res).includes(n.id));
+    if (!libres.length) break;
+    if (nodo.tipo !== 'mision' || !nodo.mision || nodo.mision.encuentro) continue;
+    const az = azarDeNodo(nodo.i);
+    const n = az.elegir(libres);
+    const busca = p.pilotos.some((pi) => pi.id === n.objetivo);
+    if (az.tirada(N.chance_aparece + (busca ? N.chance_aparece_si_va_su_objetivo : 0))) res[nodo.i] = n.id;
+  }
+  return res;
+}
+
+// Al aceptar un contrato donde se vio a un nemesis: se suma a la mision
+export function quizasAparece(datos, p, m, desplegados, az, nemesisId) {
+  const N = datos.nemesis;
+  const n = activos(p).find((x) => x.id === nemesisId);
+  if (!n || m.encuentro || m.jefe) return null;
   const va = desplegados.some((pi) => pi.id === n.objetivo);
-  if (!az.tirada(N.chance_aparece + (va ? N.chance_aparece_si_va_su_objetivo : 0))) return null;
   const O = N.origenes[n.origen];
   const frase = llenar(az.elegir(O.frases), { objetivo: n.objetivoApodo || 'Control' });
   const piloto = { id: n.id, nombre: n.nombre || n.apodo, apodo: n.apodo, retrato: n.retrato, clase: n.clase, personalidad: n.personalidad,

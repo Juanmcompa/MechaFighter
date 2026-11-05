@@ -1,14 +1,29 @@
 {
-  "_ayuda": "Némesis: pilotos enemigos con nombre que vuelven una y otra vez. Nacen cuando uno de los nuestros baja un mecha enemigo y el piloto sobrevive (bronca o un familiar que busca venganza), o de la campaña anterior (caído). Aparecen en contratos que se aceptan, buscan a su objetivo en la batalla y, si pierden y escapan, vuelven preparados contra lo que los bajó. Chances en %. {yo} = el némesis, {objetivo} = el piloto que busca, {lugar} = donde empezó todo, {asesino}, {victima}.",
-  "chance_nace": 30,
+  "_ayuda": "Némesis: pilotos enemigos con nombre que vuelven una y otra vez. Nacen cuando uno de los nuestros baja un mecha enemigo y el piloto sobrevive (bronca o un familiar que busca venganza), o de la campaña anterior (caído). Se los ve en el mapa del sector (un contrato marcado con su calavera) antes de aceptarlo, buscan a su objetivo en la batalla y, si pierden y escapan, vuelven preparados contra lo que los bajó. Chances en %. {yo} = el némesis, {objetivo} = el piloto que busca, {lugar} = donde empezó todo, {asesino}, {victima}. El primer némesis de la campaña nace seguro la primera vez que bajan un mecha con piloto (después de la primera misión).",
+  "chance_nace": 45,
   "max_activos": 2,
-  "misiones_entre_apariciones": 2,
-  "chance_aparece": 35,
+  "misiones_entre_apariciones": 1,
+  "chance_aparece": 40,
   "chance_aparece_si_va_su_objetivo": 25,
   "chance_muere": 20,
   "chance_muere_por_derrota": 20,
   "premio": 50,
-  "apodos": ["Tuerca Negra", "El Carnicero", "Serrucho", "La Viuda", "Diente de Lata", "Óxido", "Cuervo Rojo", "El Sastre", "Mandíbula", "Herrumbre", "La Hiena", "Sirena", "Ceniza Roja", "El Cobrador"],
+  "apodos": [
+    "Tuerca Negra",
+    "El Carnicero",
+    "Serrucho",
+    "La Viuda",
+    "Diente de Lata",
+    "Óxido",
+    "Cuervo Rojo",
+    "El Sastre",
+    "Mandíbula",
+    "Herrumbre",
+    "La Hiena",
+    "Sirena",
+    "Ceniza Roja",
+    "El Cobrador"
+  ],
   "origenes": {
     "bronca": {
       "nombre": "Bronca",
@@ -16,7 +31,11 @@
         "«{yo}» se eyectó de su mecha en llamas mientras «{objetivo}» lo remataba en {lugar}. Sobrevivió. Y no se olvida de las caras.",
         "En {lugar}, «{objetivo}» le partió el mecha a «{yo}». Lo dejó vivo. Error."
       ],
-      "frases": ["{objetivo}, ¿te acordás de mí? Yo sí me acuerdo de vos.", "Te estuve buscando, {objetivo}.", "Esta vez no me agarrás de espaldas, {objetivo}."]
+      "frases": [
+        "{objetivo}, ¿te acordás de mí? Yo sí me acuerdo de vos.",
+        "Te estuve buscando, {objetivo}.",
+        "Esta vez no me agarrás de espaldas, {objetivo}."
+      ]
     },
     "familiar": {
       "nombre": "Venganza",
@@ -24,7 +43,11 @@
         "El piloto que «{objetivo}» bajó en {lugar} tenía una hermana: «{yo}». Juró encontrarlo.",
         "«{yo}» enterró a su hermano después de {lugar}. Sabe el nombre del que apretó el gatillo: «{objetivo}»."
       ],
-      "frases": ["Esto es por mi hermano, {objetivo}.", "Él no te hizo nada, {objetivo}. Yo sí te voy a hacer.", "¿Sabés cómo se llamaba? No. Claro que no."]
+      "frases": [
+        "Esto es por mi hermano, {objetivo}.",
+        "Él no te hizo nada, {objetivo}. Yo sí te voy a hacer.",
+        "¿Sabés cómo se llamaba? No. Claro que no."
+      ]
     },
     "caido": {
       "nombre": "Caído",
@@ -32,43 +55,91 @@
         "«{yo}» peleaba con nosotros en {lugar}. Lo dimos por muerto. No estaba muerto, y ahora pelea para el otro lado.",
         "Cuando cayó el escuadrón en {lugar}, nadie volvió a buscar a «{yo}». Él no lo olvidó."
       ],
-      "frases": ["Me dejaron ahí, Control. Ahora me toca a mí.", "¿Me extrañaron? Yo a ustedes sí.", "Conozco sus órdenes. Las escribí con ustedes."]
+      "frases": [
+        "Me dejaron ahí, Control. Ahora me toca a mí.",
+        "¿Me extrañaron? Yo a ustedes sí.",
+        "Conozco sus órdenes. Las escribí con ustedes."
+      ]
     }
   },
   "tacticas": {
     "lejos": {
-      "tipos": ["riel", "bala"],
+      "tipos": [
+        "riel",
+        "bala"
+      ],
       "como": "lo bajaron a distancia",
       "clase": "infiltrador",
-      "partes": ["torso_medio", "piernas_saltarinas", "brazo_hoja", "brazo_escudo", "mochila_propulsor"],
+      "partes": [
+        "torso_medio",
+        "piernas_saltarinas",
+        "brazo_hoja",
+        "brazo_escudo",
+        "mochila_propulsor"
+      ],
       "aviso": "Volvió con escudo y propulsores: esta vez cierra la distancia antes de que le apunten."
     },
     "cerca": {
-      "tipos": ["tajo", "llama"],
+      "tipos": [
+        "tajo",
+        "llama"
+      ],
       "como": "lo bajaron cuerpo a cuerpo",
       "clase": "tirador",
-      "partes": ["torso_ligero", "piernas_bipode", "cabeza_optica", "brazo_canon_riel"],
+      "partes": [
+        "torso_ligero",
+        "piernas_bipode",
+        "cabeza_optica",
+        "brazo_canon_riel"
+      ],
       "aviso": "Aprendió la lección: ahora pelea de lejos y no deja que nadie se le acerque."
     },
     "fuego": {
-      "tipos": ["rafaga"],
+      "tipos": [
+        "rafaga"
+      ],
       "como": "lo barrieron a puro fuego",
       "clase": "vanguardia",
-      "partes": ["torso_pesado", "piernas_orugas", "brazo_escudo", "brazo_rotativa"],
+      "partes": [
+        "torso_pesado",
+        "piernas_orugas",
+        "brazo_escudo",
+        "brazo_rotativa"
+      ],
       "aviso": "Volvió blindado hasta los dientes: la lluvia de balas ya no le hace cosquillas."
     },
     "explosivos": {
-      "tipos": ["misil"],
+      "tipos": [
+        "misil"
+      ],
       "como": "lo reventaron con explosivos",
       "clase": "infiltrador",
-      "partes": ["torso_ligero", "piernas_saltarinas", "brazo_rifle", "brazo_hoja", "mochila_propulsor"],
+      "partes": [
+        "torso_ligero",
+        "piernas_saltarinas",
+        "brazo_rifle",
+        "brazo_hoja",
+        "mochila_propulsor"
+      ],
       "aviso": "Ahora es liviano y no para de moverse: los misiles no lo van a encontrar quieto."
     }
   },
   "final": {
-    "muere": ["«{yo}» no se levanta esta vez. «{asesino}» cerró la cuenta.", "Del mecha de «{yo}» no quedó nada. Se terminó."],
-    "escapa": ["«{yo}» se eyectó otra vez entre el humo. Por radio se escuchó: «Esto no terminó».", "El mecha de «{yo}» quedó hecho chatarra, pero la cabina estaba vacía."],
-    "sigue": ["«{yo}» se retiró entero. Va a volver.", "«{yo}» se fue sin un rasguño. Y con ganas de más."],
-    "cobra": ["«{yo}» se cobró a «{victima}». La bronca no se le pasa.", "«{yo}» bajó a «{victima}» y se fue riendo."]
+    "muere": [
+      "«{yo}» no se levanta esta vez. «{asesino}» cerró la cuenta.",
+      "Del mecha de «{yo}» no quedó nada. Se terminó."
+    ],
+    "escapa": [
+      "«{yo}» se eyectó otra vez entre el humo. Por radio se escuchó: «Esto no terminó».",
+      "El mecha de «{yo}» quedó hecho chatarra, pero la cabina estaba vacía."
+    ],
+    "sigue": [
+      "«{yo}» se retiró entero. Va a volver.",
+      "«{yo}» se fue sin un rasguño. Y con ganas de más."
+    ],
+    "cobra": [
+      "«{yo}» se cobró a «{victima}». La bronca no se le pasa.",
+      "«{yo}» bajó a «{victima}» y se fue riendo."
+    ]
   }
 }

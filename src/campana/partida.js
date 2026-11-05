@@ -17,7 +17,7 @@ import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { desplegables, cumplirTareas } from './tareas.js';
 import { armarLore } from './lore.js';
-import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos } from './nemesis.js';
+import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
@@ -188,9 +188,15 @@ export function nodosSiguientes(p) {
   return aca && aca.sig ? sig.filter((n) => aca.sig.includes(n.i)) : sig;
 }
 
+// Que nemesis se vieron en los contratos de la columna que viene ({ indiceDelNodo: idNemesis })
+export function nemesisDelMapa(datos, p) {
+  return nemesisEnNodos(datos, p, nodosSiguientes(p), (i) => azarAparte(p, 'nemesis:' + i));
+}
+
 export function elegirNodo(datos, p, i) {
   const nodo = nodosSiguientes(p)[i];
   if (!nodo) return null;
+  const acecho = nemesisDelMapa(datos, p); // (antes de moverse: depende de donde estamos)
   p.columna++;
   p.posicion = nodo.i;
   gastarCombustible(datos, p);
@@ -206,7 +212,7 @@ export function elegirNodo(datos, p, i) {
       // quizas aparece un nemesis (la mision se copia: el cambio es solo para esta)
       if (nodo.tipo === 'mision') {
         p.nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
-        quizasAparece(datos, p, p.nodo.mision, desplegables(datos, p), azarAparte(p, 'nemesis'));
+        if (acecho[nodo.i]) quizasAparece(datos, p, p.nodo.mision, desplegables(datos, p), azarAparte(p, 'nemesis'), acecho[nodo.i]);
       }
       // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
       p.nodo.animo = calcularAnimo(datos, p, nodo.mision, desplegables(datos, p), azarAparte(p, 'animo'));

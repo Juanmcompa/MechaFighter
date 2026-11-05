@@ -139,7 +139,7 @@ console.log('Campana');
   n.ultima = -10;
   const m = armarMision(datos, 'asalto', 2, crearAzar(4), 2);
   const dn = { ...datos, nemesis: { ...datos.nemesis, chance_aparece: 100, chance_muere: 0, chance_muere_por_derrota: 0 } }; // (solo para la prueba)
-  quizasAparece(dn, p, m, p.pilotos, crearAzar(5));
+  quizasAparece(dn, p, m, p.pilotos, crearAzar(5), n.id);
   ok(m.nemesis === n.id && m.rivales.some((r) => r.nemesis && r.odia === objetivo.id), 'el nemesis aparece en el contrato y busca a su objetivo');
   const r = simular(datos, { mision: m, escuadron: p.pilotos.map((x) => ({ piloto: x, mecha: x.mecha, gambits: x.gambits })), semilla: m.semilla });
   ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.ref === 'ex:' + n.id), 'el nemesis pelea en la batalla');
