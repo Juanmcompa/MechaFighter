@@ -39,8 +39,12 @@ export function armarCharla(datos, p, m, pilotos) {
   if (nem) {
     charla.push({ piloto: nem.piloto, enemigo: true, texto: nem.frase });
     const blanco = pilotos.find((pi) => pi.id === nem.odia);
-    if (blanco) dice(blanco, elegir(C.nemesis_reaccion).replace(/\{nemesis\}/g, nem.piloto.apodo));
-    else dice(quien(), elegir(C.nemesis_otro));
+    if (blanco) {
+      dice(blanco, elegir(C.nemesis_reaccion).replace(/\{nemesis\}/g, nem.piloto.apodo));
+      if (nem.lineas) charla.push({ piloto: nem.piloto, enemigo: true, texto: nem.lineas.replica });
+      const otro = pilotos.find((pi) => pi.id !== blanco.id);
+      if (otro && C.nemesis_apoyo) dice(otro, elegir(C.nemesis_apoyo).replace(/\{blanco\}/g, blanco.apodo));
+    } else dice(quien(), elegir(C.nemesis_otro));
   }
   if ((m.rivales || []).some((r) => !r.nemesis)) dice(quien(), elegir(C.rivales_viejos));
 
@@ -90,11 +94,16 @@ export function despliegue(app, raiz) {
   const listo = boton('¡Adentro!', ir, { iconoNombre: 'play', clase: 'principal oculto' });
   const saltar = boton('Saltar', ir, { iconoNombre: 'saltar', clase: 'secundario compacto' });
 
+  // si viene un nemesis: primero el cara a cara
+  const nem = (m.rivales || []).find((r) => r.nemesis);
+  const versus = nem ? tarjetaVersus(datos, nem, pilotos) : null;
+
   montar(raiz,
-    h('div', { class: 'despliegue' },
+    h('div', { class: 'despliegue' + (nem ? ' con-nemesis' : '') },
       h('header', { class: 'despliegue-cabecera' },
         h('div', {}, h('small', {}, 'DESPLIEGUE EN CURSO'), h('h1', { class: 'titulo-pantalla' }, ico(m.icono), ' ', m.nombre)),
         saltar),
+      versus,
       bodega,
       h('div', { class: 'altitud' }, ico('arriba'), altura, alt),
       radio,
@@ -122,6 +131,24 @@ export function despliegue(app, raiz) {
     alt.textContent = Math.max(0, Math.round(3000 * (1 - frac) / 50) * 50) + ' m';
     timer = setTimeout(paso, 900 + l.texto.length * 28);
   };
-  timer = setTimeout(paso, 500);
+  timer = setTimeout(paso, versus ? 3200 : 500);
   return () => clearTimeout(timer);
+}
+
+// Cara a cara: el nemesis contra el piloto que busca (o contra todo el escuadron)
+function tarjetaVersus(datos, nem, pilotos) {
+  const O = datos.nemesis.origenes[nem.origen] || { nombre: 'Némesis' };
+  const blanco = pilotos.find((pi) => pi.id === nem.odia);
+  const lado = (pi, clase, nombre, sub) => h('div', { class: 'vs-lado ' + clase },
+    pi ? retrato(datos, pi, 'retrato-grande') : h('span', { class: 'vs-escuadron' }, ico('piloto')),
+    h('strong', {}, nombre), h('small', {}, sub));
+  return h('section', { class: 'versus', 'aria-label': 'Némesis a la vista' },
+    h('div', { class: 'vs-alerta' }, ico('rayo'), ' SEÑAL HOSTIL · CANAL ABIERTO'),
+    h('div', { class: 'vs-caras' },
+      lado(nem.piloto, 'malo', '«' + nem.piloto.apodo + '»', O.nombre + (nem.derrotas ? ' · ' + nem.derrotas + (nem.derrotas > 1 ? ' derrotas' : ' derrota') : '')),
+      h('span', { class: 'vs-vs' }, 'VS'),
+      blanco ? lado(blanco, 'bueno', '«' + blanco.apodo + '»', 'Su objetivo') : lado(null, 'bueno', 'El escuadrón', 'Viene por todos')),
+    h('p', { class: 'vs-frase' }, '«' + nem.frase + '»'),
+    nem.aviso ? h('p', { class: 'vs-aviso' }, ico('mira'), ' ' + nem.aviso) : nem.historia ? h('p', { class: 'vs-aviso' }, nem.historia) : null,
+    nem.cae ? h('p', { class: 'vs-ultima' }, 'Ya lo bajaron demasiadas veces: si cae hoy, no se levanta.') : null);
 }

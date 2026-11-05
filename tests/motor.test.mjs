@@ -138,7 +138,7 @@ console.log('Campana');
   const n = nemesisDelLegado(datos, p, { ...fotoPiloto(p.pilotos[1]), apodo: 'Prueba', id: 'x9' }, 'acá', objetivo, az);
   n.ultima = -10;
   const m = armarMision(datos, 'asalto', 2, crearAzar(4), 2);
-  const dn = { ...datos, nemesis: { ...datos.nemesis, chance_aparece: 100, chance_muere: 0, chance_muere_por_derrota: 0 } }; // (solo para la prueba)
+  const dn = { ...datos, nemesis: { ...datos.nemesis, chance_aparece: 100 } }; // (solo para la prueba)
   quizasAparece(dn, p, m, p.pilotos, crearAzar(5), n.id);
   ok(m.nemesis === n.id && m.rivales.some((r) => r.nemesis && r.odia === objetivo.id), 'el nemesis aparece en el contrato y busca a su objetivo');
   const r = simular(datos, { mision: m, escuadron: p.pilotos.map((x) => ({ piloto: x, mecha: x.mecha, gambits: x.gambits })), semilla: m.semilla });
@@ -149,6 +149,9 @@ console.log('Campana');
     { tipo: 'dispara', u: 'u1', o: uid, arma: 'riel', acierta: true, danio: 90 }, { tipo: 'muere', u: uid, por: 'u1' }];
   const out = resolverNemesis(dn, p, { registro: reg }, m, crearAzar(6));
   ok(!out.muerto && n.estado === 'activo' && n.clase === 'infiltrador' && normalizarPieza(n.mecha.brazo_izq).parte === 'brazo_escudo', 'escapa y vuelve preparado contra el riel');
+  // a la tercera derrota (o con un tiro a la cabina) cae para siempre
+  n.derrotas = dn.nemesis.derrotas_para_caer - 1;
+  ok(resolverNemesis(dn, p, { registro: reg }, m, crearAzar(7)).muerto && n.estado === 'muerto', 'a la tercera cae para siempre');
 }
 
 // Daño por partes: un brazo roto no vuelve a disparar; un tiro a la cabina deja el mecha para saquear

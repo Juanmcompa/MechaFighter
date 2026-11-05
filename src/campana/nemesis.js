@@ -104,10 +104,21 @@ export function quizasAparece(datos, p, m, desplegados, az, nemesisId) {
   if (!n || m.encuentro || m.jefe) return null;
   const va = desplegados.some((pi) => pi.id === n.objetivo);
   const O = N.origenes[n.origen];
-  const frase = llenar(az.elegir(O.frases), { objetivo: n.objetivoApodo || 'Control' });
+  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo };
+  const frase = llenar(az.elegir(O.frases), v);
+  // todo lo que dice en la batalla queda armado aca (la vista no tira azar). cae: si lo bajan, esta vez no se levanta.
+  const di = (lista) => llenar(az.elegir(lista), v);
+  const B = N.batalla, R = N.respuestas;
+  const lineas = {
+    replica: di(N.replicas), escapa: di(B.escapa), cae: di(B.cae), baja: di(B.baja), bajaObjetivo: di(B.baja_objetivo), sobrevive: di(B.sobrevive),
+    respEscapa: di(R.escapa), respCae: di(R.cae), respSobrevive: di(R.sobrevive)
+  };
+  const cae = n.derrotas + 1 >= N.derrotas_para_caer;
   const piloto = { id: n.id, nombre: n.nombre || n.apodo, apodo: n.apodo, retrato: n.retrato, clase: n.clase, personalidad: n.personalidad,
     nivel: Math.min(n.nivel, (m.nivel || 1) + 2), xp: 0, medallas: [], cicatrices: [], traumas: [], hoja: [], bajas: 0, misiones: 0 };
-  m.rivales = (m.rivales || []).concat({ piloto, mecha: n.mecha, gambits: n.gambits, odia: va ? n.objetivo : null, nemesis: true, frase });
+  m.rivales = (m.rivales || []).concat({ piloto, mecha: n.mecha, gambits: n.gambits, odia: va ? n.objetivo : null, nemesis: true, frase,
+    objetivo: n.objetivo, objetivoApodo: n.objetivoApodo, lineas, cae, origen: n.origen, derrotas: n.derrotas, aviso: n.aviso,
+    historia: n.historia.slice(-1)[0] || '' });
   m.nemesis = n.id;
   m.cantidadEnemigos = (m.cantidadEnemigos || 0) + 1;
   m.recompensa.creditos += N.premio;
@@ -158,7 +169,8 @@ export function resolverNemesis(datos, p, resultado, m, az) {
   const k = muerte.por ? fichas.get(muerte.por) : null;
   const asesino = k && k.bando === 0 ? (p.pilotos.find((x) => x.id === k.ref) || { apodo: k.nombre, id: null }) : null;
   n.derrotas++;
-  if (muerte.limpio || az.tirada(N.chance_muere + N.chance_muere_por_derrota * (n.derrotas - 1))) {
+  // cae para siempre solo con un tiro limpio a la cabina, o cuando ya lo bajaron demasiadas veces
+  if (muerte.limpio || n.derrotas >= N.derrotas_para_caer) {
     n.estado = 'muerto';
     out.muerto = true;
     out.textos.push(llenar(az.elegir(N.final.muere), { yo: n.apodo, asesino: asesino ? asesino.apodo : 'el escuadrón' }));

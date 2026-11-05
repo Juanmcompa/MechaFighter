@@ -108,6 +108,7 @@ export function batalla(app, raiz) {
       h('h2', {}, resultado.victoria ? 'MISIÓN CUMPLIDA' : 'MISIÓN FALLIDA'),
       h('p', {}, datos.textos.motivos_fin[resultado.motivo] || ''),
       informe.caidos.length ? h('p', { class: 'caidos' }, ico('lapida'), ' Caídos: ' + informe.caidos.join(', ')) : null,
+      finalNemesis(m, resultado),
       boton('Ver informe', () => app.ir('informe', informe), { iconoNombre: 'play', clase: 'principal' })));
     final.querySelector('button').focus();
   }
@@ -131,4 +132,19 @@ export function batalla(app, raiz) {
   window.addEventListener('resize', alCambiarTamano);
   // devuelve la limpieza: cortar el bucle al salir de la pantalla
   return () => { vivo = false; window.removeEventListener('resize', alCambiarTamano); };
+}
+
+// Como termino el nemesis, en la caja del final de la batalla
+function finalNemesis(m, resultado) {
+  const rv = (m.rivales || []).find((r) => r.nemesis && r.lineas);
+  if (!rv) return null;
+  const reg = resultado.registro || [];
+  const ap = reg.find((e) => e.tipo === 'aparece' && e.ficha && e.ficha.ref === 'ex:' + rv.piloto.id);
+  const muerte = ap ? reg.find((e) => e.tipo === 'muere' && e.u === ap.u) : null;
+  const quien = '«' + rv.piloto.apodo + '»';
+  const [clase, titulo, texto] = !muerte ? ['sigue', quien + ' sigue suelto', rv.lineas.sobrevive]
+    : muerte.limpio || rv.cae ? ['cae', quien + ' cayó para siempre', rv.lineas.cae]
+    : ['escapa', quien + ' se eyectó', 'Va a volver, y mejor preparado.'];
+  return h('div', { class: 'final-nemesis ' + clase }, ico('calavera'),
+    h('div', {}, h('strong', {}, titulo), h('span', {}, clase === 'escapa' ? texto : '«' + texto + '»')));
 }

@@ -253,6 +253,7 @@ export class Repeticion {
           }
         }
         this.alEvento({ texto: (k ? k.ficha.nombre + ' abatió a ' + u.ficha.nombre : u.ficha.nombre + ' cae') + (e.limpio && !propio ? ' · tiro a la cabina, queda entero' : ''), clase: propio ? 'mal' : 'bien', importante: propio && u.ficha.tipo === 'piloto' });
+        this.nemesisAlCaer(u, k, e, U, propio);
         break;
       }
       case 'anula': {
@@ -392,6 +393,32 @@ export class Repeticion {
     const quien = u.ficha.bando === 0 ? u.ficha.nombre.toUpperCase() + ' › CONTROL' : u.ficha.nombre;
     this.alEvento({ texto: quien + ': «' + texto + '»', clase: 'voz', importante: momento === 'vinculo_cae' || momento === 'contacto' });
     return true;
+  }
+
+  // El nemesis de la mision (lo que dice esta armado en campana/nemesis.js > quizasAparece)
+  rivalNemesis(x) {
+    return x && x.ficha.nemesis ? (this.mision.rivales || []).find((r) => r.nemesis && 'ex:' + r.piloto.id === x.ficha.ref) : null;
+  }
+
+  // Lo que se dicen el nemesis y su rival cuando cae alguno de los dos
+  nemesisAlCaer(u, k, e, U, propio) {
+    const canal = (x, texto) => this.alEvento({ texto: 'NÉMESIS · ' + x.ficha.nombre.toUpperCase() + ' (canal abierto): «' + texto + '»', clase: 'mal', importante: true });
+    const nuestro = (x, texto) => {
+      x.grito = { texto, hasta: this.T + 30 };
+      this.alEvento({ texto: x.ficha.nombre.toUpperCase() + ' › CONTROL: «' + texto + '»', clase: 'voz', importante: true });
+    };
+    const rv = this.rivalNemesis(u);
+    if (rv && rv.lineas) {
+      const cae = e.limpio || rv.cae;
+      if (!cae) this.flotante(u, '¡EYECCIÓN!', '#ffd27a');
+      canal(u, cae ? rv.lineas.cae : rv.lineas.escapa);
+      const vivos = [...U.values()].filter((x) => x.viva && x.ficha.bando === 0 && x.ficha.tipo === 'piloto');
+      const contesta = vivos.find((x) => x.ficha.ref === rv.objetivo) || (k && k.viva && k.ficha.bando === 0 ? k : vivos[0]);
+      if (contesta) nuestro(contesta, cae ? rv.lineas.respCae : rv.lineas.respEscapa);
+      return;
+    }
+    const rk = this.rivalNemesis(k);
+    if (rk && rk.lineas && propio && u.ficha.tipo === 'piloto') canal(k, u.ficha.ref === rk.objetivo ? rk.lineas.bajaObjetivo : rk.lineas.baja);
   }
 
   flotante(u, texto, color, chico = false) {

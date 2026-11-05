@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 37,
-  "cambio": "Némesis a la vista: aparecen en el mapa y salen mucho más seguido",
+  "numero": 38,
+  "cambio": "Cara a cara con el némesis: aparece, provoca, y si lo bajás se eyecta",
   "novedades": [
+    "v0.38 · Cara a cara con el némesis: aparece, provoca, y si lo bajás se eyecta",
     "v0.37 · Némesis a la vista: aparecen en el mapa y salen mucho más seguido",
     "v0.36 · Colonias Muertas con bichos nuevos: larvas, contagiados, brutos y La Madre",
     "v0.35 · Némesis: enemigos con nombre que vuelven, te buscan y aprenden",
     "v0.34 · Cada contrato con su historia: quién paga, por qué y qué armas llevar",
-    "v0.33 · Despliegue: los mechas bajan y los pilotos charlan antes de pelear",
-    "v0.32 · Hangar nuevo en el celu: pilotos arriba y tareas entre misiones"
+    "v0.33 · Despliegue: los mechas bajan y los pilotos charlan antes de pelear"
   ]
 }

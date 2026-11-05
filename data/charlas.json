@@ -137,5 +137,10 @@
   "nemesis_otro": [
     "¿Quién es ese? ¿Por qué sabe nuestros nombres?",
     "Un canal abierto del otro lado. Esto es personal para alguien."
+  ],
+  "nemesis_apoyo": [
+    "Tranquilo, «{blanco}». Si viene por vos, viene por todos.",
+    "Que venga. Lo estamos esperando.",
+    "«{blanco}», no estás solo en esto."
   ]
 }
