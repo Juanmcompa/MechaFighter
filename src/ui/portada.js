@@ -1,6 +1,7 @@
 import { h, montar, boton, panel, ico, retrato, version } from './comun.js';
 import { nuevaPartida } from '../campana/partida.js';
 import { cargarLegado, borrarLegado } from '../campana/guardado.js';
+import { despedidasDe } from '../campana/legado.js';
 
 export function portada(app, raiz) {
   const guardada = app.partida || app.cargarGuardada();
@@ -34,13 +35,15 @@ export function portada(app, raiz) {
               boton('Empezar de cero', empezar, { clase: 'peligro' })));
           }, { iconoNombre: 'mas', clase: 'secundario' })
           : boton('Nueva campaña', empezar, { iconoNombre: 'mas', clase: 'principal' })),
-      legado && (legado.veterano || (legado.escuadron && legado.escuadron.length)) ? panel('De la campaña anterior',
+      legado && (legado.veterano || legado.nadie || (legado.escuadron && legado.escuadron.length)) ? panel('De la campaña anterior',
+        !legado.veterano && legado.nadie ? h('p', { class: 'legado-linea' }, ico('lapida'), h('span', {}, legado.nadie)) : null,
         legado.veterano ? h('p', { class: 'legado-linea' }, retrato(app.datos, legado.veterano, 'retrato-mini'),
           h('span', {}, h('strong', {}, '«' + legado.veterano.apodo + '»'), legado.veterano.comoLlego === 'sobrevivio'
             ? ' sobrevivió y vuelve a firmar con vos (niv ' + legado.veterano.nivel + ').'
             : ' sigue con vos en la próxima campaña (niv ' + legado.veterano.nivel + ').')) : null,
         legado.escuadron && legado.escuadron.length ? h('p', { class: 'legado-linea' }, ico('calavera'),
-          h('span', {}, 'No se encontraron los cuerpos de ' + legado.escuadron.map((f) => '«' + f.apodo + '»').join(', ') + '. Hay rumores.')) : null) : null,
+          h('span', {}, 'No se encontraron los cuerpos de ' + legado.escuadron.map((f) => '«' + f.apodo + '»').join(', ') + '. Hay rumores.')) : null,
+        despedidasDe(legado).length ? h('ul', { class: 'despedidas' }, ...despedidasDe(legado).map((t) => h('li', {}, t))) : null) : null,
       panel('Cómo se juega',
         h('ol', { class: 'pasos' },
           h('li', {}, h('strong', {}, 'Elegí un contrato'), ' en el mapa del sector.'),

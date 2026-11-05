@@ -2,6 +2,7 @@
 import { h, montar, ico, boton, panel, chip, retrato } from './comun.js';
 import { elegirVeterano } from '../campana/partida.js';
 import { guardarLegado } from '../campana/guardado.js';
+import { despedidasDe } from '../campana/legado.js';
 import { relato } from '../campana/cronica.js';
 
 export function fin(app, raiz) {
@@ -24,13 +25,15 @@ export function fin(app, raiz) {
     gano && p.pilotos.length ? panel('Vuelven', h('ul', { class: 'lista-simple' }, ...p.pilotos.map((pi) =>
       h('li', {}, ico(datos.clases[pi.clase].icono), ' «' + pi.apodo + '» ' + pi.nombre + ' · niv ' + pi.nivel + ' · ' + pi.bajas + ' bajas')))) : null,
     L && gano && p.pilotos.length ? panel('¿Quién sigue con vos?',
-      h('p', { class: 'ayuda' }, 'Uno de ellos puede arrancar la próxima campaña con su nivel, sus medallas y sus cicatrices.'),
+      h('p', { class: 'ayuda' }, 'Uno de ellos arranca la próxima campaña con su nivel, sus medallas y sus cicatrices. Si no elegís, sigue el de más nivel (marcado).'),
       h('div', { class: 'veteranos' }, ...p.pilotos.map((pi) => h('button', {
         class: 'tarjeta-veterano' + (L.veterano && L.veterano.id === pi.id ? ' elegido' : ''), onclick: () => elegir(pi.id)
-      }, retrato(datos, pi, 'retrato-chico'), h('strong', {}, '«' + pi.apodo + '»'), h('small', {}, datos.clases[pi.clase].nombre + ' · niv ' + pi.nivel))))) : null,
+      }, retrato(datos, pi, 'retrato-chico'), h('strong', {}, '«' + pi.apodo + '»'), h('small', {}, datos.clases[pi.clase].nombre + ' · niv ' + pi.nivel)))),
+      despedidasDe(L).length ? h('ul', { class: 'despedidas' }, ...despedidasDe(L).map((t) => h('li', {}, t))) : null) : null,
     L && !gano ? panel('Lo que queda',
       L.veterano ? h('p', { class: 'legado-linea' }, retrato(datos, L.veterano, 'retrato-chico'),
-        h('span', {}, h('strong', {}, '«' + L.veterano.apodo + '»'), ' apareció entre los restos, vivo. Va a estar en la próxima campaña.')) : null,
+        h('span', {}, h('strong', {}, '«' + L.veterano.apodo + '»'), ' apareció entre los restos, vivo. Va a estar en la próxima campaña.'))
+        : h('p', { class: 'legado-linea' }, ico('lapida'), h('span', {}, L.nadie || 'No encontraron a nadie con vida.')),
       L.escuadron.length ? h('p', { class: 'legado-linea' }, ico('calavera'),
         h('span', {}, 'Nunca encontraron los cuerpos de ' + L.escuadron.map((f) => '«' + f.apodo + '»').join(', ') + '.')) : null) : null,
     panelCronica(datos, p),

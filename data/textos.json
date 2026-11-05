@@ -49,5 +49,35 @@
     "los Hijos del Vacío",
     "la Brigada Remache",
     "los Lobos de Órbita"
-  ]
+  ],
+  "despedidas": {
+    "_ayuda": "Por qué no siguen con vos los que sobrevivieron a la campaña (sale una frase por piloto; primero según su personalidad, si no una general). {apodo}, {sector}.",
+    "temerario": [
+      "«{apodo}» se fue a buscar una guerra más grande. Dice que esta le quedó chica.",
+      "«{apodo}» se anotó en la primera fila de otro contrato antes de que se enfriara el mecha."
+    ],
+    "cobarde": [
+      "«{apodo}» juró que no se sube más a un mecha. Esta vez parece que va en serio.",
+      "«{apodo}» agarró su paga y se tomó el primer transporte lejos del Cinturón."
+    ],
+    "sanguinario": [
+      "«{apodo}» firmó con los mercenarios de Ostrova. Pagan por baja.",
+      "«{apodo}» se fue sin despedirse. Nadie lo extraña del todo."
+    ],
+    "leal": [
+      "«{apodo}» quería seguir, pero le prometió a su familia que volvía. Cumplió.",
+      "«{apodo}» se quedó cuidando a los heridos en Santa Brígida. «Alguien tiene que hacerlo», dijo."
+    ],
+    "general": [
+      "«{apodo}» se retiró con su paga. Dice que va a abrir un taller.",
+      "«{apodo}» firmó con otra compañía. Pagan mejor y preguntan menos.",
+      "«{apodo}» volvió con su familia. Promete escribir.",
+      "«{apodo}» no contestó más la radio. Nadie sabe adónde fue.",
+      "«{apodo}» se quedó con la gente de la colonia. Dice que ahí lo necesitan."
+    ],
+    "nadie": [
+      "Buscaron entre los restos en «{sector}». No encontraron a nadie con vida.",
+      "El equipo de rescate llegó tarde a «{sector}». Solo quedaba chatarra."
+    ]
+  }
 }

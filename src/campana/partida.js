@@ -273,7 +273,7 @@ function avanzar(datos, p) {
   if (p.estado === 'fin') return;
   if (p.columna >= def.columnas_por_sector - 1) {
     p.puntaje += datos.reglas.campana.puntaje_por_sector;
-    if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; p.legado = legadoDeVictoria(p); return; }
+    if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; p.legado = legadoDeVictoria(datos, p, azarAparte(p, 'legado')); return; }
     p.sector++;
     generarSector(datos, p);
     if (p.combustible !== undefined) p.combustible = Math.min(datos.reglas.combustible.maximo, p.combustible + datos.reglas.combustible.por_sector);

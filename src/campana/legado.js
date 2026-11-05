@@ -29,12 +29,33 @@ export function legadoDeDerrota(datos, p, fotos, azar) {
     leg.veterano = { ...orden[0], comoLlego: 'sobrevivio' };
     orden.shift();
   }
+  // si no aparecio nadie, igual se dice (que no quede la duda)
+  if (!leg.veterano) leg.nadie = azar.elegir(datos.textos.despedidas.nadie).replace(/\{sector\}/g, leg.sectorNombre || 'el último sector');
   leg.escuadron = orden;
   return leg;
 }
 
-export function legadoDeVictoria(p) {
-  return { resultado: 'victoria', sector: p.sector + 1, sectorNombre: (p.sectores[p.sector] || {}).nombre || '', veterano: null, escuadron: [] };
+// Ganaron: sigue el de mas nivel (el jugador puede elegir otro) y cada uno de los demas cuenta por que no sigue
+export function legadoDeVictoria(datos, p, azar) {
+  const D = datos.textos.despedidas;
+  const vivos = p.pilotos.slice().sort((a, b) => b.nivel - a.nivel || b.bajas - a.bajas);
+  const despedidas = {};
+  const usadas = new Set();
+  for (const pi of vivos) {
+    const todas = (D[pi.personalidad] || []).concat(D.general);
+    const lista = todas.filter((t) => !usadas.has(t));
+    const t = azar.elegir(lista.length ? lista : todas);
+    usadas.add(t);
+    despedidas[pi.id] = t.replace(/\{apodo\}/g, pi.apodo);
+  }
+  return { resultado: 'victoria', sector: p.sector + 1, sectorNombre: (p.sectores[p.sector] || {}).nombre || '',
+    veterano: vivos.length ? { ...fotoPiloto(vivos[0]), comoLlego: 'eligio' } : null, escuadron: [], despedidas };
+}
+
+// Lo que dicen los que no siguen (todos menos el veterano)
+export function despedidasDe(leg) {
+  if (!leg || !leg.despedidas) return [];
+  return Object.entries(leg.despedidas).filter(([id]) => !leg.veterano || leg.veterano.id !== id).map(([, t]) => t);
 }
 
 // Un piloto de otra campana entra a esta: id nuevo, mecha de fabrica (el suyo quedo atras), sin vinculo.

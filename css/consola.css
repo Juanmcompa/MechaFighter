@@ -360,3 +360,7 @@ button.pl-tarjeta:focus-visible { outline: 2px solid var(--ambar); outline-offse
 @keyframes vs-golpe { from { opacity: 0; transform: scale(2.6); } }
 @media (prefers-reduced-motion: reduce) { .versus, .vs-lado, .vs-vs, .vs-frase, .vs-aviso, .vs-ultima, .vs-alerta { animation: none; } }
 .vs-lado.malo .retrato-grande, .vs-lado.malo .retrato-grande img { border-color: var(--alarma); }
+
+/* los que no siguen en la proxima campana */
+.despedidas { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.despedidas li { padding-left: 14px; border-left: 2px solid var(--chapa-borde); color: var(--texto-tenue); font-size: 16px; }
