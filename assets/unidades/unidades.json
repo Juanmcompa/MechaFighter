@@ -1,5 +1,17 @@
 {
  "_escala": 2,
+ "acorazado_chatarra": {
+  "h": 41,
+  "w": 42
+ },
+ "acorazado_colmena": {
+  "h": 37,
+  "w": 42
+ },
+ "bruto_toxico": {
+  "h": 57,
+  "w": 54
+ },
  "caido_01": {
   "h": 14,
   "w": 15
@@ -27,6 +39,86 @@
  "caido_quemado": {
   "h": 15,
   "w": 13
+ },
+ "contagiado_01": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_02": {
+  "h": 16,
+  "w": 16
+ },
+ "contagiado_03": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_04": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_05": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_06": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_07": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_08": {
+  "h": 16,
+  "w": 16
+ },
+ "contagiado_09": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_10": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_11": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_12": {
+  "h": 18,
+  "w": 16
+ },
+ "contagiado_13": {
+  "h": 16,
+  "w": 16
+ },
+ "contagiado_14": {
+  "h": 15,
+  "w": 16
+ },
+ "contagiado_15": {
+  "h": 16,
+  "w": 16
+ },
+ "contagiado_16": {
+  "h": 19,
+  "w": 16
+ },
+ "contagiado_17": {
+  "h": 17,
+  "w": 16
+ },
+ "contagiado_18": {
+  "h": 19,
+  "w": 16
+ },
+ "contagiado_19": {
+  "h": 16,
+  "w": 16
+ },
+ "contagiado_20": {
+  "h": 15,
+  "w": 16
  },
  "dron_artillado": {
   "h": 46,
@@ -63,6 +155,22 @@
  "dron_vigia_b": {
   "h": 48,
   "w": 22
+ },
+ "escupidor_craneo": {
+  "h": 39,
+  "w": 42
+ },
+ "escupidor_manchado": {
+  "h": 37,
+  "w": 42
+ },
+ "escupidor_ojos": {
+  "h": 33,
+  "w": 42
+ },
+ "escupidor_tentaculos": {
+  "h": 43,
+  "w": 42
  },
  "guerrilla_01": {
   "h": 27,
@@ -103,6 +211,90 @@
  "guerrilla_10": {
   "h": 19,
   "w": 17
+ },
+ "larva_01": {
+  "h": 15,
+  "w": 16
+ },
+ "larva_02": {
+  "h": 19,
+  "w": 16
+ },
+ "larva_03": {
+  "h": 15,
+  "w": 16
+ },
+ "larva_04": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_05": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_06": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_07": {
+  "h": 18,
+  "w": 16
+ },
+ "larva_08": {
+  "h": 16,
+  "w": 16
+ },
+ "larva_09": {
+  "h": 15,
+  "w": 16
+ },
+ "larva_10": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_11": {
+  "h": 16,
+  "w": 16
+ },
+ "larva_12": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_13": {
+  "h": 16,
+  "w": 16
+ },
+ "larva_14": {
+  "h": 19,
+  "w": 16
+ },
+ "larva_15": {
+  "h": 16,
+  "w": 16
+ },
+ "larva_16": {
+  "h": 19,
+  "w": 16
+ },
+ "larva_17": {
+  "h": 16,
+  "w": 16
+ },
+ "larva_18": {
+  "h": 18,
+  "w": 16
+ },
+ "larva_19": {
+  "h": 17,
+  "w": 16
+ },
+ "larva_20": {
+  "h": 16,
+  "w": 16
+ },
+ "madre": {
+  "h": 63,
+  "w": 68
  },
  "mancha_1": {
   "h": 8,
@@ -155,6 +347,26 @@
  "pirata_10": {
   "h": 18,
   "w": 14
+ },
+ "rastrero_cuchillas": {
+  "h": 39,
+  "w": 42
+ },
+ "rastrero_rayado": {
+  "h": 37,
+  "w": 42
+ },
+ "rastrero_rojo": {
+  "h": 38,
+  "w": 42
+ },
+ "rastrero_toxico": {
+  "h": 43,
+  "w": 42
+ },
+ "tejedor": {
+  "h": 53,
+  "w": 60
  },
  "tirado_casco": {
   "h": 4,

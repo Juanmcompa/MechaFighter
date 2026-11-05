@@ -77,10 +77,18 @@
           "nombre": "La Madre",
           "plantilla": "asalto",
           "escuadras": [
-            "nido"
+            "nido",
+            "colmena",
+            "camada"
           ],
           "frase": "(un chillido que satura la radio)"
-        }
+        },
+        "fauna": [
+          "nido",
+          "enjambre_larvas",
+          "colmena",
+          "camada"
+        ]
       },
       {
         "nombre": "Anillo de Kessler",

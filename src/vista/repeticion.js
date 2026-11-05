@@ -1,7 +1,7 @@
 // Reproduce el registro de una batalla en un canvas. No sabe nada de reglas: solo lee eventos y los dibuja.
 // La batalla ya se jugo entera en el motor; aca se la mira a la velocidad que uno quiera (o se salta al final).
 
-import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro } from './dibujo.js';
+import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe } from './dibujo.js';
 import { crearTablero, lineaDeTiro, distancia, caminable } from '../motor/espacio.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
@@ -149,10 +149,12 @@ export class Repeticion {
       for (let i = vivos; i < antes; i++) {
         const [px, py] = posicionMiembro(u, i);
         const h = Number(u.id.slice(1)) * 7 + i * 13;
-        const capas = [fuego ? 'mancha_quemado' : 'mancha_' + (1 + (h % 2)), fuego ? 'caido_quemado' : 'caido_0' + (1 + (h % 6))];
+        // bichos: queda el mismo bicho tirado (y una mancha); personas: un cuerpo
+        const bicho = f.cuerpo === 'mutante';
+        const capas = [fuego ? 'mancha_quemado' : 'mancha_' + (1 + (h % 2)), fuego ? 'caido_quemado' : bicho ? figuraDe(f, u, i) : 'caido_0' + (1 + (h % 6))];
         const corridas = {};
-        if (!fuego && h % 3 === 0) { capas.push('tirado_rifle'); corridas.tirado_rifle = [5, 3]; }
-        if (!fuego && h % 5 === 1) { capas.push('tirado_casco'); corridas.tirado_casco = [-4, 4]; }
+        if (!fuego && !bicho && h % 3 === 0) { capas.push('tirado_rifle'); corridas.tirado_rifle = [5, 3]; }
+        if (!fuego && !bicho && h % 5 === 1) { capas.push('tirado_casco'); corridas.tirado_casco = [-4, 4]; }
         this.caidos.push({ x: px, y: py, ang: h * 1.3, capas, corridas });
       }
       u.vivosVista = vivos;

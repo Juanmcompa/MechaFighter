@@ -106,7 +106,12 @@ export function generarSector(datos, p) {
       let tipo = ultima ? 'jefe' : c === 0 ? 'mision' : az.elegirConPeso(pesos);
       if (tipo === 'mision' && col.filter((x) => x.tipo === 'mision').length >= 2) tipo = 'evento';
       const nodo = { tipo };
-      if (tipo === 'mision') nodo.mision = armarMision(datos, az.elegir(misionesPosibles), dif, az, nivel);
+      if (tipo === 'mision') {
+        // fauna del sector: sus escuadras salen mas seguido (pesan doble) que las de la plantilla
+        const mid = az.elegir(misionesPosibles);
+        const fauna = sdef.fauna ? { enemigos: sdef.fauna.concat(sdef.fauna, datos.misiones[mid].enemigos) } : null;
+        nodo.mision = armarMision(datos, mid, dif, az, nivel, fauna);
+      }
       if (tipo === 'jefe') {
         const J = sdef.jefe;
         nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });

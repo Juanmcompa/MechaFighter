@@ -309,8 +309,18 @@ UNIDADES['infanteria-caidos'] = [('caido_%02d' % (i + 1), {'factor': CAIDO, 'fre
     ('caido_quemado', {'factor': CAIDO, 'frente': 'arriba'}), ('tirado_rifle', {'factor': CAIDO, 'frente': 'arriba'}),
     ('tirado_casco', {'factor': CAIDO, 'frente': 'arriba'}), ('mancha_1', {'factor': CAIDO, 'frente': 'arriba'}),
     ('mancha_2', {'factor': CAIDO, 'frente': 'arriba'}), ('mancha_quemado', {'factor': CAIDO, 'frente': 'arriba'})]
+# Sector 2: mutantes (la Madre y su cria). Vista de frente: se dan vuelta para que miren para arriba.
+UNIDADES['unidades-mutantes-1'] = [(pid, {'ancho': 21, 'frente': 'abajo'}) for pid in (
+    'rastrero_rojo', 'escupidor_ojos', 'escupidor_craneo', 'rastrero_rayado', 'rastrero_toxico',
+    'escupidor_manchado', 'acorazado_colmena', 'acorazado_chatarra', 'rastrero_cuchillas', 'escupidor_tentaculos')]  # en el orden en que se detectan
+UNIDADES['unidades-mutantes-2'] = [('madre', {'ancho': 34, 'frente': 'abajo'}), ('bruto_toxico', {'ancho': 27, 'frente': 'abajo'}),
+                                   ('tejedor', {'ancho': 30, 'frente': 'abajo'})]
+LARVA, CONTAGIADO = 8, 8
+UNIDADES['unidades-larvas'] = [('larva_%02d' % (i + 1), {'ancho': LARVA, 'frente': 'arriba'}) for i in range(20)]
+UNIDADES['unidades-contagiados'] = [('contagiado_%02d' % (i + 1), {'ancho': CONTAGIADO, 'frente': 'arriba'}) for i in range(20)]
 # hojas con las piezas muy juntas: se separan con menos dilatacion
-DILATAR = {'infanteria-piratas': 4, 'infanteria-guerrilla': 4, 'infanteria-caidos': 4}
+DILATAR = {'infanteria-piratas': 4, 'infanteria-guerrilla': 4, 'infanteria-caidos': 4, 'unidades-larvas': 4, 'unidades-contagiados': 4,
+           'unidades-mutantes-1': 6, 'unidades-mutantes-2': 8}
 
 
 def unidades():

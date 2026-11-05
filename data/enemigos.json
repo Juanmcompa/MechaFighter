@@ -30,7 +30,11 @@
           "objetivo": "enemigo_cercano"
         }
       ],
-      "miembros": 4, "miembros_rango": [2, 6],
+      "miembros": 4,
+      "miembros_rango": [
+        2,
+        6
+      ],
       "danio_pct": 75,
       "figuras": [
         "pirata_01",
@@ -72,7 +76,11 @@
           "objetivo": "enemigo_mas_debil"
         }
       ],
-      "miembros": 3, "miembros_rango": [2, 4],
+      "miembros": 3,
+      "miembros_rango": [
+        2,
+        4
+      ],
       "danio_pct": 80,
       "figuras": [
         "pirata_06",
@@ -129,6 +137,12 @@
           "accion": "avanzar",
           "objetivo": "enemigo_mas_debil"
         }
+      ],
+      "sprites": [
+        "rastrero_rojo",
+        "rastrero_rayado",
+        "rastrero_toxico",
+        "rastrero_cuchillas"
       ]
     },
     "mutante_escupidor": {
@@ -166,6 +180,12 @@
           "accion": "avanzar",
           "objetivo": "enemigo_cercano"
         }
+      ],
+      "sprites": [
+        "escupidor_ojos",
+        "escupidor_craneo",
+        "escupidor_manchado",
+        "escupidor_tentaculos"
       ]
     },
     "torreta_ligera": {
@@ -293,7 +313,7 @@
       "cuerpo": "mutante",
       "personalidad": "sanguinario",
       "amenaza": 6,
-      "sprite": "mutante_verde",
+      "sprite": "madre",
       "stats": {
         "estructura": 190,
         "blindaje": 3,
@@ -587,7 +607,11 @@
         "vision": 7
       },
       "arma": "brazo_rifle",
-      "miembros": 3, "miembros_rango": [2, 5],
+      "miembros": 3,
+      "miembros_rango": [
+        2,
+        5
+      ],
       "danio_pct": 70,
       "figuras": [
         "guerrilla_01",
@@ -628,7 +652,11 @@
         "vision": 7
       },
       "arma": "brazo_lanzamisiles",
-      "miembros": 2, "miembros_rango": [1, 3],
+      "miembros": 2,
+      "miembros_rango": [
+        1,
+        3
+      ],
       "danio_pct": 45,
       "figuras": [
         "guerrilla_06",
@@ -645,6 +673,250 @@
           "condicion": "siempre",
           "accion": "buscar_cobertura",
           "objetivo": "yo"
+        }
+      ]
+    },
+    "mutante_acorazado": {
+      "nombre": "Acorazado",
+      "cuerpo": "mutante",
+      "personalidad": "temerario",
+      "amenaza": 3,
+      "sprite": "mutante_verde",
+      "sprites": [
+        "acorazado_chatarra",
+        "acorazado_colmena"
+      ],
+      "descripcion": "Caparazón de chatarra y hueso. Lento, pero cuesta mucho bajarlo.",
+      "stats": {
+        "estructura": 150,
+        "blindaje": 6,
+        "velocidad": 6,
+        "punteria": 65,
+        "evasion": 0,
+        "iniciativa": 3,
+        "moral": 120,
+        "vision": 5
+      },
+      "arma_natural": {
+        "danio": 20,
+        "alcance": 1,
+        "cadencia": 4,
+        "punteria": 10
+      },
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "mutante_bruto": {
+      "nombre": "Bruto",
+      "cuerpo": "mutante",
+      "personalidad": "sanguinario",
+      "amenaza": 4,
+      "sprite": "bruto_toxico",
+      "descripcion": "Una mole que chorrea ácido. Si llega, rompe.",
+      "stats": {
+        "estructura": 200,
+        "blindaje": 4,
+        "velocidad": 5,
+        "punteria": 70,
+        "evasion": 0,
+        "iniciativa": 4,
+        "moral": 150,
+        "vision": 5
+      },
+      "arma_natural": {
+        "danio": 26,
+        "alcance": 1,
+        "cadencia": 4,
+        "punteria": 10,
+        "estado": "fuga_hidraulica",
+        "chance_estado": 30
+      },
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "mutante_tejedor": {
+      "nombre": "Tejedor",
+      "cuerpo": "mutante",
+      "personalidad": "cobarde",
+      "amenaza": 4,
+      "sprite": "tejedor",
+      "descripcion": "Tira filamentos desde lejos que traban los sistemas del mecha.",
+      "stats": {
+        "estructura": 140,
+        "blindaje": 2,
+        "velocidad": 5,
+        "punteria": 60,
+        "evasion": 5,
+        "iniciativa": 4,
+        "moral": 100,
+        "vision": 7
+      },
+      "arma_natural": {
+        "danio": 10,
+        "alcance": 6,
+        "cadencia": 4,
+        "punteria": 5,
+        "estado": "aturdido",
+        "chance_estado": 15
+      },
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "larvas": {
+      "nombre": "Larvas",
+      "cuerpo": "mutante",
+      "personalidad": "temerario",
+      "amenaza": 1,
+      "sprite": "mutante_verde",
+      "descripcion": "Una nube de bichos chicos que muerden las juntas del mecha.",
+      "stats": {
+        "estructura": 40,
+        "blindaje": 0,
+        "velocidad": 2,
+        "punteria": 60,
+        "evasion": 20,
+        "iniciativa": 6,
+        "moral": 100,
+        "vision": 5
+      },
+      "arma_natural": {
+        "danio": 6,
+        "alcance": 1,
+        "cadencia": 2,
+        "punteria": 10
+      },
+      "miembros": 5,
+      "miembros_rango": [
+        3,
+        7
+      ],
+      "danio_pct": 100,
+      "figuras": [
+        "larva_01",
+        "larva_02",
+        "larva_03",
+        "larva_04",
+        "larva_05",
+        "larva_06",
+        "larva_07",
+        "larva_08",
+        "larva_09",
+        "larva_10",
+        "larva_11",
+        "larva_12",
+        "larva_13",
+        "larva_14",
+        "larva_15",
+        "larva_16",
+        "larva_17",
+        "larva_18",
+        "larva_19",
+        "larva_20"
+      ],
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "contagiados": {
+      "nombre": "Contagiados",
+      "cuerpo": "mutante",
+      "personalidad": "sanguinario",
+      "amenaza": 1,
+      "sprite": "mutante_verde",
+      "descripcion": "Colonos que la Madre ya alcanzó. No sienten dolor y no se detienen.",
+      "stats": {
+        "estructura": 44,
+        "blindaje": 0,
+        "velocidad": 4,
+        "punteria": 55,
+        "evasion": 5,
+        "iniciativa": 4,
+        "moral": 200,
+        "vision": 5
+      },
+      "arma_natural": {
+        "danio": 7,
+        "alcance": 1,
+        "cadencia": 3,
+        "punteria": 5
+      },
+      "miembros": 4,
+      "miembros_rango": [
+        2,
+        6
+      ],
+      "danio_pct": 100,
+      "figuras": [
+        "contagiado_01",
+        "contagiado_02",
+        "contagiado_03",
+        "contagiado_04",
+        "contagiado_05",
+        "contagiado_06",
+        "contagiado_07",
+        "contagiado_08",
+        "contagiado_09",
+        "contagiado_10",
+        "contagiado_11",
+        "contagiado_12",
+        "contagiado_13",
+        "contagiado_14",
+        "contagiado_15",
+        "contagiado_16",
+        "contagiado_17",
+        "contagiado_18",
+        "contagiado_19",
+        "contagiado_20"
+      ],
+      "gambits": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "atacar_cuerpo_a_cuerpo",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
         }
       ]
     }
@@ -705,6 +977,34 @@
         "dron_pesado",
         "dron_artillado",
         "dron_centinela"
+      ],
+      "dificultad": 3
+    },
+    "enjambre_larvas": {
+      "nombre": "Enjambre de larvas",
+      "miembros": [
+        "larvas",
+        "larvas",
+        "contagiados"
+      ],
+      "dificultad": 1
+    },
+    "colmena": {
+      "nombre": "Colmena",
+      "miembros": [
+        "mutante_acorazado",
+        "mutante_escupidor",
+        "larvas"
+      ],
+      "dificultad": 2
+    },
+    "camada": {
+      "nombre": "Camada",
+      "miembros": [
+        "mutante_bruto",
+        "mutante_tejedor",
+        "larvas",
+        "contagiados"
       ],
       "dificultad": 3
     }
