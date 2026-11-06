@@ -1,13 +1,13 @@
 {
   "_ayuda": "Lo que dicen los pilotos en la batalla cuando un gancho los hace desobedecer (la clave es el 'registro' del gancho), y otros textos cortos de la batalla.",
   "gritos": {
-    "huye_en_panico": "¡Me voy de acá!",
-    "corre_a_cubrir": "¡Aguantá, voy!",
-    "se_quiebra": "¡No puedo más!",
-    "no_otra_vez": "¡Esta vez no!",
-    "correa": "¡No te separes!",
-    "abre_paso": "¡Paso, paso!",
-    "confusion": "¿Qué? ¿Repetí, Control?"
+    "huye_en_panico": "¡Nos re vimos!",
+    "corre_a_cubrir": "¡Pido gancho!",
+    "se_quiebra": "¡Ya fue todo!",
+    "no_otra_vez": "¡Otra vez sopa!",
+    "correa": "¡No te regales!",
+    "abre_paso": "¡Abran cancha!",
+    "confusion": "¿Qué flasheás?"
   },
   "motivos_fin": {
     "sobrevivir_oleadas": "Resistieron todas las oleadas",
@@ -22,10 +22,7 @@
   "eventos": [
     {
       "texto": "Un carguero abandonado. Adentro hay créditos olvidados.",
-      "creditos": [
-        40,
-        90
-      ]
+      "creditos": [40, 90]
     },
     {
       "texto": "Una señal de auxilio resulta ser una trampa. Salen a tiempo, con el susto.",
@@ -38,6 +35,54 @@
     {
       "texto": "Noche tranquila en la órbita. Los pilotos juegan al truco y se ríen un rato.",
       "moral": 10
+    },
+    {
+      "texto": "Encuentran un satélite roto y le canibalizan los cables de cobre. Todo suma para la birra.",
+      "creditos": [20, 50]
+    },
+    {
+      "texto": "Un 'trapito' orbital les pide peaje para no rayarles los mechas. Mejor garpar y no renegar.",
+      "creditos": [-30, -10]
+    },
+    {
+      "texto": "Comen unas empanadas envasadas al vacío de dudosa procedencia en la estación. Se la pasan en el baño.",
+      "moral": -10
+    },
+    {
+      "texto": "Enganchan una señal pirata para ver el Superclásico Galáctico. Hay asado de tubo y abrazos.",
+      "moral": 15
+    },
+    {
+      "texto": "Le lloran la carta a un chatarrero y les tira un repuesto. «Con un poco de cinta aisladora, todavía tira», dice.",
+      "parte": true
+    },
+    {
+      "texto": "Inspección sorpresa de la Aduana Interplanetaria. Hay que dejarles una 'atención' para que no jodan.",
+      "creditos": [-60, -20]
+    },
+    {
+      "texto": "El Comando manda un video motivacional de 40 minutos sobre 'ponerse la camiseta'. Qué tortura.",
+      "moral": -15
+    },
+    {
+      "texto": "Revolviendo escombros encuentran un paquete cerrado de yerba que no está vencida. Lloran de la emoción.",
+      "moral": 20
+    },
+    {
+      "texto": "Venden unos cascotes espaciales haciéndolos pasar por 'arte abstracto'. Un cheto de la colonia se los compra.",
+      "creditos": [70, 150]
+    },
+    {
+      "texto": "Intentan arreglar un servo con La Gotita y Poxipol. Milagrosamente, consiguen armar una pieza útil.",
+      "parte": true
+    },
+    {
+      "texto": "Se cruzan con un convoy de políticos. Tienen que fumarse un discurso para que los dejen pasar. Te saca las ganas de vivir.",
+      "moral": -20
+    },
+    {
+      "texto": "Un piloto encuentra un billete de 100 créditos en el bolsillo de un traje espacial viejo. ¡Sale festejo!",
+      "creditos": [100, 100]
     }
   ],
   "nombres_escuadron": [
@@ -51,33 +96,32 @@
     "los Lobos de Órbita"
   ],
   "despedidas": {
-    "_ayuda": "Por qué no siguen con vos los que sobrevivieron a la campaña (sale una frase por piloto; primero según su personalidad, si no una general). {apodo}, {sector}.",
     "temerario": [
-      "«{apodo}» se fue a buscar una guerra más grande. Dice que esta le quedó chica.",
-      "«{apodo}» se anotó en la primera fila de otro contrato antes de que se enfriara el mecha."
+      "«{apodo}» dijo que esto era un embole y se fue a buscar bondi a otro lado.",
+      "«{apodo}» ni esperó a que se enfríe el mecha que ya firmó para meterse en otro quilombo."
     ],
     "cobarde": [
-      "«{apodo}» juró que no se sube más a un mecha. Esta vez parece que va en serio.",
-      "«{apodo}» agarró su paga y se tomó el primer transporte lejos del Cinturón."
+      "«{apodo}» juró que no se sube a un mecha ni mamado. Esta vez parece que va en serio.",
+      "«{apodo}» agarró la guita y tiró bomba de humo. No lo ves ni en figurita."
     ],
     "sanguinario": [
-      "«{apodo}» firmó con los mercenarios de Ostrova. Pagan por baja.",
-      "«{apodo}» se fue sin despedirse. Nadie lo extraña del todo."
+      "«{apodo}» firmó con unos turbios que garpan por cabeza. Está en su salsa.",
+      "«{apodo}» se borró sin decir ni chau. La verdad, nos hizo un favor, estaba re chapita."
     ],
     "leal": [
-      "«{apodo}» quería seguir, pero le prometió a su familia que volvía. Cumplió.",
-      "«{apodo}» se quedó cuidando a los heridos en Santa Brígida. «Alguien tiene que hacerlo», dijo."
+      "«{apodo}» quería seguir la joda, pero prometió en la casa que volvía. Y cumplió.",
+      "«{apodo}» se quedó de enfermero en la colonia. «Alguien tiene que dar una mano», tiró. Un tipazo."
     ],
     "general": [
-      "«{apodo}» se retiró con su paga. Dice que va a abrir un taller.",
-      "«{apodo}» firmó con otra compañía. Pagan mejor y preguntan menos.",
-      "«{apodo}» volvió con su familia. Promete escribir.",
-      "«{apodo}» no contestó más la radio. Nadie sabe adónde fue.",
-      "«{apodo}» se quedó con la gente de la colonia. Dice que ahí lo necesitan."
+      "«{apodo}» agarró los morlacos y dice que se pone un lubricentro.",
+      "«{apodo}» se fue con la competencia. Pagan en dólares y no rompen las bolas.",
+      "«{apodo}» se volvió a las casas. Prometió avisar cuando llegue; seguimos esperando.",
+      "«{apodo}» nos clavó el visto por radio y desapareció. Andá a saber dónde anda.",
+      "«{apodo}» se quedó haciendo patria con la gente de la colonia. Gustos son gustos."
     ],
     "nadie": [
-      "Buscaron entre los restos en «{sector}». No encontraron a nadie con vida.",
-      "El equipo de rescate llegó tarde a «{sector}». Solo quedaba chatarra."
+      "Rastrillaron «{sector}». No quedó ni el loro.",
+      "El rescate llegó tarde a «{sector}». Pura chatarra para el desarmadero."
     ]
   }
 }
