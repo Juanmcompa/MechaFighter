@@ -150,5 +150,5 @@ function tarjetaVersus(datos, nem, pilotos) {
       blanco ? lado(blanco, 'bueno', '«' + blanco.apodo + '»', 'Su objetivo') : lado(null, 'bueno', 'El escuadrón', 'Viene por todos')),
     h('p', { class: 'vs-frase' }, '«' + nem.frase + '»'),
     nem.aviso ? h('p', { class: 'vs-aviso' }, ico('mira'), ' ' + nem.aviso) : nem.historia ? h('p', { class: 'vs-aviso' }, nem.historia) : null,
-    nem.cae ? h('p', { class: 'vs-ultima' }, 'Ya lo bajaron demasiadas veces: si cae hoy, no se levanta.') : null);
+    nem.cae ? h('p', { class: 'vs-ultima' }, nem.jefe ? 'Es el jefe del sector: si cae hoy, no se levanta.' : 'Ya lo bajaron demasiadas veces: si cae hoy, no se levanta.') : null);
 }

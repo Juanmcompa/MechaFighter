@@ -29,13 +29,14 @@ function mechaCon(datos, clase, partes) {
 
 function nuevo(datos, p, az, origen, objetivo, lugar, nivel, base = null) {
   const N = datos.nemesis;
-  const usados = new Set((p.nemesis || []).map((n) => n.apodo));
+  const usados = new Set((p.nemesis || []).map((n) => n.apodo).concat(p.pilotos.map((x) => x.apodo)));
   const libres = N.apodos.filter((a) => !usados.has(a));
   const clase = base ? base.clase : az.elegir(['vanguardia', 'tirador', 'infiltrador']);
   const total = (datos.reglas.arte && datos.reglas.arte.retratos) || 0;
   const n = {
     id: 'n' + ((p.nemesis || []).length + 1) + '_' + p.misionesJugadas,
-    apodo: base ? base.apodo : az.elegir(libres.length ? libres : N.apodos),
+    // (si un piloto del escuadron ya se llama igual, el que vuelve de entre los muertos se distingue)
+    apodo: base ? base.apodo + (usados.has(base.apodo) ? ' el Caído' : '') : az.elegir(libres.length ? libres : N.apodos),
     nombre: base ? base.nombre : '',
     retrato: base ? base.retrato : (total ? az.entero(1, total) : 0),
     origen, objetivo: objetivo ? objetivo.id : null, objetivoApodo: objetivo ? objetivo.apodo : null, lugar,
@@ -84,7 +85,8 @@ export function quizasNace(datos, p, resultado, m, az) {
 export function nemesisEnNodos(datos, p, nodos, azarDeNodo) {
   const N = datos.nemesis;
   const res = {};
-  const cand = activos(p).filter((n) => p.misionesJugadas - n.ultima >= N.misiones_entre_apariciones);
+  // (el que es jefe del sector espera al final: no anda por los contratos)
+  const cand = activos(p).filter((n) => n.jefeDe === undefined && p.misionesJugadas - n.ultima >= N.misiones_entre_apariciones);
   for (const nodo of nodos) {
     const libres = cand.filter((n) => !Object.values(res).includes(n.id));
     if (!libres.length) break;
@@ -146,6 +148,7 @@ export function resolverNemesis(datos, p, resultado, m, az) {
   let uid = null;
   for (const e of reg) if (e.tipo === 'aparece' && e.ficha) { fichas.set(e.u, e.ficha); if (e.ficha.ref === 'ex:' + n.id) uid = e.u; }
   n.apariciones++;
+  delete n.jefeDe;
   n.ultima = p.misionesJugadas;
   n.aviso = null;
   const out = { apodo: n.apodo, retrato: n.retrato, textos: [] };
@@ -170,7 +173,7 @@ export function resolverNemesis(datos, p, resultado, m, az) {
   const asesino = k && k.bando === 0 ? (p.pilotos.find((x) => x.id === k.ref) || { apodo: k.nombre, id: null }) : null;
   n.derrotas++;
   // cae para siempre solo con un tiro limpio a la cabina, o cuando ya lo bajaron demasiadas veces
-  if (muerte.limpio || n.derrotas >= N.derrotas_para_caer) {
+  if (muerte.limpio || m.nemesisJefe || n.derrotas >= N.derrotas_para_caer) {
     n.estado = 'muerto';
     out.muerto = true;
     out.textos.push(llenar(az.elegir(N.final.muere), { yo: n.apodo, asesino: asesino ? asesino.apodo : 'el escuadrón' }));
@@ -209,3 +212,34 @@ export function reasignarObjetivos(p) {
 
 // Los nemesis que buscan a este piloto
 export const loBuscan = (p, pilotoId) => activos(p).filter((n) => n.objetivo === pilotoId);
+
+// Al empezar un sector: el nemesis mas curtido se queda con el territorio y pasa a ser su jefe
+export function elegirJefeNemesis(p, sector) {
+  for (const n of p.nemesis || []) if (n.jefeDe !== undefined && n.jefeDe !== sector) delete n.jefeDe;
+  const cand = activos(p).slice().sort((a, b) => b.derrotas - a.derrotas || b.apariciones - a.apariciones || b.nivel - a.nivel);
+  const n = cand[0];
+  if (n) n.jefeDe = sector;
+  return n || null;
+}
+
+// El nemesis como jefe del sector: lider de la mision, mas nivel, busca a su objetivo, y si cae no se levanta
+export function nemesisComoJefe(datos, p, m, n, titulo, az) {
+  const N = datos.nemesis;
+  const O = N.origenes[n.origen];
+  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo };
+  const di = (lista) => llenar(az.elegir(lista), v);
+  const B = N.batalla, R = N.respuestas;
+  const lineas = { replica: di(N.replicas), escapa: di(B.escapa), cae: di(B.cae), baja: di(B.baja), bajaObjetivo: di(B.baja_objetivo),
+    sobrevive: di(B.sobrevive), respEscapa: di(R.escapa), respCae: di(R.cae), respSobrevive: di(R.sobrevive) };
+  const piloto = { id: n.id, nombre: n.nombre || n.apodo, apodo: n.apodo, retrato: n.retrato, clase: n.clase, personalidad: n.personalidad,
+    nivel: Math.min(Math.max(n.nivel, m.nivel || 1), (m.nivel || 1) + 1), xp: 0, medallas: [], cicatrices: [], traumas: [], hoja: [], bajas: 0, misiones: 0 };
+  m.rivales = (m.rivales || []).concat({ piloto, mecha: n.mecha, gambits: n.gambits, odia: n.objetivo, nemesis: true, lider: true, jefe: true,
+    frase: di(O.frases), objetivo: n.objetivo, objetivoApodo: n.objetivoApodo, lineas, cae: true, origen: n.origen, derrotas: n.derrotas,
+    aviso: n.aviso, historia: n.historia.slice(-1)[0] || '' });
+  m.nemesis = n.id;
+  m.nemesisJefe = true;
+  m.nombre = '«' + n.apodo + '», ' + titulo;
+  m.jefe = { nombre: m.nombre, frase: lineas.replica, nemesis: true };
+  m.cantidadEnemigos = (m.cantidadEnemigos || 0) + 1;
+  return m;
+}

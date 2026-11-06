@@ -17,7 +17,7 @@ import { momentosDeMision, sumarAHoja } from './hoja.js';
 import { presentar, calcularAnimo, actualizarAfinidad } from './animo.js';
 import { desplegables, cumplirTareas } from './tareas.js';
 import { armarLore } from './lore.js';
-import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos } from './nemesis.js';
+import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos, elegirJefeNemesis, nemesisComoJefe } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 
 export const VERSION_PARTIDA = 1;
@@ -89,14 +89,28 @@ function vincular(a, b) {
 
 // ---------- Mapa de sectores ----------
 
+// El territorio del sector n (se repiten en ronda: la campana no termina hasta que cae el escuadron)
+export function territorio(datos, n) {
+  const D = datos.sectores.campana_base.sectores_def;
+  return D[n % D.length];
+}
+
 export function generarSector(datos, p) {
   const def = datos.sectores.campana_base;
-  const sdef = def.sectores_def[p.sector] || def.sectores_def.at(-1);
+  // campana infinita: los territorios se repiten en ronda, cada vuelta mas dificil
+  const sdef = territorio(datos, p.sector);
+  const vuelta = Math.floor(p.sector / def.sectores_def.length);
   const az = azarDe(p, 'sector');
   const dif = def.dificultad_por_sector[p.sector] || def.dificultad_por_sector.at(-1);
   const pesos = Object.entries(def.tipos_de_nodo);
   const misionesPosibles = def.misiones_por_dificultad[String(dif)];
-  const nivel = (def.nivel_enemigo_por_sector || [])[p.sector] || dif;
+  const niveles = def.nivel_enemigo_por_sector || [];
+  const extra = Math.max(0, p.sector - niveles.length + 1) * ((def.infinito || {}).nivel_extra_por_sector || 1);
+  const nivel = p.sector < niveles.length ? niveles[p.sector] : (niveles.at(-1) || dif) + extra;
+  // el jefe: el nemesis mas curtido; si no hay, el de la lista (o, en otra vuelta, uno de sus herederos)
+  const jefeNemesis = elegirJefeNemesis(p, p.sector);
+  const heredero = vuelta > 0 && sdef.herederos && sdef.herederos.length ? sdef.herederos[(vuelta - 1) % sdef.herederos.length] : null;
+  const nombreJefe = jefeNemesis ? '«' + jefeNemesis.apodo + '», ' + (sdef.titulo_jefe || 'jefe del sector') : heredero ? heredero.nombre : sdef.jefe.nombre;
   const columnas = [];
   for (let c = 0; c < def.columnas_por_sector; c++) {
     const ultima = c === def.columnas_por_sector - 1;
@@ -114,10 +128,16 @@ export function generarSector(datos, p) {
       }
       if (tipo === 'jefe') {
         const J = sdef.jefe;
-        nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });
-        nodo.mision.nombre = J.nombre;
-        nodo.mision.descripcion = 'Objetivo del sector: ' + J.nombre + '. ' + nodo.mision.descripcion;
-        nodo.mision.jefe = { nombre: J.nombre, frase: J.frase };
+        if (jefeNemesis) {
+          // (la escolta un nivel abajo que la de un jefe comun: el nemesis ya pega como jefe)
+          nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel, { lider: null, enemigos: J.escuadras });
+          nemesisComoJefe(datos, p, nodo.mision, jefeNemesis, sdef.titulo_jefe || 'jefe del sector', az);
+        } else {
+          nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });
+          nodo.mision.nombre = nombreJefe;
+          nodo.mision.jefe = { nombre: nombreJefe, frase: heredero ? heredero.frase : J.frase };
+        }
+        nodo.mision.descripcion = 'Objetivo del sector: ' + nombreJefe + '. ' + nodo.mision.descripcion;
         nodo.mision.recompensa.creditos += 100;
         nodo.mision.recompensa.botin += 1;
       }
@@ -128,7 +148,7 @@ export function generarSector(datos, p) {
   }
   // El escuadron de la campana anterior aparece en un contrato del sector indicado
   const L = datos.reglas.legado;
-  if (p.encuentro && !p.encuentro.hecho && p.sector === Math.min(L.sector_encuentro, def.sectores - 1)) {
+  if (p.encuentro && !p.encuentro.hecho && p.sector === L.sector_encuentro) {
     const col = columnas[Math.min(L.columna_encuentro, columnas.length - 2)];
     const k = Math.max(0, col.findIndex((n) => n.tipo === 'mision'));
     col[k] = { tipo: 'mision', i: col[k].i, encuentro: true, mision: misionEncuentro(datos, p, az, dif, nivel) };
@@ -156,9 +176,13 @@ export function generarSector(datos, p) {
     }
     for (const nodo of a) nodo.sig.sort((x, y) => x - y);
   }
+  const nombre = sdef.nombre + (vuelta ? ' ' + ['', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][Math.min(vuelta, 9)] : '');
+  const objetivo = jefeNemesis
+    ? '«' + jefeNemesis.apodo + '» se quedó con ' + sdef.nombre + '. ' + (jefeNemesis.historia.slice(-1)[0] || '') + ' Encontralo y bajalo: esta vez no hay eyección.'
+    : heredero ? heredero.nombre + ' se quedó con lo que dejó ' + sdef.jefe.nombre + '. Encontralo y bajalo.' : sdef.objetivo;
   p.sectores[p.sector] = {
-    nombre: sdef.nombre, numero: p.sector + 1, de: def.sectores, objetivo: sdef.objetivo, jefe: sdef.jefe.nombre,
-    dificultad: dif, columnas, inteligencia: 0
+    nombre, numero: p.sector + 1, objetivo, jefe: nombreJefe, jefeNemesis: jefeNemesis ? jefeNemesis.id : null,
+    dificultad: dif, nivel, columnas, inteligencia: 0
   };
   p.columna = -1;
   p.posicion = null; // en que nodo de la columna actual esta el escuadron
@@ -171,7 +195,7 @@ function inteligenciaAlJefe(datos, p, nodo) {
   if (s.inteligencia === undefined) return; // partida guardada antes de que existiera
   const m = nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
   const az = azarAparte(p, 'jefe');
-  const escuadras = datos.sectores.campana_base.sectores_def[p.sector] ? datos.sectores.campana_base.sectores_def[p.sector].jefe.escuadras : ['banda_con_mecha'];
+  const escuadras = territorio(datos, p.sector).jefe.escuadras;
   if (!s.inteligencia) sumarCondicion(datos, m, I.sin_datos, az, escuadras);
   else if (s.inteligencia >= I.datos_desde) sumarCondicion(datos, m, I.con_datos, az, escuadras);
   m.cantidadEnemigos = m.oleadas.reduce((t, o) => t + o.length, 0) + m.emboscadas.reduce((t, e) => t + e.unidades.length, 0) + (m.refuerzos ? m.refuerzos.unidades.length : 0);
@@ -273,7 +297,6 @@ function avanzar(datos, p) {
   if (p.estado === 'fin') return;
   if (p.columna >= def.columnas_por_sector - 1) {
     p.puntaje += datos.reglas.campana.puntaje_por_sector;
-    if (p.sector + 1 >= def.sectores) { p.estado = 'fin'; p.resultado = 'victoria'; p.legado = legadoDeVictoria(datos, p, azarAparte(p, 'legado')); return; }
     p.sector++;
     generarSector(datos, p);
     if (p.combustible !== undefined) p.combustible = Math.min(datos.reglas.combustible.maximo, p.combustible + datos.reglas.combustible.por_sector);

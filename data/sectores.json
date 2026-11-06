@@ -2,7 +2,7 @@
   "_ayuda": "Como se arma el mapa de nodos de cada campana. Cada sector tiene varias columnas de nodos; el jugador elige un camino de izquierda a derecha. 'tipos_de_nodo' son los pesos de lo que puede aparecer. 'sectores': el objetivo y el jefe con nombre de cada sector, en orden. Ganar misiones del sector junta inteligencia sobre el jefe (ver 'inteligencia').",
   "campana_base": {
     "nombre": "Cinturón de Kessler",
-    "sectores": 3,
+    "sectores": 0,
     "columnas_por_sector": 6,
     "nodos_por_columna": {
       "min": 2,
@@ -67,7 +67,18 @@
             "patrulla_saqueadora"
           ],
           "frase": "¿Mercenarios? En mi chatarrería no entra nadie sin pagar."
-        }
+        },
+        "titulo_jefe": "Señor de la Chatarrería",
+        "herederos": [
+          {
+            "nombre": "Mila «La Grúa», hija de Varga",
+            "frase": "Mi viejo te esperaba. Yo te estaba esperando más."
+          },
+          {
+            "nombre": "El Desarmador",
+            "frase": "Todo lo que entra acá sale en pedazos."
+          }
+        ]
       },
       {
         "nombre": "Colonias Muertas",
@@ -88,6 +99,17 @@
           "enjambre_larvas",
           "colmena",
           "camada"
+        ],
+        "titulo_jefe": "Pastor de la Colmena",
+        "herederos": [
+          {
+            "nombre": "La Cría de la Madre",
+            "frase": "(un zumbido que no termina nunca)"
+          },
+          {
+            "nombre": "El Pastor",
+            "frase": "Ella no murió. Ella está en todos nosotros."
+          }
         ]
       },
       {
@@ -101,8 +123,24 @@
             "banda_con_mecha"
           ],
           "frase": "Control, ¿no? Despedite de tus pilotos."
-        }
+        },
+        "titulo_jefe": "Comandante del Anillo",
+        "herederos": [
+          {
+            "nombre": "Capitana Dresk",
+            "frase": "Ostrova era blando. Yo no."
+          },
+          {
+            "nombre": "El Almirante Gris",
+            "frase": "Su escuadrón ya es leyenda en la flota. Leyenda muerta."
+          }
+        ]
       }
-    ]
+    ],
+    "infinito": {
+      "_ayuda": "La campaña no termina: despues del ultimo territorio se vuelve al primero, mas dificil. Cada vuelta suma 'nivel_extra_por_sector' al nivel de los enemigos por cada sector despues del ultimo de la lista.",
+      "nivel_extra_por_sector": 1
+    },
+    "_ayuda": " Campaña infinita: los territorios de 'sectores_def' se repiten en ronda, cada vuelta más difíciles ('infinito'). El jefe de cada sector es el némesis más curtido que ande suelto (con 'titulo_jefe'); si no hay, el jefe de la lista, y en las vueltas siguientes uno de sus 'herederos'."
   }
 }

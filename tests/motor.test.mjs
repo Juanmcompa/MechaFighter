@@ -154,6 +154,20 @@ console.log('Campana');
   ok(resolverNemesis(dn, p, { registro: reg }, m, crearAzar(7)).muerto && n.estado === 'muerto', 'a la tercera cae para siempre');
 }
 
+// Campana infinita: despues del tercer sector vuelve el primero (mas dificil) y el jefe es el nemesis mas curtido
+{
+  const p = nuevaPartida(datos, 92);
+  p.nemesis = [];
+  const n = nemesisDelLegado(datos, p, { ...fotoPiloto(p.pilotos[1]), apodo: 'Jefazo', id: 'x8' }, 'acá', p.pilotos[0], crearAzar(2));
+  p.sector = 3; generarSector(datos, p);
+  const s = p.sectores[3];
+  const jefe = s.columnas.at(-1)[0].mision;
+  ok(s.nombre.endsWith(' II') && s.nivel > datos.sectores.campana_base.nivel_enemigo_por_sector.at(-1), 'el sector 4 repite el primer territorio, mas dificil');
+  ok(s.jefeNemesis === n.id && jefe.nemesisJefe && jefe.rivales.some((r) => r.nemesis && r.lider && r.cae), 'el nemesis se queda con el sector y es el jefe (y si cae, cae)');
+  const r = simular(datos, { mision: jefe, escuadron: p.pilotos.map((x) => ({ piloto: x, mecha: x.mecha, gambits: x.gambits })), semilla: jefe.semilla });
+  ok(r.registro.some((e) => e.tipo === 'aparece' && e.ficha.ref === 'ex:' + n.id), 'el jefe nemesis pelea');
+}
+
 // Daño por partes: un brazo roto no vuelve a disparar; un tiro a la cabina deja el mecha para saquear
 {
   let rotos = 0, dispararonRotos = 0, limpios = 0, piezas = 0;

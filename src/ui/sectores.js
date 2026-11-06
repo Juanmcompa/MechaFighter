@@ -121,7 +121,7 @@ export function sectores(app, raiz) {
       boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar' }),
       botonIcono('menu', 'Menú principal', () => app.ir('portada'))
     ]),
-    h('h1', { class: 'titulo-pantalla' }, s.nombre + (s.numero ? ' · ' + s.numero + '/' + s.de : '')),
+    h('h1', { class: 'titulo-pantalla' }, (s.numero ? 'Sector ' + s.numero + ' · ' : '') + s.nombre),
     s.objetivo ? panel('Objetivo del sector',
       h('p', { class: 'briefing' }, s.objetivo),
       h('div', { class: 'intel' }, ico('ojo'), h('span', {}, 'Inteligencia sobre ' + s.jefe + ': '),

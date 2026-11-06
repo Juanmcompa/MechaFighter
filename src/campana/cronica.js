@@ -20,8 +20,8 @@ export function relato(datos, p) {
   for (const e of p.cronica || []) {
     let c = capitulos.find((x) => x.sector === e.sector);
     if (!c) {
-      const def = (datos.sectores.campana_base.sectores_def || [])[e.sector - 1];
-      c = { sector: e.sector, titulo: def ? def.nombre : 'Sector ' + e.sector, hechos: [] };
+      const s = (p.sectores || [])[e.sector - 1];
+      c = { sector: e.sector, titulo: 'Sector ' + e.sector + (s ? ' · ' + s.nombre : ''), hechos: [] };
       capitulos.push(c);
     }
     c.hechos.push(e);
@@ -34,7 +34,7 @@ export function relato(datos, p) {
   const sobrevivio = p.legado && p.legado.veterano && p.legado.veterano.comoLlego === 'sobrevivio' ? p.legado.veterano.apodo : null;
   const cierre = gano
     ? 'Cruzaron el Cinturón. ' + p.pilotos.length + ' volvieron a casa para contarlo.'
-    : 'Llegaron hasta ' + ((datos.sectores.campana_base.sectores_def || [])[p.sector] || {}).nombre + '. Ahí se terminó el contrato de ' + nombre + '.';
+    : 'Llegaron hasta el sector ' + (p.sector + 1) + ', ' + ((p.sectores || [])[p.sector] || {}).nombre + '. Ahí se terminó el contrato de ' + nombre + '.';
   const logros = [];
   logros.push((st.ganadas || 0) + ' misiones cumplidas de ' + (st.jugadas || p.misionesJugadas || 0));
   logros.push((st.bajas || 0) + ' enemigos abatidos');

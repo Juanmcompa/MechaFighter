@@ -127,7 +127,9 @@ export function simular(datos, { mision, escuadron, semilla }) {
     const [x, y] = ap.enemigo[(i + 1) % ap.enemigo.length];
     const base = unidadDePiloto(datos, r.piloto, r.mecha, r.gambits);
     // nemesis: odia = el piloto nuestro que va a buscar
-    B.agregarUnidad({ ...base, tipo: 'enemigo', ref: 'ex:' + r.piloto.id, vinculoRef: null, amenaza: 3, exPiloto: true, nemesis: !!r.nemesis, odia: r.odia || null }, 1, x, y);
+    const u = B.agregarUnidad({ ...base, tipo: 'enemigo', ref: 'ex:' + r.piloto.id, vinculoRef: null, amenaza: 3, exPiloto: true, nemesis: !!r.nemesis, odia: r.odia || null }, 1, x, y);
+    // un nemesis que es jefe del sector es el lider de la mision (bajarlo es ganar)
+    if (u && r.lider && !B.lider) { B.lider = u; u.rol = 'lider'; }
   });
   for (const em of mision.emboscadas || []) {
     em.unidades.forEach((id) => B.agregarUnidad(unidadEnemiga(datos, id, mision.nivel || 1), 1, em.casilla[0], em.casilla[1]));

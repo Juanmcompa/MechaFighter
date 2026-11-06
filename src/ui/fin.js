@@ -20,6 +20,7 @@ export function fin(app, raiz) {
       : 'No quedó nadie para seguir. El contrato se cierra sin firmas.'),
     h('div', { class: 'chips grande' },
       chip('puntaje', p.puntaje + ' puntos', 'Puntaje final'),
+      chip('mapa', 'Sector ' + (p.sector + 1), 'Hasta dónde llegaron'),
       chip('mision', p.misionesJugadas + ' misiones', 'Misiones jugadas'),
       chip('lapida', p.caidos.length + ' caídos', 'Caídos')),
     gano && p.pilotos.length ? panel('Vuelven', h('ul', { class: 'lista-simple' }, ...p.pilotos.map((pi) =>
