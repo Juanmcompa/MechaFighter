@@ -1,13 +1,76 @@
 {
   "_ayuda": "Lo que dicen los pilotos en la batalla cuando un gancho los hace desobedecer (la clave es el 'registro' del gancho), y otros textos cortos de la batalla.",
   "gritos": {
-    "huye_en_panico": "¡Nos re vimos!",
-    "corre_a_cubrir": "¡Pido gancho!",
-    "se_quiebra": "¡Ya fue todo!",
-    "no_otra_vez": "¡Otra vez sopa!",
-    "correa": "¡No te regales!",
-    "abre_paso": "¡Abran cancha!",
-    "confusion": "¿Qué flasheás?"
+    "huye_en_panico": [
+      "¡Nos re vimos!",
+      "¡Me las pico!",
+      "¡Fui!",
+      "¡Me tomo el palo!",
+      "¡Nos fuimos!",
+      "¡Acá no es!",
+      "¡Huyendo con estilo!",
+      "¡Chau pinela!"
+    ],
+    "corre_a_cubrir": [
+      "¡Pido gancho!",
+      "¡Cubrime, rey!",
+      "¡Me fondeo!",
+      "¡A la cucha!",
+      "¡Me escabullo!",
+      "¡Bancá un cacho!",
+      "¡Me resguardo!",
+      "¡Bajo techo!"
+    ],
+    "se_quiebra": [
+      "¡Ya fue todo!",
+      "¡Renuncio!",
+      "¡Cerrá y vamos!",
+      "¡No doy más!",
+      "¡Toy liquidado!",
+      "¡Me desborda!",
+      "¡Chau, colapsé!",
+      "¡Abandono!"
+    ],
+    "no_otra_vez": [
+      "¡Otra vez sopa!",
+      "¡¿Me jodés?!",
+      "¡Qué sal!",
+      "¡No de nuevo!",
+      "¡Otra vez sopa, no!",
+      "¡Increíble!",
+      "¡No te la puedo creer!",
+      "¡La misma historia!"
+    ],
+    "correa": [
+      "¡No te regales!",
+      "¡Pegate, fantasma!",
+      "¡Acá, Rambo!",
+      "¡No te disperses!",
+      "¡Al pie, pichón!",
+      "¡Volvé al rebaño!",
+      "¡No corras solo!",
+      "¡Atento al lazo!"
+    ],
+    "abre_paso": [
+      "¡Abran cancha!",
+      "¡Pista, pista!",
+      "¡Rajen!",
+      "¡Permiso, barra!",
+      "¡Me llevan puesto!",
+      "¡A un lado!",
+      "¡Se pasa!",
+      "¡Vengo sin frenos!"
+    ],
+    "confusion": [
+      "¿Qué flasheás?",
+      "¿Eh, Control?",
+      "¿Cualquiera, no?",
+      "¿De qué me hablás?",
+      "¿Qué me decís?",
+      "¿Estoy soñando?",
+      "¿Quién soy?",
+      "¿Me leíste mal?"
+    ]
   },
   "motivos_fin": {
     "sobrevivir_oleadas": "Resistieron todas las oleadas",
