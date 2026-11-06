@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 43,
-  "cambio": "Campaña infinita: los némesis se adueñan de los sectores",
+  "numero": 44,
+  "cambio": "En el celu: el mapa de batalla ocupa todo el ancho y la radio del despliegue no crece",
   "novedades": [
+    "v0.44 · En el celu: el mapa de batalla ocupa todo el ancho y la radio del despliegue no crece",
     "v0.43 · Campaña infinita: los némesis se adueñan de los sectores",
     "v0.42 · More shouts",
     "v0.41 · more texts",
     "v0.391 · ¡Ahora con más personalidad!",
-    "v0.39 · Los sobrevivientes siguen con vos (y los que no, te dicen por qué)",
-    "v0.38 · Cara a cara con el némesis: aparece, provoca, y si lo bajás se eyecta"
+    "v0.39 · Los sobrevivientes siguen con vos (y los que no, te dicen por qué)"
   ]
 }

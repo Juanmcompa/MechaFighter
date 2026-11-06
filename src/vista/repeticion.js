@@ -56,8 +56,13 @@ export class Repeticion {
     // como una tira chiquita. El lado izquierdo del mapa (donde arranca el escuadron) queda abajo.
     this.girado = window.innerHeight > window.innerWidth && ancho > alto;
     const [cw, ch] = this.girado ? [alto, ancho] : [ancho, alto];
-    const altoMax = Math.max(240, window.innerHeight * (this.girado ? 0.5 : 0.62));
-    this.L = Math.max(10, Math.floor(Math.min(disponible / cw, altoMax / ch)));
+    // girado (celular parado): que ocupe todo el ancho; el alto solo se limita para que no tape toda la pantalla
+    const altoMax = Math.max(240, window.innerHeight * (this.girado ? 0.85 : 0.62));
+    const cs = getComputedStyle(this.canvas.parentElement);
+    const ancho1 = disponible - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+    const d0 = Math.min(2, window.devicePixelRatio || 1);
+    // (redondeado a pixeles fisicos, para que se vea nitido)
+    this.L = Math.max(10, Math.floor(Math.min(ancho1 / cw, altoMax / ch) * d0) / d0);
     const dpr = (this.dpr = Math.min(2, window.devicePixelRatio || 1));
     this.W = cw * this.L; this.H = ch * this.L;
     this.canvas.width = this.W * dpr;
