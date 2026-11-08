@@ -81,6 +81,22 @@ export async function cargarTerreno(base = './') {
       if (id.startsWith('obj_')) TER.sombras[id] = silueta(im);
     })));
     Object.assign(TER, { casilla: m.casilla, texturas: m.texturas, objetos: m.objetos, detalles: m.detalles });
+    // series numeradas (obj_m_cover_barrels_001, _002... u obj_explosive_barrel_1, _2...): se buscan solas
+    // hasta que falta un numero, asi para sumar variantes alcanza con dejar el PNG con el numero que sigue
+    await Promise.all(Object.entries(m.series || {}).flatMap(([grupo, prefijos]) => prefijos.map(async (pre) => {
+      const lista = (TER.objetos[grupo] = TER.objetos[grupo] || []);
+      for (let i = 1; i <= 60; i++) {
+        let id = null, im = null;
+        for (const n of [String(i).padStart(3, '0'), String(i)]) {
+          im = await cargarImagen(base + 'assets/terreno/' + pre + n + '.png');
+          if (im) { id = pre + n; break; }
+        }
+        if (!im) break;
+        TER.imgs[id] = im;
+        TER.sombras[id] = silueta(im);
+        lista.push(id);
+      }
+    })));
     TER.listo = ['piso_a', 'muro_a'].every((id) => TER.imgs[id]);
   } catch { /* sin terreno: se dibuja por codigo */ }
   return TER;

@@ -79,7 +79,7 @@ function mapaConArte(ctx, mapa, L) {
       if (T(x, y) !== 'piso' || !det.length || ruido(x, y, 7) >= 65 || enZona(x, y)) continue;
       const im = img(det[ruido(x, y, 3) % det.length]);
       if (!im) continue;
-      const k = L / TER.casilla;
+      const k = escalaArte(im, L);
       const w = im.width * k, h = im.height * k;
       ctx.globalAlpha = 0.85;
       ctx.drawImage(im, x * L + (L - w) / 2, y * L + (L - h) / 2, w, h);
@@ -92,19 +92,29 @@ function mapaConArte(ctx, mapa, L) {
       const t = T(x, y);
       const lista = t === 'media_cobertura' ? TER.objetos.baja : t === 'cobertura_total' ? TER.objetos.alta : null;
       if (!lista || !lista.length) continue;
-      const id = lista[ruido(x, y, 5) % lista.length];
-      const im = img(id);
-      if (!im) continue;
-      const k = L / TER.casilla;
-      const w = im.width * k, h = im.height * k, ox = x * L + (L - w) / 2, oy = y * L + (L - h) / 2;
-      const d = t === 'cobertura_total' ? L * 0.14 : L * 0.08;
-      ctx.globalAlpha = 0.5;
-      ctx.drawImage(TER.sombras[id], ox + d, oy + d, w, h);
-      ctx.globalAlpha = 1;
-      ctx.drawImage(im, ox, oy, w, h);
+      objeto(ctx, lista[ruido(x, y, 5) % lista.length], x, y, L, t === 'cobertura_total' ? 0.14 : 0.08);
     }
   }
   rompibles(ctx, T, ancho, alto, L);
+}
+
+// Cuanto se agranda una imagen del terreno: el arte nuevo (medidas multiplo de 32) va a 32 pixeles por casilla;
+// el viejo, a terreno.json "casilla" (64)
+const escalaArte = (im, L) => (im.width % 32 === 0 && im.height % 32 === 0 ? L / 32 : L / (TER.casilla || 64));
+
+// Un objeto del terreno centrado en su casilla, con su sombra (alto: cuanto se corre la sombra, en casillas)
+function objeto(ctx, id, x, y, L, alto) {
+  const im = TER.imgs[id];
+  if (!im) return false;
+  const k = escalaArte(im, L);
+  const w = im.width * k, h = im.height * k, ox = x * L + (L - w) / 2, oy = y * L + (L - h) / 2;
+  if (TER.sombras[id]) {
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(TER.sombras[id], ox + L * alto, oy + L * alto, w, h);
+    ctx.globalAlpha = 1;
+  }
+  ctx.drawImage(im, ox, oy, w, h);
+  return true;
 }
 
 // Lo que se puede romper (dibujo provisorio hasta que llegue el arte): edificios, escombros, barriles, quemaduras.
@@ -122,8 +132,10 @@ function rompibles(ctx, T, ancho, alto, L) {
   for (let y = 0; y < alto; y++) {
     for (let x = 0; x < ancho; x++) {
       const t = T(x, y), px = x * L, py = y * L;
-      const arte = TER.imgs && TER.imgs[t];
-      if (arte && t !== 'piso' && t !== 'muro' && t !== 'peligro') { ctx.drawImage(arte, px, py, L, L); continue; }
+      // arte cargado: una serie (terreno.json "series") o una imagen con el nombre del tipo
+      const serie = TER.objetos && TER.objetos[t];
+      if (serie && serie.length && objeto(ctx, serie[ruido(x, y, 5) % serie.length], x, y, L, t === 'edificio' ? 0.14 : 0.08)) continue;
+      if (t !== 'piso' && t !== 'muro' && t !== 'peligro' && TER.imgs && TER.imgs[t]) { ctx.drawImage(TER.imgs[t], px, py, L, L); continue; }
       if (t === 'edificio') {
         // techo visto desde arriba; borde mas oscuro donde termina el edificio
         const b = L * 0.14;
