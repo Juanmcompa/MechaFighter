@@ -189,6 +189,10 @@ select:hover, input:hover { border-color: var(--fosforo-tenue); }
 @media (max-width: 999px) { .plantel { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } }
 .plantel li { display: grid; grid-template-columns: 1fr auto; gap: 2px 6px; align-items: center; }
 .plantel .barra { grid-column: 1 / -1; }
+/* vida en batalla: rayitas cada 10 puntos (--seg lo pone batalla.js) */
+.plantel .barra { height: 10px; }
+.plantel .barra::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(to right, transparent 0 calc(var(--seg, 10%) - 1px), rgba(0,0,0,.7) calc(var(--seg, 10%) - 1px) var(--seg, 10%)); }
 .plantel .caido { color: var(--texto-tenue); }
 .pl-moral { color: var(--ambar); font-weight: bold; }
 .feed { list-style: none; margin: 0; padding: 8px; max-height: 260px; overflow-y: auto; background: #0b0d09; border: 2px solid var(--chapa-borde); font-size: 18px; }

@@ -129,7 +129,7 @@ export function actualizarAfinidad(datos, p, registro, desplegados, victoria) {
   };
   const vida = new Map(), vidaMax = new Map();
   for (const e of registro) {
-    if (e.tipo === 'aparece') { vida.set(e.u, e.ficha.vidaMax); vidaMax.set(e.u, e.ficha.vidaMax); }
+    if (e.tipo === 'aparece') { vida.set(e.u, e.ficha.vida ?? e.ficha.vidaMax); vidaMax.set(e.u, e.ficha.vidaMax); }
     if (e.tipo === 'dispara' && e.acierta) vida.set(e.o, vida.get(e.o) - e.danio);
     if (e.tipo === 'repara') {
       if (e.vida - e.cant < vidaMax.get(e.o) * 0.25) sumar(ref.get(e.u), ref.get(e.o), C.salvo, 'salvo');

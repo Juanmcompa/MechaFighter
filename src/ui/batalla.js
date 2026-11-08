@@ -93,6 +93,7 @@ export function batalla(app, raiz) {
       if (!t) continue;
       const pct = Math.max(0, Math.round((u.vida * 100) / u.ficha.vidaMax));
       t.vida.firstChild.style.width = pct + '%';
+      t.vida.style.setProperty('--seg', (1000 / u.ficha.vidaMax) + '%'); // una rayita cada 10 puntos
       t.vida.classList.toggle('critica', pct < 30);
       const b = t.li.firstChild;
       b.classList.toggle('caido', !u.viva);

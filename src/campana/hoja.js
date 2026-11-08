@@ -27,7 +27,7 @@ export function momentosDeMision(registro, mision, sector, pilotosPorRef) {
 
   for (const e of registro) {
     switch (e.tipo) {
-      case 'aparece': ficha.set(e.u, e.ficha); vida.set(e.u, e.ficha.vidaMax); break;
+      case 'aparece': ficha.set(e.u, e.ficha); vida.set(e.u, e.ficha.vida ?? e.ficha.vidaMax); break;
       case 'dispara': if (e.acierta) vida.set(e.o, (vida.get(e.o) || 0) - e.danio); break;
       case 'esquirla': vida.set(e.u, (vida.get(e.u) || 0) - e.danio); break;
       case 'vida': vida.set(e.u, e.vida); break;

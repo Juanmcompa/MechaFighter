@@ -201,7 +201,7 @@ export class Repeticion {
         // peso: 0 liviano (infanteria, mutantes) .. 3 pesado. Define giro, pisada y sacudon.
         const peso = f.cuerpo !== 'mecha' ? 0 : torso.includes('pesado') ? 3 : torso.includes('medio') ? 2 : torso ? 1 : 2;
         U.set(e.u, { id: e.u, ficha: f, x: f.x, y: f.y, desde: [f.x, f.y], hacia: [f.x, f.y], t0: 0, dur: 0, salto: false,
-          ang: f.bando === 0 ? 0 : Math.PI, paso: 0, vida: f.vidaMax, viva: true, golpe: 0, estados: new Set(), moral: 'moral_firme',
+          ang: f.bando === 0 ? 0 : Math.PI, paso: 0, vida: f.vida ?? f.vidaMax, viva: true, golpe: 0, estados: new Set(), moral: 'moral_firme',
           grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6,
           peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0,
           marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
@@ -652,12 +652,7 @@ export class Repeticion {
       if (!u.viva || !seVe(u)) continue;
       const [cx, cy] = centro(u);
       const top = cy - Lz * 0.5 - 2;
-      const pct = Math.max(0, u.vida / u.ficha.vidaMax);
-      if (pct < 1 || u.ficha.bando === 0) {
-        ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(cx - Lz * 0.4, top - 4, Lz * 0.8, 4);
-        ctx.fillStyle = pct > 0.5 ? '#8fdc5a' : pct > 0.25 ? '#e0a43a' : '#d9553f';
-        ctx.fillRect(cx - Lz * 0.4 + 1, top - 3, (Lz * 0.8 - 2) * pct, 2);
-      }
+      barraDeVida(ctx, u, cx, top, Lz);
       if (u.estados.has('en_llamas')) { ctx.fillStyle = '#ff8a2a'; ctx.fillRect(cx + Lz * 0.42, top - 4, 3, 3); }
       if (u.estados.has('suprimido')) { ctx.fillStyle = '#b8b8b8'; ctx.fillRect(cx + Lz * 0.42, top, 3, 3); }
       if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - Lz * 0.5, top + 4); }
@@ -699,3 +694,35 @@ export class Repeticion {
 }
 
 export { COLORES };
+
+// Barra de vida estilo MOBA: todas del mismo ancho, con una rayita cada 10 puntos (y una mas marcada cada 50),
+// asi a simple vista se ve cuanta vida tiene. El pedazo recien perdido queda claro un momento y despues se va.
+const SEGMENTO = 10;
+function barraDeVida(ctx, u, cx, top, Lz) {
+  const max = u.ficha.vidaMax, vida = Math.max(0, u.vida);
+  // lo que se ve baja de a poco hasta la vida real (el "rastro" del golpe)
+  if (u.vidaVista === undefined || u.vidaVista < vida) u.vidaVista = vida;
+  else u.vidaVista += (vida - u.vidaVista) * 0.08;
+  const w = Math.round(Math.max(26, Lz * 0.92)), hb = Math.round(Math.max(5, Lz * 0.16));
+  const x0 = Math.round(cx - w / 2), y0 = Math.round(top - hb - 2);
+  const ancho = w - 2;
+  const bueno = u.ficha.bando === 0;
+  const pct = vida / max;
+  ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(x0, y0, w, hb + 2);
+  ctx.fillStyle = '#1b1f18'; ctx.fillRect(x0 + 1, y0 + 1, ancho, hb);
+  ctx.fillStyle = '#f2e6b0'; ctx.fillRect(x0 + 1, y0 + 1, ancho * Math.min(1, u.vidaVista / max), hb);
+  ctx.fillStyle = bueno ? (pct > 0.3 ? '#6fc24a' : '#e0a43a') : '#d24a38';
+  ctx.fillRect(x0 + 1, y0 + 1, ancho * pct, hb);
+  // brillo arriba para que se lea como barra
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(x0 + 1, y0 + 1, ancho * pct, Math.max(1, hb / 3));
+  // rayitas: cada 10 (si entran) y cada 50 mas largas
+  const paso = (ancho * SEGMENTO) / max;
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  for (let v = SEGMENTO; v < max; v += SEGMENTO) {
+    const grande = v % 50 === 0;
+    if (!grande && paso < 2.5) continue;
+    const x = Math.round(x0 + 1 + (ancho * v) / max);
+    ctx.fillRect(x, y0 + 1, 1, grande ? hb : Math.ceil(hb * 0.55));
+  }
+}
+
