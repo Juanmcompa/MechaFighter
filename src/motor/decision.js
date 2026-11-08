@@ -62,6 +62,8 @@ export function enAlcance(B, u, o, arma) {
 }
 
 const FUNCIONES = {
+  // el enemigo esta pegado a un barril que este puede reventar sin agarrar a los suyos
+  junto_a_barril: (B, ctx) => !!ctx.otro && ctx.otro.bando !== ctx.u.bando && !!barrilParaReventar(B, ctx.u, ctx.otro, true),
   a_tiro: (B, ctx) => !!ctx.otro && ctx.u.armas.some((a) => enAlcance(B, ctx.u, ctx.otro, a)),
   aislado: (B, ctx) => !!ctx.otro && !B.unidades.some((o) => o.viva && o !== ctx.otro && o.bando === ctx.otro.bando && distancia(o, ctx.otro) <= 3),
   en_cobertura: (B, ctx) => {
@@ -267,6 +269,16 @@ function accion(B, u, id, obj, correa) {
       return disparo(B, u, obj, aDistancia) || otroATiro(B, u, obj);
     }
 
+    case 'reventar_barril': {
+      const b = barrilParaReventar(B, u, esUnidad && obj.bando !== u.bando ? obj : null);
+      if (!b) return null;
+      const enRango = u.armas.filter((a) => aDistancia(a) && enAlcance(B, u, b, a));
+      const listas = armasListas(u, (a) => enRango.includes(a));
+      if (listas.length) return { tipo: 'tirar_casilla', x: b.x, y: b.y, armas: listas.map((a) => u.armas.indexOf(a)) };
+      if (enRango.some((a) => a.municionMax && a.municion === 0 && a.recargando === 0)) return { tipo: 'recargar' };
+      return { tipo: 'esperar' };
+    }
+
     case 'disparar_cabina': {
       // solo contra mechas (los que tienen partes que saquear)
       if (!esUnidad || obj.bando === u.bando || !obj.slots || obj.tipo === 'invocacion') return null;
@@ -468,6 +480,31 @@ function accion(B, u, id, obj, correa) {
     }
   }
   return null;
+}
+
+// ---------- Barriles ----------
+
+// El barril que conviene reventar: a tiro, con enemigos al lado y ninguno de los suyos en la explosion.
+// Si hay "preferido", suma que lo agarre a el; con "soloEse", tiene que agarrarlo si o si.
+function barrilParaReventar(B, u, preferido = null, soloEse = false) {
+  const t = B.tablero, D = t.destructibles;
+  if (!D) return null;
+  const armas = u.armas.filter(aDistancia);
+  if (!armas.length) return null;
+  const enemigos = enemigosConocidos(B, u);
+  let mejor = null, mejorV = 0;
+  for (let k = 0; k < t.tipos.length; k++) {
+    const def = D[t.tipos[k]];
+    if (!def || !def.explota) continue;
+    const c = { x: k % t.ancho, y: (k / t.ancho) | 0 }, r = def.explota.radio;
+    if (distancia(u, c) <= r || !armas.some((a) => enAlcance(B, u, c, a))) continue;
+    if (B.unidades.some((v) => v.viva && v.bando === u.bando && distancia(v, c) <= r)) continue;
+    const agarra = enemigos.filter((e) => distancia(e, c) <= r);
+    if (!agarra.length || (soloEse && !agarra.includes(preferido))) continue;
+    const v = agarra.length + (preferido && agarra.includes(preferido) ? 2 : 0);
+    if (v > mejorV) { mejor = c; mejorV = v; }
+  }
+  return mejor;
 }
 
 function otroATiro(B, u, salvo) {

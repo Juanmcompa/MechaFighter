@@ -50,6 +50,17 @@
       },
       "ayuda": "Un enemigo sin compañeros cerca."
     },
+    "enemigo_junto_a_barril": {
+      "texto": "Enemigo pegado a un barril",
+      "icono": "rayo",
+      "expr": {
+        "existe": "enemigo",
+        "donde": {
+          "fn": "junto_a_barril"
+        }
+      },
+      "ayuda": "Hay un enemigo al lado de un barril que se puede reventar sin agarrar a ninguno de los nuestros."
+    },
     "aliado_vida_bajo": {
       "texto": "Aliado con vida < {valor}%",
       "icono": "cruz",
@@ -398,6 +409,17 @@
         "arma_a_distancia"
       ],
       "ayuda": "Acierta menos, pero si el mecha enemigo cae así, su arma queda entera para el botín."
+    },
+    "reventar_barril": {
+      "texto": "Reventar barril",
+      "icono": "rayo",
+      "etiquetas": [
+        "ataque"
+      ],
+      "requiere": [
+        "arma_a_distancia"
+      ],
+      "ayuda": "Le tira a un barril que tenga enemigos al lado (mejor si está el objetivo). Nunca si hay alguno de los nuestros cerca. Si no hay barril que sirva, sigue con la próxima orden."
     }
   },
   "objetivos": {
@@ -470,7 +492,8 @@
     "hay_vip",
     "radar_oculto",
     "esta_marcado",
-    "escolta_peleando"
+    "escolta_peleando",
+    "junto_a_barril"
   ],
   "maximo_por_unidad": 8
 }

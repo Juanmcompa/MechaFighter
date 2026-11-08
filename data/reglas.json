@@ -59,6 +59,7 @@
       }
     }
   },
+  "bonus_tiro_a_cosa": 20,
   "danio_minimo": 1,
   "punteria_minima": 5,
   "punteria_maxima": 95,

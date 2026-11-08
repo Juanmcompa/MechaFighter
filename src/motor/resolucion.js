@@ -50,6 +50,7 @@ export function resolverAcciones(B, intenciones) {
   for (const { u, i } of intenciones) {
     switch (i.tipo) {
       case 'atacar': atacar(B, u, i); break;
+      case 'tirar_casilla': tirarCasilla(B, u, i); break;
       case 'recargar':
         for (const a of u.armas) if (a.municionMax && a.municion < a.municionMax && a.recargando === 0) a.recargando = a.recarga;
         B.log({ tipo: 'recarga', u: u.id });
@@ -76,6 +77,27 @@ export function resolverAcciones(B, intenciones) {
         u.ocupado = h.demora || 0;
         break;
       }
+    }
+  }
+}
+
+// Tirarle a una cosa del mapa (un barril): no esquiva, asi que se acierta mas facil
+function tirarCasilla(B, u, i) {
+  const t = B.tablero, R = B.datos.reglas, az = B.azarCombate;
+  encarar(u, i.x, i.y);
+  const mu = mods(B, u);
+  for (const idx of i.armas) {
+    const a = u.armas[idx];
+    if (!a) continue;
+    if (!t.destructibles || !t.destructibles[t.tipos[i.y * t.ancho + i.x]]) break; // ya revento
+    const chance = Math.max(R.punteria_minima, Math.min(R.punteria_maxima, a.punteria + (mu.punteria || 0) + (R.bonus_tiro_a_cosa || 0)));
+    const acierta = az.tirada(chance);
+    B.log({ tipo: 'tira_casilla', u: u.id, x: i.x, y: i.y, arma: a.tipoVisual, slot: a.slot, acierta });
+    if (acierta) danarCasilla(B, i.x, i.y, a.danio, u);
+    a.espera = a.cadencia;
+    if (a.municionMax) {
+      a.municion--;
+      if (a.municion <= 0) a.recargando = a.recarga;
     }
   }
 }

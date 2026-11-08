@@ -247,6 +247,16 @@ export class Repeticion {
         this.temblor = Math.max(this.temblor, e.antes === 'edificio' ? 0.8 : 0.3);
         if (e.antes === 'edificio') this.alEvento({ texto: 'Se viene abajo un edificio', clase: '' });
         break;
+      case 'tira_casilla': {
+        if (!u) break;
+        u.angObj = Math.atan2(e.y - u.y, e.x - u.x);
+        u.retroceso = 1;
+        this.accion.set(u.id, e.t);
+        this.efectos.push({ tipo: 'fogonazo', id: u.id, t0: this.T, dur: 1.6 });
+        const d = e.acierta ? 0 : 0.6;
+        this.efectos.push({ tipo: e.arma, de: [u.x, u.y], a: [e.x + d * Math.sin(e.t), e.y + d * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
+        break;
+      }
       case 'esquirla': if (u) { u.vida -= e.danio; u.golpe = 1; this.flotante(u, '-' + e.danio, '#ff9a5a'); } break;
       case 'explota':
         this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: e.r + 0.6, t0: this.T, dur: 9 });
