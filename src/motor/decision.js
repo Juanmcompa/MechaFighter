@@ -7,7 +7,7 @@
 //
 // El motor no sabe que es un Cobarde: solo aplica ganchos.
 
-import { distancia, lineaDeTiro, cobertura, pasoHacia, campo, caminable, vecinos } from './espacio.js';
+import { distancia, lineaDeTiro, cobertura, pasoHacia, campo, caminable, vecinos, segura, tipo as tipoCasilla } from './espacio.js';
 import { enemigosConocidos, aliados, vidaPct, porId, ganchos as ganchosDe, mods, tieneEstado } from './estado.js';
 
 // ---------- Datos que se pueden leer en una condicion ----------
@@ -130,7 +130,7 @@ function casillaDeZona(B, u, z) {
     let mejor = { x: u.x, y: u.y, punto: true }, mejorD = distancia(u, fondo);
     for (let y = z[0][1]; y <= z[1][1]; y++) {
       for (let x = z[0][0]; x <= z[1][0]; x++) {
-        if (!caminable(B.tablero, x, y) || ocupada(x, y) || distancia({ x, y }, u) > 1) continue;
+        if (!segura(B.tablero, x, y) || ocupada(x, y) || distancia({ x, y }, u) > 1) continue;
         const d = distancia({ x, y }, fondo);
         if (d < mejorD) { mejor = { x, y, punto: true }; mejorD = d; }
       }
@@ -140,7 +140,7 @@ function casillaDeZona(B, u, z) {
   let mejor = null, mejorD = 32767;
   for (let y = z[0][1]; y <= z[1][1]; y++) {
     for (let x = z[0][0]; x <= z[1][0]; x++) {
-      if (!caminable(B.tablero, x, y) || ocupada(x, y)) continue;
+      if (!segura(B.tablero, x, y) || ocupada(x, y)) continue;
       const d = distancia(u, { x, y });
       if (d < mejorD) { mejor = { x, y, punto: true }; mejorD = d; }
     }
@@ -324,7 +324,7 @@ function accion(B, u, id, obj, correa) {
       let mejor = null, mejorD = 32767;
       for (let y = obj.y - alcance; y <= obj.y + alcance; y++) {
         for (let x = obj.x - alcance; x <= obj.x + alcance; x++) {
-          if (!caminable(B.tablero, x, y) || ocupada(x, y)) continue;
+          if (!segura(B.tablero, x, y) || ocupada(x, y)) continue;
           const c = { x, y };
           if (distancia(c, obj) < 1 || cobertura(B.tablero, obj, c) !== null || !lineaDeTiro(B.tablero, c, obj)) continue;
           const d = desdeMi[y * B.tablero.ancho + x];
@@ -377,7 +377,7 @@ function accion(B, u, id, obj, correa) {
       let mejor = null, mejorV = 32767;
       for (let y = u.y - 5; y <= u.y + 5; y++) {
         for (let x = u.x - 5; x <= u.x + 5; x++) {
-          if (!caminable(B.tablero, x, y) || ocupada(x, y)) continue;
+          if (!segura(B.tablero, x, y) || ocupada(x, y)) continue;
           const d = desdeMi[y * B.tablero.ancho + x];
           if (d < 0 || d > 6) continue;
           const cob = cobertura(B.tablero, { x, y }, e);
@@ -420,7 +420,7 @@ function accion(B, u, id, obj, correa) {
       let mejor = null, mejorD = actual;
       for (let y = u.y - salto; y <= u.y + salto; y++) {
         for (let x = u.x - salto; x <= u.x + salto; x++) {
-          if (!caminable(B.tablero, x, y) || ocupada(x, y) || (x === obj.x && y === obj.y)) continue;
+          if (!segura(B.tablero, x, y) || ocupada(x, y) || (x === obj.x && y === obj.y)) continue;
           const d = c[y * B.tablero.ancho + x];
           if (d >= 1 && d < mejorD) { mejor = [x, y]; mejorD = d; }
         }
@@ -466,7 +466,7 @@ function accion(B, u, id, obj, correa) {
       let mejor = null, mejorD = 32767;
       for (let y = u.y - 2; y <= u.y + 2; y++) {
         for (let x = u.x - 2; x <= u.x + 2; x++) {
-          if (!caminable(B.tablero, x, y) || ocupada(x, y) || (x === u.x && y === u.y)) continue;
+          if (!segura(B.tablero, x, y) || ocupada(x, y) || (x === u.x && y === u.y)) continue;
           const d = distancia({ x, y }, e);
           if (d < mejorD) { mejor = [x, y]; mejorD = d; }
         }
@@ -480,6 +480,25 @@ function accion(B, u, id, obj, correa) {
     }
   }
   return null;
+}
+
+// ---------- Acido ----------
+
+// Si esta parado en acido, un paso hacia la casilla segura mas cercana (de las libres).
+function salirDelAcido(B, u) {
+  if (u.mover > 0 || u.fijo || mods(B, u).inmovil || tipoCasilla(B.tablero, u.x, u.y) !== 'peligro') return null;
+  const t = B.tablero, ocupada = ocupadaPara(B, u);
+  // primero un vecino seguro; si no hay, hacia el piso seguro mas cerca
+  for (const [x, y] of vecinos(t, u.x, u.y)) if (segura(t, x, y) && !ocupada(x, y)) return { tipo: 'mover', a: [x, y], anula: 'sale_del_acido' };
+  const c = campo(t, u.x, u.y);
+  let mejor = null, mejorD = 32767;
+  for (let k = 0; k < c.length; k++) {
+    const x = k % t.ancho, y = (k / t.ancho) | 0;
+    if (c[k] > 0 && c[k] < mejorD && segura(t, x, y) && !ocupada(x, y)) { mejor = [x, y]; mejorD = c[k]; }
+  }
+  if (!mejor) return null;
+  const p = pasoHacia(t, u, mejor[0], mejor[1], ocupada);
+  return p ? { tipo: 'mover', a: p, anula: 'sale_del_acido' } : null;
 }
 
 // ---------- Barriles ----------
@@ -574,7 +593,9 @@ function abrirPaso(B, u) {
 // ---------- La decision completa ----------
 
 export function decidir(B, u) {
-  const i = decidirSinLimite(B, u);
+  let i = decidirSinLimite(B, u);
+  // parado en acido y sin ir a ningun lado (tirando, esperando): primero sale. Si esta cruzando, que siga.
+  if (i.tipo !== 'mover') i = salirDelAcido(B, u) || i;
   // el escoltado no espera para siempre: si lleva mucho parado, arranca igual por un rato
   if (u === B.vip) {
     if (u.apuro > 0) {

@@ -45,19 +45,36 @@ export function vecinos(t, x, y) {
   return out;
 }
 
-// Campo de distancias desde una casilla (BFS). El mapa no cambia durante la batalla: se guarda y se reusa.
+// Pisar acido (peligro) cuesta como dar varios pasos: se cruza solo si rodear es mucho mas largo
+export const COSTO_PELIGRO = 6;
+const costo = (t, x, y) => (t.tipos[y * t.ancho + x] === 'peligro' ? COSTO_PELIGRO : 1);
+
+// Una casilla donde se puede quedar parado sin quemarse
+export const segura = (t, x, y) => caminable(t, x, y) && tipo(t, x, y) !== 'peligro';
+
+// Campo de "distancias" (en costo de camino) desde una casilla. Se guarda y se reusa hasta que el mapa cambia.
+// Va por baldes de costo (los pasos cuestan 1 o COSTO_PELIGRO), asi sigue siendo exacto y rapido.
 export function campo(t, gx, gy) {
   const clave = gy * t.ancho + gx;
   let c = t.campos.get(clave);
   if (c) return c;
   c = new Int16Array(t.ancho * t.alto).fill(-1);
   c[clave] = 0;
-  const cola = [gx, gy];
-  for (let i = 0; i < cola.length; i += 2) {
-    const x = cola[i], y = cola[i + 1], d = c[y * t.ancho + x];
-    for (const [nx, ny] of vecinos(t, x, y)) {
-      const k = ny * t.ancho + nx;
-      if (c[k] === -1) { c[k] = d + 1; cola.push(nx, ny); }
+  const baldes = [[gx, gy]];
+  for (let d = 0; d < baldes.length; d++) {
+    const b = baldes[d];
+    if (!b) continue;
+    for (let i = 0; i < b.length; i += 2) {
+      const x = b[i], y = b[i + 1];
+      if (c[y * t.ancho + x] !== d) continue; // ya tenia uno mas barato
+      // el campo va del destino hacia afuera: el que esta en (nx, ny) da el paso hacia (x, y) y paga entrar ahi
+      const paso = costo(t, x, y);
+      for (const [nx, ny] of vecinos(t, x, y)) {
+        const k = ny * t.ancho + nx, nd = d + paso;
+        if (c[k] !== -1 && c[k] <= nd) continue;
+        c[k] = nd;
+        (baldes[nd] || (baldes[nd] = [])).push(nx, ny);
+      }
     }
   }
   t.campos.set(clave, c);
