@@ -6,7 +6,7 @@ import { ENCAJES, normalizarPieza } from '../motor/unidades.js';
 import { mechaDeClase } from '../campana/reclutas.js';
 import { fichaDe } from '../ui/hangar.js';
 import { dibujarMechaVisor } from '../vista/dibujo.js';
-import { SPR, UNI, TER } from '../vista/sprites.js';
+import { SPR, UNI, TER, pintarEquipo } from '../vista/sprites.js';
 import * as C from './carpeta.js';
 
 const NOMBRE_ENCAJE = { cabeza: 'Cabeza', torso: 'Torso', piernas: 'Piernas', brazo_der: 'Brazo der.', brazo_izq: 'Brazo izq.', mochila: 'Mochila' };
@@ -14,8 +14,9 @@ const V = { clase: 'vanguardia', mecha: null, color: 'azul', angulo: 270, zoom: 
 V.zoom = 2;
 
 // Una imagen nueva pasa a ser un sprite del juego (para los dos bandos), como pieza de papel de 32x32
-function registrarNuevo(id, im) {
-  for (const color of ['azul', 'rojo', 'verde']) SPR.imgs[color + '/' + id] = im;
+function registrarNuevo(id, im, config) {
+  // una sola version dibujada: el color de equipo se pinta solo (reglas.arte.color_equipo)
+  for (const color of ['azul', 'rojo', 'verde']) SPR.imgs[color + '/' + id] = pintarEquipo(im, color, config);
   // 32 pixeles = una casilla (24 unidades del dibujo)
   const f = (SPR.escala || 2) * (24 / 32);
   SPR.meta[id] = { w: im.width * f, h: im.height * f, ancla: [im.width * f / 2, im.height * f / 2], papel: true };
@@ -112,7 +113,7 @@ export function pestanaVisor(T, raiz) {
       const im = await cargarImagen(a.archivo || a);
       if (!im) continue;
       const id = (a.nombre || a.name.replace(/\.png$/i, ''));
-      registrarNuevo(id, im);
+      registrarNuevo(id, im, (d.reglas.arte || {}).color_equipo);
       V.nuevos = V.nuevos.filter((x) => x.id !== id).concat({ id, im });
     }
     pintarNuevos();
@@ -130,7 +131,7 @@ export function pestanaVisor(T, raiz) {
     h('div', { class: 'tl-izq' },
       panel('Armado', armado),
       panel('Arte nuevo (para probar)',
-        h('p', { class: 'ayuda' }, 'PNG de 32×32 con el centro del mecha en el centro del cuadro. El brazo y la pierna, del lado derecho: el izquierdo es el mismo espejado. El nombre del archivo es el nombre del sprite.'),
+        h('p', { class: 'ayuda' }, 'PNG de 32×32 con el centro del mecha en el centro del cuadro. El brazo y la pierna, del lado derecho: el izquierdo es el mismo espejado. El nombre del archivo es el nombre del sprite. Color de equipo: lo pintado con verde puro (#00ff00 luz, #00c000 medio, #008000 sombra) se vuelve azul o rojo solo.'),
         h('div', { class: 'tl-controles' },
           C.hayAcceso() ? boton('Leer arte/partes', async () => sumarArchivos(await C.listarImagenes('arte/partes')), { iconoNombre: 'hangar', clase: 'secundario compacto' }) : null,
           C.hayAcceso() ? boton('Leer assets/iconos', async () => sumarArchivos(await C.listarImagenes('assets/iconos')), { iconoNombre: 'estrella', clase: 'secundario compacto' }) : null,

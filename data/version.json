@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 45,
-  "cambio": "Taller del desarrollador: batalla de prueba, sprites, piezas y textos en varios idiomas",
+  "numero": 46,
+  "cambio": "Textos del código editables y traducibles, y color de equipo automático para el arte nuevo",
   "novedades": [
+    "v0.46 · Textos del código editables y traducibles, y color de equipo automático para el arte nuevo",
     "v0.45 · Taller del desarrollador: batalla de prueba, sprites, piezas y textos en varios idiomas",
     "v0.44 · En el celu: el mapa de batalla ocupa todo el ancho y la radio del despliegue no crece",
     "v0.43 · Campaña infinita: los némesis se adueñan de los sectores",
     "v0.42 · More shouts",
-    "v0.41 · more texts",
-    "v0.391 · ¡Ahora con más personalidad!"
+    "v0.41 · more texts"
   ]
 }

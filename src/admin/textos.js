@@ -9,24 +9,52 @@ const X = { tabla: 'charlas', idioma: '', busca: '', faltan: false, mostrar: 150
 
 async function cargarIdiomas() {
   X.idiomas = {};
-  const codigos = new Set(['en']);
+  const codigos = new Set(['en', 'es']);
   for (const im of await C.listarJSON('data/idiomas')) codigos.add(im);
   for (const c of codigos) {
     try { X.idiomas[c] = await C.leerJSON('data/idiomas/' + c + '.json'); } catch { /* todavia no existe */ }
   }
-  if (!X.idioma) X.idioma = Object.keys(X.idiomas)[0] || '';
+  if (!X.idioma) X.idioma = Object.keys(X.idiomas).find((c) => c !== 'es') || '';
 }
 
 export function pestanaTextos(T, raiz) {
   const tablas = TABLAS_DE_TEXTO.filter((t) => T.crudos[t]);
-  if (!tablas.includes(X.tabla)) X.tabla = tablas[0];
+  if (!tablas.includes(X.tabla) && X.tabla !== '__interfaz') X.tabla = tablas[0];
   const cuerpo = h('div', { class: 'tl-textos' });
   const estado = h('span', { class: 'chip' });
 
   const idiomaActual = () => (X.idioma && X.idiomas[X.idioma]) || null;
   const traduccion = (ruta) => { const I = idiomaActual(); return I && I.textos && I.textos[X.tabla] ? I.textos[X.tabla][ruta] || '' : ''; };
 
+  // ---- textos de la interfaz (los del codigo): original | cambio en castellano | traduccion
+  const asegurarIdioma = (c, nombre) => {
+    if (!X.idiomas[c]) X.idiomas[c] = { _ayuda: 'Traducciones del juego. Ver src/core/idiomas.js y src/core/traducir.js. Se edita desde el taller (admin.html).', nombre: nombre || c, textos: {} };
+    X.idiomas[c].interfaz = X.idiomas[c].interfaz || {};
+    return X.idiomas[c];
+  };
+  const pintarInterfaz = () => {
+    const cat = (X.interfaz && X.interfaz.textos) || {};
+    const ES = (X.idiomas.es && X.idiomas.es.interfaz) || {};
+    const I = X.idioma && X.idioma !== 'es' ? X.idiomas[X.idioma] : null;
+    const IT = (I && I.interfaz) || {};
+    const q = X.busca.toLowerCase();
+    const filas = Object.entries(cat).filter(([o]) => (!q || o.toLowerCase().includes(q) || (ES[o] || '').toLowerCase().includes(q) || (IT[o] || '').toLowerCase().includes(q)) && (!X.faltan || !IT[o]));
+    estado.textContent = Object.keys(cat).length + ' textos de la interfaz' + (I ? ' · ' + (I.nombre || X.idioma) + ': ' + Object.keys(IT).length + ' traducidos' : '');
+    const area = (valor, ph, alCambiar) => h('textarea', { rows: 1, placeholder: ph, onchange: (e) => alCambiar(e.target.value) }, valor || '');
+    cuerpo.replaceChildren(
+      Object.keys(cat).length ? null : h('p', { class: 'error' }, 'No hay catálogo: corré  node tools/extraer_textos.mjs'),
+      h('table', { class: 'tl-tabla-textos' },
+        h('thead', {}, h('tr', {}, h('th', {}, 'En el código'), h('th', {}, 'Castellano (cambio)'), I ? h('th', {}, I.nombre || X.idioma) : null)),
+        h('tbody', {}, ...filas.slice(0, X.mostrar).map(([o, donde]) => h('tr', {},
+          h('td', { class: 'tl-ruta' }, h('div', {}, '«' + o + '»'), h('code', {}, donde.slice(0, 2).join(' · ') + (donde.length > 2 ? ' (+' + (donde.length - 2) + ')' : ''))),
+          h('td', {}, area(ES[o], '(igual)', (v) => { const E = asegurarIdioma('es', 'Castellano'); if (v) E.interfaz[o] = v; else delete E.interfaz[o]; X.sucios.add('idioma:es'); marcar(); })),
+          I ? h('td', {}, area(IT[o], '(sin traducir)', (v) => { if (v) I.interfaz[o] = v; else delete I.interfaz[o]; X.sucios.add('idioma:' + X.idioma); marcar(); })) : null)))),
+      filas.length > X.mostrar ? boton('Mostrar más (' + (filas.length - X.mostrar) + ')', () => { X.mostrar += 300; pintar(); }, { clase: 'secundario compacto' }) : null,
+      h('p', { class: 'ayuda' }, 'Los que empiezan o terminan con espacio o coma son pedazos de una frase armada con datos (ej. «Nivel » + número): se cambian donde aparezcan.'));
+  };
+
   const pintar = () => {
+    if (X.tabla === '__interfaz') { if (X.idiomas && X.idioma) asegurarIdioma(X.idioma); pintarInterfaz(); return; }
     const filas = textosDe(T.crudos[X.tabla]);
     const q = X.busca.toLowerCase();
     const vis = filas.filter((f) => (!q || f.valor.toLowerCase().includes(q) || f.ruta.toLowerCase().includes(q) || traduccion(f.ruta).toLowerCase().includes(q)) &&
@@ -84,12 +112,13 @@ export function pestanaTextos(T, raiz) {
 
   const selIdioma = h('select', { onchange: (e) => { X.idioma = e.target.value; pintar(); } });
   const pintarIdiomas = () => selIdioma.replaceChildren(h('option', { value: '' }, 'Solo castellano'),
-    ...Object.entries(X.idiomas || {}).map(([c, I]) => h('option', { value: c, ...(c === X.idioma ? { selected: true } : {}) }, (I.nombre || c) + ' (' + c + ')')));
+    ...Object.entries(X.idiomas || {}).filter(([c]) => c !== 'es').map(([c, I]) => h('option', { value: c, ...(c === X.idioma ? { selected: true } : {}) }, (I.nombre || c) + ' (' + c + ')')));
 
   raiz.append(panel('Textos e idiomas',
     h('p', { class: 'ayuda' }, 'Cada fila es un texto del juego. Lo de la izquierda dice en qué archivo y en qué parte está. En las listas de frases, + suma una frase y × la quita. Para probar un idioma en el juego: abrilo con ?idioma=en al final de la dirección. Los textos de los botones y pantallas (los que están en el código) todavía no se traducen.'),
     h('div', { class: 'tl-filtros' },
-      h('select', { onchange: (e) => { X.tabla = e.target.value; X.mostrar = 150; pintar(); } }, ...tablas.map((t) => h('option', { value: t, ...(t === X.tabla ? { selected: true } : {}) }, t + '.json'))),
+      h('select', { onchange: (e) => { X.tabla = e.target.value; X.mostrar = 150; pintar(); } }, ...tablas.map((t) => h('option', { value: t, ...(t === X.tabla ? { selected: true } : {}) }, t + '.json')),
+        h('option', { value: '__interfaz', ...(X.tabla === '__interfaz' ? { selected: true } : {}) }, 'interfaz (textos del código)')),
       h('input', { type: 'search', placeholder: 'Buscar texto...', value: X.busca, oninput: (e) => { X.busca = e.target.value; X.mostrar = 150; pintar(); } }),
       selIdioma,
       boton('Nuevo idioma', () => {
@@ -105,6 +134,7 @@ export function pestanaTextos(T, raiz) {
 
   (async () => {
     if (!X.idiomas) await cargarIdiomas();
+    try { X.interfaz = await C.leerJSON('data/interfaz.json'); } catch { X.interfaz = null; }
     pintarIdiomas(); marcar(); pintar();
   })();
 }

@@ -1,6 +1,7 @@
 // Despliegue: la pantalla entre la preparacion y la batalla. Los mechas bajan y los pilotos hablan por radio
 // entre ellos (segun quienes son, como llegan y como se llevan). Es puro color: no cambia nada del juego.
 import { h, montar, ico, boton, retrato } from './comun.js';
+import { tr } from '../core/traducir.js';
 import { escuadronParaMision } from '../campana/partida.js';
 import { dibujarMechaFicha } from '../vista/dibujo.js';
 import { fichaDe } from './hangar.js';
@@ -114,7 +115,7 @@ export function despliegue(app, raiz) {
   const paso = () => {
     if (i >= charla.length) {
       altura.firstChild.style.width = '100%';
-      alt.textContent = 'EN TIERRA';
+      alt.textContent = tr('EN TIERRA');
       raiz.querySelector('.despliegue').classList.add('aterrizo');
       listo.classList.remove('oculto');
       listo.focus({ preventScroll: true });

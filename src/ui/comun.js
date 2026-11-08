@@ -3,10 +3,13 @@ import { icono } from './iconos.js';
 import { nombrePieza, normalizarPieza } from '../motor/unidades.js';
 import { rutaRetrato } from '../vista/sprites.js';
 import { elegirRetrato } from '../campana/reclutas.js';
+import { tr } from '../core/traducir.js';
 
 // Version que se muestra en la barra de estado de abajo
 // Version del juego (data/version.json, la suma sola tools/hooks/post-commit en cada commit)
 export const version = (datos) => (datos && datos.version ? datos.version.mayor + '.' + datos.version.numero : '0');
+
+const TRADUCIBLES = new Set(['title', 'aria-label', 'placeholder', 'alt']);
 
 // h('div', { class: 'x', onclick: fn }, hijo1, 'texto', ...). html: '...' para meter iconos.
 export function h(tag, attrs = {}, ...hijos) {
@@ -16,9 +19,10 @@ export function h(tag, attrs = {}, ...hijos) {
     if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
     else if (k === 'html') el.innerHTML = v;
     else if (k === 'class') el.className = v;
-    else el.setAttribute(k, v === true ? '' : v);
+    else el.setAttribute(k, v === true ? '' : TRADUCIBLES.has(k) ? tr(String(v)) : v);
   }
-  for (const c of hijos.flat()) if (c !== null && c !== undefined && c !== false) el.append(c.nodeType ? c : String(c));
+  // (los textos pasan por tr: si hay traduccion o cambio en data/idiomas, se usa ese)
+  for (const c of hijos.flat()) if (c !== null && c !== undefined && c !== false) el.append(c.nodeType ? c : tr(String(c)));
   return el;
 }
 

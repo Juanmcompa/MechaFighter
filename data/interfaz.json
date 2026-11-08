@@ -1,0 +1,1646 @@
+{
+ "_ayuda": "Catalogo de los textos de la interfaz que estan en el codigo (lo arma tools/extraer_textos.mjs; no se edita a mano). Para cambiarlos o traducirlos: admin.html > Textos e idiomas > interfaz. Los cambios van en data/idiomas/<codigo>.json > interfaz (es.json para cambiar el castellano).",
+ "textos": {
+  "Desarrollado por Juan M. Comparini": [
+   "src/ui/app.js:36"
+  ],
+  "Batalla": [
+   "src/ui/batalla.js:19"
+  ],
+  "Cambiar cámara": [
+   "src/ui/batalla.js:21"
+  ],
+  "Seguir a ": [
+   "src/ui/batalla.js:38"
+  ],
+  "SYSTEM RUNNING": [
+   "src/ui/batalla.js:47"
+  ],
+  "Velocidad": [
+   "src/ui/batalla.js:51"
+  ],
+  "Pausa": [
+   "src/ui/batalla.js:52"
+  ],
+  "Velocidad ": [
+   "src/ui/batalla.js:53"
+  ],
+  "Ver el final": [
+   "src/ui/batalla.js:54",
+   "src/ui/portada.js:29"
+  ],
+  "Registro de combate": [
+   "src/ui/batalla.js:57"
+  ],
+  "Siguiendo": [
+   "src/ui/batalla.js:80"
+  ],
+  "Todo el mapa": [
+   "src/ui/batalla.js:80"
+  ],
+  "Acción": [
+   "src/ui/batalla.js:80"
+  ],
+  " · caído": [
+   "src/ui/batalla.js:101"
+  ],
+  "MISIÓN CUMPLIDA": [
+   "src/ui/batalla.js:108"
+  ],
+  "MISIÓN FALLIDA": [
+   "src/ui/batalla.js:108"
+  ],
+  " Caídos: ": [
+   "src/ui/batalla.js:110"
+  ],
+  "Ver informe": [
+   "src/ui/batalla.js:112"
+  ],
+  " sigue suelto": [
+   "src/ui/batalla.js:145"
+  ],
+  " cayó para siempre": [
+   "src/ui/batalla.js:146"
+  ],
+  " se eyectó": [
+   "src/ui/batalla.js:147"
+  ],
+  "Va a volver, y mejor preparado.": [
+   "src/ui/batalla.js:147"
+  ],
+  "width:": [
+   "src/ui/comun.js:52"
+  ],
+  "Radar ": [
+   "src/ui/comun.js:66"
+  ],
+  "Estructura ": [
+   "src/ui/comun.js:67",
+   "src/ui/hangar.js:222"
+  ],
+  "Blindaje ": [
+   "src/ui/comun.js:67"
+  ],
+  "Carga ": [
+   "src/ui/comun.js:67"
+  ],
+  "Paso ": [
+   "src/ui/comun.js:68"
+  ],
+  "Evasión ": [
+   "src/ui/comun.js:68"
+  ],
+  " · Blindaje +": [
+   "src/ui/comun.js:68"
+  ],
+  "Visión ": [
+   "src/ui/comun.js:69"
+  ],
+  " · Puntería +": [
+   "src/ui/comun.js:69"
+  ],
+  "Daño ": [
+   "src/ui/comun.js:70"
+  ],
+  "Alcance ": [
+   "src/ui/comun.js:70"
+  ],
+  "Cadencia ": [
+   "src/ui/comun.js:70"
+  ],
+  " · Cargador ": [
+   "src/ui/comun.js:70"
+  ],
+  "Bloqueo ": [
+   "src/ui/comun.js:71"
+  ],
+  "Blindaje +": [
+   "src/ui/comun.js:71"
+  ],
+  "Munición +": [
+   "src/ui/comun.js:73"
+  ],
+  "Peso ": [
+   "src/ui/comun.js:74"
+  ],
+  "Normal": [
+   "src/ui/comun.js:90"
+  ],
+  "Rara": [
+   "src/ui/comun.js:90"
+  ],
+  "Muy rara": [
+   "src/ui/comun.js:90"
+  ],
+  "Legendaria": [
+   "src/ui/comun.js:90"
+  ],
+  "Única": [
+   "src/ui/comun.js:90"
+  ],
+  " (se revela con la experiencia)": [
+   "src/ui/comun.js:95"
+  ],
+  "Créditos": [
+   "src/ui/comun.js:104",
+   "src/ui/informe.js:52",
+   "src/ui/nodos.js:106"
+  ],
+  "Puntaje": [
+   "src/ui/comun.js:105",
+   "src/ui/informe.js:53"
+  ],
+  "Pilotos": [
+   "src/ui/comun.js:106",
+   "src/ui/hangar.js:21"
+  ],
+  "Combustible: cada salto gasta 1": [
+   "src/ui/comun.js:107"
+  ],
+  "Sector ": [
+   "src/ui/comun.js:108",
+   "src/ui/fin.js:23",
+   "src/ui/sectores.js:124",
+   "src/campana/cronica.js:24"
+  ],
+  " Sin combustible: el remolque cobró ": [
+   "src/ui/comun.js:111"
+  ],
+  " créditos y los mechas perdieron ": [
+   "src/ui/comun.js:112"
+  ],
+  "% de estructura.": [
+   "src/ui/comun.js:112"
+  ],
+  "--i:": [
+   "src/ui/despliegue.js:89"
+  ],
+  "¡Adentro!": [
+   "src/ui/despliegue.js:95"
+  ],
+  "Saltar": [
+   "src/ui/despliegue.js:96"
+  ],
+  "DESPLIEGUE EN CURSO": [
+   "src/ui/despliegue.js:105"
+  ],
+  "EN TIERRA": [
+   "src/ui/despliegue.js:118"
+  ],
+  "» · canal abierto": [
+   "src/ui/despliegue.js:127"
+  ],
+  "Control": [
+   "src/ui/despliegue.js:127",
+   "src/campana/nemesis.js:109",
+   "src/campana/nemesis.js:229"
+  ],
+  "Némesis": [
+   "src/ui/despliegue.js:141",
+   "src/ui/informe.js:33",
+   "src/ui/preparacion.js:97"
+  ],
+  "Némesis a la vista": [
+   "src/ui/despliegue.js:146"
+  ],
+  " SEÑAL HOSTIL · CANAL ABIERTO": [
+   "src/ui/despliegue.js:147"
+  ],
+  "VS": [
+   "src/ui/despliegue.js:150"
+  ],
+  "Su objetivo": [
+   "src/ui/despliegue.js:151"
+  ],
+  "El escuadrón": [
+   "src/ui/despliegue.js:151"
+  ],
+  "Viene por todos": [
+   "src/ui/despliegue.js:151"
+  ],
+  "Es el jefe del sector: si cae hoy, no se levanta.": [
+   "src/ui/despliegue.js:154"
+  ],
+  "Ya lo bajaron demasiadas veces: si cae hoy, no se levanta.": [
+   "src/ui/despliegue.js:154"
+  ],
+  "Campaña cumplida": [
+   "src/ui/fin.js:17"
+  ],
+  "Escuadrón perdido": [
+   "src/ui/fin.js:17"
+  ],
+  "El Cinturón quedó atrás. ": [
+   "src/ui/fin.js:19"
+  ],
+  " piloto(s) vuelven a casa.": [
+   "src/ui/fin.js:19"
+  ],
+  "No quedó nadie para seguir. El contrato se cierra sin firmas.": [
+   "src/ui/fin.js:20"
+  ],
+  "Puntaje final": [
+   "src/ui/fin.js:22"
+  ],
+  "Hasta dónde llegaron": [
+   "src/ui/fin.js:23"
+  ],
+  "Misiones jugadas": [
+   "src/ui/fin.js:24"
+  ],
+  " caídos": [
+   "src/ui/fin.js:25"
+  ],
+  "Caídos": [
+   "src/ui/fin.js:25"
+  ],
+  "Vuelven": [
+   "src/ui/fin.js:26"
+  ],
+  " · niv ": [
+   "src/ui/fin.js:27",
+   "src/ui/fin.js:32",
+   "src/ui/fin.js:45",
+   "src/ui/preparacion.js:75"
+  ],
+  "¿Quién sigue con vos?": [
+   "src/ui/fin.js:28"
+  ],
+  "Uno de ellos arranca la próxima campaña con su nivel, sus medallas y sus cicatrices. Si no elegís, sigue el de más nivel (marcado).": [
+   "src/ui/fin.js:29"
+  ],
+  "Lo que queda": [
+   "src/ui/fin.js:34"
+  ],
+  " apareció entre los restos, vivo. Va a estar en la próxima campaña.": [
+   "src/ui/fin.js:36"
+  ],
+  "No encontraron a nadie con vida.": [
+   "src/ui/fin.js:37"
+  ],
+  "Nunca encontraron los cuerpos de ": [
+   "src/ui/fin.js:39"
+  ],
+  "Memorial": [
+   "src/ui/fin.js:41"
+  ],
+  " · piloteaba «": [
+   "src/ui/fin.js:45"
+  ],
+  " misiones · ": [
+   "src/ui/fin.js:45"
+  ],
+  "Cayó en ": [
+   "src/ui/fin.js:46"
+  ],
+  "Nueva campaña": [
+   "src/ui/fin.js:51",
+   "src/ui/portada.js:31",
+   "src/ui/portada.js:37"
+  ],
+  "Cabeza": [
+   "src/ui/hangar.js:12",
+   "src/ui/hangar.js:206"
+  ],
+  "Torso": [
+   "src/ui/hangar.js:12"
+  ],
+  "Piernas": [
+   "src/ui/hangar.js:12",
+   "src/ui/hangar.js:206"
+  ],
+  "Brazo izq.": [
+   "src/ui/hangar.js:12",
+   "src/ui/hangar.js:206"
+  ],
+  "Brazo der.": [
+   "src/ui/hangar.js:12",
+   "src/ui/hangar.js:206"
+  ],
+  "Mochila": [
+   "src/ui/hangar.js:12"
+  ],
+  "Secciones": [
+   "src/ui/hangar.js:24"
+  ],
+  "Mecha": [
+   "src/ui/hangar.js:26",
+   "src/ui/hangar.js:381"
+  ],
+  "Órdenes": [
+   "src/ui/hangar.js:26",
+   "src/ui/hangar.js:498"
+  ],
+  "Info": [
+   "src/ui/hangar.js:26"
+  ],
+  "Nivel": [
+   "src/ui/hangar.js:46",
+   "src/ui/preparacion.js:104"
+  ],
+  "Relaciones": [
+   "src/ui/hangar.js:63",
+   "src/ui/informe.js:46"
+  ],
+  "Hoja de servicio": [
+   "src/ui/hangar.js:63"
+  ],
+  "Misión": [
+   "src/ui/hangar.js:76"
+  ],
+  "Mapa": [
+   "src/ui/hangar.js:76"
+  ],
+  "Volver a la misión": [
+   "src/ui/hangar.js:76"
+  ],
+  "Volver al mapa": [
+   "src/ui/hangar.js:76"
+  ],
+  " Este es tu escuadrón. Tocá cada piloto arriba: armá su mecha, revisá sus órdenes y conocelo en Info. Cuando estés, volvé al mapa.": [
+   "src/ui/hangar.js:80"
+  ],
+  "Reparar · ": [
+   "src/ui/hangar.js:95"
+  ],
+  "Sin daños": [
+   "src/ui/hangar.js:95"
+  ],
+  "No alcanzan los créditos": [
+   "src/ui/hangar.js:99"
+  ],
+  "Reparar todo el mecha": [
+   "src/ui/hangar.js:99"
+  ],
+  "El mecha está sano": [
+   "src/ui/hangar.js:99"
+  ],
+  "Alguien tiene que salir a la misión": [
+   "src/ui/hangar.js:105"
+  ],
+  "Próxima misión": [
+   "src/ui/hangar.js:112"
+  ],
+  "Qué hace en la próxima misión": [
+   "src/ui/hangar.js:114"
+  ],
+  "Sale": [
+   "src/ui/hangar.js:115"
+  ],
+  "Sale a pelear con el escuadrón": [
+   "src/ui/hangar.js:115"
+  ],
+  " No sale a pelear.": [
+   "src/ui/hangar.js:118"
+  ],
+  "Sale a pelear. ": [
+   "src/ui/hangar.js:119"
+  ],
+  "Mecha al ": [
+   "src/ui/hangar.js:119"
+  ],
+  "Mecha entero.": [
+   "src/ui/hangar.js:119"
+  ],
+  "Piloto": [
+   "src/ui/hangar.js:136"
+  ],
+  "NIV": [
+   "src/ui/hangar.js:142"
+  ],
+  " XP": [
+   "src/ui/hangar.js:143",
+   "src/ui/hangar.js:143",
+   "src/ui/informe.js:26",
+   "src/campana/tareas.js:51"
+  ],
+  "Nivel máximo": [
+   "src/ui/hangar.js:143"
+  ],
+  "Vínculo: pelean mejor cerca y les duele perderse": [
+   "src/ui/hangar.js:147"
+  ],
+  "Sin vínculo": [
+   "src/ui/hangar.js:147"
+  ],
+  "No tiene a nadie cercano en el escuadrón": [
+   "src/ui/hangar.js:147"
+  ],
+  "Lo busca «": [
+   "src/ui/hangar.js:148"
+  ],
+  "Todavía sin historia. Misiones: ": [
+   "src/ui/hangar.js:154"
+  ],
+  " · Bajas: ": [
+   "src/ui/hangar.js:154",
+   "src/ui/hangar.js:155"
+  ],
+  "Misiones: ": [
+   "src/ui/hangar.js:155"
+  ],
+  "Se cura con un vínculo nuevo": [
+   "src/ui/hangar.js:162"
+  ],
+  "Se cura descansando (": [
+   "src/ui/hangar.js:162"
+  ],
+  " más)": [
+   "src/ui/hangar.js:162"
+  ],
+  "Clase ": [
+   "src/ui/hangar.js:178"
+  ],
+  "a:": [
+   "src/ui/hangar.js:188",
+   "src/ui/hangar.js:451"
+  ],
+  "c:": [
+   "src/ui/hangar.js:189",
+   "src/ui/hangar.js:451"
+  ],
+  "Sale igual, pegado con cinta: ": [
+   "src/ui/hangar.js:223"
+  ],
+  "Roto: ": [
+   "src/ui/hangar.js:224"
+  ],
+  " — no funciona hasta repararlo o cambiarlo.": [
+   "src/ui/hangar.js:224"
+  ],
+  "Estructura": [
+   "src/ui/hangar.js:226",
+   "src/ui/hangar.js:249",
+   "src/ui/hangar.js:408"
+  ],
+  "Todo": [
+   "src/ui/hangar.js:228"
+  ],
+  "Sin daños.": [
+   "src/ui/hangar.js:228"
+  ],
+  " Habilidades especiales": [
+   "src/ui/hangar.js:234"
+  ],
+  " · le falta: ": [
+   "src/ui/hangar.js:238"
+  ],
+  "Ninguna.": [
+   "src/ui/hangar.js:239"
+  ],
+  "Algunas partes traen habilidades y órdenes nuevas (★). Si las equipás, aparecen en el editor de órdenes.": [
+   "src/ui/hangar.js:240"
+  ],
+  "Blindaje": [
+   "src/ui/hangar.js:249",
+   "src/ui/hangar.js:407"
+  ],
+  "Daño": [
+   "src/ui/hangar.js:249"
+  ],
+  "Alcance": [
+   "src/ui/hangar.js:250",
+   "src/ui/hangar.js:408"
+  ],
+  "Puntería": [
+   "src/ui/hangar.js:250",
+   "src/ui/hangar.js:407"
+  ],
+  "Evasión": [
+   "src/ui/hangar.js:250",
+   "src/ui/hangar.js:407"
+  ],
+  "Paso": [
+   "src/ui/hangar.js:251",
+   "src/ui/hangar.js:408"
+  ],
+  "Visión": [
+   "src/ui/hangar.js:251",
+   "src/ui/hangar.js:408"
+  ],
+  "Vista del mecha": [
+   "src/ui/hangar.js:294"
+  ],
+  "— vacío —": [
+   "src/ui/hangar.js:304"
+  ],
+  "Carga": [
+   "src/ui/hangar.js:319"
+  ],
+  "Sobrepeso: camina más lento.": [
+   "src/ui/hangar.js:322"
+  ],
+  "Puesta": [
+   "src/ui/hangar.js:339"
+  ],
+  "Igual": [
+   "src/ui/hangar.js:341"
+  ],
+  "ROTA": [
+   "src/ui/hangar.js:343"
+  ],
+  "Sacar": [
+   "src/ui/hangar.js:345",
+   "src/ui/hangar.js:362"
+  ],
+  "Dejar el encaje vacío": [
+   "src/ui/hangar.js:356"
+  ],
+  "★ Gana: ": [
+   "src/ui/hangar.js:358"
+  ],
+  " (y sus órdenes)": [
+   "src/ui/hangar.js:358"
+  ],
+  "✕ Pierde: ": [
+   "src/ui/hangar.js:359"
+  ],
+  "Probar otra": [
+   "src/ui/hangar.js:361"
+  ],
+  "Equipar": [
+   "src/ui/hangar.js:362"
+  ],
+  "Nombre del mecha": [
+   "src/ui/hangar.js:371"
+  ],
+  "Marcas de bajas en el torso": [
+   "src/ui/hangar.js:383"
+  ],
+  " · tocá una parte para comparar": [
+   "src/ui/hangar.js:389"
+  ],
+  "No hay partes de este tipo en el depósito. Se ganan en las misiones o se compran en el taller.": [
+   "src/ui/hangar.js:392"
+  ],
+  "Estado y reparación": [
+   "src/ui/hangar.js:394"
+  ],
+  "Habilidades especiales": [
+   "src/ui/hangar.js:395"
+  ],
+  "Moral": [
+   "src/ui/hangar.js:407"
+  ],
+  "Daño %": [
+   "src/ui/hangar.js:407"
+  ],
+  "Recarga": [
+   "src/ui/hangar.js:407"
+  ],
+  "Iniciativa": [
+   "src/ui/hangar.js:408"
+  ],
+  "Cadencia": [
+   "src/ui/hangar.js:408"
+  ],
+  "Cargador": [
+   "src/ui/hangar.js:408"
+  ],
+  "Personalidad: ": [
+   "src/ui/hangar.js:419"
+  ],
+  " A veces pasa por alto tus órdenes.": [
+   "src/ui/hangar.js:419"
+  ],
+  "Vínculo con «": [
+   "src/ui/hangar.js:421"
+  ],
+  "Cerca de su vínculo pelea mejor; si lo pierde, se derrumba.": [
+   "src/ui/hangar.js:421"
+  ],
+  "Le pesa en combate: puede quebrarse.": [
+   "src/ui/hangar.js:423"
+  ],
+  "N": [
+   "src/ui/hangar.js:438"
+  ],
+  "SI ": [
+   "src/ui/hangar.js:457"
+  ],
+  "SI": [
+   "src/ui/hangar.js:463"
+  ],
+  "HACER": [
+   "src/ui/hangar.js:463"
+  ],
+  "A QUIÉN": [
+   "src/ui/hangar.js:463"
+  ],
+  "Distancia": [
+   "src/ui/hangar.js:484"
+  ],
+  "Menos": [
+   "src/ui/hangar.js:485"
+  ],
+  "Más": [
+   "src/ui/hangar.js:485"
+  ],
+  " No la puede cumplir: le falta ": [
+   "src/ui/hangar.js:487"
+  ],
+  "Subir": [
+   "src/ui/hangar.js:489"
+  ],
+  "Bajar": [
+   "src/ui/hangar.js:490"
+  ],
+  "Borrar": [
+   "src/ui/hangar.js:491"
+  ],
+  "Listo": [
+   "src/ui/hangar.js:492"
+  ],
+  "Se leen de arriba abajo: hace la primera que se cumpla y pueda hacer. Tocá una para cambiarla.": [
+   "src/ui/hangar.js:499"
+  ],
+  "Orden": [
+   "src/ui/hangar.js:502"
+  ],
+  "De fábrica": [
+   "src/ui/hangar.js:504"
+  ],
+  "Pasivas": [
+   "src/ui/hangar.js:505"
+  ],
+  "Lo que lleva encima siempre, sin que se lo ordenes.": [
+   "src/ui/hangar.js:505"
+  ],
+  "Se lleva normal con todos. Lo que vivan juntos lo va a cambiar.": [
+   "src/ui/hangar.js:516"
+  ],
+  "Los amigos cerca apuntan mejor. Los rivales juntos discuten por radio.": [
+   "src/ui/hangar.js:517"
+  ],
+  "Todavía no hay nada para contar. Ya va a haber.": [
+   "src/ui/hangar.js:525"
+  ],
+  "brazo izq.": [
+   "src/ui/informe.js:4"
+  ],
+  "brazo der.": [
+   "src/ui/informe.js:4"
+  ],
+  "uno salvó al otro": [
+   "src/ui/informe.js:5"
+  ],
+  "alguien huyó": [
+   "src/ui/informe.js:5"
+  ],
+  "Cicatriz nueva": [
+   "src/ui/informe.js:12"
+  ],
+  "Trauma nuevo": [
+   "src/ui/informe.js:13"
+  ],
+  "Medalla": [
+   "src/ui/informe.js:14"
+  ],
+  "Misión cumplida": [
+   "src/ui/informe.js:17"
+  ],
+  "Misión fallida": [
+   "src/ui/informe.js:17"
+  ],
+  "Escuadrón": [
+   "src/ui/informe.js:19",
+   "src/ui/preparacion.js:73"
+  ],
+  "Caído en combate": [
+   "src/ui/informe.js:25"
+  ],
+  "Herido de gravedad, sobrevive": [
+   "src/ui/informe.js:25"
+  ],
+  "Vuelve": [
+   "src/ui/informe.js:25"
+  ],
+  " · ¡sube de nivel!": [
+   "src/ui/informe.js:26"
+  ],
+  " Mecha al ": [
+   "src/ui/informe.js:29"
+  ],
+  " · roto: ": [
+   "src/ui/informe.js:29"
+  ],
+  " · reparar: ": [
+   "src/ui/informe.js:29"
+  ],
+  "Cayó en combate.": [
+   "src/ui/informe.js:30"
+  ],
+  "Nace un némesis": [
+   "src/ui/informe.js:36"
+  ],
+  "Va a volver. Y va a venir preparado.": [
+   "src/ui/informe.js:39"
+  ],
+  "En la base": [
+   "src/ui/informe.js:40"
+  ],
+  "Rescate": [
+   "src/ui/informe.js:42"
+  ],
+  " Entre los restos encontraron a «": [
+   "src/ui/informe.js:43"
+  ],
+  "», vivo. Vuelve al escuadrón.": [
+   "src/ui/informe.js:43"
+  ],
+  "Inteligencia": [
+   "src/ui/informe.js:44"
+  ],
+  " Averiguaron algo más sobre ": [
+   "src/ui/informe.js:45"
+  ],
+  "Botín": [
+   "src/ui/informe.js:50",
+   "src/ui/sectores.js:105"
+  ],
+  " Trofeo del jefe: ": [
+   "src/ui/informe.js:54"
+  ],
+  "Sin partes esta vez.": [
+   "src/ui/informe.js:55"
+  ],
+  "Sin pago ni botín.": [
+   "src/ui/informe.js:55"
+  ],
+  "Rescatado de los caídos: ": [
+   "src/ui/informe.js:56"
+  ],
+  " Saqueado entero: ": [
+   "src/ui/informe.js:57"
+  ],
+  " Chatarra de los mechas destrozados: +": [
+   "src/ui/informe.js:58"
+  ],
+  " créditos.": [
+   "src/ui/informe.js:58",
+   "src/ui/sectores.js:158"
+  ],
+  " Para llevarte sus armas enteras, apuntá a la cabina.": [
+   "src/ui/informe.js:59"
+  ],
+  "Final de la campaña": [
+   "src/ui/informe.js:61"
+  ],
+  "Seguir": [
+   "src/ui/informe.js:61"
+  ],
+  "Hangar": [
+   "src/ui/informe.js:62",
+   "src/ui/nodos.js:8",
+   "src/ui/preparacion.js:81",
+   "src/ui/sectores.js:121"
+  ],
+  "Seguir viaje": [
+   "src/ui/nodos.js:9"
+  ],
+  " en el escuadrón": [
+   "src/ui/nodos.js:28"
+  ],
+  "Riesgo: sale bien ": [
+   "src/ui/nodos.js:29"
+  ],
+  "Salió mal": [
+   "src/ui/nodos.js:31"
+  ],
+  "Salió bien": [
+   "src/ui/nodos.js:31"
+  ],
+  "Decidido": [
+   "src/ui/nodos.js:31"
+  ],
+  " Taller": [
+   "src/ui/nodos.js:45"
+  ],
+  "En venta": [
+   "src/ui/nodos.js:46"
+  ],
+  "Vendida": [
+   "src/ui/nodos.js:49"
+  ],
+  "Comprar por ": [
+   "src/ui/nodos.js:50"
+  ],
+  "Combustible": [
+   "src/ui/nodos.js:52"
+  ],
+  "Tenés ": [
+   "src/ui/nodos.js:53"
+  ],
+  "+1 combustible · ": [
+   "src/ui/nodos.js:54"
+  ],
+  "Tu depósito": [
+   "src/ui/nodos.js:56"
+  ],
+  "Vender": [
+   "src/ui/nodos.js:59"
+  ],
+  "No tenés partes sueltas. Lo que está montado en los mechas se cambia en el hangar.": [
+   "src/ui/nodos.js:60"
+  ],
+  " Reclutas": [
+   "src/ui/nodos.js:75"
+  ],
+  "El escuadrón está completo (": [
+   "src/ui/nodos.js:76"
+  ],
+  "Se suma al escuadrón.": [
+   "src/ui/nodos.js:87"
+  ],
+  "Contratar · ": [
+   "src/ui/nodos.js:88"
+  ],
+  " Descanso": [
+   "src/ui/nodos.js:102"
+  ],
+  " Señal": [
+   "src/ui/nodos.js:102"
+  ],
+  "Parte nueva en el depósito": [
+   "src/ui/nodos.js:107"
+  ],
+  " se recupera": [
+   "src/ui/nodos.js:108"
+  ],
+  "Trauma curado": [
+   "src/ui/nodos.js:108"
+  ],
+  "Mecha de ": [
+   "src/ui/nodos.js:109",
+   "src/campana/dilemas.js:75"
+  ],
+  "Reparación gratis": [
+   "src/ui/nodos.js:109"
+  ],
+  "MECHA": [
+   "src/ui/portada.js:21"
+  ],
+  "FIGHTER": [
+   "src/ui/portada.js:21"
+  ],
+  "Escuadrón táctico autónomo": [
+   "src/ui/portada.js:22"
+  ],
+  "Armá tus mechas, programalos y mirá cómo pelean solos. Los pilotos tienen personalidad propia, y si caen no vuelven.": [
+   "src/ui/portada.js:23"
+  ],
+  "Continuar": [
+   "src/ui/portada.js:26"
+  ],
+  "Se pierde la campaña en curso.": [
+   "src/ui/portada.js:34"
+  ],
+  "Empezar de cero": [
+   "src/ui/portada.js:35"
+  ],
+  "De la campaña anterior": [
+   "src/ui/portada.js:38"
+  ],
+  " sobrevivió y vuelve a firmar con vos (niv ": [
+   "src/ui/portada.js:42"
+  ],
+  " sigue con vos en la próxima campaña (niv ": [
+   "src/ui/portada.js:43"
+  ],
+  "No se encontraron los cuerpos de ": [
+   "src/ui/portada.js:45"
+  ],
+  "Cómo se juega": [
+   "src/ui/portada.js:47"
+  ],
+  "Elegí un contrato": [
+   "src/ui/portada.js:49"
+  ],
+  " en el mapa del sector.": [
+   "src/ui/portada.js:49"
+  ],
+  "En el hangar": [
+   "src/ui/portada.js:50"
+  ],
+  " cambiá partes y programá cada mecha: SI pasa algo → HACÉ algo.": [
+   "src/ui/portada.js:50"
+  ],
+  "Mirá la batalla.": [
+   "src/ui/portada.js:51"
+  ],
+  " No hay control: lo que programaste, y lo que el piloto decida, es lo que pasa.": [
+   "src/ui/portada.js:51"
+  ],
+  "Cuidá a tu gente.": [
+   "src/ui/portada.js:52"
+  ],
+  " Ganan experiencia, cicatrices y medallas. La muerte es permanente.": [
+   "src/ui/portada.js:52"
+  ],
+  "App en desarrollo · Early Access": [
+   "src/ui/portada.js:53"
+  ],
+  "Novedades: ": [
+   "src/ui/portada.js:68"
+  ],
+  "NOVEDADES": [
+   "src/ui/portada.js:69"
+  ],
+  "Plano del mapa": [
+   "src/ui/preparacion.js:16"
+  ],
+  " (líder)": [
+   "src/ui/preparacion.js:25"
+  ],
+  "Tu escuadrón anterior": [
+   "src/ui/preparacion.js:28"
+  ],
+  "Briefing": [
+   "src/ui/preparacion.js:39"
+  ],
+  " Contrato de ": [
+   "src/ui/preparacion.js:40",
+   "src/ui/sectores.js:98"
+  ],
+  "Buscamos: ": [
+   "src/ui/preparacion.js:42"
+  ],
+  " Inteligencia reunida: ": [
+   "src/ui/preparacion.js:45"
+  ],
+  "Llegan a ciegas: los esperan con refuerzos.": [
+   "src/ui/preparacion.js:46"
+  ],
+  "Saben dónde está: sin niebla y atentos.": [
+   "src/ui/preparacion.js:46"
+  ],
+  "Datos sueltos.": [
+   "src/ui/preparacion.js:46"
+  ],
+  "Nivel ": [
+   "src/ui/preparacion.js:48",
+   "src/ui/preparacion.js:104",
+   "src/ui/sectores.js:103"
+  ],
+  "Nivel de los enemigos": [
+   "src/ui/preparacion.js:48",
+   "src/ui/sectores.js:103"
+  ],
+  "Pago si ganan": [
+   "src/ui/preparacion.js:49"
+  ],
+  "Botín si ganan": [
+   "src/ui/preparacion.js:50"
+  ],
+  "Niebla": [
+   "src/ui/preparacion.js:51",
+   "src/ui/sectores.js:106"
+  ],
+  "Solo ven lo que tienen a la vista": [
+   "src/ui/preparacion.js:51"
+  ],
+  "Explorada": [
+   "src/ui/preparacion.js:52"
+  ],
+  "Alguien fue adelante: sin niebla": [
+   "src/ui/preparacion.js:52"
+  ],
+  "Oleadas": [
+   "src/ui/preparacion.js:53"
+  ],
+  "Qué llevar": [
+   "src/ui/preparacion.js:55"
+  ],
+  "Conviene: ": [
+   "src/ui/preparacion.js:57"
+  ],
+  "Mejor no: ": [
+   "src/ui/preparacion.js:58"
+  ],
+  "Cambiá las armas en el hangar antes de desplegar.": [
+   "src/ui/preparacion.js:59"
+  ],
+  "Atención": [
+   "src/ui/preparacion.js:60"
+  ],
+  "Mapa · ": [
+   "src/ui/preparacion.js:65"
+  ],
+  "Apoyo": [
+   "src/ui/preparacion.js:66"
+  ],
+  " La resistencia local pelea con ustedes: ": [
+   "src/ui/preparacion.js:67"
+  ],
+  "Hostiles": [
+   "src/ui/preparacion.js:69"
+  ],
+  "Reportes confusos. Esperen emboscadas.": [
+   "src/ui/preparacion.js:69"
+  ],
+  "Ánimo del escuadrón": [
+   "src/ui/preparacion.js:70"
+  ],
+  "Si no te convence cómo viene alguno, dejalo haciendo otra cosa desde el hangar.": [
+   "src/ui/preparacion.js:72"
+  ],
+  "Con traumas": [
+   "src/ui/preparacion.js:76"
+  ],
+  "Mecha dañado: reparalo en el hangar": [
+   "src/ui/preparacion.js:78"
+  ],
+  "Se quedan: ": [
+   "src/ui/preparacion.js:79"
+  ],
+  "Desplegar": [
+   "src/ui/preparacion.js:82"
+  ],
+  "Plano": [
+   "src/ui/preparacion.js:83"
+  ],
+  "background:#4a8fd1": [
+   "src/ui/preparacion.js:84"
+  ],
+  "background:#c4473b": [
+   "src/ui/preparacion.js:85"
+  ],
+  "background:#e0a43a": [
+   "src/ui/preparacion.js:86"
+  ],
+  "Por qué los odia": [
+   "src/ui/preparacion.js:103"
+  ],
+  "Veces que lo bajaron y escapó": [
+   "src/ui/preparacion.js:105"
+  ],
+  " Busca a «": [
+   "src/ui/preparacion.js:107"
+  ],
+  ": va a ir directo a buscarlo.": [
+   "src/ui/preparacion.js:107"
+  ],
+  ", que se queda en la base esta vez.": [
+   "src/ui/preparacion.js:107"
+  ],
+  "Contrato": [
+   "src/ui/sectores.js:8"
+  ],
+  "Jefe": [
+   "src/ui/sectores.js:9"
+  ],
+  "Taller": [
+   "src/ui/sectores.js:10"
+  ],
+  "Reclutas": [
+   "src/ui/sectores.js:11"
+  ],
+  "Señal": [
+   "src/ui/sectores.js:12"
+  ],
+  "Descanso": [
+   "src/ui/sectores.js:13"
+  ],
+  "Se vio a un némesis": [
+   "src/ui/sectores.js:54"
+  ],
+  "Se vio a «": [
+   "src/ui/sectores.js:95"
+  ],
+  "» en la zona": [
+   "src/ui/sectores.js:95"
+  ],
+  "Anda buscando a «": [
+   "src/ui/sectores.js:96"
+  ],
+  "Viene por el escuadrón.": [
+   "src/ui/sectores.js:96"
+  ],
+  "Enemigos": [
+   "src/ui/sectores.js:102"
+  ],
+  "Pago": [
+   "src/ui/sectores.js:104"
+  ],
+  "No se ve lo que no tenés a la vista": [
+   "src/ui/sectores.js:106"
+  ],
+  "Milicia ×": [
+   "src/ui/sectores.js:107"
+  ],
+  "La resistencia local pelea con ustedes": [
+   "src/ui/sectores.js:107"
+  ],
+  " Ganarla suma inteligencia sobre ": [
+   "src/ui/sectores.js:111"
+  ],
+  "Aceptar contrato": [
+   "src/ui/sectores.js:112"
+  ],
+  "Ir": [
+   "src/ui/sectores.js:112"
+  ],
+  "Menú principal": [
+   "src/ui/sectores.js:122"
+  ],
+  "Objetivo del sector": [
+   "src/ui/sectores.js:125"
+  ],
+  "Inteligencia sobre ": [
+   "src/ui/sectores.js:127"
+  ],
+  "Elegí el próximo destino siguiendo los caminos. Cada salto gasta 1 de combustible. Lo que no elijas queda atrás.": [
+   "src/ui/sectores.js:130"
+  ],
+  " Sin combustible: el próximo salto es remolcado (−": [
+   "src/ui/sectores.js:131"
+  ],
+  " créditos y los mechas pierden ": [
+   "src/ui/sectores.js:132"
+  ],
+  "%). Buscá combustible en un taller o en una señal.": [
+   "src/ui/sectores.js:132"
+  ],
+  " En memoria de ": [
+   "src/ui/sectores.js:136"
+  ],
+  "Sin datos: si llegan así al jefe, los van a estar esperando con refuerzos.": [
+   "src/ui/sectores.js:150"
+  ],
+  "Datos sueltos. Una misión más y llegan sabiendo dónde está.": [
+   "src/ui/sectores.js:151"
+  ],
+  "Saben dónde está y qué tiene: llegan sin niebla y atentos.": [
+   "src/ui/sectores.js:152"
+  ],
+  "Un desarmadero con partes a la venta. También compran lo que te sobra.": [
+   "src/ui/sectores.js:157"
+  ],
+  "Pilotos sin trabajo buscan escuadrón. Cada uno cuesta ": [
+   "src/ui/sectores.js:158"
+  ],
+  "Una señal sin identificar. Puede ser cualquier cosa.": [
+   "src/ui/sectores.js:159"
+  ],
+  "Un muelle tranquilo. Ayuda a sanar los traumas.": [
+   "src/ui/sectores.js:160"
+  ],
+  "px VT323, monospace": [
+   "src/ui/vistaMapa.js:48"
+  ],
+  "Control... ¿sos vos? Nos dejaste ahí.": [
+   "src/vista/repeticion.js:13"
+  ],
+  "No me mires así. Pagan mejor que vos.": [
+   "src/vista/repeticion.js:13"
+  ],
+  "Nadie vino a buscarnos, Control.": [
+   "src/vista/repeticion.js:13"
+  ],
+  "Ahora sí vas a ver cómo peleo.": [
+   "src/vista/repeticion.js:13"
+  ],
+  "Brazo izquierdo destruido": [
+   "src/vista/repeticion.js:15"
+  ],
+  "Brazo derecho destruido": [
+   "src/vista/repeticion.js:15"
+  ],
+  "Piernas destruidas": [
+   "src/vista/repeticion.js:15"
+  ],
+  "Cabeza destruida": [
+   "src/vista/repeticion.js:15"
+  ],
+  " proyecta un señuelo": [
+   "src/vista/repeticion.js:194"
+  ],
+  " despliega una torreta": [
+   "src/vista/repeticion.js:194"
+  ],
+  "ex:": [
+   "src/vista/repeticion.js:197",
+   "src/vista/repeticion.js:405",
+   "src/campana/saqueo.js:34"
+  ],
+  "NÉMESIS · ": [
+   "src/vista/repeticion.js:199",
+   "src/vista/repeticion.js:410"
+  ],
+  " (canal abierto): «": [
+   "src/vista/repeticion.js:199",
+   "src/vista/repeticion.js:350",
+   "src/vista/repeticion.js:410"
+  ],
+  " repara a ": [
+   "src/vista/repeticion.js:239"
+  ],
+  " abatió a ": [
+   "src/vista/repeticion.js:260"
+  ],
+  " · tiro a la cabina, queda entero": [
+   "src/vista/repeticion.js:260"
+  ],
+  " se prende fuego": [
+   "src/vista/repeticion.js:284"
+  ],
+  " se quiebra": [
+   "src/vista/repeticion.js:291"
+  ],
+  "CONTROL › ESCUADRÓN: Oleada ": [
+   "src/vista/repeticion.js:320"
+  ],
+  " en camino.": [
+   "src/vista/repeticion.js:320"
+  ],
+  "CONTROL: ": [
+   "src/vista/repeticion.js:332"
+  ],
+  ", ¡corten la radio y concéntrense!": [
+   "src/vista/repeticion.js:332"
+  ],
+  "CONTROL › ESCUADRÓN: ¡Refuerzos enemigos por detrás! ": [
+   "src/vista/repeticion.js:335"
+  ],
+  " contactos.": [
+   "src/vista/repeticion.js:335"
+  ],
+  "¡MINA! ": [
+   "src/vista/repeticion.js:341"
+  ],
+  " pisó una mina.": [
+   "src/vista/repeticion.js:341"
+  ],
+  "CONTROL › ESCUADRÓN: ": [
+   "src/vista/repeticion.js:345",
+   "src/vista/repeticion.js:357"
+  ],
+  "CONTROL › ESCUADRÓN: La milicia local pelea con ustedes (": [
+   "src/vista/repeticion.js:347"
+  ],
+  " pelotón": [
+   "src/vista/repeticion.js:347"
+  ],
+  "). No los dejen solos.": [
+   "src/vista/repeticion.js:347"
+  ],
+  "CONTROL › ESCUADRÓN: Objetivo confirmado: ": [
+   "src/vista/repeticion.js:349"
+  ],
+  " › CONTROL": [
+   "src/vista/repeticion.js:398"
+  ],
+  " › CONTROL: «": [
+   "src/vista/repeticion.js:413"
+  ],
+  "¡EYECCIÓN!": [
+   "src/vista/repeticion.js:418"
+  ],
+  " viene confiado: ": [
+   "src/campana/animo.js:62"
+  ],
+  " misiones ganadas al hilo. Puede mandarse solo.": [
+   "src/campana/animo.js:62"
+  ],
+  " está nervioso": [
+   "src/campana/animo.js:66"
+  ],
+  " (arrastra un trauma)": [
+   "src/campana/animo.js:66"
+  ],
+  " viene descansado: atento y con buenos reflejos.": [
+   "src/campana/animo.js:70"
+  ],
+  " está atento: mejor puntería y reflejos.": [
+   "src/campana/animo.js:74"
+  ],
+  " no tiene claras las coordenadas. Puede tardar en encontrar el objetivo.": [
+   "src/campana/animo.js:81"
+  ],
+  " no se soportan. Juntos se distraen discutiendo.": [
+   "src/campana/animo.js:103"
+  ],
+  " se cubren las espaldas: cerca, apuntan mejor.": [
+   "src/campana/animo.js:108"
+  ],
+  "el escuadrón": [
+   "src/campana/cronica.js:18",
+   "src/campana/nemesis.js:179"
+  ],
+  "Cruzaron el Cinturón. ": [
+   "src/campana/cronica.js:36"
+  ],
+  " volvieron a casa para contarlo.": [
+   "src/campana/cronica.js:36"
+  ],
+  "Llegaron hasta el sector ": [
+   "src/campana/cronica.js:37"
+  ],
+  " misiones cumplidas de ": [
+   "src/campana/cronica.js:39"
+  ],
+  " enemigos abatidos": [
+   "src/campana/cronica.js:40"
+  ],
+  " decisión difícil": [
+   "src/campana/cronica.js:43"
+  ],
+  " decisiones difíciles": [
+   "src/campana/cronica.js:43"
+  ],
+  "La historia de ": [
+   "src/campana/cronica.js:45"
+  ],
+  "» fue el más letal: ": [
+   "src/campana/cronica.js:49"
+  ],
+  ", y no volvió.": [
+   "src/campana/cronica.js:50"
+  ],
+  "Faltan créditos": [
+   "src/campana/dilemas.js:29"
+  ],
+  "Falta combustible": [
+   "src/campana/dilemas.js:30"
+  ],
+  " créditos": [
+   "src/campana/dilemas.js:59",
+   "src/campana/tareas.js:55"
+  ],
+  "Todos los mechas": [
+   "src/campana/dilemas.js:75"
+  ],
+  "» se suma": [
+   "src/campana/dilemas.js:87"
+  ],
+  "Se sumó «": [
+   "src/campana/dilemas.js:87"
+  ],
+  "» al escuadrón.": [
+   "src/campana/dilemas.js:87"
+  ],
+  "No hay lugar en el escuadrón": [
+   "src/campana/dilemas.js:88"
+  ],
+  " inteligencia sobre ": [
+   "src/campana/dilemas.js:95"
+  ],
+  "Mechas reparados": [
+   "src/campana/dilemas.js:100"
+  ],
+  " XP a todos": [
+   "src/campana/dilemas.js:108"
+  ],
+  "El escuadrón se une": [
+   "src/campana/dilemas.js:112"
+  ],
+  "Hay tensión en el escuadrón": [
+   "src/campana/dilemas.js:112"
+  ],
+  "H": [
+   "src/campana/generar_mapa.js:70",
+   "src/campana/generar_mapa.js:74",
+   "src/campana/generar_mapa.js:74",
+   "src/campana/generar_mapa.js:74",
+   "src/campana/generar_mapa.js:74",
+   "src/campana/generar_mapa.js:142",
+   "src/campana/generar_mapa.js:142",
+   "src/campana/generar_mapa.js:153",
+   "src/campana/generar_mapa.js:153",
+   "src/campana/generar_mapa.js:153",
+   "src/campana/generar_mapa.js:154",
+   "src/campana/generar_mapa.js:154"
+  ],
+  "Salvó a ": [
+   "src/campana/hoja.js:37"
+  ],
+  " cuando estaba por caer, en ": [
+   "src/campana/hoja.js:37"
+  ],
+  "Huyó en pánico en ": [
+   "src/campana/hoja.js:44"
+  ],
+  "Se quebró bajo el fuego en ": [
+   "src/campana/hoja.js:45"
+  ],
+  "Corrió a cubrir a ": [
+   "src/campana/hoja.js:49"
+  ],
+  "un compañero": [
+   "src/campana/hoja.js:49",
+   "src/campana/hoja.js:72"
+  ],
+  "Primera baja: un ": [
+   "src/campana/hoja.js:59"
+  ],
+  ", en ": [
+   "src/campana/hoja.js:59",
+   "src/campana/hoja.js:76"
+  ],
+  "Derribó al líder enemigo en ": [
+   "src/campana/hoja.js:60"
+  ],
+  "Cayó corriendo a cubrir a ": [
+   "src/campana/hoja.js:72"
+  ],
+  "Cayó tratando de escapar": [
+   "src/campana/hoja.js:73"
+  ],
+  "Cayó abriéndole paso al transporte": [
+   "src/campana/hoja.js:74"
+  ],
+  "Cayó ante un ": [
+   "src/campana/hoja.js:75"
+  ],
+  "Cayó en combate": [
+   "src/campana/hoja.js:75"
+  ],
+  "Bajó ": [
+   "src/campana/hoja.js:82"
+  ],
+  " enemigos en ": [
+   "src/campana/hoja.js:82"
+  ],
+  "el último sector": [
+   "src/campana/legado.js:33"
+  ],
+  " Viejo": [
+   "src/campana/legado.js:72"
+  ],
+  "Viejos conocidos": [
+   "src/campana/legado.js:83"
+  ],
+  "Llegan reportes de mechas con nuestras marcas peleando para los piratas. Los pilotos: ": [
+   "src/campana/legado.js:86"
+  ],
+  "la campaña anterior": [
+   "src/campana/legado.js:87",
+   "src/campana/nemesis.js:58",
+   "src/campana/partida.js:59"
+  ],
+  " Y detrás de todo está ": [
+   "src/campana/lore.js:61"
+  ],
+  " el Caído": [
+   "src/campana/nemesis.js:39"
+  ],
+  "Bajó a «": [
+   "src/campana/nemesis.js:162"
+  ],
+  "» en «": [
+   "src/campana/nemesis.js:162"
+  ],
+  "Salió entero de «": [
+   "src/campana/nemesis.js:169"
+  ],
+  "Cayó para siempre en «": [
+   "src/campana/nemesis.js:180"
+  ],
+  ", a manos de «": [
+   "src/campana/nemesis.js:180"
+  ],
+  "Terminó con «": [
+   "src/campana/nemesis.js:181"
+  ],
+  "», su némesis, en «": [
+   "src/campana/nemesis.js:181"
+  ],
+  "En «": [
+   "src/campana/nemesis.js:195"
+  ],
+  "Escapó de «": [
+   "src/campana/nemesis.js:196"
+  ],
+  "Ahora la tiene con «": [
+   "src/campana/nemesis.js:199"
+  ],
+  "» ya no está. Ahora va por todo el escuadrón.": [
+   "src/campana/nemesis.js:208"
+  ],
+  "Sobrevivió a la caída de su escuadrón en ": [
+   "src/campana/partida.js:59"
+  ],
+  "Veterano de la campaña anterior. Eligió seguir.": [
+   "src/campana/partida.js:60"
+  ],
+  "Salieron del muelle ": [
+   "src/campana/partida.js:78"
+  ],
+  "» venía de la campaña anterior.": [
+   "src/campana/partida.js:79"
+  ],
+  "Objetivo del sector: ": [
+   "src/campana/partida.js:140"
+  ],
+  "» se quedó con ": [
+   "src/campana/partida.js:181"
+  ],
+  " Encontralo y bajalo: esta vez no hay eyección.": [
+   "src/campana/partida.js:181"
+  ],
+  " se quedó con lo que dejó ": [
+   "src/campana/partida.js:182"
+  ],
+  "nemesis:": [
+   "src/campana/partida.js:217"
+  ],
+  "Una semana en el muelle orbital. Se reparan los mechas y se ordenan las cabezas.": [
+   "src/campana/partida.js:281"
+  ],
+  "Cruzaron a ": [
+   "src/campana/partida.js:303"
+  ],
+  "Se quedaron sin combustible y tuvieron que pagar un remolque.": [
+   "src/campana/partida.js:321"
+  ],
+  "afinidad:": [
+   "src/campana/partida.js:346",
+   "src/campana/partida.js:412",
+   "src/campana/partida.js:596"
+  ],
+  "Contrataron a «": [
+   "src/campana/partida.js:413"
+  ],
+  "Cayó en combate, en ": [
+   "src/campana/partida.js:494"
+  ],
+  "Lo dieron por muerto en ": [
+   "src/campana/partida.js:510"
+  ],
+  ", y volvió.": [
+   "src/campana/partida.js:510"
+  ],
+  "Volvió de ": [
+   "src/campana/partida.js:511"
+  ],
+  " con el mecha hecho trizas.": [
+   "src/campana/partida.js:511"
+  ],
+  "Quedó solo contra todos en ": [
+   "src/campana/partida.js:512"
+  ],
+  "Rescatado de entre los restos en ": [
+   "src/campana/partida.js:595"
+  ],
+  "Derrotaron a ": [
+   "src/campana/partida.js:608"
+  ],
+  " los hizo retroceder.": [
+   "src/campana/partida.js:608"
+  ],
+  "» abatió ": [
+   "src/campana/partida.js:612"
+  ],
+  " Cayó ": [
+   "src/campana/partida.js:613"
+  ],
+  " A «": [
+   "src/campana/partida.js:615"
+  ],
+  "» lo dieron por muerto, y volvió.": [
+   "src/campana/partida.js:615"
+  ],
+  " Rescataron a «": [
+   "src/campana/partida.js:616"
+  ],
+  "» de entre los restos.": [
+   "src/campana/partida.js:616"
+  ],
+  "nemesis:fin": [
+   "src/campana/partida.js:631"
+  ],
+  "Terminaron con «": [
+   "src/campana/partida.js:633"
+  ],
+  "», su némesis.": [
+   "src/campana/partida.js:633"
+  ],
+  "» se les volvió a escapar.": [
+   "src/campana/partida.js:633"
+  ],
+  "Nació un némesis: «": [
+   "src/campana/partida.js:637"
+  ],
+  "mecha:": [
+   "src/campana/reclutas.js:91"
+  ],
+  "Descansó y se le pasó el trauma.": [
+   "src/campana/tareas.js:44"
+  ],
+  "Descansó. Vuelve con la cabeza fresca.": [
+   "src/campana/tareas.js:44"
+  ],
+  "Entrenó en el simulador: +": [
+   "src/campana/tareas.js:51"
+  ],
+  " y subió a nivel ": [
+   "src/campana/tareas.js:51"
+  ],
+  "Volvió de los desarmaderos con ": [
+   "src/campana/tareas.js:55"
+  ],
+  "Reconoció el terreno por delante del escuadrón.": [
+   "src/campana/tareas.js:67"
+  ]
+ }
+}

@@ -37,10 +37,33 @@
   "punteria_maxima": 95,
   "tareas": {
     "_ayuda": "Lo que puede hacer un piloto en vez de salir a la proxima mision (se elige en el hangar). Se cumple cuando termina esa mision, gane o pierda el resto. Siempre tiene que salir al menos uno.",
-    "descansar": { "nombre": "Descansar", "icono": "descanso", "descripcion": "Se queda en la base. Los traumas sanan más rápido y en la misión siguiente vuelve atento.", "cura_traumas": 2, "atento": true },
-    "entrenar": { "nombre": "Entrenar", "icono": "mira", "descripcion": "Horas de simulador mientras los demás pelean.", "xp": 50 },
-    "chatarrear": { "nombre": "Chatarrear", "icono": "llave", "descripcion": "Recorre desarmaderos: trae créditos y a veces una parte.", "creditos": 30, "chance_parte": 30 },
-    "explorar": { "nombre": "Explorar", "icono": "ojo", "descripcion": "Va adelante a reconocer: la misión sale sin niebla y suma inteligencia sobre el jefe del sector.", "quita_niebla": true, "inteligencia": 1 }
+    "descansar": {
+      "nombre": "Descansar",
+      "icono": "descanso",
+      "descripcion": "Se queda en la base. Los traumas sanan más rápido y en la misión siguiente vuelve atento.",
+      "cura_traumas": 2,
+      "atento": true
+    },
+    "entrenar": {
+      "nombre": "Entrenar",
+      "icono": "mira",
+      "descripcion": "Horas de simulador mientras los demás pelean.",
+      "xp": 50
+    },
+    "chatarrear": {
+      "nombre": "Chatarrear",
+      "icono": "llave",
+      "descripcion": "Recorre desarmaderos: trae créditos y a veces una parte.",
+      "creditos": 30,
+      "chance_parte": 30
+    },
+    "explorar": {
+      "nombre": "Explorar",
+      "icono": "ojo",
+      "descripcion": "Va adelante a reconocer: la misión sale sin niebla y suma inteligencia sobre el jefe del sector.",
+      "quita_niebla": true,
+      "inteligencia": 1
+    }
   },
   "xp_por_nivel": [
     0,
@@ -110,7 +133,25 @@
     "unico": 1
   },
   "arte": {
-    "retratos": 66
+    "retratos": 66,
+    "color_equipo": {
+      "_ayuda": "Color de equipo del arte nuevo: en cada pieza, los pixeles pintados EXACTAMENTE con los colores de 'marca' (luz, medio, sombra) se cambian solos por los del bando. Asi se dibuja una sola version de cada pieza.",
+      "marca": [
+        "#00ff00",
+        "#00c000",
+        "#008000"
+      ],
+      "azul": [
+        "#7fb6ea",
+        "#4a8fd1",
+        "#2b5a88"
+      ],
+      "rojo": [
+        "#e57a6c",
+        "#c4473b",
+        "#7e2a22"
+      ]
+    }
   },
   "animo": {
     "racha_confiado": 3,

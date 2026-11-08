@@ -56,6 +56,10 @@ para el commit. Sin carpeta, *Guardar* descarga el archivo.
   Valida antes de guardar.
 - **Textos e idiomas:** todas las frases del juego, con una columna por idioma (`data/idiomas/<código>.json`).
   Para jugar en otro idioma: `?idioma=en` al final de la dirección.
+  Los textos de botones y pantallas (los escritos en el código) también: están en el catálogo `data/interfaz.json`
+  (se rearma con `node tools/extraer_textos.mjs`) y se cambian o traducen desde *interfaz* sin tocar el código.
+- **Color de equipo del arte nuevo:** se dibuja una sola versión de cada pieza; lo pintado con verde puro
+  (`#00ff00`, `#00c000`, `#008000`) se vuelve azul o rojo solo (`reglas.json > arte > color_equipo`).
 
 ## Cómo está hecho
 
