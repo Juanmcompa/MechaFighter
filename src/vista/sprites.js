@@ -81,6 +81,21 @@ export async function cargarTerreno(base = './') {
       if (id.startsWith('obj_')) TER.sombras[id] = silueta(im);
     })));
     Object.assign(TER, { casilla: m.casilla, texturas: m.texturas, objetos: m.objetos, detalles: m.detalles });
+    // variantes: piso_a_2, piso_a_3... (o obj_cajones_2...) se suman solas a las de su nombre base,
+    // y cada casilla elige una. Se buscan hasta que falta un numero.
+    TER.variantes = {};
+    await Promise.all([...m.texturas, ...Object.values(m.objetos).flat()].map(async (id) => {
+      if (!TER.imgs[id]) return;
+      const lista = [id];
+      for (let n = 2; n <= 40; n++) {
+        const im = await cargarImagen(base + 'assets/terreno/' + id + '_' + n + '.png');
+        if (!im) break;
+        TER.imgs[id + '_' + n] = im;
+        if (id.startsWith('obj_')) TER.sombras[id + '_' + n] = silueta(im);
+        lista.push(id + '_' + n);
+      }
+      if (lista.length > 1) TER.variantes[id] = lista;
+    }));
     // series numeradas (obj_m_cover_barrels_001, _002... u obj_explosive_barrel_1, _2...): se buscan solas
     // hasta que falta un numero, asi para sumar variantes alcanza con dejar el PNG con el numero que sigue
     await Promise.all(Object.entries(m.series || {}).flatMap(([grupo, prefijos]) => prefijos.map(async (pre) => {

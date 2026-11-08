@@ -54,7 +54,7 @@ function mapaConArte(ctx, mapa, L) {
         else if (z && img('concreto')) id = 'concreto';
         else id = r < 30 && img('rejilla') ? 'rejilla' : r < 250 && img('piso_b') ? 'piso_b' : 'piso_a';
       }
-      ctx.drawImage(img(id) || img('piso_a'), px, py, L, L);
+      ctx.drawImage(img(variante(id, x, y)) || img('piso_a'), px, py, L, L);
     }
   }
   // 2. sombras de lo alto sobre el piso (la luz viene de arriba a la izquierda) y borde de los muros
@@ -98,12 +98,19 @@ function mapaConArte(ctx, mapa, L) {
   rompibles(ctx, T, ancho, alto, L);
 }
 
+// Si hay variantes de esa imagen (nombre_2, nombre_3...), cada casilla elige una (siempre la misma)
+function variante(id, x, y) {
+  const v = TER.variantes && TER.variantes[id];
+  return v ? v[ruido(x, y, 13) % v.length] : id;
+}
+
 // Cuanto se agranda una imagen del terreno: el arte nuevo (medidas multiplo de 32) va a 32 pixeles por casilla;
 // el viejo, a terreno.json "casilla" (64)
 const escalaArte = (im, L) => (im.width % 32 === 0 && im.height % 32 === 0 ? L / 32 : L / (TER.casilla || 64));
 
 // Un objeto del terreno centrado en su casilla, con su sombra (alto: cuanto se corre la sombra, en casillas)
 function objeto(ctx, id, x, y, L, alto) {
+  id = variante(id, x, y);
   const im = TER.imgs[id];
   if (!im) return false;
   const k = escalaArte(im, L);

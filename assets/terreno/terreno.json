@@ -1,5 +1,5 @@
 {
- "_ayuda": "Arte del terreno. 'texturas' van a una casilla entera. Objetos y detalles: si la imagen mide multiplos de 32 (arte nuevo) va a 32 pixeles por casilla; si no, a 'casilla' pixeles por casilla (arte viejo). 'series': prefijos de imagenes numeradas (nombre_001, nombre_002... o nombre_1, nombre_2...) que se cargan solas en ese grupo hasta que falta un numero. Grupos: baja (media cobertura), alta (cobertura total), barril, edificio, escombros, escombros_bajos, piso_quemado.",
+ "_ayuda": "Arte del terreno. 'texturas' van a una casilla entera. Objetos y detalles: si la imagen mide multiplos de 32 (arte nuevo) va a 32 pixeles por casilla; si no, a 'casilla' pixeles por casilla (arte viejo). 'series': prefijos de imagenes numeradas (nombre_001, nombre_002... o nombre_1, nombre_2...) que se cargan solas en ese grupo hasta que falta un numero. Grupos: baja (media cobertura), alta (cobertura total), barril, edificio, escombros, escombros_bajos, piso_quemado. Variantes: cualquier textura u objeto con _2, _3... al final (piso_a_2.png, muro_a_2.png, obj_cajones_2.png) se suma solo como variante de su nombre base; los numeros tienen que ir seguidos.",
  "casilla": 64,
  "texturas": [
   "piso_a",
