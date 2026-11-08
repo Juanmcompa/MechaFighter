@@ -2,7 +2,7 @@
 // La batalla ya se jugo entera en el motor; aca se la mira a la velocidad que uno quiera (o se salta al final).
 
 import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe } from './dibujo.js';
-import { crearTablero, lineaDeTiro, distancia, caminable } from '../motor/espacio.js';
+import { crearTablero, lineaDeTiro, distancia, caminable, cambiarCasilla } from '../motor/espacio.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
@@ -20,7 +20,9 @@ export class Repeticion {
     this.ultimaVoz = -999;
     this.datos = datos;
     this.mision = mision;
-    this.mapa = mision.plano || datos.mapas[mision.mapa];
+    // copia propia del mapa: durante la batalla se rompen cosas y hay que redibujarlas
+    const original = mision.plano || datos.mapas[mision.mapa];
+    this.mapa = { ...original, filas: original.filas.slice(), leyenda: { ...original.leyenda } };
     this.tablero = crearTablero(this.mapa);
     this.registro = registro;
     this.canvas = canvas;
@@ -77,6 +79,7 @@ export class Repeticion {
     const lado = Math.max(Math.round(this.L * dpr), 64);
     this.fondo.width = ancho * lado; this.fondo.height = alto * lado;
     dibujarMapa(this.fondo.getContext('2d'), this.mapa, lado);
+    this.ladoFondo = lado;
     this.cam = { x: (ancho * this.L) / 2, y: (alto * this.L) / 2, z: 1 };
   }
 
@@ -166,6 +169,17 @@ export class Repeticion {
     }
   }
 
+  // Algo del mapa se rompio: cambia la letra en la copia del mapa y se vuelve a pintar el fondo
+  romper(x, y, queda) {
+    const M = this.mapa;
+    let letra = Object.keys(M.leyenda).find((k) => M.leyenda[k] === queda);
+    if (!letra) { letra = String.fromCharCode(0x2460 + Object.keys(M.leyenda).length); M.leyenda[letra] = queda; }
+    const f = M.filas[y];
+    M.filas[y] = f.slice(0, x) + letra + f.slice(x + 1);
+    cambiarCasilla(this.tablero, x, y, queda);
+    this.fondoSucio = true;
+  }
+
   saltarAlFinal() {
     this.T = this.ultimoTick + 1;
     this.avanzar(0);
@@ -227,6 +241,12 @@ export class Repeticion {
         } else this.flotante(o, 'falla', '#8a9488', true);
         break;
       }
+      case 'rompe':
+        this.romper(e.x, e.y, e.queda);
+        this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: e.antes === 'edificio' ? 1.1 : 0.6, t0: this.T, dur: 8 });
+        this.temblor = Math.max(this.temblor, e.antes === 'edificio' ? 0.8 : 0.3);
+        if (e.antes === 'edificio') this.alEvento({ texto: 'Se viene abajo un edificio', clase: '' });
+        break;
       case 'esquirla': if (u) { u.vida -= e.danio; u.golpe = 1; this.flotante(u, '-' + e.danio, '#ff9a5a'); } break;
       case 'explota':
         this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: e.r + 0.6, t0: this.T, dur: 9 });
@@ -447,10 +467,11 @@ export class Repeticion {
         u.y = u.desde[1] + (u.hacia[1] - u.desde[1]) * e;
         // la zancada sigue al paso: media vuelta de piernas por casilla
         u.paso = ((u.pasos + e) * 0.5) % 1;
+        u.anda = true;
         u.alza = u.peso ? Math.sin(k * Math.PI) : 0;
         if (u.salto) u.alza = Math.sin(k * Math.PI) * 3;
       } else {
-        u.x = u.hacia[0]; u.y = u.hacia[1]; u.alza = 0;
+        u.x = u.hacia[0]; u.y = u.hacia[1]; u.alza = 0; u.anda = false;
         if (u.pisoPendiente) {
           // la pisada: polvo, y en los pesados un sacudon chico
           u.pisoPendiente = false;
@@ -513,6 +534,7 @@ export class Repeticion {
     ctx.scale(c.z, c.z);
     ctx.translate(-c.x, -c.y);
     ctx.imageSmoothingEnabled = false;
+    if (this.fondoSucio && this.ladoFondo) { this.fondoSucio = false; dibujarMapa(this.fondo.getContext('2d'), this.mapa, this.ladoFondo); }
     ctx.drawImage(this.fondo, 0, 0, ancho * L, alto * L);
     const vistas = this.visibles();
     const seVe = (u) => !vistas || u.ficha.bando === 0 || vistas.has(Math.round(u.y) * ancho + Math.round(u.x));

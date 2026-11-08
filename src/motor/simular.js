@@ -20,7 +20,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
   const registro = [];
   const B = {
     datos, mision, mapa,
-    tablero: crearTablero(mapa),
+    tablero: crearTablero(mapa, datos.reglas.destructibles),
     t: 0,
     unidades: [],
     porId: new Map(),

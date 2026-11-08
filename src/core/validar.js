@@ -223,7 +223,7 @@ export function validarDatos(d) {
   }
 
   // --- 8. Mapas
-  const leyendaValida = new Set(['piso', 'muro', 'media_cobertura', 'cobertura_total', 'peligro']);
+  const leyendaValida = new Set(['piso', 'muro', 'media_cobertura', 'cobertura_total', 'peligro', 'edificio', 'barril', 'escombros', 'escombros_bajos', 'piso_quemado']);
   for (const [id, m] of Object.entries(d.mapas || {})) {
     const aqui = 'mapas › ' + id;
     const [ancho, alto] = m.tamano || [0, 0];

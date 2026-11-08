@@ -1,7 +1,7 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 1,
-  "version_motor": 11,
+  "version_motor": 12,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
   "escuadra_maxima": 6,
@@ -31,6 +31,33 @@
   "cobertura": {
     "media": 25,
     "total": 50
+  },
+  "destructibles": {
+    "_ayuda": "Lo que se rompe en el mapa. 'vida': cuanto aguanta; 'queda': en que se convierte al romperse. Lo rompen las explosiones (todo lo que esta en su radio) y los disparos que la cobertura ataja (cuando el tiro falla contra alguien cubierto, la cobertura se come la mitad del daño). 'explota': revienta y lastima a todos los que estan cerca (de cualquier bando).",
+    "edificio": {
+      "vida": 160,
+      "queda": "escombros"
+    },
+    "cobertura_total": {
+      "vida": 110,
+      "queda": "media_cobertura"
+    },
+    "media_cobertura": {
+      "vida": 60,
+      "queda": "escombros_bajos"
+    },
+    "escombros": {
+      "vida": 80,
+      "queda": "escombros_bajos"
+    },
+    "barril": {
+      "vida": 12,
+      "queda": "piso_quemado",
+      "explota": {
+        "danio": 40,
+        "radio": 1
+      }
+    }
   },
   "danio_minimo": 1,
   "punteria_minima": 5,

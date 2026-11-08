@@ -523,6 +523,14 @@ function abrirPaso(B, u) {
     if (ocupada(x, y) || camino.some((c) => c.x === x && c.y === y)) continue;
     return { tipo: 'mover', a: [x, y], anula: 'abre_paso' };
   }
+  // en un pasillo no hay costado: se adelanta por el camino hasta donde pueda correrse
+  const meta = casillaDeZona(B, B.vip, B.mapa.zonas[B.mision.zonaMeta]);
+  const c = campo(B.tablero, meta.x, meta.y);
+  const aqui = c[u.y * B.tablero.ancho + u.x];
+  for (const [x, y] of vecinos(B.tablero, u.x, u.y)) {
+    const d = c[y * B.tablero.ancho + x];
+    if (!ocupada(x, y) && d >= 0 && d < aqui) return { tipo: 'mover', a: [x, y], anula: 'abre_paso' };
+  }
   return null;
 }
 

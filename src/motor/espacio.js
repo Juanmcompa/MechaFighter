@@ -2,15 +2,29 @@
 // Distancias en "casillas de rey" (Chebyshev): moverse en diagonal cuesta lo mismo que derecho. Es la regla que
 // el jugador entiende mirando la grilla, y evita raices cuadradas.
 
-const CAMINABLE = { piso: true, peligro: true };
-const TAPA_VISTA = { muro: true, cobertura_total: true };
-export const VALOR_COBERTURA = { media_cobertura: 'media', cobertura_total: 'total' };
+// (edificio: tapa como un muro pero se puede romper; escombros: lo que queda, cubre a medias;
+//  escombros_bajos y piso_quemado: se camina por encima; barril: cubre a medias y revienta)
+const CAMINABLE = { piso: true, peligro: true, escombros_bajos: true, piso_quemado: true };
+const TAPA_VISTA = { muro: true, cobertura_total: true, edificio: true };
+export const VALOR_COBERTURA = { media_cobertura: 'media', cobertura_total: 'total', edificio: 'total', escombros: 'media', barril: 'media' };
 
-export function crearTablero(mapa) {
+// destructibles: reglas.destructibles (lo que se puede romper y en que se convierte)
+export function crearTablero(mapa, destructibles = null) {
   const [ancho, alto] = mapa.tamano;
   const tipos = [];
   for (let y = 0; y < alto; y++) for (let x = 0; x < ancho; x++) tipos.push(mapa.leyenda[mapa.filas[y][x]] || 'muro');
-  return { ancho, alto, tipos, campos: new Map() };
+  const vida = new Int16Array(ancho * alto);
+  if (destructibles) tipos.forEach((t, i) => { if (destructibles[t]) vida[i] = destructibles[t].vida; });
+  return { ancho, alto, tipos, vida, destructibles, campos: new Map() };
+}
+
+// Cambia lo que hay en una casilla (algo se rompio). Si cambia por donde se puede caminar, se olvidan los caminos.
+export function cambiarCasilla(t, x, y, nuevo) {
+  const k = y * t.ancho + x;
+  const antes = t.tipos[k];
+  t.tipos[k] = nuevo;
+  t.vida[k] = t.destructibles && t.destructibles[nuevo] ? t.destructibles[nuevo].vida : 0;
+  if (!!CAMINABLE[antes] !== !!CAMINABLE[nuevo]) t.campos.clear();
 }
 
 export const dentro = (t, x, y) => x >= 0 && y >= 0 && x < t.ancho && y < t.alto;
@@ -121,9 +135,15 @@ export function lineaDeTiro(t, a, b) {
 // Cobertura que tiene "objetivo" frente a un disparo desde "tirador": la primera casilla de la linea que sale del
 // objetivo hacia el tirador. Devuelve 'total', 'media' o null.
 export function cobertura(t, objetivo, tirador) {
+  const c = casillaDeCobertura(t, objetivo, tirador);
+  return c ? VALOR_COBERTURA[tipo(t, c[0], c[1])] : null;
+}
+
+// La casilla que cubre al objetivo de ese disparo (la que se come el tiro si falla), o null
+export function casillaDeCobertura(t, objetivo, tirador) {
   if (distancia(objetivo, tirador) <= 1) return null; // cuerpo a cuerpo: no hay donde esconderse
   const l = linea(objetivo.x, objetivo.y, tirador.x, tirador.y);
-  return VALOR_COBERTURA[tipo(t, l[0][0], l[0][1])] || null;
+  return VALOR_COBERTURA[tipo(t, l[0][0], l[0][1])] ? l[0] : null;
 }
 
 // Casilla caminable y libre mas cercana a (x, y), en un orden fijo.

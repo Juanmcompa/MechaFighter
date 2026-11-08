@@ -9,7 +9,8 @@
 import { crearAzar } from '../core/azar.js';
 
 const ANCHO = 24, ALTO = 16;
-const LEYENDA = { '.': 'piso', '#': 'muro', h: 'media_cobertura', H: 'cobertura_total', '~': 'peligro' };
+// E: edificio (tapa todo, pero se puede derribar); b: barril (cubre a medias y revienta)
+const LEYENDA = { '.': 'piso', '#': 'muro', h: 'media_cobertura', H: 'cobertura_total', '~': 'peligro', E: 'edificio', b: 'barril' };
 
 export function generarMapa(datos, semilla, estiloForzado = null) {
   const G = datos.generador_mapas;
@@ -24,6 +25,10 @@ export function generarMapa(datos, semilla, estiloForzado = null) {
   ESTILOS[estilo](g, az, poner, es);
   // un poco de cobertura suelta en todos (salvo donde ya hay mucho)
   if (estilo !== 'deposito') desparramar(az, poner, es, az.entero(2, 5));
+  // edificios macizos y barriles (cuantos, segun el estilo)
+  const E = G.estilos[estilo];
+  for (let i = az.entero(...(E.edificios || [0, 0])); i > 0; i--) edificio(az, poner, es);
+  for (let i = az.entero(...(E.barriles || [0, 0])); i > 0; i--) barriles(az, poner, es);
 
   // bordes
   for (let x = 0; x < ANCHO; x++) { g[0][x] = '#'; g[ALTO - 1][x] = '#'; }
@@ -83,6 +88,32 @@ function desparramar(az, poner, es, n) {
   }
 }
 
+// Un edificio macizo de 2x2 a 3x3, solo sobre piso libre
+function edificio(az, poner, es) {
+  for (let intento = 0; intento < 8; intento++) {
+    const w = az.entero(2, 3), h = az.entero(2, 3);
+    const x = az.entero(6, ANCHO - 8 - w), y = az.entero(2, ALTO - 3 - h);
+    let libre = true;
+    for (let yy = y - 1; yy <= y + h; yy++) for (let xx = x - 1; xx <= x + w; xx++) if (!es(xx, yy, '.')) libre = false;
+    if (!libre) continue;
+    for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) poner(xx, yy, 'E');
+    return;
+  }
+}
+
+// Uno o dos barriles, mejor si es pegado a alguna cobertura (ahi es donde se esconde la gente)
+function barriles(az, poner, es) {
+  for (let intento = 0; intento < 12; intento++) {
+    const x = az.entero(6, ANCHO - 8), y = az.entero(2, ALTO - 3);
+    if (!es(x, y, '.')) continue;
+    const pegado = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => es(x + dx, y + dy, 'h') || es(x + dx, y + dy, 'H') || es(x + dx, y + dy, 'E'));
+    if (!pegado && intento < 8) continue;
+    poner(x, y, 'b');
+    if (az.tirada(40) && es(x + 1, y, '.')) poner(x + 1, y, 'b');
+    return;
+  }
+}
+
 function charco(az, poner, cx, cy, r) {
   for (let y = cy - r; y <= cy + r; y++)
     for (let x = cx - r - 1; x <= cx + r + 1; x++) {
@@ -114,8 +145,9 @@ const ESTILOS = {
       const w = az.entero(4, 7), h = az.entero(3, 5);
       const x1 = az.entero(5, ANCHO - 6 - w), y1 = az.entero(1, ALTO - 2 - h);
       const x2 = x1 + w, y2 = y1 + h;
-      for (let x = x1; x <= x2; x++) { poner(x, y1, '#'); poner(x, y2, '#'); }
-      for (let y = y1; y <= y2; y++) { poner(x1, y, '#'); poner(x2, y, '#'); }
+      const pared = az.tirada(60) ? 'E' : '#'; // algunas casas todavia se pueden voltear
+      for (let x = x1; x <= x2; x++) { poner(x, y1, pared); poner(x, y2, pared); }
+      for (let y = y1; y <= y2; y++) { poner(x1, y, pared); poner(x2, y, pared); }
       for (let y = y1 + 1; y < y2; y++) for (let x = x1 + 1; x < x2; x++) poner(x, y, '.');
       // puertas (y paredes caidas)
       for (let p = az.entero(2, 3); p > 0; p--) {

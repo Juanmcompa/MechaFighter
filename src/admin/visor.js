@@ -61,7 +61,7 @@ export function pestanaVisor(T, raiz) {
     const paso = V.caminar ? ((t - t0) / 700) % 1 : 0.25;
     golpe = Math.max(0, golpe - 0.03);
     ctx.imageSmoothingEnabled = false;
-    dibujarMechaVisor(ctx, ficha(), lado, { ang: (V.angulo * Math.PI) / 180, paso, golpe, zoom: V.zoom * 0.5 });
+    dibujarMechaVisor(ctx, ficha(), lado, { ang: (V.angulo * Math.PI) / 180, paso, golpe, zoom: V.zoom * 0.5, anda: V.caminar });
     requestAnimationFrame(dibujar);
   };
   requestAnimationFrame(dibujar);
@@ -106,6 +106,7 @@ export function pestanaVisor(T, raiz) {
         h('label', {}, 'Probar como ', h('select', { onchange: (e) => {
           for (const s of Object.keys(V.pruebas)) if (V.pruebas[s] === id) delete V.pruebas[s];
           if (e.target.value) { V.pruebas[e.target.value] = id; if (e.target.value === 'brazo_der') V.pruebas.brazo_izq = id; }
+          // si se prueba una pierna "x" y tambien se cargaron x_1, x_2..., se ven caminando solas
         } }, h('option', { value: '' }, '—'), ...ENCAJES.map((s) => h('option', { value: s, ...(V.pruebas[s] === id ? { selected: true } : {}) }, NOMBRE_ENCAJE[s]))))))));
   };
   const sumarArchivos = async (archivos) => {
@@ -131,7 +132,7 @@ export function pestanaVisor(T, raiz) {
     h('div', { class: 'tl-izq' },
       panel('Armado', armado),
       panel('Arte nuevo (para probar)',
-        h('p', { class: 'ayuda' }, 'PNG de 32×32 con el centro del mecha en el centro del cuadro. El brazo y la pierna, del lado derecho: el izquierdo es el mismo espejado. El nombre del archivo es el nombre del sprite. Color de equipo: lo pintado con verde puro (#00ff00 luz, #00c000 medio, #008000 sombra) se vuelve azul o rojo solo.'),
+        h('p', { class: 'ayuda' }, 'PNG de 32×32 con el centro del mecha en el centro del cuadro. El brazo y la pierna, del lado derecho: el izquierdo es el mismo espejado. El nombre del archivo es el nombre del sprite. Piernas animadas: piernas_x.png (quieta) más piernas_x_1.png, piernas_x_2.png (y _3) con los cuadros del paso; cargalas todas juntas y probá piernas_x. Color de equipo: lo pintado con verde puro (#00ff00 luz, #00c000 medio, #008000 sombra) se vuelve azul o rojo solo.'),
         h('div', { class: 'tl-controles' },
           C.hayAcceso() ? boton('Leer arte/partes', async () => sumarArchivos(await C.listarImagenes('arte/partes')), { iconoNombre: 'hangar', clase: 'secundario compacto' }) : null,
           C.hayAcceso() ? boton('Leer assets/iconos', async () => sumarArchivos(await C.listarImagenes('assets/iconos')), { iconoNombre: 'estrella', clase: 'secundario compacto' }) : null,

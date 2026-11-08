@@ -1,7 +1,7 @@
 // Aplica las intenciones de un tick. Primero todos los movimientos, despues todas las acciones, y las muertes al
 // final (en simular.js): asi dos unidades pueden matarse a la vez y el orden de proceso no da ventajas escondidas.
 
-import { distancia, cobertura, vecinos } from './espacio.js';
+import { distancia, cobertura, vecinos, casillaDeCobertura, cambiarCasilla } from './espacio.js';
 import { vidaPct, porId, mods, ponerEstado, quitarEstado, evento, aliados } from './estado.js';
 import { unidadEnemiga } from './unidades.js';
 
@@ -111,6 +111,11 @@ function atacar(B, u, i) {
       if (danio < 0) { bloqueo = true; danio = -danio; }
     }
     B.log({ tipo: 'dispara', u: u.id, o: o.id, arma: a.tipoVisual, slot: a.slot, acierta, danio, cob, bloqueo });
+    // el tiro que falla contra alguien cubierto le pega a la cobertura (y la va rompiendo)
+    if (!acierta && cob) {
+      const c = casillaDeCobertura(B.tablero, o, u);
+      if (c) danarCasilla(B, c[0], c[1], a.danio >> 1, u);
+    }
 
     // Efectos que pueden caer aunque no pegue (la supresion asusta igual)
     if (a.estado && acierta && az.tirada(a.chanceEstado)) ponerEstado(B, o, a.estado, u.id);
@@ -199,8 +204,38 @@ export function herir(B, o, danio, autor) {
   if (antes >= 50 && vidaPct(o) < 50) for (const v of B.unidades) if (v.viva && v.vinculo === o.id) evento(B, 'vinculo_herido', v);
 }
 
+// Algo del mapa recibe dano: si se queda sin vida se rompe (y un barril revienta)
+export function danarCasilla(B, x, y, danio, u) {
+  const t = B.tablero;
+  const D = t.destructibles;
+  if (!D || x < 0 || y < 0 || x >= t.ancho || y >= t.alto) return;
+  const k = y * t.ancho + x;
+  const antes = t.tipos[k];
+  if (!D[antes] || danio <= 0) return;
+  t.vida[k] -= danio;
+  if (t.vida[k] > 0) return;
+  const def = D[antes];
+  cambiarCasilla(t, x, y, def.queda);
+  B.log({ tipo: 'rompe', x, y, antes, queda: def.queda });
+  if (def.explota) {
+    B.log({ tipo: 'explota', x, y, r: def.explota.radio });
+    for (const v of B.unidades) {
+      if (!v.viva || distancia(v, { x, y }) > def.explota.radio) continue;
+      const d = Math.max(B.datos.reglas.danio_minimo, def.explota.danio - v.blindaje);
+      herir(B, v, d, u);
+      B.log({ tipo: 'esquirla', u: v.id, danio: d });
+    }
+    // reventar puede romper lo de al lado (y encadenar barriles)
+    for (let yy = y - def.explota.radio; yy <= y + def.explota.radio; yy++)
+      for (let xx = x - def.explota.radio; xx <= x + def.explota.radio; xx++) if (xx !== x || yy !== y) danarCasilla(B, xx, yy, def.explota.danio, u);
+  }
+}
+
 function explosion(B, u, o, a) {
   B.log({ tipo: 'explota', x: o.x, y: o.y, r: a.radio });
+  // las explosiones rompen lo que haya alrededor
+  for (let yy = o.y - a.radio; yy <= o.y + a.radio; yy++)
+    for (let xx = o.x - a.radio; xx <= o.x + a.radio; xx++) danarCasilla(B, xx, yy, a.danio, u);
   for (const v of B.unidades) {
     if (!v.viva) continue;
     const d = distancia(v, o);

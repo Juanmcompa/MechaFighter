@@ -27,7 +27,7 @@ function ruido(x, y, sal = 0) {
   return ((h ^ (h >>> 16)) >>> 0) % 1000;
 }
 
-const ALTO = { muro: true, cobertura_total: true };
+const ALTO = { muro: true, cobertura_total: true, edificio: true };
 
 // El mapa con el tileset: pisos y muros que se repiten, coberturas con su sombra y detalles sueltos.
 function mapaConArte(ctx, mapa, L) {
@@ -104,6 +104,66 @@ function mapaConArte(ctx, mapa, L) {
       ctx.drawImage(im, ox, oy, w, h);
     }
   }
+  rompibles(ctx, T, ancho, alto, L);
+}
+
+// Lo que se puede romper (dibujo provisorio hasta que llegue el arte): edificios, escombros, barriles, quemaduras.
+// Si en assets/terreno hay una imagen con el nombre del tipo (edificio, escombros, barril...), se usa esa.
+function rompibles(ctx, T, ancho, alto, L) {
+  const R = (x, y, s) => ruido(x, y, s) / 1000;
+  const cascotes = (px, py, x, y, n, tam, colores) => {
+    for (let i = 0; i < n; i++) {
+      const cx = px + L * (0.15 + 0.7 * R(x, y, 20 + i)), cy = py + L * (0.15 + 0.7 * R(x, y, 40 + i));
+      const w = L * tam * (0.6 + 0.8 * R(x, y, 60 + i)), h = w * (0.5 + 0.6 * R(x, y, 80 + i));
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(cx - w / 2 + L * 0.04, cy - h / 2 + L * 0.04, w, h);
+      ctx.fillStyle = colores[i % colores.length]; ctx.fillRect(cx - w / 2, cy - h / 2, w, h);
+    }
+  };
+  for (let y = 0; y < alto; y++) {
+    for (let x = 0; x < ancho; x++) {
+      const t = T(x, y), px = x * L, py = y * L;
+      const arte = TER.imgs && TER.imgs[t];
+      if (arte && t !== 'piso' && t !== 'muro' && t !== 'peligro') { ctx.drawImage(arte, px, py, L, L); continue; }
+      if (t === 'edificio') {
+        // techo visto desde arriba; borde mas oscuro donde termina el edificio
+        const b = L * 0.14;
+        ctx.fillStyle = '#2c333b'; ctx.fillRect(px, py, L, L);
+        ctx.fillStyle = '#4f5a66';
+        const iz = T(x - 1, y) === 'edificio' ? 0 : b, de = T(x + 1, y) === 'edificio' ? 0 : b;
+        const ar = T(x, y - 1) === 'edificio' ? 0 : b, ab = T(x, y + 1) === 'edificio' ? 0 : b;
+        ctx.fillRect(px + iz, py + ar, L - iz - de, L - ar - ab);
+        ctx.fillStyle = '#5f6b78'; if (ar) ctx.fillRect(px + iz, py + ar, L - iz - de, Math.max(1, L * 0.04));
+        // ventilaciones y cajas del techo
+        const r = ruido(x, y, 9);
+        ctx.fillStyle = '#39424b';
+        if (r < 400) ctx.fillRect(px + L * 0.3, py + L * 0.3, L * 0.28, L * 0.2);
+        else if (r < 650) { ctx.fillRect(px + L * 0.55, py + L * 0.25, L * 0.14, L * 0.14); ctx.fillRect(px + L * 0.25, py + L * 0.6, L * 0.14, L * 0.14); }
+        ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = Math.max(1, L / 40);
+        ctx.beginPath(); ctx.moveTo(px + iz, py + L * 0.5); ctx.lineTo(px + L - de, py + L * 0.5); ctx.stroke(); ctx.lineWidth = 1;
+      } else if (t === 'escombros') {
+        cascotes(px, py, x, y, 7, 0.26, ['#5a5f63', '#6d7175', '#4a4e52', '#7b6f60']);
+      } else if (t === 'escombros_bajos') {
+        cascotes(px, py, x, y, 4, 0.13, ['#5a5f63', '#6d7175', '#4a4e52']);
+      } else if (t === 'piso_quemado') {
+        const g = ctx.createRadialGradient(px + L / 2, py + L / 2, 0, px + L / 2, py + L / 2, L * 0.62);
+        g.addColorStop(0, 'rgba(10,8,6,0.75)'); g.addColorStop(0.7, 'rgba(20,15,10,0.35)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g; ctx.fillRect(px - L * 0.2, py - L * 0.2, L * 1.4, L * 1.4);
+        cascotes(px, py, x, y, 3, 0.1, ['#3a2a20', '#2a2420']);
+      } else if (t === 'barril') {
+        // tambor rojo con franja amarilla: revienta
+        const tambor = (cx, cy, r) => {
+          ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.beginPath(); ctx.arc(cx + r * 0.25, cy + r * 0.25, r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#8e2f1f'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#e2b23a'; ctx.lineWidth = Math.max(1, r * 0.22); ctx.beginPath(); ctx.arc(cx, cy, r * 0.72, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = '#c4452c'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#2a1a14'; ctx.beginPath(); ctx.arc(cx + r * 0.2, cy - r * 0.2, r * 0.12, 0, Math.PI * 2); ctx.fill();
+          ctx.lineWidth = 1;
+        };
+        tambor(px + L * 0.4, py + L * 0.42, L * 0.24);
+        if (ruido(x, y, 11) < 600) tambor(px + L * 0.7, py + L * 0.68, L * 0.17);
+      }
+    }
+  }
 }
 
 export function dibujarMapa(ctx, mapa, L) {
@@ -136,6 +196,7 @@ export function dibujarMapa(ctx, mapa, L) {
       }
     }
   }
+  rompibles(ctx, (x, y) => (x < 0 || y < 0 || x >= ancho || y >= alto ? 'muro' : mapa.leyenda[mapa.filas[y][x]]), ancho, alto, L);
   zonas(ctx, mapa, L);
 }
 
@@ -244,7 +305,18 @@ function mechaConSprites(ctx, f, u) {
   };
   const zancada = Math.sin(u.paso * Math.PI * 2) * 1.6;
   const piernas = a.piernas;
-  if (piernas) {
+  // Piernas animadas: si existen <piernas>_1, _2 (y _3), son los cuadros del caminar de UNA pierna (la derecha).
+  // La izquierda usa el mismo dibujo espejado, medio paso corrido. Quieto, se usa el dibujo de siempre.
+  const cuadros = [];
+  if (piernas) for (let i = 1; i <= 4 && sprite(color, piernas + '_' + i); i++) cuadros.push(piernas + '_' + i);
+  if (cuadros.length) {
+    const n = cuadros.length;
+    const k = Math.floor(u.paso * n * 2);
+    const der = u.anda === false ? piernas : cuadros[k % n];
+    const izq = u.anda === false ? piernas : cuadros[(k + Math.max(1, n >> 1)) % n];
+    pieza(der, tw * 0.26, th * 0.05, false);
+    pieza(izq, -tw * 0.26, th * 0.05, true);
+  } else if (piernas) {
     const orugas = piernas.includes('orugas');
     const dx = orugas ? tw * 0.42 : tw * 0.26;
     const dy = orugas ? 0 : th * 0.05;
@@ -539,12 +611,12 @@ function dibujarRestos(ctx, f) {
 
 // Mecha grande para el hangar (sin rotar, mirando a la derecha).
 // Para el taller: un mecha girado (ang en radianes, 0 = mirando a la derecha), con el paso y el golpe que se pida
-export function dibujarMechaVisor(ctx, ficha, lado, { ang = -Math.PI / 2, paso = 0.25, golpe = 0, zoom = 1 } = {}) {
+export function dibujarMechaVisor(ctx, ficha, lado, { ang = -Math.PI / 2, paso = 0.25, golpe = 0, zoom = 1, anda = true } = {}) {
   ctx.save();
   ctx.translate(lado / 2, lado / 2);
   ctx.scale((lado / 34) * zoom, (lado / 34) * zoom);
   ctx.rotate(ang);
-  dibujarMecha(ctx, ficha, { paso, golpe, marcas: ficha.marcas || 0 });
+  dibujarMecha(ctx, ficha, { paso, golpe, anda, marcas: ficha.marcas || 0 });
   ctx.restore();
 }
 
@@ -554,6 +626,6 @@ export function dibujarMechaFicha(ctx, ficha, lado) {
   ctx.translate(lado / 2, lado / 2);
   ctx.scale(lado / 34, lado / 34);
   ctx.rotate(-Math.PI / 2);
-  dibujarMecha(ctx, ficha, { paso: 0.25, golpe: 0, marcas: ficha.marcas || 0 });
+  dibujarMecha(ctx, ficha, { paso: 0.25, golpe: 0, anda: false, marcas: ficha.marcas || 0 });
   ctx.restore();
 }

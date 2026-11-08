@@ -1,36 +1,115 @@
 {
-  "_ayuda": "Mapas armados al azar para las misiones. 'chance': de cada 100 misiones, cuantas usan un mapa generado (el resto usa los mapas hechos a mano de data/mapas). Cada estilo tiene peso (que tan seguido sale), nombres posibles y una descripcion que se muestra antes de la mision. El jugador siempre entra por la izquierda y los enemigos por la derecha.",
+  "_ayuda": "Mapas armados al azar para las misiones. 'chance': de cada 100 misiones, cuantas usan un mapa generado (el resto usa los mapas hechos a mano de data/mapas). Cada estilo tiene peso (que tan seguido sale), nombres posibles y una descripcion que se muestra antes de la mision. El jugador siempre entra por la izquierda y los enemigos por la derecha. 'edificios' y 'barriles': [minimo, maximo] por mapa. Los edificios tapan todo pero se pueden derribar; los barriles revientan (ver reglas.destructibles).",
   "chance": 80,
   "estilos": {
     "campo": {
       "peso": 20,
-      "nombres": ["Llanura de chatarra", "Playón de cargas", "Campo de baterías", "Pista de aterrizaje rota", "Basural de fundición"],
-      "descripcion": "Terreno abierto con cobertura desparramada. El que se queda quieto al descubierto, cae."
+      "nombres": [
+        "Llanura de chatarra",
+        "Playón de cargas",
+        "Campo de baterías",
+        "Pista de aterrizaje rota",
+        "Basural de fundición"
+      ],
+      "descripcion": "Terreno abierto con cobertura desparramada. El que se queda quieto al descubierto, cae.",
+      "edificios": [
+        0,
+        2
+      ],
+      "barriles": [
+        1,
+        3
+      ]
     },
     "rio": {
       "peso": 18,
-      "nombres": ["Cauce ácido", "Canal de desechos", "Arroyo corrosivo", "Desagüe de la planta"],
-      "descripcion": "Un río de ácido corta el mapa. Hay pocos puentes: el que los controla, controla la pelea."
+      "nombres": [
+        "Cauce ácido",
+        "Canal de desechos",
+        "Arroyo corrosivo",
+        "Desagüe de la planta"
+      ],
+      "descripcion": "Un río de ácido corta el mapa. Hay pocos puentes: el que los controla, controla la pelea.",
+      "edificios": [
+        0,
+        1
+      ],
+      "barriles": [
+        0,
+        2
+      ]
     },
     "ruinas": {
       "peso": 18,
-      "nombres": ["Barrio abandonado", "Caserío saqueado", "Ruinas de la colonia", "Galpones caídos"],
-      "descripcion": "Edificios en ruinas con pocas entradas. Se pelea de cerca y a la vuelta de cada esquina."
+      "nombres": [
+        "Barrio abandonado",
+        "Caserío saqueado",
+        "Ruinas de la colonia",
+        "Galpones caídos"
+      ],
+      "descripcion": "Edificios en ruinas con pocas entradas. Se pelea de cerca y a la vuelta de cada esquina.",
+      "edificios": [
+        0,
+        1
+      ],
+      "barriles": [
+        1,
+        2
+      ]
     },
     "canon": {
       "peso": 16,
-      "nombres": ["Quebrada", "Paso de montaña", "Cañadón seco", "Garganta del viento"],
-      "descripcion": "Paredes de roca que se cierran. Poco lugar para flanquear: hay que empujar de frente."
+      "nombres": [
+        "Quebrada",
+        "Paso de montaña",
+        "Cañadón seco",
+        "Garganta del viento"
+      ],
+      "descripcion": "Paredes de roca que se cierran. Poco lugar para flanquear: hay que empujar de frente.",
+      "edificios": [
+        0,
+        0
+      ],
+      "barriles": [
+        1,
+        2
+      ]
     },
     "deposito": {
       "peso": 14,
-      "nombres": ["Depósito de contenedores", "Patio de maniobras", "Puerto seco", "Almacén a cielo abierto"],
-      "descripcion": "Filas de contenedores con pasillos entre medio. Buena cobertura, mala visión."
+      "nombres": [
+        "Depósito de contenedores",
+        "Patio de maniobras",
+        "Puerto seco",
+        "Almacén a cielo abierto"
+      ],
+      "descripcion": "Filas de contenedores con pasillos entre medio. Buena cobertura, mala visión.",
+      "edificios": [
+        0,
+        1
+      ],
+      "barriles": [
+        2,
+        4
+      ]
     },
     "crater": {
       "peso": 14,
-      "nombres": ["Cráter de impacto", "Pozo de fundición", "Hundimiento", "Boca de la mina"],
-      "descripcion": "Un pozo en el medio obliga a rodear por los costados. Cuidado con quedar encerrado."
+      "nombres": [
+        "Cráter de impacto",
+        "Pozo de fundición",
+        "Hundimiento",
+        "Boca de la mina"
+      ],
+      "descripcion": "Un pozo en el medio obliga a rodear por los costados. Cuidado con quedar encerrado.",
+      "edificios": [
+        0,
+        1
+      ],
+      "barriles": [
+        0,
+        2
+      ]
     }
   }
 }
