@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 52,
-  "cambio": "Variantes de piso, muros y objetos: más variedad en cada mapa",
+  "numero": 53,
+  "cambio": "texture_test",
   "novedades": [
+    "v0.53 · texture_test",
     "v0.52 · Variantes de piso, muros y objetos: más variedad en cada mapa",
     "v0.51 · Barriles nuevos en el mapa, y el arte de 32 píxeles ocupa la casilla entera",
     "v0.50 · Barras de vida nuevas: con rayitas cada 10 puntos, y los mechas golpeados ya se ven golpeados",
     "v0.49 · Los mechas ya no se quedan parados sobre el ácido",
-    "v0.48 · Nueva orden: reventar barriles con enemigos al lado",
-    "v0.47 · Edificios que se derrumban y barriles que explotan"
+    "v0.48 · Nueva orden: reventar barriles con enemigos al lado"
   ]
 }
