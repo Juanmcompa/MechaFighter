@@ -1,0 +1,72 @@
+/* Taller del desarrollador (admin.html). Usa el estilo del juego; aca solo el armado de la pantalla. */
+body.taller { padding: 12px; }
+#taller { max-width: 1400px; margin: 0 auto; display: grid; gap: 12px; }
+.taller-cabecera { display: grid; gap: 8px; position: sticky; top: 0; z-index: 5; padding: 8px 0; background: var(--consola, #0e1712); }
+.taller-titulo { display: flex; gap: 10px; align-items: baseline; }
+.taller-titulo strong { font: 400 26px 'Pixelify Sans', sans-serif; color: var(--fosforo); letter-spacing: 3px; }
+.taller-titulo span { color: var(--texto-tenue); }
+.taller-carpeta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.taller-pestanas { display: flex; flex-wrap: wrap; gap: 6px; }
+.taller-pestanas .pestana { flex: 1 1 160px; display: flex; gap: 6px; justify-content: center; align-items: center; min-height: 40px; }
+.taller-aviso { margin: 0; min-height: 1.2em; font-size: 16px; }
+.taller-aviso.bien, .bien { color: var(--fosforo); }
+.taller-aviso.error, .error, .mal { color: var(--alarma); }
+.taller-cuerpo { display: grid; gap: 12px; }
+.tl-columnas { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 12px; align-items: start; }
+.tl-columnas > * { min-width: 0; display: grid; gap: 12px; }
+@media (max-width: 900px) { .tl-columnas { grid-template-columns: 1fr; } }
+.tl-mechas { display: grid; gap: 8px; }
+.tl-mecha { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; border: 1px solid var(--chapa-borde); padding: 6px 8px; }
+.tl-mecha legend { color: var(--fosforo); }
+.tl-mecha label, .tl-config label, .tl-armado label { display: grid; gap: 2px; font-size: 14px; color: var(--texto-tenue); }
+.tl-config { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+select, input[type=text], input[type=number], input[type=search], textarea {
+  font: inherit; font-size: 15px; color: var(--texto); background: #0b120d; border: 1px solid var(--chapa-borde); padding: 4px 6px; min-width: 0; max-width: 100%; }
+textarea { width: 100%; resize: vertical; font-family: 'VT323', monospace; }
+textarea.mal { border-color: var(--alarma); }
+.tl-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px; padding: 6px 0; }
+.tl-controles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tl-resultado { margin: 0; font-size: 18px; }
+.tl-armado { display: grid; gap: 6px; }
+.tl-slot { display: grid; grid-template-columns: 40px 1fr; gap: 8px; align-items: center; }
+.tl-icono { width: 36px; height: 36px; image-rendering: pixelated; object-fit: contain; }
+.tl-icono.vacio { display: block; border: 1px dashed var(--chapa-borde); }
+.tl-icono-grande { width: 96px; height: 96px; image-rendering: pixelated; object-fit: contain; }
+.tl-visor-caja { display: grid; place-items: center; padding: 8px; background: #050806; border: 2px solid var(--chapa-borde); }
+.tl-visor { image-rendering: pixelated; }
+.tl-mini { width: 48px; height: 48px; image-rendering: pixelated; object-fit: contain; background: #1a221c; }
+.tl-nuevos { display: grid; gap: 8px; max-height: 60vh; overflow: auto; }
+.tl-nuevo { display: grid; grid-template-columns: 52px 1fr; gap: 8px; align-items: start; border-bottom: 1px solid var(--chapa-borde); padding-bottom: 6px; }
+.tl-galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; max-height: 50vh; overflow: auto; }
+.tl-galeria figure { margin: 0; display: grid; justify-items: center; gap: 2px; }
+.tl-galeria figcaption { font-size: 12px; color: var(--texto-tenue); word-break: break-all; text-align: center; }
+.tl-filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tl-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 75vh; overflow: auto; }
+.tl-item { width: 100%; display: flex; gap: 8px; align-items: center; text-align: left; padding: 4px 6px; font: inherit; color: var(--texto); background: #111a14; border: 1px solid transparent; cursor: pointer; }
+.tl-item.activa { border-color: var(--fosforo); background: #13301a; }
+.tl-item span { display: grid; }
+.tl-item small { color: var(--texto-tenue); font-size: 13px; }
+.tl-editor { display: grid; gap: 10px; }
+.tl-editor-cabecera { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tl-editor-cabecera h3 { margin: 0; color: var(--fosforo); }
+.tl-previas { display: flex; gap: 12px; align-items: center; padding: 6px; background: #050806; border: 1px solid var(--chapa-borde); }
+.tl-previa { width: 192px; height: 192px; image-rendering: pixelated; }
+.tl-campos { display: grid; gap: 4px; }
+.tl-campo { display: grid; grid-template-columns: 170px 1fr 32px; gap: 6px; align-items: start; }
+.tl-campo label { color: var(--texto-tenue); font-size: 15px; padding-top: 4px; word-break: break-all; }
+.tl-campo.nuevo { grid-template-columns: 170px 1fr auto; }
+.boton.peligro { border-color: var(--alarma); color: var(--alarma); }
+.tl-errores ul { margin: 4px 0 0; font-size: 14px; }
+.tl-tabla-textos { width: 100%; border-collapse: collapse; }
+.tl-tabla-textos th { text-align: left; color: var(--fosforo); position: sticky; top: 0; background: var(--visor, #0b120d); padding: 4px; }
+.tl-tabla-textos td { vertical-align: top; padding: 3px 4px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.tl-tabla-textos td:first-child { width: 22%; }
+.tl-ruta code { font-size: 13px; color: var(--texto-tenue); word-break: break-all; }
+.tl-acciones { display: inline-flex; gap: 2px; margin-left: 4px; }
+.tl-acciones .boton-icono { width: 24px; height: 24px; min-height: 0; font-size: 16px; }
+.tl-controles .boton-icono.control { width: 52px; height: 42px; font-size: 18px; }
+.tl-filtros > select, .tl-filtros > input { width: auto; flex: 0 1 220px; }
+.tl-filtros > input[type=search] { flex: 1 1 220px; }
+.boton.peligro { background: #2a0f0b; border-color: var(--alarma); color: var(--alarma); }
+input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--fosforo); vertical-align: middle; }
+.tl-config label:has(input[type=checkbox]) { display: flex; gap: 6px; align-items: center; }

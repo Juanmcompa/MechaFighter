@@ -11,10 +11,11 @@ import { crearAzar } from '../core/azar.js';
 const ANCHO = 24, ALTO = 16;
 const LEYENDA = { '.': 'piso', '#': 'muro', h: 'media_cobertura', H: 'cobertura_total', '~': 'peligro' };
 
-export function generarMapa(datos, semilla) {
+export function generarMapa(datos, semilla, estiloForzado = null) {
   const G = datos.generador_mapas;
   const az = crearAzar(semilla);
-  const estilo = az.elegirConPeso(Object.entries(G.estilos).map(([k, v]) => [k, v.peso]));
+  const sorteado = az.elegirConPeso(Object.entries(G.estilos).map(([k, v]) => [k, v.peso]));
+  const estilo = estiloForzado && G.estilos[estiloForzado] ? estiloForzado : sorteado;
   const g = [];
   for (let y = 0; y < ALTO; y++) g.push(Array(ANCHO).fill('.'));
   const poner = (x, y, c) => { if (x > 0 && y > 0 && x < ANCHO - 1 && y < ALTO - 1) g[y][x] = c; };

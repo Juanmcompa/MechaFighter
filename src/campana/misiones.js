@@ -21,9 +21,12 @@ function escuadra(datos, azar, lista, dificultad) {
 export function armarMision(datos, plantillaId, dificultad, azar, nivel = dificultad, cambios = null) {
   const tpl = cambios ? { ...datos.misiones[plantillaId], ...cambios } : datos.misiones[plantillaId];
   // la mayoria de las veces el mapa se arma al azar (ver generador_mapas.json); si no, uno hecho a mano
+  // (tpl.forzarMapa: el taller elige el mapa a mano: 'generado:<estilo>' o el id de un mapa hecho a mano)
   const G = datos.generador_mapas;
-  const plano = G && azar.tirada(G.chance) ? generarMapa(datos, azar.entero(1, 999999999)) : null;
-  const mapaId = plano ? 'generado' : azar.elegir(tpl.mapas);
+  const forzado = tpl.forzarMapa || null;
+  const plano = forzado ? (forzado.startsWith('generado') ? generarMapa(datos, azar.entero(1, 999999999), forzado.split(':')[1] || null) : null)
+    : G && azar.tirada(G.chance) ? generarMapa(datos, azar.entero(1, 999999999)) : null;
+  const mapaId = plano ? 'generado' : forzado || azar.elegir(tpl.mapas);
   const mapa = plano || datos.mapas[mapaId];
   const p = tpl.parametros || {};
   const m = {

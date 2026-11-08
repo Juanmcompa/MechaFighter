@@ -4,7 +4,10 @@
 // No sabe si esta en el navegador o en Node: recibe una funcion leer(ruta) que devuelve el JSON ya leido.
 // En el navegador es fetch; en las pruebas y en el servidor, el disco.
 
-export async function cargarDatos(leer) {
+import { aplicarIdioma } from './idiomas.js';
+
+// idioma: codigo ('en', 'pt'...) o nada para castellano. Si no hay archivo de ese idioma, queda en castellano.
+export async function cargarDatos(leer, idioma = null) {
   const indice = await leer('data/indice.json');
   const datos = {};
   for (const nombre of indice.tablas) {
@@ -13,6 +16,9 @@ export async function cargarDatos(leer) {
   datos.mapas = {};
   for (const id of indice.mapas) {
     datos.mapas[id] = sinAyuda(await leer('data/mapas/' + id + '.json'));
+  }
+  if (idioma && idioma !== 'es') {
+    try { aplicarIdioma(datos, await leer('data/idiomas/' + idioma + '.json')); } catch { /* sin traduccion */ }
   }
   return congelar(datos);
 }

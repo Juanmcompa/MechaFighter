@@ -43,6 +43,20 @@ npx serve .
 
 y abrir la dirección que muestra. Para las pruebas, con [Node.js](https://nodejs.org) 22 o más nuevo: `npm test`.
 
+## Taller (herramienta local)
+
+`admin.html` es el taller del desarrollador, para revisar todo antes de publicar. Con el servidor local corriendo,
+abrir `http://localhost:3000/admin.html` (o la dirección que muestre) en **Chrome o Edge** y tocar
+*Elegir carpeta del proyecto* (la carpeta MechaFighter): así lo que se guarda queda directo en los archivos, listo
+para el commit. Sin carpeta, *Guardar* descarga el archivo.
+
+- **Batalla de prueba:** escuadrón armado pieza por pieza contra las escuadras que elijas, en el mapa que elijas.
+- **Sprites:** el mecha montado en grande, girando y caminando; carga arte nuevo (PNG de 32×32) para probarlo.
+- **Piezas y datos:** alta, baja y modificación de piezas, enemigos, escuadras, clases, habilidades y misiones.
+  Valida antes de guardar.
+- **Textos e idiomas:** todas las frases del juego, con una columna por idioma (`data/idiomas/<código>.json`).
+  Para jugar en otro idioma: `?idioma=en` al final de la dirección.
+
 ## Cómo está hecho
 
 HTML, CSS y JavaScript sin dependencias ni compilación. El combate es **determinista**: mismo escuadrón, misma misión

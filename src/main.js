@@ -18,7 +18,10 @@ async function arrancar() {
   let datos;
   try {
     linea('Enlazando con el hangar...');
-    datos = await cargarDatos(leerConFetch());
+    // idioma: ?idioma=en en la direccion, o el que quedo elegido (castellano si no hay)
+    let idioma = new URLSearchParams(location.search).get('idioma');
+    try { if (idioma) localStorage.setItem('mechafighter.idioma', idioma); else idioma = localStorage.getItem('mechafighter.idioma'); } catch { /* sin guardado */ }
+    datos = await cargarDatos(leerConFetch(), idioma);
   } catch (e) {
     linea(e.message, 'error');
     if (location.protocol === 'file:') linea('Abrí el juego con un servidor local (ver README).', 'aviso');

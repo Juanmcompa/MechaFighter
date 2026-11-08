@@ -392,5 +392,36 @@
         ]
       }
     }
+  },
+  "doctrina_de_armado": {
+    "_ayuda": "Por qué existe cada clase de chasis (peso y movilidad). Es lore: todavía no se muestra en el juego; queda para la ficha de las piezas en el hangar.",
+    "pesos": {
+      "ligero": {
+        "origen": "Estructuras de drones exploradores de la Flota y vehículos de mensajería del Cinturón.",
+        "lore": "Están hechos de aleaciones baratas y plásticos industriales. La filosofía es simple: el mejor blindaje es no estar ahí cuando llegue el disparo.",
+        "tactica": "Ideales para esquivar fuego de artillería lenta y flanquear. Pero cargan poco: si le montás un cañón de riel a un torso liviano, el retroceso le arranca el brazo de cuajo."
+      },
+      "medio": {
+        "origen": "Exoesqueletos de carga, maquinaria minera y tractores portuarios.",
+        "lore": "Es la columna vertebral de la Cooperativa y los Transportistas. Nacieron para cargar cajas en los puertos espaciales, pero resulta que también son buenísimos para cargar ametralladoras rotativas.",
+        "tactica": "El equilibrio justo. Aguantan un par de impactos directos y pueden llevar casi cualquier combinación de armas sin recalentar los motores."
+      },
+      "pesado": {
+        "origen": "Chatarra militar pura: puertas de búnker, placas de cruceros caídos y tanques de asedio.",
+        "lore": "Son montañas de acero reciclado caminando por el campo de batalla. Lentos como un asteroide y carísimos de mantener, pero casi indestructibles de frente.",
+        "tactica": "El ancla del escuadrón. Atraen el fuego enemigo y tienen la energía para alimentar sistemas enormes, como lanzamisiles múltiples o escudos de placas."
+      }
+    },
+    "movilidad": {
+      "bipode": {
+        "lore": "El estándar humanoide. Copia la biomecánica básica para que cualquier piloto novato pueda caminar sin tropezarse con sus propios pies."
+      },
+      "orugas": {
+        "lore": "Tracción robada a excavadoras mineras. Sacrifican toda capacidad de esquivar a cambio de estabilidad perfecta para disparar artillería pesada."
+      },
+      "salto": {
+        "lore": "Diseñadas para abordajes en gravedad cero. Usan micropropulsores de maniobra para saltar por encima de las coberturas y caer a la espalda del enemigo."
+      }
+    }
   }
 }

@@ -226,12 +226,16 @@ function mechaConSprites(ctx, f, u) {
   ctx.save();
   ctx.rotate(Math.PI / 2);
   ctx.imageSmoothingEnabled = false;
-  // dibuja la parte id con su punto de enganche en (x, y); espejo = del lado izquierdo
-  const pieza = (id, x, y, espejo = false) => {
+  // dibuja la parte id con su punto de enganche en (x, y); espejo = del lado izquierdo.
+  // Piezas "de papel" (el arte nuevo de 32x32): todas comparten el centro del mecha y ya vienen ubicadas
+  // (el brazo y la pierna se dibujan del lado derecho; el izquierdo es el mismo espejado). Solo se mueve el paso.
+  const pieza = (id, x, y, espejo = false, pasoPapel = 0) => {
     const im = sprite(color, id);
     if (!im) return;
     const m = M(id);
-    const w = m.w / E, h = m.h / E, ax = m.ancla[0] / E, ay = m.ancla[1] / E;
+    const w = m.w / E, h = m.h / E;
+    const [ax, ay] = m.papel ? [w / 2, h / 2] : [m.ancla[0] / E, m.ancla[1] / E];
+    if (m.papel) { x = 0; y = pasoPapel; }
     ctx.save();
     ctx.translate(x, y);
     if (espejo) ctx.scale(-1, 1);
@@ -244,8 +248,8 @@ function mechaConSprites(ctx, f, u) {
     const orugas = piernas.includes('orugas');
     const dx = orugas ? tw * 0.42 : tw * 0.26;
     const dy = orugas ? 0 : th * 0.05;
-    pieza(piernas, dx, dy + (orugas ? 0 : zancada), false);
-    pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true);
+    pieza(piernas, dx, dy + (orugas ? 0 : zancada), false, orugas ? 0 : zancada);
+    pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true, orugas ? 0 : -zancada);
   }
   if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
   ctx.drawImage(torso, -tw / 2, -th / 2, tw, th);
@@ -534,6 +538,16 @@ function dibujarRestos(ctx, f) {
 }
 
 // Mecha grande para el hangar (sin rotar, mirando a la derecha).
+// Para el taller: un mecha girado (ang en radianes, 0 = mirando a la derecha), con el paso y el golpe que se pida
+export function dibujarMechaVisor(ctx, ficha, lado, { ang = -Math.PI / 2, paso = 0.25, golpe = 0, zoom = 1 } = {}) {
+  ctx.save();
+  ctx.translate(lado / 2, lado / 2);
+  ctx.scale((lado / 34) * zoom, (lado / 34) * zoom);
+  ctx.rotate(ang);
+  dibujarMecha(ctx, ficha, { paso, golpe, marcas: ficha.marcas || 0 });
+  ctx.restore();
+}
+
 export function dibujarMechaFicha(ctx, ficha, lado) {
   ctx.clearRect(0, 0, lado, lado);
   ctx.save();
