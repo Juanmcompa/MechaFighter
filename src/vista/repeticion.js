@@ -5,6 +5,17 @@ import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, mover
 import { crearTablero, lineaDeTiro, distancia, caminable, cambiarCasilla } from '../motor/espacio.js';
 import { CAPAS, crearCompositor, colorLuz, girarNormales } from './luz.js';
 
+// Las velocidades de la batalla se cuentan desde la mitad de antes: 1x es tranquilo, 2x el viejo 1x
+const ESCALA_VELOCIDAD = 0.5;
+
+// Gira un angulo hacia otro, como mucho "paso" radianes
+function girarHacia(ang, obj, paso) {
+  let dif = obj - ang;
+  while (dif > Math.PI) dif -= Math.PI * 2;
+  while (dif < -Math.PI) dif += Math.PI * 2;
+  return ang + (Math.abs(dif) <= paso ? dif : Math.sign(dif) * paso);
+}
+
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
 // Anulaciones que se cuentan por radio con la voz del piloto (ver voces.json)
@@ -139,7 +150,7 @@ export class Repeticion {
 
   // Avanza el reloj (ms reales) y aplica los eventos que van tocando.
   avanzar(ms) {
-    if (!this.pausado && !this.terminado) this.T += (ms / this.msPorTick) * this.velocidad;
+    if (!this.pausado && !this.terminado) this.T += (ms / this.msPorTick) * this.velocidad * ESCALA_VELOCIDAD;
     while (this.i < this.registro.length && this.registro[this.i].t <= this.T) this.aplicar(this.registro[this.i++]);
     this.actualizarUnidades(ms);
     this.moverCamara(ms);
@@ -256,10 +267,12 @@ export class Repeticion {
     for (const u of vivas) {
       if (!u.ficha.apariencia) continue; // solo los mechas tienen faro
       const def = u.ficha.bando === 0 ? cfg.faro : cfg.faro_enemigo || cfg.faro;
-      const extra = { dir: direccion(u.ang), cono: ((def.cono || 35) * Math.PI) / 180, suave: 0.12 };
+      // el faro va con la cabeza (que mira al enemigo mas cerca)
+      const ac = u.angCabeza ?? u.ang;
+      const extra = { dir: direccion(ac), cono: ((def.cono || 35) * Math.PI) / 180, suave: 0.12 };
       // faros marcados en el dibujo (amarillo #ffff00), o uno en el medio
       if (u.faros === undefined) u.faros = farosDe(u.ficha);
-      const c = Math.cos(u.ang), s = Math.sin(u.ang);
+      const c = Math.cos(ac), s = Math.sin(ac);
       if (u.faros) for (const [fw, rt] of u.faros) sumar(u.x + 0.5 + c * fw - s * rt, u.y + 0.5 + s * fw + c * rt, def, extra, u.faros.length > 1 ? 0.7 : 1);
       else sumar(u.x + 0.5 + c * 0.25, u.y + 0.5 + s * 0.25, def, extra);
     }
@@ -347,7 +360,9 @@ export class Repeticion {
       case 'salta':
         if (!u) break;
         u.desde = [u.hacia[0], u.hacia[1]]; u.hacia = e.a; u.t0 = e.t; u.dur = Math.max(1, e.d); u.salto = e.tipo === 'salta';
-        u.angObj = Math.atan2(e.a[1] - u.desde[1], e.a[0] - u.desde[0]);
+        u.angMov = Math.atan2(e.a[1] - u.desde[1], e.a[0] - u.desde[0]);
+        // el torso sigue al que esta encañonando (si no, mira hacia donde camina)
+        if (!(u.apunta && this.T < u.apunta.hasta)) u.angObj = u.angMov;
         u.pisoPendiente = true;
         break;
       case 'dispara': {
@@ -356,7 +371,10 @@ export class Repeticion {
         this.efectos.push({ tipo: 'fijado', id: o.id, t0: this.T, dur: 5, propio: o.ficha.bando === 0 });
         this.accion.set(u.id, e.t); this.accion.set(o.id, e.t);
         u.angObj = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
-        u.retroceso = 1;
+        u.apunta = { id: o.id, hasta: e.t + 14 };
+        // cuerpo a cuerpo: embestida y el brazo que pega sale para adelante; a distancia: retroceso
+        if (e.arma === 'tajo' || e.arma === 'garra') { u.retroceso = -1.6; u.estocada = 1; u.estocadaSlot = e.slot; }
+        else u.retroceso = 1;
         const tiro = u.tiros = (u.tiros || 0) + 1; // para turnar los cañones
         this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, n: tiro, t0: this.T, dur: 1.6 });
         const desvio = e.acierta ? 0 : 0.6;
@@ -593,13 +611,45 @@ export class Repeticion {
 
   actualizarUnidades(ms) {
     for (const u of this.unidades.values()) {
-      const dtTicks = this.pausado ? 0 : (ms / this.msPorTick) * this.velocidad;
-      // Girar lleva tiempo: el torso de los pesados tarda en encarar (se nota el peso al apuntar y al doblar).
-      let dif = u.angObj - u.ang;
-      while (dif > Math.PI) dif -= Math.PI * 2;
-      while (dif < -Math.PI) dif += Math.PI * 2;
+      const dtTicks = this.pausado ? 0 : (ms / this.msPorTick) * this.velocidad * ESCALA_VELOCIDAD;
+      // Cada parte gira por su lado (se nota el peso):
+      //  - las piernas, hacia donde camina, rapido;
+      //  - el torso (con los brazos), hacia el que esta atacando mientras lo tiene encañonado; si no, hacia donde
+      //    camina. Es lo mas lento: los pesados tardan en encarar;
+      //  - la cabeza, siempre al enemigo mas cerca, rapida (y sin pasarse de lo que da el cuello).
+      if (u.apunta && this.T < u.apunta.hasta) {
+        const o = this.unidades.get(u.apunta.id);
+        if (o && o.viva) u.angObj = Math.atan2(o.y - u.y, o.x - u.x);
+        else u.apunta = null;
+      }
       const giro = [0.7, 0.4, 0.3, 0.22][u.peso] * dtTicks;
-      u.ang += Math.abs(dif) <= giro ? dif : Math.sign(dif) * giro;
+      u.ang = girarHacia(u.ang, u.angObj, giro * 0.75);
+      if (u.angPiernas === undefined) { u.angPiernas = u.ang; u.angCabeza = u.ang; }
+      u.angPiernas = girarHacia(u.angPiernas, u.angMov ?? u.angPiernas, giro * 1.8);
+      if (u.viva && u.ficha.apariencia) {
+        let cerca = null, dMin = 81;
+        for (const o of this.unidades.values()) {
+          if (!o.viva || o.ficha.bando === u.ficha.bando) continue;
+          const d = (o.x - u.x) ** 2 + (o.y - u.y) ** 2;
+          if (d < dMin) { dMin = d; cerca = o; }
+        }
+        let quiere = cerca ? Math.atan2(cerca.y - u.y, cerca.x - u.x) : u.ang;
+        // el cuello da hasta 100 grados para cada lado del torso
+        let rel = quiere - u.ang;
+        while (rel > Math.PI) rel -= Math.PI * 2;
+        while (rel < -Math.PI) rel += Math.PI * 2;
+        quiere = u.ang + Math.max(-1.75, Math.min(1.75, rel));
+        u.angCabeza = girarHacia(u.angCabeza, quiere, giro * 2.5);
+      }
+      // estocada (cuerpo a cuerpo): el brazo sale para adelante y vuelve
+      if (u.estocada > 0) u.estocada = Math.max(0, u.estocada - dtTicks / 3);
+      // sacudon de lo que va arriba de las piernas, al ritmo de los pasos (los pesados se sacuden mas)
+      if (u.anda && u.peso && u.viva) {
+        const tic = Math.floor(this.T * 3), sem = (u.semilla ??= [...u.id].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) % 997);
+        const r = (n) => (((tic * 9301 + sem * 49297 + n * 233) % 233280) / 233280 - 0.5);
+        const amp = [0, 0.25, 0.4, 0.6][u.peso] * (0.6 + Math.abs(Math.sin(u.paso * Math.PI * 2)));
+        u.sacude = [r(1) * amp, r(2) * amp];
+      } else u.sacude = null;
       if (u.dur && this.T < u.t0 + u.dur && u.viva) {
         const k = Math.max(0, Math.min(1, (this.T - u.t0) / u.dur));
         // Un mecha da pasos: arranca, carga el peso y frena en cada casilla (curva suave). La infanteria corre parejo.
@@ -625,6 +675,7 @@ export class Repeticion {
       }
       if (u.ficha.figuras && u.viva) moverTropa(u, this.T, dtTicks, (x, y) => caminable(this.tablero, x, y));
       if (u.retroceso > 0) u.retroceso = Math.max(0, u.retroceso - dtTicks / 2.5);
+      else if (u.retroceso < 0) u.retroceso = Math.min(0, u.retroceso + dtTicks / 2.5); // la embestida del cuerpo a cuerpo
       if (u.golpe > 0) u.golpe = Math.max(0, u.golpe - ms / 180);
       if (u.grito && this.T > u.grito.hasta) u.grito = null;
     }
@@ -754,8 +805,16 @@ export class Repeticion {
           ctx.fillStyle = COLOR_TRAZO[f.tipo];
           ctx.beginPath(); ctx.arc(x0 + (x1 - x0) * k, y0 + (y1 - y0) * k, L * 0.12, 0, Math.PI * 2); ctx.fill();
         } else if (f.tipo === 'tajo' || f.tipo === 'garra') {
-          ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.arc(x1, y1, L * 0.35, k * 3, k * 3 + 1.8); ctx.stroke();
+          // un tajo ancho que barre de un lado al otro, cruzando al que recibe
+          const a0 = Math.atan2(y1 - y0, x1 - x0) - Math.PI / 2;
+          const barrido = a0 - 1.2 + Math.min(1, k * 2.2) * 2.4;
+          ctx.lineCap = 'round';
+          for (const [ancho, alfa, r] of [[L * 0.16, 0.35, 0.5], [L * 0.07, 0.9, 0.48]]) {
+            ctx.globalAlpha = (1 - k) * alfa;
+            ctx.lineWidth = ancho;
+            ctx.beginPath(); ctx.arc(x1, y1, L * r, Math.min(barrido, a0 - 1.2 + 0.2), barrido); ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
         } else {
           ctx.lineWidth = f.tipo === 'riel' ? 3 : f.tipo === 'rafaga' ? 1 : 1.5;
           ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();

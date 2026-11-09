@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 70,
-  "cambio": "texture_qual_update",
+  "numero": 71,
+  "cambio": "Mechas con más peso: piernas, torso y cabeza giran por separado, y batallas más tranquilas",
   "novedades": [
+    "v0.71 · Mechas con más peso: piernas, torso y cabeza giran por separado, y batallas más tranquilas",
     "v0.70 · texture_qual_update",
     "v0.69 · La mochila se dibuja encima del torso",
     "v0.68 · RETEXTURE_HOTFIX",
     "v0.67 · texture_fix2",
-    "v0.66 · Cada bando con su propio brillo: el escudo azul ya no brilla rojo",
-    "v0.65 · Los faros salen de donde los dibujes: píxel amarillo en la cabeza"
+    "v0.66 · Cada bando con su propio brillo: el escudo azul ya no brilla rojo"
   ]
 }

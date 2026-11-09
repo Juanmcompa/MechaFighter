@@ -25,7 +25,7 @@ export function batalla(app, raiz) {
   const feed = h('ol', { class: 'feed', 'aria-live': 'polite' });
   const plantel = h('ul', { class: 'plantel' });
   const reloj = h('span', { class: 'reloj' }, '00:00');
-  const velocidades = [1, 2, 4];
+  const velocidades = [0.5, 1, 2, 4, 8];
   const botones = {};
   const final = h('div', { class: 'final oculto' });
 
@@ -50,7 +50,7 @@ export function batalla(app, raiz) {
       h('div', { class: 'visor visor-reloj' }, reloj)),
     h('div', { class: 'controles', role: 'group', 'aria-label': 'Velocidad' },
       (botones.pausa = botonIcono('pausa', 'Pausa', () => { rep.pausado = !rep.pausado; marcar(); }, 'control')),
-      ...velocidades.map((v) => (botones[v] = h('button', { class: 'boton-icono control vel', 'aria-label': 'Velocidad ' + v, onclick: () => { rep.velocidad = v; rep.pausado = false; marcar(); } }, v + 'x'))),
+      ...velocidades.map((v) => (botones[v] = h('button', { class: 'boton-icono control vel', 'aria-label': 'Velocidad ' + v, onclick: () => { rep.velocidad = v; rep.pausado = false; marcar(); } }, (v < 1 ? '½' : v) + 'x'))),
       botonIcono('saltar', 'Ver el final', () => rep.saltarAlFinal(), 'control')),
     h('div', { class: 'columnas-batalla' },
       h('div', { class: 'col-campo' }, plantel, envoltura),

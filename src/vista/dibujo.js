@@ -388,6 +388,10 @@ function mechaConSprites(ctx, f, u) {
   };
   const zancada = Math.sin(u.paso * Math.PI * 2) * 1.6;
   const piernas = a.piernas;
+  // cada parte puede mirar para otro lado (ver repeticion: angPiernas, angCabeza): se giran respecto del torso
+  const rel = (x) => { let d = (x ?? u.ang ?? 0) - (u.ang ?? 0); while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return d; };
+  ctx.save();
+  ctx.rotate(rel(u.angPiernas));
   // Piernas animadas: si existen <piernas>_1, _2 (y _3), son los cuadros del caminar de UNA pierna (la derecha).
   // La izquierda usa el mismo dibujo espejado, medio paso corrido. Quieto, se usa el dibujo de siempre.
   const cuadros = [];
@@ -406,12 +410,37 @@ function mechaConSprites(ctx, f, u) {
     pieza(piernas, dx, dy + (orugas ? 0 : zancada), false, orugas ? 0 : zancada);
     pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true, orugas ? 0 : -zancada);
   }
+  ctx.restore();
+  // de las piernas para arriba: se sacude con los pasos
+  if (u.sacude) ctx.translate(u.sacude[0], u.sacude[1]);
   pintar(ctx, torso, -tw / 2, -th / 2, tw, th);
   // la mochila va encima del torso (se ve desde arriba, colgada en la espalda)
   if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
-  if (a.brazo_der) pieza(a.brazo_der, tw * 0.5, -th * 0.05, false);
-  if (a.brazo_izq) pieza(a.brazo_izq, -tw * 0.5, -th * 0.05, true);
-  if (a.cabeza) pieza(a.cabeza, 0, -th * 0.12);
+  // brazos; el que pega cuerpo a cuerpo sale para adelante y barre
+  const brazo = (slot, x, espejo) => {
+    const id = a[slot];
+    if (!id) return;
+    if (u.estocada > 0 && u.estocadaSlot === slot) {
+      const k = 1 - u.estocada; // 0 -> 1
+      const avance = Math.sin(k * Math.PI) * th * 0.55;
+      const barre = (0.7 - k * 1.4) * (espejo ? -1 : 1);
+      ctx.save();
+      // (las piezas de papel ya vienen ubicadas: solo se corren para adelante)
+      if (M(id).papel) ctx.translate(0, -avance); else ctx.translate(x, -th * 0.05 - avance);
+      ctx.rotate(barre);
+      pieza(id, 0, 0, espejo);
+      ctx.restore();
+    } else pieza(id, x, -th * 0.05, espejo);
+  };
+  brazo('brazo_der', tw * 0.5, false);
+  brazo('brazo_izq', -tw * 0.5, true);
+  if (a.cabeza) {
+    ctx.save();
+    if (!M(a.cabeza).papel) ctx.translate(0, -th * 0.12);
+    ctx.rotate(rel(u.angCabeza));
+    pieza(a.cabeza, 0, 0);
+    ctx.restore();
+  }
   // marcas de bajas pintadas en la espalda del torso: palitos de a cinco, como en una celda
   const marcas = Math.min(u.marcas || f.marcas || 0, 15);
   if (marcas) {

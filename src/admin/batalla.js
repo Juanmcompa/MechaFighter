@@ -103,7 +103,7 @@ export function pestanaBatalla(T, raiz) {
     boton('Pelear', pelear, { iconoNombre: 'espadas', clase: 'principal' }),
     boton('Otra semilla', () => { E.semilla = Math.floor(Math.random() * 99999) + 1; pestanaRepintar(); pelear(); }, { iconoNombre: 'dado', clase: 'secundario' }),
     botonIcono('pausa', 'Pausa', () => { if (rep) rep.pausado = !rep.pausado; }, 'control'),
-    ...[1, 2, 4, 8].map((v) => h('button', { class: 'boton-icono control vel', onclick: () => { if (rep) { rep.velocidad = v; rep.pausado = false; } } }, v + 'x')),
+    ...[0.5, 1, 2, 4, 8].map((v) => h('button', { class: 'boton-icono control vel', onclick: () => { if (rep) { rep.velocidad = v; rep.pausado = false; } } }, v + 'x')),
     botonIcono('saltar', 'Ver el final', () => rep && rep.saltarAlFinal(), 'control'),
     botonIcono('mapa', 'Cámara: todo el mapa / acción', () => rep && rep.alternarGeneral(), 'control'));
 
