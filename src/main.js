@@ -40,7 +40,7 @@ async function arrancar() {
     return;
   }
   linea('Calibrando sensores...');
-  await Promise.all([cargarSprites('./', (datos.reglas.arte || {}).retratos || 0), cargarTerreno('./'), cargarUnidades('./'), cargarLuces('./')]);
+  await Promise.all([cargarSprites('./', (datos.reglas.arte || {}).retratos || 0, { extras: Object.values(datos.partes).map((p) => p.sprite), colorEquipo: (datos.reglas.arte || {}).color_equipo }), cargarTerreno('./'), cargarUnidades('./'), cargarLuces('./')]);
   const app = crearApp(datos, raiz);
   window.mechafighter = app; // para las pruebas y para mirar desde la consola
   app.ir('portada');

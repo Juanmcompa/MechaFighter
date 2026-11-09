@@ -12,7 +12,9 @@ function cargarImagen(src) {
   });
 }
 
-export async function cargarSprites(base = './', cantidadRetratos = 0) {
+// extras: ids de sprite que usan las piezas (data/partes.json) aunque no esten en sprites.json (arte nuevo);
+// colorEquipo: reglas.arte.color_equipo, para pintar el color de bando cuando falta la version de un color
+export async function cargarSprites(base = './', cantidadRetratos = 0, { extras = [], colorEquipo = null } = {}) {
   try {
     const r = await fetch(base + 'assets/mecha/sprites.json', { cache: 'no-cache' });
     if (!r.ok) return SPR;
@@ -27,6 +29,23 @@ export async function cargarSprites(base = './', cantidadRetratos = 0) {
       }
     }
     await Promise.all(pedidos);
+    // arte nuevo que todavia no esta en sprites.json: se carga igual y se mide solo
+    await Promise.all([...new Set(extras)].filter((id) => id && !meta[id]).map(async (id) => {
+      const im = await cargarImagen(base + 'assets/mecha/azul/' + id + '.png');
+      if (!im) return;
+      im._luz = 'mecha/' + id;
+      // 32 pixeles = una casilla, como el arte "de papel"; si mide justo multiplos de 32, se arma como papel
+      const f = SPR.escala * (24 / 32);
+      const papel = im.width % 32 === 0 && im.height % 32 === 0;
+      meta[id] = { w: im.width * f, h: im.height * f, ancla: [im.width * f / 2, im.height * f / 2], ...(papel ? { papel: true } : {}) };
+      SPR.imgs['azul/' + id] = pintarEquipo(im, 'azul', colorEquipo);
+      for (const color of ['rojo', 'verde']) {
+        const otra = await cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png');
+        if (otra) otra._luz = im._luz;
+        // si las tres son el mismo dibujo (o falta alguna), el color de bando se pinta solo
+        SPR.imgs[color + '/' + id] = pintarEquipo(otra || im, color, colorEquipo);
+      }
+    }));
     SPR.listo = Object.keys(SPR.imgs).length > 0;
     SPR.retratos = cantidadRetratos;
   } catch { /* sin sprites: se dibuja por codigo */ }
