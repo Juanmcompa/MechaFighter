@@ -19,6 +19,8 @@ import { desplegables, cumplirTareas } from './tareas.js';
 import { armarLore } from './lore.js';
 import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos, elegirJefeNemesis, nemesisComoJefe } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
+import { crearPlano, agregar, rodear, destinos, duenoEn, amenazasCerca, quien, esAmenaza, escalonDe, escalonPorId, indiceEscalon, sumarReputacion,
+  correrFrente, pasaElTiempo, nodrizaInicial, nivelModulo, valorModulo, combustibleMaximo, limitePilotos } from './brujula.js';
 
 export const VERSION_PARTIDA = 1;
 const MAX_HOJA_MEMORIAL = 6;
@@ -73,6 +75,7 @@ export function nuevaPartida(datos, semilla, legado = null) {
   p.inventario.push({ parte: 'brazo_rifle', afijos: [] }, { parte: 'mochila_municion', afijos: [] }, { parte: 'cabeza_radar', afijos: [] });
   // combustible, nombre y cronica del escuadron
   p.combustible = R.combustible.inicial;
+  p.reputacion = {}; p.nodriza = nodrizaInicial(datos); p.restos = 0;
   p.nombreEscuadron = az.elegir(datos.textos.nombres_escuadron);
   p.cronica = []; p.stats = {};
   anotar(p, 'Salieron del muelle ' + p.pilotos.map((x) => '«' + x.apodo + '»').join(', ') + '.' +
@@ -95,6 +98,7 @@ export function territorio(datos, n) {
   return D[n % D.length];
 }
 
+// Arma el sector: el plano (bandos, frente, amenazas), los nidos, la guarida del jefe y los primeros destinos.
 export function generarSector(datos, p) {
   const def = datos.sectores.campana_base;
   // campana infinita: los territorios se repiten en ronda, cada vuelta mas dificil
@@ -102,8 +106,6 @@ export function generarSector(datos, p) {
   const vuelta = Math.floor(p.sector / def.sectores_def.length);
   const az = azarDe(p, 'sector');
   const dif = def.dificultad_por_sector[p.sector] || def.dificultad_por_sector.at(-1);
-  const pesos = Object.entries(def.tipos_de_nodo);
-  const misionesPosibles = def.misiones_por_dificultad[String(dif)];
   const niveles = def.nivel_enemigo_por_sector || [];
   const extra = Math.max(0, p.sector - niveles.length + 1) * ((def.infinito || {}).nivel_extra_por_sector || 1);
   const nivel = p.sector < niveles.length ? niveles[p.sector] : (niveles.at(-1) || dif) + extra;
@@ -111,121 +113,162 @@ export function generarSector(datos, p) {
   const jefeNemesis = elegirJefeNemesis(p, p.sector);
   const heredero = vuelta > 0 && sdef.herederos && sdef.herederos.length ? sdef.herederos[(vuelta - 1) % sdef.herederos.length] : null;
   const nombreJefe = jefeNemesis ? '«' + jefeNemesis.apodo + '», ' + (sdef.titulo_jefe || 'jefe del sector') : heredero ? heredero.nombre : sdef.jefe.nombre;
-  const columnas = [];
-  for (let c = 0; c < def.columnas_por_sector; c++) {
-    const ultima = c === def.columnas_por_sector - 1;
-    const n = ultima ? 1 : az.entero(def.nodos_por_columna.min, def.nodos_por_columna.max);
-    const col = [];
-    for (let i = 0; i < n; i++) {
-      let tipo = ultima ? 'jefe' : c === 0 ? 'mision' : az.elegirConPeso(pesos);
-      if (tipo === 'mision' && col.filter((x) => x.tipo === 'mision').length >= 2) tipo = 'evento';
-      const nodo = { tipo };
-      if (tipo === 'mision') {
-        // fauna del sector: sus escuadras salen mas seguido (pesan doble) que las de la plantilla
-        const mid = az.elegir(misionesPosibles);
-        const fauna = sdef.fauna ? { enemigos: sdef.fauna.concat(sdef.fauna, datos.misiones[mid].enemigos) } : null;
-        nodo.mision = armarMision(datos, mid, dif, az, nivel, fauna);
-      }
-      if (tipo === 'jefe') {
-        const J = sdef.jefe;
-        if (jefeNemesis) {
-          // (la escolta un nivel abajo que la de un jefe comun: el nemesis ya pega como jefe)
-          nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel, { lider: null, enemigos: J.escuadras });
-          nemesisComoJefe(datos, p, nodo.mision, jefeNemesis, sdef.titulo_jefe || 'jefe del sector', az);
-        } else {
-          nodo.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });
-          nodo.mision.nombre = nombreJefe;
-          nodo.mision.jefe = { nombre: nombreJefe, frase: heredero ? heredero.frase : J.frase };
-        }
-        nodo.mision.descripcion = 'Objetivo del sector: ' + nombreJefe + '. ' + nodo.mision.descripcion;
-        nodo.mision.recompensa.creditos += 100;
-        nodo.mision.recompensa.botin += 1;
-      }
-      nodo.i = i;
-      col.push(nodo);
-    }
-    columnas.push(col);
-  }
-  // El escuadron de la campana anterior aparece en un contrato del sector indicado
-  const L = datos.reglas.legado;
-  if (p.encuentro && !p.encuentro.hecho && p.sector === L.sector_encuentro) {
-    const col = columnas[Math.min(L.columna_encuentro, columnas.length - 2)];
-    const k = Math.max(0, col.findIndex((n) => n.tipo === 'mision'));
-    col[k] = { tipo: 'mision', i: col[k].i, encuentro: true, mision: misionEncuentro(datos, p, az, dif, nivel) };
-  }
-  // Lore: quien manda cada contrato y que conviene llevar
-  for (const col of columnas) for (const nodo of col) if (nodo.mision) nodo.mision.lore = armarLore(datos, nodo.mision, p.sector);
-  // Caminos: cada nodo lleva a 1 o 2 de la columna siguiente (los de enfrente), y a cada nodo llega al menos uno.
-  for (let c = 0; c < columnas.length - 1; c++) {
-    const a = columnas[c], b = columnas[c + 1];
-    const frente = (i) => Math.round(((i + 0.5) / a.length) * b.length - 0.5);
-    for (const nodo of a) {
-      const j = Math.max(0, Math.min(b.length - 1, frente(nodo.i)));
-      nodo.sig = [j];
-      if (b.length > 1 && az.entero(def.enlaces_por_nodo.min, def.enlaces_por_nodo.max) > 1) {
-        const otro = j + (az.tirada(50) ? 1 : -1);
-        const k = otro >= 0 && otro < b.length ? otro : j + (j + 1 < b.length ? 1 : -1);
-        if (!nodo.sig.includes(k)) nodo.sig.push(k);
-      }
-    }
-    for (const nb of b) {
-      if (a.some((x) => x.sig.includes(nb.i))) continue;
-      // nadie llega: lo engancha el de enfrente
-      const cerca = a.slice().sort((x, y) => Math.abs(x.i / a.length - nb.i / b.length) - Math.abs(y.i / a.length - nb.i / b.length))[0];
-      cerca.sig.push(nb.i);
-    }
-    for (const nodo of a) nodo.sig.sort((x, y) => x - y);
-  }
   const nombre = sdef.nombre + (vuelta ? ' ' + ['', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][Math.min(vuelta, 9)] : '');
   const objetivo = jefeNemesis
     ? '«' + jefeNemesis.apodo + '» se quedó con ' + sdef.nombre + '. ' + (jefeNemesis.historia.slice(-1)[0] || '') + ' Encontralo y bajalo: esta vez no hay eyección.'
     : heredero ? heredero.nombre + ' se quedó con lo que dejó ' + sdef.jefe.nombre + '. Encontralo y bajalo.' : sdef.objetivo;
-  p.sectores[p.sector] = {
+  const s = {
     nombre, numero: p.sector + 1, objetivo, jefe: nombreJefe, jefeNemesis: jefeNemesis ? jefeNemesis.id : null,
-    dificultad: dif, nivel, columnas, inteligencia: 0
+    dificultad: dif, nivel, inteligencia: 0, bandoJefe: sdef.bando_jefe || null, amenazaJefe: sdef.amenaza_jefe || null
   };
-  p.columna = -1;
-  p.posicion = null; // en que nodo de la columna actual esta el escuadron
+  p.sectores[p.sector] = s;
+  crearPlano(datos, s, sdef, az);
+
+  // La guarida del jefe (se abre con inteligencia)
+  const J = sdef.jefe;
+  const jefe = agregar(s, { tipo: 'jefe', x: s.guarida.x, y: s.guarida.y });
+  if (jefeNemesis) {
+    // (la escolta un nivel abajo que la de un jefe comun: el nemesis ya pega como jefe)
+    jefe.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel, { lider: null, enemigos: J.escuadras });
+    nemesisComoJefe(datos, p, jefe.mision, jefeNemesis, sdef.titulo_jefe || 'jefe del sector', az);
+  } else {
+    jefe.mision = armarMision(datos, J.plantilla, dif + 1, az, nivel + 1, { lider: J.unidad, enemigos: J.escuadras });
+    jefe.mision.nombre = nombreJefe;
+    jefe.mision.jefe = { nombre: nombreJefe, frase: heredero ? heredero.frase : J.frase };
+  }
+  jefe.mision.descripcion = 'Objetivo del sector: ' + nombreJefe + '. ' + jefe.mision.descripcion;
+  jefe.mision.recompensa.creditos += 100;
+  jefe.mision.recompensa.botin += 1;
+  jefe.mision.objetivo = s.bandoJefe || s.amenazaJefe || null;
+  jefe.mision.lore = armarLore(datos, jefe.mision, p.sector);
+
+  // Los nidos de fauna son destinos fijos: limpiarlos los saca del mapa
+  for (const a of s.amenazas) {
+    if (a.tipo !== 'fauna') continue;
+    const n = agregar(s, { tipo: 'mision', nido: a.id, x: a.x, y: a.y });
+    n.mision = armarContrato(datos, p, s, n, az, 'fauna');
+    if (!n.mision) s.nodos.splice(s.nodos.indexOf(n), 1);
+  }
+
+  // El escuadron de la campana anterior aparece en un contrato del sector indicado
+  const L = datos.reglas.legado;
+  if (p.encuentro && !p.encuentro.hecho && p.sector === L.sector_encuentro) {
+    const ini = s.nodos.find((n) => n.i === s.actual);
+    const ang = Math.atan2(-ini.y, -ini.x); // hacia el centro
+    const n = agregar(s, { tipo: 'mision', encuentro: true, x: Math.round((ini.x + Math.cos(ang) * 2) * 100) / 100, y: Math.round((ini.y + Math.sin(ang) * 2) * 100) / 100 });
+    n.mision = misionEncuentro(datos, p, az, dif, nivel);
+    n.mision.lore = armarLore(datos, n.mision, p.sector);
+  }
+  p.columna = 0;
+  p.posicion = s.actual;
+  rodear(datos, p, az, (x, y) => crearDestino(datos, p, s, x, y, az));
+  gremioCerca(datos, p, s);
 }
 
-// Inteligencia sobre el jefe: sin datos llega con refuerzos; con suficientes, sin niebla y el escuadron atento.
+// Un destino nuevo en (x, y): contrato, parada, reclutas, señal o descanso
+function crearDestino(datos, p, s, x, y, az, forzado = null) {
+  const Bj = datos.bandos.brujula;
+  const tipo = forzado || az.elegirConPeso(Object.entries(Bj.tipos));
+  const nodo = agregar(s, { tipo, x, y });
+  if (tipo === 'contrato') {
+    nodo.tipo = 'mision';
+    nodo.mision = armarContrato(datos, p, s, nodo, az);
+    // nadie te contrata por aca: queda una señal
+    if (!nodo.mision) { nodo.tipo = 'evento'; delete nodo.mision; }
+    else nodo.vence = s.saltos + az.entero(Bj.vence[0], Bj.vence[1]);
+  }
+  if (nodo.tipo === 'parada') {
+    const dueno = duenoEn(s, x, y);
+    nodo.dueno = dueno === 'contagio' || az.tirada(30) ? 'transportistas' : dueno;
+  }
+  return nodo;
+}
+
+// Un contrato: un bando (el cliente) paga para pelear contra otro bando o contra una amenaza (el objetivo).
+// contraAmenaza: forzar el objetivo (los nidos). Devuelve la mision, o null si nadie te contrata.
+function armarContrato(datos, p, s, nodo, az, contraAmenaza = null) {
+  const def = datos.sectores.campana_base;
+  const posibles = s.bandos.filter((b) => escalonDe(datos, p, b).contratos);
+  if (!posibles.length) return null;
+  const dueno = duenoEn(s, nodo.x, nodo.y);
+  const local = posibles.includes(dueno) ? dueno : null;
+  const cerca = amenazasCerca(datos, s, nodo.x, nodo.y);
+  let cliente, objetivo;
+  if (contraAmenaza) { objetivo = contraAmenaza; cliente = local || az.elegir(posibles); }
+  else if (cerca.length && az.tirada(35)) { objetivo = cerca[0].tipo; cliente = local || az.elegir(posibles); }
+  else {
+    cliente = local && az.tirada(60) ? local : az.elegir(posibles);
+    const rivales = s.bandos.filter((b) => b !== cliente);
+    objetivo = rivales.length ? az.elegir(rivales) : az.elegir(Object.keys(datos.bandos.amenazas));
+  }
+  const C = quien(datos, cliente), Q = quien(datos, objetivo);
+  const porDif = def.misiones_por_dificultad[String(s.dificultad)] || def.misiones_por_dificultad['1'];
+  let tipos = (esAmenaza(datos, objetivo) ? Q.contratos : C.contratos).filter((t) => porDif.includes(t));
+  if (!tipos.length) tipos = porDif;
+  const mid = az.elegir(tipos);
+  const cambios = { enemigos: Q.escuadras };
+  if (datos.misiones[mid].lider) cambios.lider = Q.lider || null;
+  // contra la fauna y el contagio se pelea con escuadras de una dificultad menos (son muchos y no paran)
+  const dif = esAmenaza(datos, objetivo) ? Math.max(1, s.dificultad - 1) : s.dificultad;
+  const m = armarMision(datos, mid, dif, az, s.nivel, cambios);
+  m.recompensa.creditos = Math.round((m.recompensa.creditos * (C.pago_pct || 100)) / 100);
+  m.cliente = cliente;
+  m.objetivo = objetivo;
+  if (nodo.nido) m.nido = nodo.nido;
+  // una amenaza cerca se cuela en la mision (no distingue bandos)
+  for (const a of cerca) if (a.tipo !== objetivo && az.tirada(datos.bandos.amenazas[a.tipo].chance_irrumpe)) sumarCondicion(datos, m, 'irrumpe_' + a.tipo, az, []);
+  m.lore = armarLore(datos, m, p.sector, null, { id: cliente, nombre: C.nombre, quien: C.quien });
+  return m;
+}
+
+// Inteligencia sobre el jefe: con poca llega con refuerzos; con toda, sin niebla y el escuadron atento.
 function inteligenciaAlJefe(datos, p, nodo) {
   const I = datos.sectores.campana_base.inteligencia;
   const s = p.sectores[p.sector];
-  if (s.inteligencia === undefined) return; // partida guardada antes de que existiera
   const m = nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
   const az = azarAparte(p, 'jefe');
   const escuadras = territorio(datos, p.sector).jefe.escuadras;
-  if (!s.inteligencia) sumarCondicion(datos, m, I.sin_datos, az, escuadras);
-  else if (s.inteligencia >= I.datos_desde) sumarCondicion(datos, m, I.con_datos, az, escuadras);
+  if (s.inteligencia < (I.para_guarida || 1)) sumarCondicion(datos, m, I.sin_datos, az, escuadras);
+  else if (s.inteligencia >= I.datos_desde + 1 || s.inteligencia >= I.maxima) sumarCondicion(datos, m, I.con_datos, az, escuadras);
   m.cantidadEnemigos = m.oleadas.reduce((t, o) => t + o.length, 0) + m.emboscadas.reduce((t, e) => t + e.unidades.length, 0) + (m.refuerzos ? m.refuerzos.unidades.length : 0);
   m.inteligencia = s.inteligencia;
 }
 
-// Los nodos a los que se puede ir desde donde esta el escuadron
-export function nodosSiguientes(p) {
-  const s = p.sectores[p.sector];
-  if (!s || !s.columnas[p.columna + 1]) return [];
-  const sig = s.columnas[p.columna + 1];
-  if (p.columna < 0 || p.posicion === null || p.posicion === undefined) return sig;
-  const aca = s.columnas[p.columna][p.posicion];
-  return aca && aca.sig ? sig.filter((n) => aca.sig.includes(n.i)) : sig;
-}
+// Los destinos que se ven desde la nave, con su costo y si estan bloqueados (la guarida sin datos)
+export function destinosDeLaNave(datos, p) { return destinos(datos, p); }
+// Solo los nodos a los que se puede saltar
+export function nodosSiguientes(datos, p) { return destinos(datos, p).filter((d) => !d.bloqueado).map((d) => d.nodo); }
 
-// Que nemesis se vieron en los contratos de la columna que viene ({ indiceDelNodo: idNemesis })
+// Que nemesis se vieron en los contratos que se ven ({ idDelNodo: idNemesis })
 export function nemesisDelMapa(datos, p) {
-  return nemesisEnNodos(datos, p, nodosSiguientes(p), (i) => azarAparte(p, 'nemesis:' + i));
+  return nemesisEnNodos(datos, p, destinosDeLaNave(datos, p).map((d) => d.nodo), (i) => azarAparte(p, 'nemesis:' + i));
 }
 
+// Saltar a un destino. i: indice en destinosDeLaNave (o el nodo mismo).
 export function elegirNodo(datos, p, i) {
-  const nodo = nodosSiguientes(p)[i];
-  if (!nodo) return null;
+  const lista = destinosDeLaNave(datos, p);
+  const d = typeof i === 'object' ? lista.find((x) => x.nodo.i === i.i) : lista.filter((x) => !x.bloqueado)[i];
+  if (!d || d.bloqueado) return null;
+  const nodo = d.nodo;
+  const s = p.sectores[p.sector];
   const acecho = nemesisDelMapa(datos, p); // (antes de moverse: depende de donde estamos)
-  p.columna++;
+  const yaFue = !!nodo.visitado;
+  // el salto: combustible, emboscadas de la fauna en los saltos largos, y la guerra que sigue
+  gastarCombustible(datos, p, d.costo);
+  emboscada(datos, p, d.costo);
+  s.actual = nodo.i;
+  s.saltos++;
+  s.ruta.push([nodo.x, nodo.y]);
+  p.columna = s.saltos;
   p.posicion = nodo.i;
-  gastarCombustible(datos, p);
-  p.nodo = { ...nodo, indice: i };
+  pasaElTiempo(datos, s, azarAparte(p, 'frente'));
+  mientrasViajan(datos, p);
+  p.nodo = { ...nodo, indice: i, revisita: yaFue };
   nodo.visitado = true;
+  // destinos nuevos alrededor (se arman al llegar: asi la misma partida da siempre lo mismo)
+  rodear(datos, p, azarDe(p, 'brujula'), (x, y) => crearDestino(datos, p, s, x, y, azarDe(p, 'destino')));
+  gremioCerca(datos, p, s);
+  if (yaFue && nodo.tipo !== 'parada') { p.nodo = null; p.estado = 'sectores'; return null; }
   // al jefe se llega con lo que se averiguo en el camino
   if (nodo.tipo === 'jefe') inteligenciaAlJefe(datos, p, p.nodo);
   const R = datos.reglas.campana;
@@ -241,14 +284,19 @@ export function elegirNodo(datos, p, i) {
       // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
       p.nodo.animo = calcularAnimo(datos, p, nodo.mision, desplegables(datos, p), azarAparte(p, 'animo'));
       break;
-    case 'taller': {
-      const az = azarDe(p, 'taller');
-      p.nodo.oferta = [];
-      for (let k = 0; k < R.partes_en_taller; k++) {
-        const pieza = sortearParte(datos, az, p.sectores[p.sector].dificultad, p);
-        p.nodo.oferta.push({ pieza, precio: precioPieza(datos, pieza), vendida: false });
+    case 'parada': {
+      if (!nodo.oferta) {
+        const az = azarDe(p, 'parada');
+        const B = quien(datos, nodo.dueno) || {};
+        nodo.oferta = [];
+        for (let k = 0; k < R.partes_en_taller; k++) {
+          const pieza = B.partes && B.partes.length ? sortearParteDe(datos, az, B.partes, s.dificultad, p) : sortearParte(datos, az, s.dificultad, p);
+          if (!pieza) continue;
+          nodo.oferta.push({ pieza, vendida: false });
+        }
       }
-      p.estado = 'taller';
+      p.nodo = { tipo: 'parada', i: nodo.i, dueno: nodo.dueno, revisita: yaFue };
+      p.estado = 'parada';
       break;
     }
     case 'reclutamiento': {
@@ -275,57 +323,162 @@ export function elegirNodo(datos, p, i) {
         pi.traumas = pi.traumas.filter((t) => t.cura !== 'misiones_de_descanso' || t.resta > 0);
         if (pi.traumas.length < antes) curados.push(pi.apodo);
       }
-      // en el muelle se reparan los mechas gratis
+      // en el refugio se reparan los mechas gratis
       const reparados = [];
       for (const pi of p.pilotos) if (costoReparacion(datos, pi).total && reparar(datos, p, pi.id, 'todo', true)) reparados.push(pi.apodo);
-      p.nodo.resultado = { texto: 'Una semana en el muelle orbital. Se reparan los mechas y se ordenan las cabezas.', curados, reparados };
+      p.nodo.resultado = { texto: 'Una semana en un refugio orbital. Se reparan los mechas y se ordenan las cabezas.', curados, reparados };
       p.estado = 'evento';
       break;
     }
+    default:
+      p.nodo = null;
+      p.estado = 'sectores';
   }
   return p.nodo;
 }
 
-// Cerrar un nodo que no es mision (taller, reclutamiento, evento): seguir viaje.
+// Cerrar un nodo que no es mision (parada, reclutamiento, evento): seguir viaje.
 export function seguir(datos, p) {
   p.nodo = null;
-  avanzar(datos, p);
+  if (p.estado !== 'fin') p.estado = 'sectores';
 }
 
-function avanzar(datos, p) {
-  const def = datos.sectores.campana_base;
-  if (p.estado === 'fin') return;
-  if (p.columna >= def.columnas_por_sector - 1) {
-    p.puntaje += datos.reglas.campana.puntaje_por_sector;
-    p.sector++;
-    generarSector(datos, p);
-    if (p.combustible !== undefined) p.combustible = Math.min(datos.reglas.combustible.maximo, p.combustible + datos.reglas.combustible.por_sector);
-    anotar(p, 'Cruzaron a ' + p.sectores[p.sector].nombre + '.', 'sector');
+// Con poco combustible y ninguna parada a la vista, el gremio de transportistas aparece cerca (a un salto)
+function gremioCerca(datos, p, s) {
+  const Bj = datos.bandos.brujula;
+  const aca = s.nodos.find((n) => n.i === s.actual);
+  if (p.combustible > 3 || s.nodos.some((n) => n.tipo === 'parada' && n !== aca && Math.hypot(n.x - aca.x, n.y - aca.y) <= Bj.visible)) return;
+  const az = azarDe(p, 'gremio');
+  for (let k = 0; k < 24; k++) {
+    const a = (az.entero(0, 359) / 180) * Math.PI;
+    const x = Math.round((aca.x + Math.cos(a)) * 100) / 100, y = Math.round((aca.y + Math.sin(a)) * 100) / 100;
+    if (Math.hypot(x, y) > Bj.radio_sector || s.nodos.some((n) => Math.hypot(n.x - x, n.y - y) < Bj.separacion * 0.7)) continue;
+    const n = crearDestino(datos, p, s, x, y, az, 'parada');
+    n.dueno = 'transportistas';
+    return;
   }
-  p.estado = 'sectores';
 }
 
-// ---------- Combustible ----------
+// Cayo el jefe: el sector queda para el bando que gano y se cruza al siguiente
+function cerrarSector(datos, p) {
+  const s = p.sectores[p.sector];
+  const F = datos.bandos.frente;
+  if (s.bandoJefe && s.frente[s.bandoJefe] !== undefined) {
+    const otros = s.bandos.filter((b) => b !== s.bandoJefe);
+    for (const b of otros) correrFrente(datos, s, b, s.bandoJefe, Math.round(F.jefe_cae / otros.length));
+  }
+  // si el jefe era la madre de la fauna, se terminan los nidos y el contagio del sector
+  if (s.amenazaJefe) for (const a of s.amenazas) a.vivo = false;
+  s.ganador = s.bandos.slice().sort((a, b) => s.frente[b] - s.frente[a])[0];
+  s.cerrado = true;
+  p.puntaje += datos.reglas.campana.puntaje_por_sector;
+  p.sector++;
+  generarSector(datos, p);
+  p.combustible = Math.min(combustibleMaximo(datos, p), (p.combustible || 0) + datos.reglas.combustible.por_sector);
+  anotar(p, 'Cruzaron a ' + p.sectores[p.sector].nombre + '.', 'sector');
+}
 
-// Cada salto gasta combustible. Sin combustible, los remolcan: cuesta creditos y los mechas sufren.
-function gastarCombustible(datos, p) {
-  if (p.combustible === undefined) return; // partida vieja
+// ---------- Viaje: combustible, emboscadas y lo que hace la nave mientras ----------
+
+// Cada salto gasta combustible. Sin suficiente, los remolcan: cuesta creditos y los mechas sufren.
+function gastarCombustible(datos, p, costo = 1) {
   const C = datos.reglas.combustible;
   p.remolque = null;
-  if (p.combustible >= C.por_salto) { p.combustible -= C.por_salto; return; }
-  const cobro = Math.min(p.creditos, C.remolque_creditos);
+  if (p.combustible >= costo) { p.combustible -= costo; return; }
+  p.combustible = 0;
+  const cobro = Math.min(p.creditos, C.remolque_creditos * costo);
   p.creditos -= cobro;
-  for (const x of p.pilotos) x.mechaVida = Math.max(0, (x.mechaVida === undefined ? 100 : x.mechaVida) - C.remolque_danio_pct);
-  p.remolque = { creditos: cobro, danio: C.remolque_danio_pct };
+  const danio = Math.round((C.remolque_danio_pct * valorModulo(datos, p, 'casco')) / 100);
+  for (const x of p.pilotos) x.mechaVida = Math.max(0, (x.mechaVida === undefined ? 100 : x.mechaVida) - danio);
+  p.remolque = { creditos: cobro, danio };
   sumarStat(p, 'remolques');
   if (p.stats.remolques === 1) anotar(p, 'Se quedaron sin combustible y tuvieron que pagar un remolque.', 'remolque');
 }
 
+// En los saltos largos, si hay fauna en el sector, a veces se pega al casco
+function emboscada(datos, p, costo) {
+  const E = datos.bandos.brujula.emboscada;
+  const s = p.sectores[p.sector];
+  p.emboscada = null;
+  if (costo < E.desde_distancia || !s.amenazas.some((a) => a.tipo === 'fauna' && a.vivo)) return;
+  if (!azarAparte(p, 'emboscada:' + s.saltos).tirada(E.chance)) return;
+  const danio = Math.round((E.danio_pct * valorModulo(datos, p, 'casco')) / 100);
+  for (const x of p.pilotos) x.mechaVida = Math.max(1, (x.mechaVida === undefined ? 100 : x.mechaVida) - danio);
+  p.emboscada = { danio };
+  sumarStat(p, 'emboscadas');
+}
+
+// Bahia de reparacion y enfermeria: trabajan mientras la nave viaja
+function mientrasViajan(datos, p) {
+  const bahia = valorModulo(datos, p, 'bahia');
+  if (bahia) for (const x of p.pilotos) if (x.mechaVida !== undefined && x.mechaVida < 100) x.mechaVida = Math.min(100, x.mechaVida + bahia);
+  const cada = valorModulo(datos, p, 'enfermeria');
+  if (cada && p.sectores[p.sector].saltos % cada === 0) {
+    const pi = p.pilotos.find((x) => x.traumas.some((t) => t.cura === 'misiones_de_descanso'));
+    if (pi) {
+      const t = pi.traumas.find((x) => x.cura === 'misiones_de_descanso');
+      t.resta -= 1;
+      if (t.resta <= 0) pi.traumas.splice(pi.traumas.indexOf(t), 1);
+    }
+  }
+}
+
+// ---------- Paradas tecnicas ----------
+
+// El nodo de la parada donde esta la nave (con su oferta guardada: si se vuelve, sigue igual)
+export function paradaActual(p) {
+  if (!p.nodo || p.nodo.tipo !== 'parada') return null;
+  return p.sectores[p.sector].nodos.find((n) => n.i === p.nodo.i) || null;
+}
+
+// Precios de la parada segun como te ve su bando (los neutrales, normal)
+export const pctPrecio = (datos, p, dueno) => escalonDe(datos, p, dueno).precio_pct;
+export const precioCombustible = (datos, p) => {
+  const n = paradaActual(p);
+  return Math.round((datos.reglas.combustible.precio * (n ? pctPrecio(datos, p, n.dueno) : 100)) / 100);
+};
+
 export function comprarCombustible(datos, p) {
-  const C = datos.reglas.combustible;
-  if (p.combustible === undefined || p.creditos < C.precio || p.combustible >= C.maximo) return false;
-  p.creditos -= C.precio;
+  const precio = precioCombustible(datos, p);
+  if (p.combustible === undefined || p.creditos < precio || p.combustible >= combustibleMaximo(datos, p)) return false;
+  p.creditos -= precio;
   p.combustible++;
+  return true;
+}
+
+// Lo que pide una pieza de la parada: precio con el trato del bando y si te la venden (por rareza)
+export function ofertaDe(datos, p, o, dueno) {
+  const rareza = datos.partes[o.pieza.parte].rareza;
+  const pide = datos.bandos.reputacion.rareza_pide[rareza] || 'hostil';
+  const bloqueada = indiceEscalon(datos, escalonDe(datos, p, dueno).id) < indiceEscalon(datos, pide);
+  return { precio: Math.round((precioPieza(datos, o.pieza) * pctPrecio(datos, p, dueno)) / 100), bloqueada, pide: escalonPorId(datos, pide).nombre };
+}
+
+// Mejoras de la nodriza: que hace falta para la siguiente (en la parada donde esta la nave)
+export function mejoraDe(datos, p, id) {
+  const M = datos.nodriza.modulos[id];
+  const nv = nivelModulo(datos, p, id);
+  const sig = M.niveles[nv + 1];
+  if (!sig) return { tope: true };
+  const req = sig.requiere || {};
+  const n = paradaActual(p);
+  const faltas = [];
+  if (!n) faltas.push('Se instala en una parada técnica');
+  if (req.escalon && n && indiceEscalon(datos, escalonDe(datos, p, n.dueno).id) < indiceEscalon(datos, req.escalon)) {
+    faltas.push('Una parada que te vea ' + escalonPorId(datos, req.escalon).nombre.toLowerCase());
+  }
+  if (req.restos && (p.restos || 0) < req.restos) faltas.push(req.restos + (req.restos === 1 ? ' resto de nido' : ' restos de nido'));
+  return { tope: false, sig, costo: sig.costo, requiere: req, faltas, puede: !faltas.length && p.creditos >= sig.costo };
+}
+
+export function instalarMejora(datos, p, id) {
+  const x = mejoraDe(datos, p, id);
+  if (x.tope || !x.puede) return false;
+  p.creditos -= x.costo;
+  if (x.requiere.restos) p.restos -= x.requiere.restos;
+  p.nodriza = p.nodriza || nodrizaInicial(datos);
+  p.nodriza[id] = nivelModulo(datos, p, id) + 1;
+  sumarStat(p, 'mejoras');
   return true;
 }
 
@@ -337,7 +490,7 @@ export function elegirOpcion(datos, p, indice) {
 
 // Un recluta gratis (dilemas): si hay lugar
 export function contratarGratis(datos, p, azar) {
-  if (p.pilotos.length >= datos.reglas.escuadra_maxima) return null;
+  if (p.pilotos.length >= limitePilotos(datos, p)) return null;
   const usados = p.pilotos.map((x) => x.apodo).concat(p.caidos.map((x) => x.apodo));
   const nuevo = crearRecluta(datos, azar, nuevoId(p), null, usados, p.pilotos.map((x) => x.retrato));
   const solo = p.pilotos.find((x) => !x.vinculo);
@@ -381,12 +534,39 @@ export function precioPieza(datos, pieza) {
 }
 
 export function comprar(datos, p, i) {
-  const o = p.nodo && p.nodo.oferta && p.nodo.oferta[i];
-  if (!o || o.vendida || p.creditos < o.precio) return false;
-  p.creditos -= o.precio;
+  const n = paradaActual(p);
+  const o = n && n.oferta && n.oferta[i];
+  if (!o || o.vendida) return false;
+  const { precio, bloqueada } = ofertaDe(datos, p, o, n.dueno);
+  if (bloqueada || p.creditos < precio) return false;
+  p.creditos -= precio;
   o.vendida = true;
   p.inventario.push(o.pieza);
   return true;
+}
+
+// Una pieza de la lista de un bando (lo que vende en sus paradas o lo que deja cuando cae)
+export function sortearParteDe(datos, az, lista, dificultad = 1, p = null) {
+  const R = datos.reglas;
+  const tiene = new Set(p ? p.inventario.map((x) => x.parte).concat(p.pilotos.flatMap((pi) => Object.values(pi.mecha).filter(Boolean).map((x) => x.parte || x))) : []);
+  const candidatas = lista.filter((id) => datos.partes[id] && datos.partes[id].costo > 0 && !(datos.partes[id].rareza === 'unico' && tiene.has(id)));
+  if (!candidatas.length) return null;
+  const orden = Object.keys(R.rarezas);
+  const pesos = candidatas.map((id) => {
+    const i = orden.indexOf(datos.partes[id].rareza);
+    const w = R.rarezas[datos.partes[id].rareza] || 1;
+    return [id, Math.max(1, i === 0 ? w - dificultad * 10 : w + dificultad * 3)];
+  });
+  const id = az.elegirConPeso(pesos);
+  const parte = datos.partes[id];
+  const afijos = [];
+  const ranuras = parte.ranuras_afijo || (parte.encaje === 'torso' ? 1 : 0);
+  if (ranuras && az.tirada(R.campana.botin_chance_afijo)) {
+    const aptos = Object.entries(datos.afijos).filter(([, a]) => a.etiquetas.some((t) => parte.etiquetas.includes(t)) &&
+      orden.indexOf(a.rareza_minima) <= orden.indexOf(parte.rareza) + 1);
+    if (aptos.length) afijos.push(az.elegirConPeso(aptos.map(([aid, a]) => [aid, a.peso])));
+  }
+  return { parte: id, afijos };
 }
 
 export function vender(datos, p, i) {
@@ -401,7 +581,7 @@ export function vender(datos, p, i) {
 export function contratar(datos, p, i) {
   const c = p.nodo && p.nodo.candidatos && p.nodo.candidatos[i];
   const costo = datos.reglas.campana.costo_reclutar;
-  if (!c || c.contratado || p.creditos < costo || p.pilotos.length >= datos.reglas.escuadra_maxima) return false;
+  if (!c || c.contratado || p.creditos < costo || p.pilotos.length >= limitePilotos(datos, p)) return false;
   p.creditos -= costo;
   c.contratado = true;
   const nuevo = JSON.parse(JSON.stringify(c));
@@ -553,7 +733,7 @@ export function cerrarMision(datos, p, resultado) {
 
   // Inteligencia sobre el jefe del sector: cada mision ganada en el camino suma
   const sec = p.sectores[p.sector];
-  if (resultado.victoria && p.nodo.tipo === 'mision' && sec && sec.inteligencia !== undefined) {
+  if (resultado.victoria && p.nodo.tipo === 'mision' && sec && sec.inteligencia !== undefined && !m.encuentro) {
     const I = datos.sectores.campana_base.inteligencia;
     if (sec.inteligencia < I.maxima) { sec.inteligencia += I.por_mision; informe.inteligencia = { valor: sec.inteligencia, maxima: I.maxima, jefe: sec.jefe }; }
   }
@@ -570,8 +750,10 @@ export function cerrarMision(datos, p, resultado) {
     puntos += vivos * (pz.por_superviviente || 0) + (resultado.resumen.vipVivo ? pz.vip_intacto || 0 : 0);
     informe.creditos = m.recompensa.creditos;
     p.creditos += informe.creditos;
+    // el botin es del bando que derrotaron (sus piezas)
+    const delObjetivo = (quien(datos, m.objetivo) || {}).partes || [];
     for (let k = 0; k < m.recompensa.botin; k++) {
-      const pieza = sortearParte(datos, az, m.dificultad, p);
+      const pieza = (delObjetivo.length && sortearParteDe(datos, az, delObjetivo, m.dificultad, p)) || sortearParte(datos, az, m.dificultad, p);
       p.inventario.push(pieza);
       informe.botin.push(nombrePieza(datos, pieza));
     }
@@ -599,6 +781,9 @@ export function cerrarMision(datos, p, resultado) {
       informe.rescatado = pi.apodo;
     }
   }
+
+  // Bandos: el que pago y contra quien. La reputacion, el frente y las amenazas se mueven con el resultado.
+  informe.bandos = bandosDespues(datos, p, m, resultado.victoria, informe);
 
   // Cronica: como fue esta mision, en una o dos lineas
   sumarStat(p, 'jugadas');
@@ -643,15 +828,60 @@ export function cerrarMision(datos, p, resultado) {
   informe.puntaje = puntos;
   p.puntaje += puntos;
   p.ultimoInforme = informe;
-  p.nodo = null;
 
   // Perder un contrato no termina la partida: se sigue viaje sin recompensa. Sin pilotos, si.
+  const eraJefe = p.nodo.tipo === 'jefe';
+  if (eraJefe && !resultado.victoria) {
+    // la guarida sigue ahi: se puede volver a intentar
+    const g = sec.nodos.find((n) => n.tipo === 'jefe');
+    if (g) g.visitado = false;
+  }
+  p.nodo = null;
   if (!p.pilotos.length) {
     p.estado = 'fin'; p.resultado = 'derrota';
     p.legado = legadoDeDerrota(datos, p, fotos, azarAparte(p, 'legado'));
+  } else {
+    p.estado = 'sectores';
+    if (eraJefe && resultado.victoria) { informe.sectorCerrado = sec.nombre; cerrarSector(datos, p); }
   }
-  else avanzar(datos, p);
   return informe;
+}
+
+// Despues de un contrato: reputacion con cada bando, frente del sector, nidos y contagio, restos de nido.
+function bandosDespues(datos, p, m, victoria, informe) {
+  const s = p.sectores[p.sector];
+  const RP = datos.bandos.reputacion;
+  const cambios = [];
+  const sumar = (id, d) => { const c = sumarReputacion(datos, p, id, d); if (c) cambios.push({ ...c, nombre: quien(datos, id).nombre, color: quien(datos, id).claro,
+    antesEscalon: escalonDe(datos, { reputacion: { [id]: c.antes } }, id).nombre, despuesEscalon: escalonDe(datos, p, id).nombre }); };
+  const out = { cambios, cliente: m.cliente || null, objetivo: m.objetivo || null, frente: null, amenaza: null };
+  if (!m.cliente) return out;
+  if (!victoria) { sumar(m.cliente, RP.contrato_perdido.cliente); return out; }
+  if (esAmenaza(datos, m.objetivo)) {
+    sumar(m.cliente, RP.contrato_ganado.contra_amenaza_cliente);
+    for (const b of s.bandos) if (b !== m.cliente) sumar(b, RP.contrato_ganado.contra_amenaza_todos);
+    const A = datos.bandos.amenazas[m.objetivo];
+    if (m.nido) {
+      const a = s.amenazas.find((x) => x.id === m.nido);
+      if (a && a.vivo) { a.vivo = false; p.restos = (p.restos || 0) + 1; out.amenaza = 'Limpiaron el nido. +1 resto de nido.'; sumarStat(p, 'nidos'); }
+    } else if (m.objetivo === 'contagio') {
+      const aca = s.nodos.find((n) => n.i === s.actual);
+      const foco = s.amenazas.filter((x) => x.tipo === 'contagio' && x.vivo).sort((x, y) => Math.hypot(x.x - aca.x, x.y - aca.y) - Math.hypot(y.x - aca.x, y.y - aca.y))[0];
+      if (foco) {
+        foco.r = Math.round((foco.r - A.achica_al_ganar) * 100) / 100;
+        if (foco.r < 0.5) { foco.vivo = false; out.amenaza = 'El foco de contagio quedó contenido.'; sumarStat(p, 'focos'); }
+        else out.amenaza = 'El contagio retrocedió.';
+      }
+    }
+  } else {
+    sumar(m.cliente, RP.contrato_ganado.cliente);
+    sumar(m.objetivo, RP.contrato_ganado.rival);
+    const antes = s.frente[m.cliente];
+    correrFrente(datos, s, m.cliente, m.objetivo, datos.bandos.frente.por_contrato);
+    if (s.frente[m.cliente] !== antes) out.frente = { bando: m.cliente, antes, despues: s.frente[m.cliente] };
+  }
+  sumarStat(p, 'contratos');
+  return out;
 }
 
 // Al ganar la campana: quien sigue en la proxima (uno solo)

@@ -25,7 +25,9 @@
     "version",
     "charlas",
     "lore",
-    "nemesis"
+    "nemesis",
+    "bandos",
+    "nodriza"
   ],
   "mapas": [
     "puesto_01",

@@ -985,7 +985,7 @@
       "miembros": [
         "larvas",
         "larvas",
-        "contagiados"
+        "mutante_rastrero"
       ],
       "dificultad": 1
     },
@@ -1004,9 +1004,69 @@
         "mutante_bruto",
         "mutante_tejedor",
         "larvas",
-        "contagiados"
+        "mutante_rastrero"
       ],
       "dificultad": 3
+    },
+    "milicia": {
+      "nombre": "Milicia",
+      "miembros": [
+        "miliciano",
+        "miliciano",
+        "saqueador"
+      ],
+      "dificultad": 1
+    },
+    "guardia_cooperativa": {
+      "nombre": "Guardia de la Cooperativa",
+      "miembros": [
+        "mecha_pirata",
+        "miliciano",
+        "miliciano"
+      ],
+      "dificultad": 2
+    },
+    "horda": {
+      "nombre": "Horda de contagiados",
+      "miembros": [
+        "contagiados",
+        "contagiados",
+        "contagiados",
+        "contagiados"
+      ],
+      "dificultad": 1
+    },
+    "marea": {
+      "nombre": "Marea de contagiados",
+      "miembros": [
+        "contagiados",
+        "contagiados",
+        "contagiados",
+        "contagiados",
+        "contagiados",
+        "contagiados"
+      ],
+      "dificultad": 2
+    },
+    "tiradores_desertores": {
+      "nombre": "Tiradores desertores",
+      "miembros": [
+        "francotirador_pirata",
+        "saqueador",
+        "saqueador",
+        "mecha_pirata"
+      ],
+      "dificultad": 2
+    },
+    "escuadra_flota": {
+      "nombre": "Escuadra de la flota",
+      "miembros": [
+        "mecha_pirata",
+        "dron_cazador",
+        "dron_artillado",
+        "dron_artillado"
+      ],
+      "dificultad": 2
     }
   }
 }

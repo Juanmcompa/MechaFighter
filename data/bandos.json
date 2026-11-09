@@ -1,0 +1,390 @@
+{
+  "_ayuda": "Bandos que se disputan cada sector y amenazas que atacan a todos. Cada contrato es de un bando (el cliente) contra otro bando o contra una amenaza (el objetivo). 'escuadras': con que pelea (enemigos.json). 'lider': el enemigo grande de sus asaltos. 'partes': lo que vende en sus paradas tecnicas (partes.json). 'contratos': tipos de mision que ofrece. 'pago_pct': cuanto paga contra lo normal. Un bando 'neutral' no se pelea con nadie: maneja paradas libres. Que bandos y amenazas hay en cada sector: sectores.json > sectores_def > bandos / amenazas.",
+  "bandos": {
+    "cooperativa": {
+      "nombre": "Cooperativa Hierro Viejo",
+      "corto": "Cooperativa",
+      "quien": "la cooperativa de chatarreros",
+      "color": "#4a8fd1",
+      "claro": "#7fb6ea",
+      "fondo": "#14202c",
+      "icono": "escudo",
+      "estilo": "blindaje y escudos",
+      "escuadras": [
+        "milicia",
+        "guardia_cooperativa"
+      ],
+      "lider": "mecha_pirata",
+      "pago_pct": 95,
+      "contratos": [
+        "defensa",
+        "escolta",
+        "patrulla",
+        "asalto"
+      ],
+      "partes": [
+        "torso_pesado",
+        "piernas_orugas",
+        "brazo_escudo",
+        "piernas_estabilizadoras",
+        "torso_bastion",
+        "mochila_reparacion",
+        "brazo_rifle"
+      ]
+    },
+    "grua": {
+      "nombre": "La Grúa",
+      "corto": "La Grúa",
+      "quien": "la banda de Varga",
+      "color": "#d9553f",
+      "claro": "#e57a6c",
+      "fondo": "#2a1814",
+      "icono": "espadas",
+      "estilo": "choque y chatarra pesada",
+      "escuadras": [
+        "patrulla_saqueadora",
+        "banda_con_mecha"
+      ],
+      "lider": "mecha_pirata",
+      "pago_pct": 100,
+      "contratos": [
+        "asalto",
+        "patrulla",
+        "duelo",
+        "escolta"
+      ],
+      "partes": [
+        "brazo_hoja",
+        "brazo_gancho",
+        "brazo_lanzallamas",
+        "torso_medio",
+        "mochila_municion",
+        "brazo_rotativa",
+        "cabeza_ojo_de_varga"
+      ]
+    },
+    "vesta": {
+      "nombre": "Consorcio Vesta",
+      "corto": "Vesta",
+      "quien": "el Consorcio Vesta",
+      "color": "#9aa6b2",
+      "claro": "#e3e8ec",
+      "fondo": "#1c2024",
+      "icono": "ojo",
+      "estilo": "láser y sensores",
+      "escuadras": [
+        "enjambre",
+        "ala_de_drones",
+        "drones_pesados"
+      ],
+      "lider": "dron_pesado",
+      "pago_pct": 125,
+      "contratos": [
+        "escolta",
+        "asalto",
+        "defensa",
+        "patrulla"
+      ],
+      "partes": [
+        "cabeza_optica",
+        "cabeza_radar",
+        "brazo_canon_riel",
+        "brazo_emp",
+        "torso_reactor",
+        "brazo_riel_valquiria"
+      ]
+    },
+    "colonos": {
+      "nombre": "Sobrevivientes de Nueva Esperanza",
+      "corto": "Colonos",
+      "quien": "la colonia de Nueva Esperanza",
+      "color": "#3fa58a",
+      "claro": "#6fc2a8",
+      "fondo": "#12241f",
+      "icono": "cruz",
+      "estilo": "reparación y piezas livianas",
+      "escuadras": [
+        "milicia"
+      ],
+      "lider": "mecha_pirata",
+      "pago_pct": 85,
+      "contratos": [
+        "defensa",
+        "escolta",
+        "patrulla"
+      ],
+      "partes": [
+        "torso_ligero",
+        "mochila_reparacion",
+        "piernas_saltarinas",
+        "mochila_propulsor",
+        "cabeza_sensor",
+        "mochila_senuelo"
+      ]
+    },
+    "flota": {
+      "nombre": "Flota del Anillo",
+      "corto": "La Flota",
+      "quien": "la flota de la coronel Ostrova",
+      "color": "#c9a227",
+      "claro": "#e8c95a",
+      "fondo": "#2a2410",
+      "icono": "mira",
+      "estilo": "precisión y misiles",
+      "escuadras": [
+        "escuadra_flota",
+        "ala_de_drones",
+        "drones_pesados"
+      ],
+      "lider": "dron_pesado",
+      "pago_pct": 110,
+      "contratos": [
+        "asalto",
+        "duelo",
+        "defensa",
+        "patrulla"
+      ],
+      "partes": [
+        "brazo_lanzamisiles",
+        "mochila_torreta",
+        "cabeza_optica",
+        "torso_pesado_bf_recharged",
+        "brazo_tormenta",
+        "piernas_fantasma"
+      ]
+    },
+    "desertores": {
+      "nombre": "Desertores de la flota",
+      "corto": "Desertores",
+      "quien": "un grupo de desertores de la flota",
+      "color": "#c46ad0",
+      "claro": "#dd9be6",
+      "fondo": "#26142a",
+      "icono": "calavera",
+      "estilo": "material militar robado, barato y gastado",
+      "escuadras": [
+        "tiradores_desertores",
+        "banda_con_mecha",
+        "patrulla_saqueadora"
+      ],
+      "lider": "mecha_pirata",
+      "pago_pct": 90,
+      "contratos": [
+        "asalto",
+        "patrulla",
+        "duelo",
+        "escolta"
+      ],
+      "partes": [
+        "brazo_rifle",
+        "brazo_rotativa",
+        "piernas_bipode",
+        "torso_medio",
+        "mochila_municion",
+        "brazo_lanzamisiles"
+      ]
+    },
+    "transportistas": {
+      "nombre": "Gremio de Transportistas",
+      "corto": "Transportistas",
+      "quien": "el gremio de camioneros",
+      "color": "#e0a43a",
+      "claro": "#e0a43a",
+      "fondo": "#2a1f12",
+      "icono": "combustible",
+      "neutral": true,
+      "estilo": "de todo un poco",
+      "escuadras": [],
+      "partes": []
+    }
+  },
+  "amenazas": {
+    "fauna": {
+      "nombre": "Fauna del vacío",
+      "corto": "Fauna",
+      "color": "#a77fe0",
+      "claro": "#c7a9f0",
+      "fondo": "#1f1830",
+      "icono": "enjambre",
+      "_ayuda": "Aliens: nidos fijos en el mapa. Limpiar uno (un contrato contra la fauna en el nido) lo saca del mapa y deja restos de nido.",
+      "escuadras": [
+        "enjambre_larvas",
+        "nido",
+        "colmena",
+        "camada"
+      ],
+      "lider": "mutante_rastrero",
+      "contratos": [
+        "patrulla",
+        "asalto",
+        "defensa"
+      ],
+      "focos": [
+        1,
+        2
+      ],
+      "radio": 2.6,
+      "chance_irrumpe": 35,
+      "escuadra_irrumpe": [
+        "enjambre_larvas",
+        "nido"
+      ]
+    },
+    "contagio": {
+      "nombre": "Contagio",
+      "corto": "Contagio",
+      "color": "#c9c23a",
+      "claro": "#e0da6a",
+      "fondo": "#24230f",
+      "icono": "calavera",
+      "_ayuda": "Contagiados: una mancha que crece en cada salto (crece_por_salto, en casillas del sector) hasta radio_maximo. Ganar una cuarentena la achica (achica_al_ganar). Come territorio de todos los bandos.",
+      "escuadras": [
+        "horda",
+        "marea"
+      ],
+      "lider": null,
+      "contratos": [
+        "defensa"
+      ],
+      "focos": [
+        1,
+        1
+      ],
+      "radio_inicial": 1.6,
+      "radio_maximo": 4.5,
+      "crece_por_salto": 0.12,
+      "achica_al_ganar": 1.0,
+      "chance_irrumpe": 40,
+      "escuadra_irrumpe": [
+        "horda"
+      ],
+      "radio": 1.2
+    }
+  },
+  "reputacion": {
+    "_ayuda": "Como te ve cada bando (de -100 a 100). Cada escalon cambia precios (\"precio_pct\") y si te ofrece contratos. \"rareza_pide\": que escalon hace falta para comprarle piezas de esa rareza.",
+    "inicial": 0,
+    "escalones": [
+      {
+        "id": "hostil",
+        "nombre": "Hostil",
+        "desde": -100,
+        "precio_pct": 200,
+        "contratos": false
+      },
+      {
+        "id": "recelosa",
+        "nombre": "Recelosa",
+        "desde": -30,
+        "precio_pct": 115,
+        "contratos": true
+      },
+      {
+        "id": "neutral",
+        "nombre": "Neutral",
+        "desde": -5,
+        "precio_pct": 100,
+        "contratos": true
+      },
+      {
+        "id": "confiable",
+        "nombre": "Confiable",
+        "desde": 20,
+        "precio_pct": 90,
+        "contratos": true
+      },
+      {
+        "id": "aliada",
+        "nombre": "Aliada",
+        "desde": 50,
+        "precio_pct": 80,
+        "contratos": true
+      }
+    ],
+    "contrato_ganado": {
+      "cliente": 8,
+      "rival": -10,
+      "contra_amenaza_cliente": 6,
+      "contra_amenaza_todos": 2
+    },
+    "contrato_perdido": {
+      "cliente": -4
+    },
+    "rareza_pide": {
+      "normal": "hostil",
+      "raro": "neutral",
+      "muy_raro": "confiable",
+      "legendario": "aliada",
+      "unico": "aliada"
+    }
+  },
+  "frente": {
+    "_ayuda": "Cuanto del sector controla cada bando (%). Cada contrato ganado corre el frente; ademas se mueve un poco solo en cada salto. Si cae el jefe, su bando pierde terreno.",
+    "por_contrato": 4,
+    "deriva_por_salto": 1,
+    "minimo": 10,
+    "jefe_cae": 20
+  },
+  "brujula": {
+    "_ayuda": "Los destinos alrededor de la nave. radio_sector: tamano del sector (en saltos de 1). visible: hasta que distancia se ven los nodos ya conocidos. tipos: pesos de lo que aparece en un destino nuevo. vence: en cuantos saltos se va un contrato que no tomaste.",
+    "radio_sector": 9,
+    "visible": 3.3,
+    "maximo": 6,
+    "distancias": [
+      [
+        1,
+        45
+      ],
+      [
+        2,
+        40
+      ],
+      [
+        3,
+        15
+      ]
+    ],
+    "separacion": 0.95,
+    "tipos": {
+      "contrato": 54,
+      "parada": 15,
+      "reclutamiento": 12,
+      "evento": 12,
+      "descanso": 7
+    },
+    "vence": [
+      2,
+      4
+    ],
+    "emboscada": {
+      "desde_distancia": 3,
+      "chance": 25,
+      "danio_pct": 10
+    }
+  },
+  "renombre": {
+    "_ayuda": "Como se conoce a la compania segun su puntaje (desde: puntaje minimo). Se ve en la pantalla de Compania.",
+    "escalones": [
+      {
+        "nombre": "Desconocidos",
+        "desde": 0
+      },
+      {
+        "nombre": "Conocidos",
+        "desde": 1200
+      },
+      {
+        "nombre": "Respetados",
+        "desde": 3500
+      },
+      {
+        "nombre": "Temidos",
+        "desde": 7000
+      },
+      {
+        "nombre": "Leyenda",
+        "desde": 12000
+      }
+    ]
+  }
+}

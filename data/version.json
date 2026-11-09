@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 82,
-  "cambio": "Pasá de armado a órdenes con un toque y «Listo» cuando terminás",
+  "numero": 83,
+  "cambio": "Campaña nueva: la nodriza, la brújula, los bandos y el frente",
   "novedades": [
+    "v0.83 · Campaña nueva: la nodriza, la brújula, los bandos y el frente",
     "v0.82 · Pasá de armado a órdenes con un toque y «Listo» cuando terminás",
     "v0.81 · Hangar nuevo para celular: escuadrón, armado y órdenes más simples",
     "v0.80 · Las marcas magenta y amarilla ya no se ven en ningún sprite",
     "v0.79 · hotfix",
-    "v0.78 · more_sprites_fixes",
-    "v0.77 · La barra de munición muestra cada arma por separado"
+    "v0.78 · more_sprites_fixes"
   ]
 }

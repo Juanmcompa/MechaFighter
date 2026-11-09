@@ -96,6 +96,13 @@ export function informe(app, raiz, inf) {
         inf.botin.length ? h('span', { class: 'ch-botin' }, '+' + inf.botin.length + (inf.botin.length === 1 ? ' pieza' : ' piezas')) : null,
         inf.puntaje ? h('span', { class: 'ch-puntos' }, '+' + inf.puntaje + ' pts') : null,
         nemesisCayo ? h('span', { class: 'ch-bien' }, 'Némesis caído') : null)),
+    inf.sectorCerrado ? h('p', { class: 'inf-sector' }, ico('estrella'), ' Cayó el jefe de ' + inf.sectorCerrado + '. La nave cruza al sector siguiente.') : null,
+    inf.bandos && (inf.bandos.cambios.length || inf.bandos.frente || inf.bandos.amenaza) ? h('section', { class: 'inf-bandos', 'aria-label': 'Bandos' },
+      ...inf.bandos.cambios.map((c) => h('span', { class: 'inf-bando' + (c.despues > c.antes ? ' sube' : ' baja') },
+        h('b', { style: 'color:' + c.color }, c.nombre), ' ' + (c.despues > c.antes ? '+' : '−') + Math.abs(c.despues - c.antes) +
+        (c.antesEscalon !== c.despuesEscalon ? ' · ahora te ven ' + c.despuesEscalon.toLowerCase() : ''))),
+      inf.bandos.frente ? h('span', { class: 'inf-bando sube' }, 'El frente se corrió: ' + inf.bandos.frente.antes + '% → ' + inf.bandos.frente.despues + '%') : null,
+      inf.bandos.amenaza ? h('span', { class: 'inf-bando sube' }, inf.bandos.amenaza) : null) : null,
     lista,
     inf.nemesis ? panel('Némesis',
       h('div', { class: 'nemesis' }, retrato(app.datos, inf.nemesis, 'retrato-mini'), h('strong', { class: 'apodo' }, '«' + inf.nemesis.apodo + '»')),

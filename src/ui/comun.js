@@ -3,6 +3,7 @@ import { icono } from './iconos.js';
 import { nombrePieza, normalizarPieza } from '../motor/unidades.js';
 import { rutaRetrato } from '../vista/sprites.js';
 import { elegirRetrato } from '../campana/reclutas.js';
+import { limitePilotos, combustibleMaximo } from '../campana/brujula.js';
 import { tr } from '../core/traducir.js';
 
 // Version que se muestra en la barra de estado de abajo
@@ -96,6 +97,19 @@ export function textoPersonalidad(datos, piloto) {
   return { texto: pe.nombre, titulo: pe.pista, icono: pe.icono };
 }
 
+// Barra de abajo de la campana (la misma del hangar): Escuadron, Armado, Ordenes y Mapa
+export function barraJuego(app, activa) {
+  const p = app.partida;
+  const item = (id, texto, icono, accion) => h('button', {
+    class: 'hg-tab' + (activa === id ? ' activa' : ''), 'aria-current': activa === id ? 'page' : null, onclick: accion
+  }, ico(icono), h('span', {}, texto));
+  return h('nav', { class: 'hg-tabs', 'aria-label': 'Secciones' },
+    item('escuadron', 'Escuadrón', 'escuadron', () => app.ir('hangar')),
+    item('armado', 'Armado', 'llave', () => app.ir('hangar', { pestana: 'armado' })),
+    item('ordenes', 'Órdenes', 'lista', () => app.ir('hangar', { pestana: 'ordenes' })),
+    item('mapa', p && p.estado === 'preparacion' ? 'Misión' : 'Mapa', 'mapa', () => (p && p.estado === 'preparacion' ? app.ir('preparacion') : app.ir('sectores'))));
+}
+
 // Barra de arriba de la campana: creditos, puntaje, sector, pilotos.
 export function barraCampana(datos, p, acciones = []) {
   const s = p.sectores[p.sector];
@@ -103,8 +117,8 @@ export function barraCampana(datos, p, acciones = []) {
     h('div', { class: 'hud-datos' },
       chip('creditos', String(p.creditos), 'Créditos'),
       chip('puntaje', String(p.puntaje), 'Puntaje'),
-      chip('piloto', p.pilotos.length + '/' + datos.reglas.escuadra_maxima, 'Pilotos'),
-      p.combustible !== undefined ? chip('combustible', String(p.combustible), 'Combustible: cada salto gasta 1', p.combustible <= 1 ? 'chip-alerta' : '') : null,
+      chip('piloto', p.pilotos.length + '/' + limitePilotos(datos, p), 'Pilotos'),
+      p.combustible !== undefined ? chip('combustible', p.combustible + '/' + combustibleMaximo(datos, p), 'Combustible: cada salto gasta de 1 a 3', p.combustible <= 1 ? 'chip-alerta' : '') : null,
       s ? chip('mision', 'Sector ' + (p.sector + 1), s.nombre) : null),
     h('div', { class: 'hud-acciones' }, ...acciones),
     // recien remolcados (se quedaron sin combustible en el ultimo salto)

@@ -20,8 +20,8 @@ export function validarDatos(d) {
 
   // --- 0. Todo entero (el motor no usa decimales para que el combate de igual en todos lados) e ids prolijos
   recorrer(d, [], (ruta, valor) => {
-    // (reglas.arte es solo dibujo: ahi si puede haber decimales)
-    if (typeof valor === 'number' && !Number.isInteger(valor) && !(ruta[0] === 'reglas' && ruta[1] === 'arte')) err(ruta.join(' › '), 'tiene decimales (' + valor + '); usa enteros');
+    // (reglas.arte es solo dibujo y bandos es el plano del sector, que no entra al combate: ahi si puede haber decimales)
+    if (typeof valor === 'number' && !Number.isInteger(valor) && !(ruta[0] === 'reglas' && ruta[1] === 'arte') && ruta[0] !== 'bandos') err(ruta.join(' › '), 'tiene decimales (' + valor + '); usa enteros');
   });
   for (const tabla of ['clases', 'partes', 'afijos', 'personalidades', 'habilidades', 'estados', 'cicatrices', 'traumas',
     'medallas', 'misiones', 'sectores']) {
@@ -151,6 +151,23 @@ export function validarDatos(d) {
   for (const [id, c] of Object.entries(condiciones)) revisarExpr('gambits › ' + id, c.expr, c.parametros);
   for (const [id, a] of Object.entries(acciones)) {
     if (a.habilidad && !existe(d.habilidades, a.habilidad)) err('gambits › ' + id, 'habilidad "' + a.habilidad + '" no existe');
+  }
+
+  // --- 2b. Bandos y amenazas: escuadras, piezas y lideres que existan; sectores con bandos conocidos
+  if (d.bandos) {
+    const B = d.bandos;
+    const todos = { ...B.bandos, ...B.amenazas };
+    for (const [id, b] of Object.entries(todos)) {
+      if (id[0] === '_') continue;
+      for (const e of (b.escuadras || []).concat(b.escuadra_irrumpe || [])) if (!d.enemigos.escuadras[e]) err('bandos › ' + id, 'escuadra que no existe: ' + e);
+      for (const pz of b.partes || []) if (!d.partes[pz]) err('bandos › ' + id, 'parte que no existe: ' + pz);
+      if (b.lider && !d.enemigos.unidades[b.lider]) err('bandos › ' + id, 'lider que no existe: ' + b.lider);
+      for (const t of b.contratos || []) if (!d.misiones[t]) err('bandos › ' + id, 'tipo de contrato que no existe: ' + t);
+    }
+    for (const sd of ((d.sectores || {}).campana_base || {}).sectores_def || []) {
+      for (const b of sd.bandos || []) if (!B.bandos[b]) err('sectores › ' + sd.nombre, 'bando que no existe: ' + b);
+      for (const a of sd.amenazas || []) if (!B.amenazas[a]) err('sectores › ' + sd.nombre, 'amenaza que no existe: ' + a);
+    }
   }
 
   // --- 3. Partes y afijos

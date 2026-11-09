@@ -23,12 +23,13 @@ export function estiloDe(datos, m) {
   return m.plano ? m.plano.estilo : (datos.lore.estilo_de_mapa[m.mapa] || 'campo');
 }
 
-export function armarLore(datos, m, sector, jefeDelSector = null) {
+// clienteFijo: { id, nombre, quien } cuando el contrato ya es de un bando (bandos.json)
+export function armarLore(datos, m, sector, jefeDelSector = null, clienteFijo = null) {
   const L = datos.lore;
   const az = crearAzar((m.semilla ^ 0x2f6b1) >>> 0 || 1);
   const tipo = m.plantilla;
   const clientes = Object.entries(L.clientes).filter(([, c]) => c.sectores.includes(Math.min(sector, 2)) && c.tipos.includes(tipo));
-  const [cid, cliente] = clientes.length ? az.elegir(clientes) : ['resistencia', L.clientes.resistencia];
+  const [cid, cliente] = clienteFijo ? [clienteFijo.id, clienteFijo] : clientes.length ? az.elegir(clientes) : ['resistencia', L.clientes.resistencia];
   const dom = enemigoDominante(datos, m);
   const enemigo = L.enemigos[dom] || L.enemigos.mecha;
   const lugar = m.plano ? m.plano.nombre : ((datos.mapas[m.mapa] || {}).nombre || 'la zona');

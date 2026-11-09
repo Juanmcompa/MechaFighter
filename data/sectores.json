@@ -52,7 +52,9 @@
       "por_mision": 1,
       "sin_datos": "refuerzos",
       "con_datos": "inteligencia",
-      "datos_desde": 2
+      "datos_desde": 2,
+      "para_guarida": 3,
+      "_ayuda": "Cada contrato ganado en el sector suma por_mision (hasta maxima). Con para_guarida se abre la ruta a la guarida del jefe; con maxima (datos_desde) se llega con la condicion con_datos."
     },
     "sectores_def": [
       {
@@ -78,6 +80,14 @@
             "nombre": "El Desarmador",
             "frase": "Todo lo que entra acá sale en pedazos."
           }
+        ],
+        "bandos": [
+          "cooperativa",
+          "grua"
+        ],
+        "bando_jefe": "grua",
+        "amenazas": [
+          "fauna"
         ]
       },
       {
@@ -94,12 +104,6 @@
           ],
           "frase": "(un chillido que satura la radio)"
         },
-        "fauna": [
-          "nido",
-          "enjambre_larvas",
-          "colmena",
-          "camada"
-        ],
         "titulo_jefe": "Pastor de la Colmena",
         "herederos": [
           {
@@ -110,6 +114,16 @@
             "nombre": "El Pastor",
             "frase": "Ella no murió. Ella está en todos nosotros."
           }
+        ],
+        "bandos": [
+          "colonos",
+          "vesta"
+        ],
+        "bando_jefe": null,
+        "amenaza_jefe": "fauna",
+        "amenazas": [
+          "contagio",
+          "fauna"
         ]
       },
       {
@@ -134,6 +148,16 @@
             "nombre": "El Almirante Gris",
             "frase": "Su escuadrón ya es leyenda en la flota. Leyenda muerta."
           }
+        ],
+        "bandos": [
+          "flota",
+          "desertores",
+          "vesta"
+        ],
+        "bando_jefe": "flota",
+        "amenazas": [
+          "fauna",
+          "contagio"
         ]
       }
     ],
@@ -141,6 +165,6 @@
       "_ayuda": "La campaña no termina: despues del ultimo territorio se vuelve al primero, mas dificil. Cada vuelta suma 'nivel_extra_por_sector' al nivel de los enemigos por cada sector despues del ultimo de la lista.",
       "nivel_extra_por_sector": 1
     },
-    "_ayuda": " Campaña infinita: los territorios de 'sectores_def' se repiten en ronda, cada vuelta más difíciles ('infinito'). El jefe de cada sector es el némesis más curtido que ande suelto (con 'titulo_jefe'); si no hay, el jefe de la lista, y en las vueltas siguientes uno de sus 'herederos'."
+    "_ayuda": "Campaña infinita: los territorios de 'sectores_def' se repiten en ronda, cada vuelta más difíciles ('infinito'). El jefe de cada sector es el némesis más curtido que ande suelto (con 'titulo_jefe'); si no hay, el jefe de la lista, y en las vueltas siguientes uno de sus 'herederos'. bandos: quienes se disputan el sector (bandos.json); bando_jefe: de que bando es el jefe (o amenaza_jefe si es una amenaza); amenazas: fauna y contagio que hay."
   }
 }

@@ -10,10 +10,15 @@ import { preparacion } from './preparacion.js';
 import { batalla } from './batalla.js';
 import { despliegue } from './despliegue.js';
 import { informe } from './informe.js';
-import { taller, reclutamiento, evento } from './nodos.js';
+import { reclutamiento, evento } from './nodos.js';
+import { parada } from './parada.js';
+import { contrato } from './contrato.js';
+import { frente } from './frente.js';
+import { nodriza } from './nodriza.js';
+import { compania } from './compania.js';
 import { fin } from './fin.js';
 
-const PANTALLAS = { portada, sectores, hangar, preparacion, despliegue, batalla, informe, taller, reclutamiento, evento, fin };
+const PANTALLAS = { portada, sectores, hangar, preparacion, despliegue, batalla, informe, parada, contrato, frente, nodriza, compania, reclutamiento, evento, fin };
 
 export function crearApp(datos, raiz) {
   const app = {
@@ -43,7 +48,7 @@ export function crearApp(datos, raiz) {
     continuar() {
       const p = app.partida;
       if (!p) return app.ir('portada');
-      const destino = { sectores: 'sectores', preparacion: 'preparacion', taller: 'taller', reclutamiento: 'reclutamiento', evento: 'evento', fin: 'fin' }[p.estado];
+      const destino = { sectores: 'sectores', preparacion: 'preparacion', parada: 'parada', reclutamiento: 'reclutamiento', evento: 'evento', fin: 'fin' }[p.estado];
       app.ir(destino || 'sectores');
     },
     guardar() { if (app.partida) guardar(app.partida); },

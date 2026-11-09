@@ -138,7 +138,13 @@ export function sumarCondicion(datos, m, id, azar, escuadras) {
     if (e.vision) m.visionDelta += e.vision;
     if (e.niebla !== undefined) m.niebla = e.niebla;
     if (e.estado_escuadron) m.estadosEscuadron.push(e.estado_escuadron);
-    if (e.refuerzos) m.refuerzos = { tick: e.refuerzos, unidades: escuadra(datos, azar, escuadras, m.dificultad) };
+    if (e.refuerzos) {
+      // una amenaza (fauna, contagio) que se cuela: trae sus propias escuadras y se suma a los refuerzos que ya hubiera
+      const lista = e.amenaza && datos.bandos ? datos.bandos.amenazas[e.amenaza].escuadra_irrumpe : escuadras;
+      const unidades = escuadra(datos, azar, lista, m.dificultad);
+      if (m.refuerzos && e.amenaza) m.refuerzos.unidades.push(...unidades);
+      else m.refuerzos = { tick: e.refuerzos, unidades };
+    }
     if (e.unidad_extra) {
       if (m.oleadas.length) m.oleadas[0].push(e.unidad_extra);
       else m.emboscadas.push({ unidades: [e.unidad_extra], casilla: mapa.aparicion.enemigo[0] });

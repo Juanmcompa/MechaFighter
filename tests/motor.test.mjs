@@ -5,7 +5,7 @@ import { simular } from '../src/motor/simular.js';
 import { evaluar } from '../src/motor/decision.js';
 import { armarMision } from '../src/campana/misiones.js';
 import { crearRecluta } from '../src/campana/reclutas.js';
-import { nuevaPartida, nodosSiguientes, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector, elegirOpcion } from '../src/campana/partida.js';
+import { nuevaPartida, nodosSiguientes, destinosDeLaNave, elegirNodo, escuadronParaMision, cerrarMision, seguir, generarSector, elegirOpcion } from '../src/campana/partida.js';
 import { relato } from '../src/campana/cronica.js';
 import { fotoPiloto } from '../src/campana/legado.js';
 import { saquear } from '../src/campana/saqueo.js';
@@ -88,29 +88,42 @@ console.log('Campana');
   ok(JSON.stringify(a) === JSON.stringify(b), 'misma semilla, misma partida');
   ok(a.pilotos.length === datos.reglas.reclutas_iniciales && a.pilotos.every((p) => p.vinculo), 'arranca con reclutas vinculados de a pares');
   const p = nuevaPartida(datos, 99);
-  const i = nodosSiguientes(p).findIndex((n) => n.tipo === 'mision');
+  const i = nodosSiguientes(datos, p).findIndex((n) => n.tipo === 'mision');
   elegirNodo(datos, p, i);
   ok(p.estado === 'preparacion', 'elegir una mision lleva a la preparacion');
   const r = simular(datos, { mision: p.nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: p.nodo.mision.semilla });
   const inf = cerrarMision(datos, p, r);
-  ok(inf.pilotos.length === 4 && p.columna === 0, 'el informe cubre al escuadron y se avanza una columna');
+  ok(inf.pilotos.length === 4 && p.sectores[0].saltos === 1 && p.estado !== 'preparacion', 'el informe cubre al escuadron y la nave sigue en el sector');
   ok(p.caidos.length === inf.caidos.length && p.pilotos.length + p.caidos.length === 4, 'los muertos pasan al memorial');
   ok(JSON.parse(JSON.stringify(p)).semilla === 99, 'la partida se puede guardar');
 }
 
-// Caminos del sector: a cada nodo se llega, y desde cada uno se sigue
+// Brujula: de 1 a 6 destinos alrededor de la nave, a 1-3 de combustible; al saltar aparecen otros y el de antes queda gris
 {
   const p = nuevaPartida(datos, 77);
-  const cols = p.sectores[0].columnas;
-  let bien = true;
-  for (let c = 0; c + 1 < cols.length; c++) {
-    if (cols[c].some((n) => !n.sig || !n.sig.length)) bien = false;
-    if (cols[c + 1].some((n) => !cols[c].some((a) => a.sig.includes(n.i)))) bien = false;
+  const d0 = destinosDeLaNave(datos, p);
+  ok(d0.length >= 1 && d0.length <= 6 && d0.every((d) => d.costo >= 0 && d.costo <= 3), 'la brujula muestra de 1 a 6 destinos a 1-3 de combustible (' + d0.length + ')');
+  ok(d0.some((d) => d.nodo.tipo === 'jefe' && d.bloqueado), 'la guarida del jefe se ve, cerrada hasta tener datos');
+  const s = p.sectores[0];
+  const contrato = s.nodos.find((n) => n.tipo === 'mision' && n.mision.cliente);
+  ok(!!contrato && s.bandos.includes(contrato.mision.cliente) && contrato.mision.objetivo !== contrato.mision.cliente, 'cada contrato es de un bando contra otro (o contra una amenaza)');
+  const desde = s.actual;
+  const libre = d0.findIndex((d) => !d.bloqueado && d.nodo.tipo !== 'mision');
+  elegirNodo(datos, p, Math.max(0, libre));
+  seguir(datos, p);
+  const d1 = destinosDeLaNave(datos, p);
+  ok(s.actual !== desde && d1.some((d) => d.nodo.visitado), 'despues de saltar, lo visitado queda en la brujula (gris)');
+  // reputacion y frente
+  const q = nuevaPartida(datos, 78);
+  const sq = q.sectores[0];
+  const k = destinosDeLaNave(datos, q).filter((d) => !d.bloqueado).findIndex((d) => d.nodo.tipo === 'mision' && sq.bandos.includes(d.nodo.mision.objetivo));
+  if (k >= 0) {
+    elegirNodo(datos, q, k);
+    const m = q.nodo.mision;
+    const antes = sq.frente[m.cliente];
+    const inf = cerrarMision(datos, q, { victoria: true, motivo: 'objetivo', registro: [], resumen: { pilotos: {}, bajasEnemigas: 0 } });
+    ok(q.reputacion[m.cliente] > 0 && q.reputacion[m.objetivo] < 0 && sq.frente[m.cliente] > antes && inf.bandos.cambios.length === 2, 'ganar un contrato sube con el cliente, baja con el rival y corre el frente');
   }
-  ok(bien, 'caminos del sector: todos los nodos enlazados');
-  elegirNodo(datos, p, 0);
-  const desde = cols[0][p.posicion];
-  ok(nodosSiguientes(p).every((n) => desde.sig.includes(n.i)), 'solo se puede ir a los nodos enlazados');
 }
 
 // Legado: el veterano pasa a la campana siguiente y el escuadron perdido aparece como enemigo
@@ -122,7 +135,7 @@ console.log('Campana');
   ok(p.pilotos.length === datos.reglas.reclutas_iniciales + 1 && p.pilotos.some((x) => x.veterano && x.nivel === 4), 'el veterano entra a la campana nueva');
   p.sector = datos.reglas.legado.sector_encuentro;
   generarSector(datos, p);
-  const nodo = p.sectores[p.sector].columnas.flat().find((n) => n.encuentro);
+  const nodo = p.sectores[p.sector].nodos.find((n) => n.encuentro);
   ok(!!nodo && nodo.mision.rivales.length === 2, 'el escuadron anterior aparece en un contrato');
   ok(p.nemesis && p.nemesis.length === 1 && p.nemesis[0].origen === 'caido' && p.nemesis[0].apodo === fotos[1].apodo, 'el de mas nivel del escuadron perdido vuelve como nemesis');
   const r = simular(datos, { mision: nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: nodo.mision.semilla });
@@ -161,7 +174,7 @@ console.log('Campana');
   const n = nemesisDelLegado(datos, p, { ...fotoPiloto(p.pilotos[1]), apodo: 'Jefazo', id: 'x8' }, 'acá', p.pilotos[0], crearAzar(2));
   p.sector = 3; generarSector(datos, p);
   const s = p.sectores[3];
-  const jefe = s.columnas.at(-1)[0].mision;
+  const jefe = s.nodos.find((n) => n.tipo === 'jefe').mision;
   ok(s.nombre.endsWith(' II') && s.nivel > datos.sectores.campana_base.nivel_enemigo_por_sector.at(-1), 'el sector 4 repite el primer territorio, mas dificil');
   ok(s.jefeNemesis === n.id && jefe.nemesisJefe && jefe.rivales.some((r) => r.nemesis && r.lider && r.cae), 'el nemesis se queda con el sector y es el jefe (y si cae, cae)');
   const r = simular(datos, { mision: jefe, escuadron: p.pilotos.map((x) => ({ piloto: x, mecha: x.mecha, gambits: x.gambits })), semilla: jefe.semilla });
@@ -208,8 +221,9 @@ console.log('Campana');
 {
   const p = nuevaPartida(datos, 123);
   const comb = p.combustible;
+  const costo = destinosDeLaNave(datos, p).filter((d) => !d.bloqueado)[0].costo;
   elegirNodo(datos, p, 0);
-  ok(p.combustible === comb - datos.reglas.combustible.por_salto, 'cada salto gasta combustible');
+  ok(p.combustible === comb - costo, 'cada salto gasta el combustible de la distancia');
   p.nodo = { tipo: 'evento', dilema: 'chatarrero', resultado: null };
   const r = elegirOpcion(datos, p, 2);
   ok(r && r.cambios.some((c) => c.icono === 'combustible') && p.combustible > comb - 1, 'una opcion del dilema da combustible');

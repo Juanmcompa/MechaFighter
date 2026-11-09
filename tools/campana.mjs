@@ -1,9 +1,9 @@
-// Juega campanas enteras con un piloto automatico (elige el primer nodo, contrata si puede, compra lo primero que
-// le alcanza) para ver que tan dificil es la campana completa.
+// Juega campanas enteras con un piloto automatico (va a la guarida si puede, si no al contrato mas cerca; para en
+// las paradas cuando le falta combustible; contrata si puede, compra lo primero que le alcanza) para ver que tan dificil es la campana completa.
 //   node tools/campana.mjs [cantidad] [legado]   (con 'legado', cada campana arranca con lo que dejo la anterior)
 import { cargarDatos } from '../src/core/datos.js';
 import { simular } from '../src/motor/simular.js';
-import { nuevaPartida, nodosSiguientes, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar, reparar, costoReparacion, elegirOpcion, comprarCombustible } from '../src/campana/partida.js';
+import { nuevaPartida, destinosDeLaNave, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar, reparar, costoReparacion, elegirOpcion, comprarCombustible, paradaActual, instalarMejora, mejoraDe } from '../src/campana/partida.js';
 import { opcionDisponible } from '../src/campana/dilemas.js';
 import { leerDisco } from './leer-disco.mjs';
 
@@ -13,28 +13,38 @@ let pasaron = 0, maxSector = 0, jefesNemesis = 0;
 let ganadas = 0, misiones = 0, ganadasM = 0, caidos = 0, sectorMax = 0, puntaje = 0;
 const t0 = Date.now();
 const conLegado = process.argv[3] === 'legado';
-let remolques = 0, combFinal = 0;
+let remolques = 0, combFinal = 0, mejoras = 0, saltos = 0, emboscadas = 0;
 let legado = null, encuentros = 0, encuentrosGanados = 0, rescates = 0, veteranos = 0;
 for (let n = 0; n < N; n++) {
   const p = nuevaPartida(datos, 5000 + n, conLegado ? legado : null);
   if (legado && legado.veterano) veteranos++;
-  let vueltas = 0;
-  while (p.estado !== 'fin' && vueltas++ < 400) {
-    const nodos = nodosSiguientes(p);
-    // preferir misiones, despues reclutamiento si faltan pilotos, despues lo que sea
-    let i = nodos.findIndex((x) => x.tipo === 'reclutamiento' && p.pilotos.length < 4);
-    if (i < 0) i = nodos.findIndex((x) => x.tipo === 'mision' || x.tipo === 'jefe');
-    if (i < 0) i = 0;
-    elegirNodo(datos, p, i);
+  let vueltas = 0, esperar = 0;
+  while (p.estado !== 'fin' && vueltas++ < 600) {
+    const lista = destinosDeLaNave(datos, p).filter((d) => !d.bloqueado);
+    const nuevos = lista.filter((d) => !d.nodo.visitado).sort((a, b) => a.costo - b.costo);
+    // la guarida si se abrio; una parada si falta combustible; reclutas si faltan pilotos; si no, el contrato mas cerca
+    let d = esperar > 0 ? null : lista.find((x) => x.nodo.tipo === 'jefe');
+    if (!d && p.combustible < 5 && p.creditos >= 60) d = lista.filter((x) => x.nodo.tipo === 'parada').sort((a, b) => a.costo - b.costo)[0];
+    if (!d && p.pilotos.length < 5 && p.creditos >= 90) d = nuevos.find((x) => x.nodo.tipo === 'reclutamiento');
+    if (!d) d = nuevos.find((x) => x.nodo.tipo === 'mision') || nuevos[0] || lista[0];
+    if (!d) break;
+    elegirNodo(datos, p, d.nodo);
     if (p.estado === 'preparacion') {
       const r = simular(datos, { mision: p.nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: p.nodo.mision.semilla });
       misiones++; if (r.victoria) ganadasM++;
+      { const m = p.nodo.mision; const k2 = p.sector + ":" + (m.objetivo || "-") + ":" + m.plantilla + (m.condiciones && m.condiciones.some((c) => c.startsWith("irrumpe")) ? "+i" : ""); (globalThis.porObj ||= {})[k2] = (globalThis.porObj[k2] || [0, 0]); globalThis.porObj[k2][0] += r.victoria ? 1 : 0; globalThis.porObj[k2][1]++; }
       const k = p.sector + (p.nodo.tipo === "jefe" ? (p.nodo.mision.nemesisJefe ? "N" : "J") : ""); (globalThis.porSector ||= {})[k] = (globalThis.porSector[k] || [0, 0]); globalThis.porSector[k][0] += r.victoria ? 1 : 0; globalThis.porSector[k][1]++;
       const enc = !!p.nodo.mision.rivales;
+      if (p.nodo.tipo === 'jefe' && !r.victoria) esperar = 3; else if (esperar) esperar--;
       const inf = cerrarMision(datos, p, r);
       if (enc) { encuentros++; if (r.victoria) encuentrosGanados++; if (inf.rescatado) rescates++; }
     } else {
-      if (p.estado === 'taller') { while (p.combustible < 4 && comprarCombustible(datos, p)); p.nodo.oferta.forEach((_, k) => comprar(datos, p, k)); }
+      if (p.estado === 'parada') {
+        while (p.combustible < 8 && comprarCombustible(datos, p));
+        for (const id of ['tanque', 'bahia', 'sensor', 'casco']) if (mejoraDe(datos, p, id).puede && p.creditos > 500) instalarMejora(datos, p, id);
+        paradaActual(p).oferta.forEach((_, k) => comprar(datos, p, k));
+        mejoras += 0;
+      }
       if (p.estado === 'evento' && p.nodo.dilema) {
         const ops = datos.dilemas[p.nodo.dilema].opciones;
         elegirOpcion(datos, p, Math.max(0, ops.findIndex((op) => opcionDisponible(datos, p, op).ok)));
@@ -54,6 +64,7 @@ for (let n = 0; n < N; n++) {
   }
   if (p.resultado === 'victoria') ganadas++;
   remolques += (p.stats && p.stats.remolques) || 0; combFinal += p.combustible || 0;
+  mejoras += (p.stats && p.stats.mejoras) || 0; emboscadas += (p.stats && p.stats.emboscadas) || 0; saltos += p.sectores.reduce((t, x) => t + ((x && x.saltos) || 0), 0);
   legado = p.legado || null;
   if (legado && p.resultado === 'victoria' && p.pilotos.length) legado.veterano = { ...p.pilotos[0], comoLlego: 'eligio' };
   caidos += p.caidos.length;
@@ -66,5 +77,7 @@ for (let n = 0; n < N; n++) {
 console.log(`pasan el sector 3: ${Math.round((pasaron * 100) / N)}% · mejor sector ${maxSector} · jefes nemesis/campana ${(jefesNemesis / N).toFixed(1)} · misiones ganadas ${Math.round((ganadasM * 100) / misiones)}% · ` +
   `caidos/campana ${(caidos / N).toFixed(1)} · sector alcanzado ${(sectorMax / N).toFixed(1)} · puntaje ${Math.round(puntaje / N)} · ${Math.round((Date.now() - t0) / N)} ms`);
 console.log(Object.entries(globalThis.porSector).map(([k,[g,t]])=>k+": "+Math.round(g*100/t)+"% de "+t).join(" · "))
-console.log(`remolques por campana ${(remolques / N).toFixed(1)} · combustible al final ${(combFinal / N).toFixed(1)}`);
+console.log(`remolques por campana ${(remolques / N).toFixed(1)} · combustible al final ${(combFinal / N).toFixed(1)} · saltos ${(saltos / N).toFixed(0)} · mejoras ${(mejoras / N).toFixed(1)} · emboscadas ${(emboscadas / N).toFixed(1)}`);
 if (conLegado) console.log(`legado: ${veteranos} veteranos · ${encuentros} encuentros con el escuadron anterior (${encuentrosGanados} ganados, ${rescates} rescates)`);
+// DETALLE=1: como le fue contra cada bando y tipo de mision, por sector
+if (process.env.DETALLE) console.log(Object.entries(globalThis.porObj).sort().map(([k,[g,t]])=>k+" "+Math.round(g*100/t)+"%/"+t).join("\n"));

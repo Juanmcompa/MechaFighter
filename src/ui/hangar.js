@@ -143,7 +143,8 @@ function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
 
   return [
     h('header', { class: 'hg-cabeza' },
-      h('div', { class: 'hg-titulo' }, h('h1', {}, 'Escuadrón'), h('span', {}, s ? 'Sector ' + (p.sector + 1) + ' · ' + s.nombre : p.pilotos.length + ' pilotos')),
+      h('div', { class: 'hg-titulo' }, h('h1', {}, 'Escuadrón'),
+        h('button', { class: 'hg-compania', onclick: () => app.ir('compania'), 'aria-label': 'La compañía: renombre, nave, bandos y némesis' }, (p.nombreEscuadron || 'La compañía') + ' ›')),
       h('span', { class: 'hg-creditos', title: 'Créditos' }, '₵ ' + p.creditos.toLocaleString('es-AR'))),
     p.remolque && p.estado !== 'sectores' ? h('p', { class: 'aviso-remolque' }, ico('combustible'), ' Sin combustible: el remolque cobró ' + p.remolque.creditos +
       ' créditos y los mechas perdieron ' + p.remolque.danio + '% de estructura.') : null,
@@ -401,7 +402,7 @@ function hojaPiezas({ app, datos, p, pi, pintar }, actual, prueba) {
       botonIcono('cerrar', 'Cerrar', () => { ARMADO.slot = null; ARMADO.cand = null; pintar(); }, 'hoja-cerrar')),
     h('div', { class: 'hoja-lista', 'data-scroll': 'piezas-' + slot },
       ...filas.map(fila),
-      cantidad ? null : h('p', { class: 'ayuda' }, 'No hay piezas de este tipo en el depósito. Se ganan en las misiones o se compran en el taller.')),
+      cantidad ? null : h('p', { class: 'ayuda' }, 'No hay piezas de este tipo en el depósito. Se ganan en las misiones o se compran en las paradas técnicas.')),
     detalle,
     h('div', { class: 'hoja-botones' },
       boton('Armar solo', () => { ARMADO.cand = null; if (armarSolo(datos, p, pi)) app.guardar(); pintar(); }, { iconoNombre: 'dado', clase: 'secundario' }),
