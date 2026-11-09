@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 59,
-  "cambio": "La luz ya no atraviesa las paredes",
+  "numero": 60,
+  "cambio": "texture_fix",
   "novedades": [
+    "v0.60 · texture_fix",
     "v0.59 · La luz ya no atraviesa las paredes",
     "v0.58 · Los muros proyectan su sombra con su forma y tienen relieve con la luz",
     "v0.57 · texture n lights hotfix",
     "v0.56 · Muros nuevos que encajan solos entre sí",
-    "v0.55 · textures_map",
-    "v0.54 · Luces: el campo en penumbra, faros en los mechas y relieve con normal maps"
+    "v0.55 · textures_map"
   ]
 }

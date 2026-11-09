@@ -4,5 +4,10 @@
     "assets/terreno/muro_tiles_n.png"
   ],
   "brillos": [
+    "assets/terreno/acido_2_e.png",
+    "assets/terreno/acido_3_e.png",
+    "assets/terreno/acido_4_e.png",
+    "assets/terreno/acido_5_e.png",
+    "assets/terreno/acido_e.png"
   ]
 }

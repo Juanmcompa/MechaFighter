@@ -565,5 +565,20 @@
     "radar": 7,
     "habilidad": "marcar_objetivo",
     "descripcion": "La óptica que Varga le arrancó a un crucero. Ve todo, a través de todo. Trae Marcar objetivo y radar."
+  },
+  "torso_pesado_bf_recharged": {
+    "nombre": "BF Heavy MkII",
+    "encaje": "torso",
+    "rareza": "raro",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 100,
+    "blindaje": 20,
+    "capacidad": 40,
+    "peso": 15,
+    "costo": 320,
+    "recuperable": true,
+    "sprite": "torso_pesado_bf_recharged"
   }
 }
