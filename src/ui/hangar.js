@@ -338,9 +338,8 @@ function vistaArmado(ctx) {
     }
   });
 
-  const pie = slot ? hojaPiezas(ctx, actual, prueba) : h('div', { class: 'hg-desplegar' },
-    boton('Armar solo', () => { if (armarSolo(datos, p, pi)) { app.guardar(); } pintar(); }, { iconoNombre: 'dado', clase: 'secundario', titulo: 'Poner lo mejor del depósito para su clase' }),
-    h('p', { class: 'ar-pista-texto' }, 'Tocá una pieza del mecha para cambiarla.'));
+  const pie = slot ? hojaPiezas(ctx, actual, prueba) : pieEdicion(ctx,
+    botonIcono('dado', 'Armar solo: poner lo mejor del depósito para su clase', () => { if (armarSolo(datos, p, pi)) { app.guardar(); } pintar(); }, 'pe-solo'));
 
   return [
     cabeceraPiloto(ctx, 'Armado'),
@@ -581,8 +580,20 @@ function vistaOrdenes(ctx) {
     h('ol', { class: 'or-lista', 'aria-label': 'Órdenes, de arriba abajo: hace la primera que se cumpla' }, ...filas),
     seccion('Pasivas', h('div', {}, h('p', { class: 'ayuda' }, 'Lo que lleva encima siempre, sin que se lo ordenes.'), panelPasivas(app, pi)), false),
     ORDEN.abierta !== null ? hojaOpciones(ctx, lista, falta, guardar)
-      : h('div', { class: 'hg-desplegar' }, h('p', { class: 'ar-pista-texto' }, 'Hace la primera orden que se cumpla. Tocá un ícono para cambiarlo.'))
+      : pieEdicion(ctx)
   ];
+}
+
+// Pie de armado y ordenes: saltar de uno a otro sin volver al escuadron, y Listo cuando terminaste los dos
+function pieEdicion({ ir }, extra) {
+  const lado = (id, texto, icono) => h('button', {
+    class: 'pe-lado' + (VISTA.seccion === id ? ' activo' : ''), 'aria-pressed': VISTA.seccion === id ? 'true' : 'false',
+    onclick: () => { if (VISTA.seccion !== id) ir(id); }
+  }, ico(icono), h('span', {}, texto));
+  return h('div', { class: 'hg-desplegar pie-edicion' },
+    extra || null,
+    h('div', { class: 'pe-cambio', role: 'group', 'aria-label': 'Editar' }, lado('armado', 'Armado', 'llave'), lado('ordenes', 'Órdenes', 'lista')),
+    boton('Listo', () => ir('escuadron'), { iconoNombre: 'play', clase: 'principal' }));
 }
 
 // Opciones que puede usar hoy (para saber cuales son nuevas despues)
