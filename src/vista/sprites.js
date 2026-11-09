@@ -41,12 +41,17 @@ export async function cargarSprites(base = './', cantidadRetratos = 0, { extras 
         meta[id] = { w, h, ancla, ...(papel ? { papel: true } : {}) };
       }
       SPR.imgs['azul/' + id] = nuevo ? pintarEquipo(azul, 'azul', colorEquipo) : azul;
+      SPR.imgs['azul/' + id]._luzColor = 'mecha/azul/' + id;
       for (const color of ['rojo', 'verde']) {
         const otra = await cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png');
         // si falta, o es de otra medida (el dibujo viejo), o es el mismo dibujo: el color de bando se pinta solo
         const sirve = otra && otra.width === azul.width && otra.height === azul.height;
         if (sirve) otra._luz = azul._luz;
-        SPR.imgs[color + '/' + id] = !nuevo && sirve ? otra : pintarEquipo(sirve ? otra : azul, color, colorEquipo);
+        let im = !nuevo && sirve ? otra : pintarEquipo(sirve ? otra : azul, color, colorEquipo);
+        // (si quedo la misma imagen que la azul, se copia para que cada bando tenga su brillo)
+        if (im === azul) { const c = document.createElement('canvas'); c.width = azul.width; c.height = azul.height; c.getContext('2d').drawImage(azul, 0, 0); c._luz = azul._luz; c._puntas = azul._puntas; c._faros = azul._faros; im = c; }
+        im._luzColor = 'mecha/' + color + '/' + id;
+        SPR.imgs[color + '/' + id] = im;
       }
     }));
     SPR.listo = Object.keys(SPR.imgs).length > 0;

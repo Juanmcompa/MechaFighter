@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 65,
-  "cambio": "Los faros salen de donde los dibujes: píxel amarillo en la cabeza",
+  "numero": 66,
+  "cambio": "Cada bando con su propio brillo: el escudo azul ya no brilla rojo",
   "novedades": [
+    "v0.66 · Cada bando con su propio brillo: el escudo azul ya no brilla rojo",
     "v0.65 · Los faros salen de donde los dibujes: píxel amarillo en la cabeza",
     "v0.64 · La punta de las armas se marca en magenta, y cualquier pieza puede tener arma",
     "v0.63 · Las piezas redibujadas se arman bien aunque cambien de medida",
     "v0.62 · Los disparos salen de la punta de cada arma, no del centro del mecha",
-    "v0.61 · Las piezas con arte nuevo ya se ven en el mecha sin tocar sprites.json",
-    "v0.60 · texture_fix"
+    "v0.61 · Las piezas con arte nuevo ya se ven en el mecha sin tocar sprites.json"
   ]
 }

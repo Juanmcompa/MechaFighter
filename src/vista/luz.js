@@ -36,7 +36,13 @@ export async function cargarLuces(base = './') {
     if (!r.ok) return LUZ;
     const m = await r.json();
     await Promise.all([...(m.normales || []).map((ruta) => [ruta, 'n']), ...(m.brillos || []).map((ruta) => [ruta, 'e'])]
-      .map(([ruta, tipo]) => cargar(base + ruta).then((im) => { if (im) LUZ[tipo][claveDe(ruta)] = im; })));
+      .map(([ruta, tipo]) => cargar(base + ruta).then((im) => {
+        if (!im) return;
+        // los de un color (assets/mecha/rojo/x_e.png) valen para ese bando; los de azul, ademas, para todos
+        const color = (ruta.match(/assets\/mecha\/(azul|rojo|verde)\//) || [])[1];
+        if (color) LUZ[tipo][claveDe(ruta).replace('mecha/', 'mecha/' + color + '/')] = im;
+        if (!color || color === 'azul' || !LUZ[tipo][claveDe(ruta)]) LUZ[tipo][claveDe(ruta)] = im;
+      })));
   } catch { /* sin luces a mano: todo automatico */ }
   LUZ.listo = true;
   return LUZ;
@@ -79,13 +85,14 @@ function normalGirado(clave, im, m) {
 // (con recorte: capas(ctx, im, dx, dy, dw, dh, [sx, sy, sw, sh]) dibuja solo ese pedazo de la imagen)
 export function capas(ctx, im, dx, dy, dw, dh, recorte = null) {
   if (!CAPAS.normal || !im || !im._luz) return;
-  const n = LUZ.n[im._luz], e = LUZ.e[im._luz];
+  // ._luzColor: la version de un bando (mecha/rojo/x), que puede tener su propio brillo o normal map
+  const n = LUZ.n[im._luzColor] || LUZ.n[im._luz], e = LUZ.e[im._luzColor] || LUZ.e[im._luz];
   if (!n && !e) return;
   const m = ctx.getTransform();
   if (n) {
     const c = CAPAS.normal;
     c.setTransform(m); c.globalAlpha = ctx.globalAlpha;
-    const g = normalGirado(im._luz, n, m);
+    const g = normalGirado(LUZ.n[im._luzColor] ? im._luzColor : im._luz, n, m);
     if (recorte) c.drawImage(g, ...recorte, dx, dy, dw, dh); else c.drawImage(g, dx, dy, dw, dh);
   }
   if (e) {
