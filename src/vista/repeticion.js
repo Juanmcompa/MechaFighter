@@ -1,7 +1,7 @@
 // Reproduce el registro de una batalla en un canvas. No sabe nada de reglas: solo lee eventos y los dibuja.
 // La batalla ya se jugo entera en el motor; aca se la mira a la velocidad que uno quiera (o se salta al final).
 
-import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe, bocaEnMapa } from './dibujo.js';
+import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe, bocaEnMapa, farosDe } from './dibujo.js';
 import { crearTablero, lineaDeTiro, distancia, caminable, cambiarCasilla } from '../motor/espacio.js';
 import { CAPAS, crearCompositor, colorLuz, girarNormales } from './luz.js';
 
@@ -256,7 +256,12 @@ export class Repeticion {
     for (const u of vivas) {
       if (!u.ficha.apariencia) continue; // solo los mechas tienen faro
       const def = u.ficha.bando === 0 ? cfg.faro : cfg.faro_enemigo || cfg.faro;
-      sumar(u.x + 0.5 + Math.cos(u.ang) * 0.25, u.y + 0.5 + Math.sin(u.ang) * 0.25, def, { dir: direccion(u.ang), cono: ((def.cono || 35) * Math.PI) / 180, suave: 0.12 });
+      const extra = { dir: direccion(u.ang), cono: ((def.cono || 35) * Math.PI) / 180, suave: 0.12 };
+      // faros marcados en el dibujo (amarillo #ffff00), o uno en el medio
+      if (u.faros === undefined) u.faros = farosDe(u.ficha);
+      const c = Math.cos(u.ang), s = Math.sin(u.ang);
+      if (u.faros) for (const [fw, rt] of u.faros) sumar(u.x + 0.5 + c * fw - s * rt, u.y + 0.5 + s * fw + c * rt, def, extra, u.faros.length > 1 ? 0.7 : 1);
+      else sumar(u.x + 0.5 + c * 0.25, u.y + 0.5 + s * 0.25, def, extra);
     }
     for (const u of vivas) sumar(u.x + 0.5, u.y + 0.5, u.ficha.bando === 0 ? cfg.aura : cfg.aura_enemigo || cfg.aura);
     if (!this.acidos) {

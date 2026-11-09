@@ -464,24 +464,42 @@ function puntasEnImagen(im) {
 export function bocaDeArma(f, slot, n = 0) {
   const a = f.apariencia;
   if (!a || !a.torso || !SPR.listo) return null;
-  const E = SPR.escala, M = (id) => SPR.meta[id];
-  const T = M(a.torso);
+  const M = (id) => SPR.meta[id];
   const id = a[slot];
-  if (!T || !id || !M(id)) return null;
+  if (!M(a.torso) || !id || !M(id)) return null;
   const im = sprite('azul', id);
-  if (!im) return null;
+  if (!im || !['brazo_der', 'brazo_izq', 'mochila', 'cabeza', 'torso'].includes(slot)) return null;
+  const puntas = puntasEnImagen(im);
+  return puntoEnPieza(f, slot, puntas[n % puntas.length]);
+}
+
+// Un punto (en pixeles de la imagen de la pieza de ese encaje) pasado a casillas: [adelante, costado derecho]
+function puntoEnPieza(f, slot, [px, py]) {
+  const a = f.apariencia;
+  const E = SPR.escala, M = (id) => SPR.meta[id];
+  const T = M(a.torso), id = a[slot];
+  const im = sprite('azul', id);
   const tw = T.w / E, th = T.h / E;
   const lugar = { brazo_der: [tw * 0.5, -th * 0.05, 1], brazo_izq: [-tw * 0.5, -th * 0.05, -1], mochila: [0, th * 0.38, 1], cabeza: [0, -th * 0.12, 1], torso: [0, 0, 1] }[slot];
-  if (!lugar) return null;
   let [x, y, lado] = lugar;
   const m = M(id), w = m.w / E, h = m.h / E;
   const [ax, ay] = m.papel || slot === 'torso' ? [w / 2, h / 2] : [m.ancla[0] / E, m.ancla[1] / E];
   if (m.papel) { x = 0; y = 0; }
-  const puntas = puntasEnImagen(im);
-  const [px, py] = puntas[n % puntas.length];
   const lx = x + lado * (px * (w / im.width) - ax), ly = y + (py * (h / im.height) - ay);
   // el mecha se dibuja girado 90 grados y en una grilla de 24 por casilla
   return [-ly / 24, lx / 24];
+}
+
+// Los faros del mecha (pixeles amarillos #ffff00 en la cabeza o, si no, en el torso): [[adelante, costado], ...]
+// o null si no tiene (entonces el faro sale del centro)
+export function farosDe(f) {
+  const a = f.apariencia;
+  if (!a || !a.torso || !SPR.listo || !SPR.meta[a.torso]) return null;
+  for (const slot of ['cabeza', 'torso']) {
+    const im = a[slot] && SPR.meta[a[slot]] && sprite('azul', a[slot]);
+    if (im && im._faros) return im._faros.slice(0, 2).map((p) => puntoEnPieza(f, slot, p));
+  }
+  return null;
 }
 
 // La boca del arma en el mapa (en casillas) para una unidad mirando con angulo ang

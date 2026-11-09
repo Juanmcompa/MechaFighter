@@ -160,7 +160,7 @@ export async function cargarTerreno(base = './') {
 // Color de equipo del arte nuevo: cambia los pixeles pintados con los colores de marca (reglas.arte.color_equipo)
 // por los del bando. Devuelve un lienzo listo para dibujar (o la misma imagen si no hay nada que cambiar).
 // (de paso: los pixeles magenta #ff00ff marcan las puntas de las armas -uno por cañon-; se anotan en ._puntas
-// y se borran del dibujo)
+// y se borran del dibujo). Los amarillos #ffff00 marcan los faros (en la cabeza o el torso): van a ._faros.
 export function pintarEquipo(im, bando, config) {
   const aRGB = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
   const conColor = !!(config && config.marca && config[bando]);
@@ -172,12 +172,19 @@ export function pintarEquipo(im, bando, config) {
   const px = x.getImageData(0, 0, c.width, c.height);
   const d = px.data;
   let cambios = 0;
-  const puntas = [];
+  const puntas = [], faros = [];
   for (let i = 0; i < d.length; i += 4) {
     if (!d[i + 3]) continue;
     if (d[i] >= 215 && d[i + 1] <= 40 && d[i + 2] >= 215) {
       const p = i / 4;
       puntas.push([(p % c.width) + 0.5, Math.floor(p / c.width) + 0.5]);
+      d[i + 3] = 0;
+      cambios++;
+      continue;
+    }
+    if (d[i] >= 215 && d[i + 1] >= 215 && d[i + 2] <= 40) {
+      const p = i / 4;
+      faros.push([(p % c.width) + 0.5, Math.floor(p / c.width) + 0.5]);
       d[i + 3] = 0;
       cambios++;
       continue;
@@ -196,5 +203,6 @@ export function pintarEquipo(im, bando, config) {
   x.putImageData(px, 0, 0);
   c._luz = im._luz;
   if (puntas.length) c._puntas = puntas;
+  if (faros.length) c._faros = faros;
   return c;
 }
