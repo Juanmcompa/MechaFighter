@@ -264,11 +264,20 @@ export class Repeticion {
       for (let y = 0; y < al; y++) for (let x = 0; x < an; x++) if (this.tablero.tipos[y * an + x] === 'peligro' && x % 2 === 0 && y % 2 === 0) this.acidos.push([x, y]);
     }
     for (const [x, y] of this.acidos) sumar(x + 0.5, y + 0.5, cfg.acido);
+    // lo que tapa la luz: muros, coberturas altas y edificios (se rearma cuando algo se rompe)
+    if (!this.ocluye || this.ocluye.version !== this.versionMapa) {
+      const [an, al] = this.mapa.tamano;
+      const tapa = { muro: 1, cobertura_total: 1, edificio: 1 };
+      this.ocluye = { ancho: an, alto: al, version: this.versionMapa, celdas: Uint8Array.from(this.tablero.tipos, (t) => (tapa[t] ? 255 : 0)) };
+    }
+    // de pixel de la escena a casilla: la inversa de M, y despues dividido por el lado de la casilla
+    const inv = M.inverse();
+    const invCasilla = new DOMMatrix([inv.a / L, inv.b / L, inv.c / L, inv.d / L, inv.e / L, inv.f / L]);
     const amb = colorLuz((cfg.ambiente_por_estilo || {})[this.mapa.estilo] || cfg.ambiente || '#808080');
     const t0 = performance.now();
     const hecho = this.compositor.componer({
       escena: this.escena, normal: this.capaN, brillo: this.capaE, luces,
-      ambiente: amb, paso: celda / 32, relieve: cfg.relieve ?? 4, halo: cfg.halo ?? 1
+      ambiente: amb, paso: celda / 32, relieve: cfg.relieve ?? 4, halo: cfg.halo ?? 1, ocluye: this.ocluye, inv: invCasilla
     });
     const ctx = this.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -291,6 +300,7 @@ export class Repeticion {
     M.filas[y] = f.slice(0, x) + letra + f.slice(x + 1);
     cambiarCasilla(this.tablero, x, y, queda);
     this.fondoSucio = true;
+    this.versionMapa = (this.versionMapa || 0) + 1;
   }
 
   saltarAlFinal() {

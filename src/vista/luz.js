@@ -138,7 +138,30 @@ uniform int uN;
 uniform vec4 uPos[${MAX_LUCES}];   // x, y (pixeles), altura, radio
 uniform vec4 uCol[${MAX_LUCES}];   // r, g, b, intensidad
 uniform vec4 uCono[${MAX_LUCES}];  // direccion x, y, coseno del borde (-2 = para todos lados), suavidad
+uniform sampler2D uOcl;            // que casillas tapan la luz (muros, edificios): 1 por casilla
+uniform mat3 uInv;                 // de pixel de pantalla a casilla del mapa
+uniform vec2 uGrid;                // ancho y alto del mapa en casillas
+uniform int uConOcl;
 out vec4 color;
+
+// Cuanta luz llega de lp a p: se recorre el camino por la grilla del mapa y se suma cuanto pasa por adentro de
+// muros; con eso la luz se apaga. Las muestras van mas juntas cerca del pixel, asi el borde del muro que mira a la
+// luz se ilumina y el resto del techo no (y lo que esta detras del muro queda a oscuras).
+float llega(vec2 p, vec2 lp) {
+  if (uConOcl == 0) return 1.0;
+  vec2 a = (uInv * vec3(p, 1.0)).xy, b = (uInv * vec3(lp, 1.0)).xy;
+  float largo = length(b - a);
+  float dentro = 0.0, antes = 0.0;
+  for (int k = 1; k <= 18; k++) {
+    float f = float(k) / 18.0;
+    float t = f * f;
+    vec2 q = mix(a, b, t);
+    dentro += smoothstep(0.5, 0.9, texture(uOcl, q / uGrid).r) * (t - antes) * largo;
+    antes = t;
+    if (dentro > 0.8) return 0.0;
+  }
+  return exp(-dentro * 5.0);
+}
 
 float alto(vec2 q) {
   vec4 c = texture(uEscena, q / uRes);
@@ -178,6 +201,7 @@ void main() {
       at = max(at, (1.0 - smoothstep(0.0, L.w * 0.12, dist)) * 0.5);
     }
     vec3 l = normalize(vec3(d, L.z));
+    at *= llega(p, L.xy);
     luz += uCol[i].rgb * uCol[i].a * at * (0.25 + 0.75 * max(dot(n, l), 0.0));
   }
   vec4 br = texture(uBrillo, uv);
@@ -229,7 +253,7 @@ export function crearCompositor(simple = false) {
   gl.enableVertexAttribArray(ap);
   gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
   const U = (n) => gl.getUniformLocation(prog, n);
-  const u = { res: U('uRes'), paso: U('uPaso'), relieve: U('uRelieve'), halo: U('uHalo'), amb: U('uAmbiente'), n: U('uN'), pos: U('uPos'), col: U('uCol'), cono: U('uCono') };
+  const u = { res: U('uRes'), paso: U('uPaso'), relieve: U('uRelieve'), halo: U('uHalo'), amb: U('uAmbiente'), n: U('uN'), pos: U('uPos'), col: U('uCol'), cono: U('uCono'), inv: U('uInv'), grid: U('uGrid'), conOcl: U('uConOcl') };
   const texturas = ['uEscena', 'uNormal', 'uBrillo'].map((nombre, i) => {
     const t = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0 + i);
@@ -242,12 +266,23 @@ export function crearCompositor(simple = false) {
     return t;
   });
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  // textura de lo que tapa la luz (una casilla = un pixel; suavizada, asi las sombras no son tan cuadradas)
+  const texOcl = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE3);
+  gl.bindTexture(gl.TEXTURE_2D, texOcl);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.uniform1i(U('uOcl'), 3);
+  let versionOcl = null;
   const pos = new Float32Array(MAX_LUCES * 4), col = new Float32Array(MAX_LUCES * 4), cono = new Float32Array(MAX_LUCES * 4);
 
   return {
     gl: true,
     // escena/normal/brillo: canvas del mismo tamano. luces: [{ x, y, z, r, color:[r,g,b], i, dir:[x,y], cono, suave }]
-    componer({ escena, normal, brillo, luces, ambiente, paso, relieve, halo }) {
+    // ocluye: { celdas: Uint8Array (255 = tapa), ancho, alto, version }; inv: DOMMatrix de pixel a casilla
+    componer({ escena, normal, brillo, luces, ambiente, paso, relieve, halo, ocluye = null, inv = null }) {
       if (lienzo.width !== escena.width || lienzo.height !== escena.height) {
         lienzo.width = escena.width; lienzo.height = escena.height;
       }
@@ -273,6 +308,19 @@ export function crearCompositor(simple = false) {
       gl.uniform4fv(u.pos, pos);
       gl.uniform4fv(u.col, col);
       gl.uniform4fv(u.cono, cono);
+      if (ocluye && inv) {
+        if (versionOcl !== ocluye.version) {
+          versionOcl = ocluye.version;
+          gl.activeTexture(gl.TEXTURE3);
+          gl.bindTexture(gl.TEXTURE_2D, texOcl);
+          gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, ocluye.ancho, ocluye.alto, 0, gl.RED, gl.UNSIGNED_BYTE, ocluye.celdas);
+          gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+        }
+        gl.uniformMatrix3fv(u.inv, false, [inv.a, inv.b, 0, inv.c, inv.d, 0, inv.e, inv.f, 1]);
+        gl.uniform2f(u.grid, ocluye.ancho, ocluye.alto);
+        gl.uniform1i(u.conOcl, 1);
+      } else gl.uniform1i(u.conOcl, 0);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       return lienzo;
     }
