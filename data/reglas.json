@@ -183,34 +183,34 @@
     "luz": {
       "_ayuda": "Luces de la batalla. 'ambiente': el color de la penumbra (mas oscuro = mas noche); 'ambiente_por_estilo' cambia el tono segun el tipo de mapa generado. 'relieve': cuanto relieve se le saca a los sprites sin normal map. 'halo': cuanto brilla alrededor lo que tiene _e.png. Cada luz: radio (en casillas), intensidad, color, altura (en casillas: mas alta = ilumina mas parejo) y, los faros, cono (en grados). El jugador las puede bajar a 'simple' o apagar (localStorage mf-luces). Para probar: ?luces=completa, ?luces=simple o ?luces=no al final de la direccion.",
       "activa": true,
-      "ambiente": "#5a6070",
+      "ambiente": "#242833",
       "ambiente_por_estilo": {
-        "campo": "#646a5a",
+        "campo": "#1b2112",
         "rio": "#566470",
         "ruinas": "#6a5a50",
         "canon": "#6a5e4e",
         "deposito": "#4e5668",
         "crater": "#5a5462"
       },
-      "relieve": 4,
-      "halo": 1,
+      "relieve": 12,
+      "halo": 0.8,
       "faro": {
         "radio": 5.5,
-        "intensidad": 1.1,
+        "intensidad": 1.2,
         "color": "#fff0d0",
         "altura": 0.7,
-        "cono": 32
+        "cono": 36
       },
       "faro_enemigo": {
         "radio": 4.5,
-        "intensidad": 0.9,
+        "intensidad": 2,
         "color": "#ffb8a0",
         "altura": 0.7,
         "cono": 30
       },
       "aura": {
         "radio": 1.8,
-        "intensidad": 0.45,
+        "intensidad": 0.65,
         "color": "#c8dcff",
         "altura": 1.2
       },
@@ -222,7 +222,7 @@
       },
       "fogonazo": {
         "radio": 2.6,
-        "intensidad": 1.6,
+        "intensidad": 2.9,
         "color": "#ffc070",
         "altura": 0.8
       },
@@ -234,7 +234,7 @@
       },
       "acido": {
         "radio": 2.2,
-        "intensidad": 0.22,
+        "intensidad": 0.2,
         "color": "#86ff5a",
         "altura": 0.5
       }

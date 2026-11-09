@@ -1,6 +1,7 @@
 {
   "_ayuda": "Lo arma solo tools/luces.sh (en cada commit). Normal maps: nombre_n.png; brillos: nombre_e.png, al lado del sprite.",
   "normales": [
+    "assets/terreno/muro_tiles_n.png"
   ],
   "brillos": [
   ]
