@@ -23,7 +23,7 @@ export async function cargarSprites(base = './', cantidadRetratos = 0) {
     const pedidos = [];
     for (const color of ['azul', 'rojo', 'verde']) {
       for (const id of Object.keys(meta)) {
-        pedidos.push(cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png').then((im) => { if (im) SPR.imgs[color + '/' + id] = im; }));
+        pedidos.push(cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png').then((im) => { if (im) { im._luz = 'mecha/' + id; SPR.imgs[color + '/' + id] = im; } }));
       }
     }
     await Promise.all(pedidos);
@@ -44,7 +44,7 @@ export async function cargarUnidades(base = './') {
     UNI.escala = meta._escala || 2;
     delete meta._escala;
     UNI.meta = meta;
-    await Promise.all(Object.keys(meta).map((id) => cargarImagen(base + 'assets/unidades/' + id + '.png').then((im) => { if (im) UNI.imgs[id] = im; })));
+    await Promise.all(Object.keys(meta).map((id) => cargarImagen(base + 'assets/unidades/' + id + '.png').then((im) => { if (im) { im._luz = 'unidades/' + id; UNI.imgs[id] = im; } })));
   } catch { /* sin sprites: dibujos por codigo */ }
   return UNI;
 }
@@ -77,6 +77,7 @@ export async function cargarTerreno(base = './') {
     const ids = [...m.texturas, ...Object.values(m.objetos).flat(), ...m.detalles];
     await Promise.all(ids.map((id) => cargarImagen(base + 'assets/terreno/' + id + '.png').then((im) => {
       if (!im) return;
+      im._luz = 'terreno/' + id;
       TER.imgs[id] = im;
       if (id.startsWith('obj_')) TER.sombras[id] = silueta(im);
     })));
@@ -90,6 +91,7 @@ export async function cargarTerreno(base = './') {
       for (let n = 2; n <= 40; n++) {
         const im = await cargarImagen(base + 'assets/terreno/' + id + '_' + n + '.png');
         if (!im) break;
+        im._luz = 'terreno/' + id + '_' + n;
         TER.imgs[id + '_' + n] = im;
         if (id.startsWith('obj_')) TER.sombras[id + '_' + n] = silueta(im);
         lista.push(id + '_' + n);
@@ -107,6 +109,7 @@ export async function cargarTerreno(base = './') {
           if (im) { id = pre + n; break; }
         }
         if (!im) break;
+        im._luz = 'terreno/' + id;
         TER.imgs[id] = im;
         TER.sombras[id] = silueta(im);
         lista.push(id);
@@ -144,5 +147,6 @@ export function pintarEquipo(im, bando, config) {
   }
   if (!cambios) return im;
   x.putImageData(px, 0, 0);
+  c._luz = im._luz;
   return c;
 }

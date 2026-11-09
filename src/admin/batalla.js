@@ -107,6 +107,45 @@ export function pestanaBatalla(T, raiz) {
     botonIcono('saltar', 'Ver el final', () => rep && rep.saltarAlFinal(), 'control'),
     botonIcono('mapa', 'Cámara: todo el mapa / acción', () => rep && rep.alternarGeneral(), 'control'));
 
+  // ---- luces: se ven al instante en la batalla de prueba
+  const luzDe = (o) => (o.arte || {}).luz;
+  const ponerLuz = (ruta, v) => {
+    // (los datos del juego estan congelados: se cambia el archivo crudo y se rearman)
+    if (Object.isFrozen((T.crudos.reglas.arte || {}).luz || {})) T.crudos.reglas = JSON.parse(JSON.stringify(T.crudos.reglas));
+    const ks = ruta.split('.'); let x = luzDe(T.crudos.reglas);
+    if (!x) return;
+    for (const k of ks.slice(0, -1)) x = x[k] = x[k] || {};
+    x[ks.at(-1)] = v;
+    T.rearmar('reglas');
+  };
+  const leerLuz = (ruta) => ruta.split('.').reduce((x, k) => (x ? x[k] : undefined), luzDe(T.crudos.reglas));
+  const deslizador = (etiqueta, ruta, min, max, paso) => h('label', {}, etiqueta + ' ',
+    h('input', { type: 'range', min, max, step: paso, value: leerLuz(ruta) ?? min, oninput: (e) => ponerLuz(ruta, Number(e.target.value)) }));
+  const colorLuz = (etiqueta, ruta) => h('label', {}, etiqueta + ' ',
+    h('input', { type: 'color', value: leerLuz(ruta) || '#808080', oninput: (e) => ponerLuz(ruta, e.target.value) }));
+  let modoLuz = 'completa';
+  try { modoLuz = localStorage.getItem('mf-luces') || 'completa'; } catch { /* nada */ }
+  const panelLuces = luzDe(T.crudos.reglas) ? panel('Luces',
+    h('p', { class: 'ayuda' }, 'Se ve en vivo en la batalla de arriba. «Guardar» las deja en data/reglas.json. Normal maps: nombre_n.png; lo que brilla: nombre_e.png (al lado del sprite).'),
+    h('div', { class: 'tl-config' },
+      h('label', {}, 'Calidad (esta compu) ', h('select', { onchange: (e) => { try { localStorage.setItem('mf-luces', e.target.value); } catch { /* nada */ } } },
+        ...[['completa', 'Completa (relieve)'], ['simple', 'Simple'], ['no', 'Apagadas']].map(([v, t]) => h('option', { value: v, ...(v === modoLuz ? { selected: true } : {}) }, t)))),
+      h('label', {}, h('input', { type: 'checkbox', ...(leerLuz('activa') ? { checked: true } : {}), onchange: (e) => ponerLuz('activa', e.target.checked) }), ' Luces en el juego'),
+      colorLuz('Penumbra', 'ambiente'),
+      ...Object.keys(leerLuz('ambiente_por_estilo') || {}).map((k) => colorLuz('· ' + k, 'ambiente_por_estilo.' + k)),
+      deslizador('Relieve', 'relieve', 0, 12, 0.5),
+      deslizador('Halo', 'halo', 0, 3, 0.1),
+      deslizador('Faro: alcance', 'faro.radio', 1, 10, 0.5),
+      deslizador('Faro: fuerza', 'faro.intensidad', 0, 3, 0.1),
+      deslizador('Faro: ancho', 'faro.cono', 10, 80, 1),
+      colorLuz('Faro: color', 'faro.color'),
+      deslizador('Faro enemigo: fuerza', 'faro_enemigo.intensidad', 0, 3, 0.1),
+      deslizador('Aura: fuerza', 'aura.intensidad', 0, 2, 0.05),
+      deslizador('Fogonazo: fuerza', 'fogonazo.intensidad', 0, 4, 0.1),
+      deslizador('Explosión: fuerza', 'explosion.intensidad', 0, 5, 0.1),
+      deslizador('Ácido: fuerza', 'acido.intensidad', 0, 2, 0.05)),
+    boton('Guardar luces', () => T.guardar('reglas'), { iconoNombre: 'estrella', clase: 'principal compacto' })) : null;
+
   const pestanaRepintar = () => { if (campoSemilla) campoSemilla.value = E.semilla; };
 
   raiz.append(
@@ -117,7 +156,7 @@ export function pestanaBatalla(T, raiz) {
         panel('Enemigos y mapa', config,
           h('details', {}, h('summary', {}, 'Elegir escuadras enemigas (si no marcás ninguna, salen las de la misión)'), escuadras))),
       h('div', { class: 'tl-der' },
-        controles, resultado, envoltura,
+        controles, resultado, envoltura, panelLuces,
         h('section', { class: 'taclog' }, h('h2', { class: 'taclog-titulo' }, '[ TAC-LOG ]'), feed))));
 
   return () => { corriendo = false; };

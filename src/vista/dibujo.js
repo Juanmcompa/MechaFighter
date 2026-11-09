@@ -3,6 +3,7 @@
 // Vista cenital: el "frente" de cada unidad mira hacia +x antes de rotar.
 
 import { SPR, sprite, TER, UNI } from './sprites.js';
+import { pintar, CAPAS, LUZ } from './luz.js';
 
 export const COLORES = {
   piso: '#1a1e16', pisoLinea: 'rgba(143,220,90,0.05)',
@@ -54,7 +55,13 @@ function mapaConArte(ctx, mapa, L) {
         else if (z && img('concreto')) id = 'concreto';
         else id = r < 30 && img('rejilla') ? 'rejilla' : r < 250 && img('piso_b') ? 'piso_b' : 'piso_a';
       }
-      ctx.drawImage(img(variante(id, x, y)) || img('piso_a'), px, py, L, L);
+      const im = img(variante(id, x, y)) || img('piso_a');
+      pintar(ctx, im, px, py, L, L);
+      // el acido brilla solo (si no tiene su propio _e.png)
+      if (t === 'peligro' && CAPAS.brillo && im && !LUZ.e[im._luz]) {
+        const b = CAPAS.brillo;
+        b.setTransform(ctx.getTransform()); b.globalAlpha = 0.12; b.drawImage(im, px, py, L, L); b.globalAlpha = 1;
+      }
     }
   }
   // 2. sombras de lo alto sobre el piso (la luz viene de arriba a la izquierda) y borde de los muros
@@ -82,7 +89,7 @@ function mapaConArte(ctx, mapa, L) {
       const k = escalaArte(im, L);
       const w = im.width * k, h = im.height * k;
       ctx.globalAlpha = 0.85;
-      ctx.drawImage(im, x * L + (L - w) / 2, y * L + (L - h) / 2, w, h);
+      pintar(ctx, im, x * L + (L - w) / 2, y * L + (L - h) / 2, w, h);
       ctx.globalAlpha = 1;
     }
   }
@@ -120,7 +127,7 @@ function objeto(ctx, id, x, y, L, alto) {
     ctx.drawImage(TER.sombras[id], ox + L * alto, oy + L * alto, w, h);
     ctx.globalAlpha = 1;
   }
-  ctx.drawImage(im, ox, oy, w, h);
+  pintar(ctx, im, ox, oy, w, h);
   return true;
 }
 
@@ -142,7 +149,7 @@ function rompibles(ctx, T, ancho, alto, L) {
       // arte cargado: una serie (terreno.json "series") o una imagen con el nombre del tipo
       const serie = TER.objetos && TER.objetos[t];
       if (serie && serie.length && objeto(ctx, serie[ruido(x, y, 5) % serie.length], x, y, L, t === 'edificio' ? 0.14 : 0.08)) continue;
-      if (t !== 'piso' && t !== 'muro' && t !== 'peligro' && TER.imgs && TER.imgs[t]) { ctx.drawImage(TER.imgs[t], px, py, L, L); continue; }
+      if (t !== 'piso' && t !== 'muro' && t !== 'peligro' && TER.imgs && TER.imgs[t]) { pintar(ctx, TER.imgs[t], px, py, L, L); continue; }
       if (t === 'edificio') {
         // techo visto desde arriba; borde mas oscuro donde termina el edificio
         const b = L * 0.14;
@@ -319,7 +326,7 @@ function mechaConSprites(ctx, f, u) {
     ctx.save();
     ctx.translate(x, y);
     if (espejo) ctx.scale(-1, 1);
-    ctx.drawImage(im, -ax, -ay, w, h);
+    pintar(ctx, im, -ax, -ay, w, h);
     ctx.restore();
   };
   const zancada = Math.sin(u.paso * Math.PI * 2) * 1.6;
@@ -343,7 +350,7 @@ function mechaConSprites(ctx, f, u) {
     pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true, orugas ? 0 : -zancada);
   }
   if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
-  ctx.drawImage(torso, -tw / 2, -th / 2, tw, th);
+  pintar(ctx, torso, -tw / 2, -th / 2, tw, th);
   if (a.brazo_der) pieza(a.brazo_der, tw * 0.5, -th * 0.05, false);
   if (a.brazo_izq) pieza(a.brazo_izq, -tw * 0.5, -th * 0.05, true);
   if (a.cabeza) pieza(a.cabeza, 0, -th * 0.12);
@@ -362,7 +369,7 @@ function mechaConSprites(ctx, f, u) {
   if (u.golpe > 0) {
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = u.golpe * 0.6;
-    ctx.drawImage(torso, -tw / 2, -th / 2, tw, th);
+    pintar(ctx, torso, -tw / 2, -th / 2, tw, th);
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
   }
@@ -541,7 +548,7 @@ function dibujarPeloton(ctx, f, u, L) {
     ctx.rotate(m.ang + Math.PI / 2);
     ctx.translate(0, -trote);
     if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
-    ctx.drawImage(im, -w / 2, -h * 0.62, w, h); // el arma sobresale adelante: el cuerpo queda en el centro
+    pintar(ctx, im, -w / 2, -h * 0.62, w, h); // el arma sobresale adelante: el cuerpo queda en el centro
     ctx.filter = 'none';
     ctx.restore();
   }
@@ -561,7 +568,7 @@ export function dibujarCaido(ctx, c, L) {
     const m = UNI.meta[id];
     const w = m.w / UNI.escala, h = m.h / UNI.escala;
     const o = c.corridas[id] || [0, 0];
-    ctx.drawImage(im, o[0] - w / 2, o[1] - h / 2, w, h);
+    pintar(ctx, im, o[0] - w / 2, o[1] - h / 2, w, h);
   }
   ctx.restore();
 }
@@ -583,7 +590,7 @@ function dibujarUnidadSprite(ctx, f, u, t) {
   }
   ctx.rotate(Math.PI / 2);
   if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
-  ctx.drawImage(im, -w / 2, -h / 2, w, h);
+  pintar(ctx, im, -w / 2, -h / 2, w, h);
   ctx.filter = 'none';
   ctx.restore();
 }

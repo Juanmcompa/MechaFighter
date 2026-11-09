@@ -17,5 +17,7 @@ lista=$(printf '%s\n%s\n' "$nueva" "$viejas" | grep -v '^$' | sed '$!s/$/,/')
 printf '{\n  "_ayuda": "%s",\n  "mayor": %s,\n  "numero": %s,\n  "cambio": "%s",\n  "novedades": [\n%s\n  ]\n}\n' \
   "$ayuda" "$mayor" "$n" "$titulo" "$lista" > "$f"
 git add "$f"
+# lista de normal maps y brillos (assets/luces.json)
+sh tools/luces.sh && git add assets/luces.json
 MF_VERSION=1 git commit --amend --no-edit --no-verify -q
 exit 0

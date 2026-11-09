@@ -20,7 +20,8 @@ export function validarDatos(d) {
 
   // --- 0. Todo entero (el motor no usa decimales para que el combate de igual en todos lados) e ids prolijos
   recorrer(d, [], (ruta, valor) => {
-    if (typeof valor === 'number' && !Number.isInteger(valor)) err(ruta.join(' › '), 'tiene decimales (' + valor + '); usa enteros');
+    // (reglas.arte es solo dibujo: ahi si puede haber decimales)
+    if (typeof valor === 'number' && !Number.isInteger(valor) && !(ruta[0] === 'reglas' && ruta[1] === 'arte')) err(ruta.join(' › '), 'tiene decimales (' + valor + '); usa enteros');
   });
   for (const tabla of ['clases', 'partes', 'afijos', 'personalidades', 'habilidades', 'estados', 'cicatrices', 'traumas',
     'medallas', 'misiones', 'sectores']) {

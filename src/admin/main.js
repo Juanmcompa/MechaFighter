@@ -8,6 +8,7 @@ import { h, montar, boton, ico } from '../ui/comun.js';
 import { cargarDatos } from '../core/datos.js';
 import { validarDatos } from '../core/validar.js';
 import { cargarSprites, cargarTerreno, cargarUnidades } from '../vista/sprites.js';
+import { cargarLuces } from '../vista/luz.js';
 import * as C from './carpeta.js';
 import { pestanaBatalla } from './batalla.js';
 import { pestanaVisor } from './visor.js';
@@ -129,7 +130,7 @@ async function arrancar() {
     raiz.replaceChildren(); montar(raiz, h('p', { class: 'error' }, e.message), h('p', { class: 'ayuda' }, 'Abrí el taller con el servidor local (igual que el juego).'));
     return;
   }
-  await Promise.all([cargarSprites('./', (T.datos.reglas.arte || {}).retratos || 0), cargarTerreno('./'), cargarUnidades('./')]);
+  await Promise.all([cargarSprites('./', (T.datos.reglas.arte || {}).retratos || 0), cargarTerreno('./'), cargarUnidades('./'), cargarLuces('./')]);
   raiz.replaceChildren();
   montar(raiz, cabecera, cuerpo);
   pintar();

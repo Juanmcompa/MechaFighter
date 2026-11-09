@@ -3,6 +3,7 @@
 
 import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe } from './dibujo.js';
 import { crearTablero, lineaDeTiro, distancia, caminable, cambiarCasilla } from '../motor/espacio.js';
+import { CAPAS, crearCompositor, colorLuz } from './luz.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
@@ -78,8 +79,8 @@ export class Repeticion {
     // tileset), aunque en pantalla se vea mas chico.
     const lado = Math.max(Math.round(this.L * dpr), 64);
     this.fondo.width = ancho * lado; this.fondo.height = alto * lado;
-    dibujarMapa(this.fondo.getContext('2d'), this.mapa, lado);
     this.ladoFondo = lado;
+    this.pintarFondo();
     this.cam = { x: (ancho * this.L) / 2, y: (alto * this.L) / 2, z: 1 };
   }
 
@@ -166,6 +167,116 @@ export class Repeticion {
         this.caidos.push({ x: px, y: py, ang: h * 1.3, capas, corridas });
       }
       u.vivosVista = vivos;
+    }
+  }
+
+  // El mapa (una vez, y de nuevo si algo se rompe). Con luces, tambien sus capas de normales y de brillo.
+  pintarFondo() {
+    const lado = this.ladoFondo, f = this.fondo;
+    const antes = { ...CAPAS };
+    if (this.configLuz()) {
+      for (const k of ['fondoN', 'fondoE']) {
+        if (!this[k]) this[k] = document.createElement('canvas');
+        this[k].width = f.width; this[k].height = f.height;
+      }
+      CAPAS.normal = this.fondoN.getContext('2d'); CAPAS.brillo = this.fondoE.getContext('2d');
+    }
+    f.getContext('2d').clearRect(0, 0, f.width, f.height);
+    dibujarMapa(f.getContext('2d'), this.mapa, lado);
+    Object.assign(CAPAS, antes);
+  }
+
+  // ---------- Luces ----------
+
+  // La configuracion de luces, o null si estan apagadas (reglas.arte.luz; el jugador puede bajarlas)
+  configLuz() {
+    const cfg = (this.datos.reglas.arte || {}).luz;
+    if (!cfg || !cfg.activa) return null;
+    let pref = null;
+    try { pref = new URLSearchParams(location.search).get('luces') || localStorage.getItem('mf-luces'); } catch { /* sin almacenamiento */ }
+    if (pref === 'no') return null;
+    this.modoLuz = pref === 'simple' || (this.lucesLentas && pref !== 'completa') ? 'simple' : 'completa';
+    return cfg;
+  }
+
+  // Prepara los lienzos de la escena y de las capas; devuelve false si no hay luces
+  prepararLuz() {
+    const cfg = this.configLuz();
+    if (!cfg) return false;
+    if (!this.compositor || this.compositor.modo !== this.modoLuz) {
+      this.compositor = crearCompositor(this.modoLuz === 'simple');
+      this.compositor.modo = this.modoLuz;
+    }
+    // como mucho unos 2 millones de pixeles (si no, en pantallas grandes la placa no da)
+    this.qLuz = Math.min(1, Math.sqrt(2.0e6 / (this.canvas.width * this.canvas.height)));
+    const w = Math.round(this.canvas.width * this.qLuz), h = Math.round(this.canvas.height * this.qLuz);
+    for (const k of ['escena', 'capaN', 'capaE']) {
+      if (!this[k]) this[k] = document.createElement('canvas');
+      const c = this[k];
+      if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+      if (k !== 'escena') { const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, c.width, c.height); }
+    }
+    if (!this.fondoN) this.pintarFondo();
+    CAPAS.normal = this.capaN.getContext('2d'); CAPAS.brillo = this.capaE.getContext('2d');
+    return true;
+  }
+
+  // Junta la escena con las luces y la pasa al canvas de verdad. M: la transformacion del mapa a la pantalla.
+  componerLuz(M, seVe) {
+    CAPAS.normal = null; CAPAS.brillo = null;
+    const cfg = this.configLuz();
+    const L = this.L, s = Math.hypot(M.a, M.b), celda = L * s;
+    const aPx = (x, y) => [M.a * x + M.c * y + M.e, M.b * x + M.d * y + M.f];
+    const direccion = (ang) => {
+      const vx = Math.cos(ang), vy = Math.sin(ang), X = M.a * vx + M.c * vy, Y = M.b * vx + M.d * vy, n = Math.hypot(X, Y) || 1;
+      return [X / n, Y / n];
+    };
+    const luces = [];
+    const sumar = (cx, cy, def, extra = {}, fuerza = 1) => {
+      if (!def || fuerza <= 0) return;
+      const [X, Y] = aPx(cx * L, cy * L);
+      luces.push({ x: X, y: Y, z: (def.altura ?? 0.8) * celda, r: def.radio * celda, color: colorLuz(def.color), i: def.intensidad * fuerza, ...extra });
+    };
+    // en orden de importancia (entran 40)
+    for (const f of this.efectos) {
+      const k = (this.T - f.t0) / f.dur;
+      if (f.tipo === 'explosion') sumar(f.a[0] + 0.5, f.a[1] + 0.5, cfg.explosion, {}, 1 - k);
+    }
+    for (const f of this.efectos) {
+      if (f.tipo !== 'fogonazo') continue;
+      const u = this.unidades.get(f.id);
+      if (!u || !seVe(u)) continue;
+      const k = (this.T - f.t0) / f.dur;
+      sumar(u.x + 0.5 + Math.cos(u.ang) * 0.7, u.y + 0.5 + Math.sin(u.ang) * 0.7, cfg.fogonazo, {}, 1 - k);
+    }
+    const vivas = [...this.unidades.values()].filter((u) => u.viva && seVe(u));
+    for (const u of vivas) {
+      if (!u.ficha.apariencia) continue; // solo los mechas tienen faro
+      const def = u.ficha.bando === 0 ? cfg.faro : cfg.faro_enemigo || cfg.faro;
+      sumar(u.x + 0.5 + Math.cos(u.ang) * 0.25, u.y + 0.5 + Math.sin(u.ang) * 0.25, def, { dir: direccion(u.ang), cono: ((def.cono || 35) * Math.PI) / 180, suave: 0.12 });
+    }
+    for (const u of vivas) sumar(u.x + 0.5, u.y + 0.5, u.ficha.bando === 0 ? cfg.aura : cfg.aura_enemigo || cfg.aura);
+    if (!this.acidos) {
+      this.acidos = [];
+      const [an, al] = this.mapa.tamano;
+      for (let y = 0; y < al; y++) for (let x = 0; x < an; x++) if (this.tablero.tipos[y * an + x] === 'peligro' && x % 2 === 0 && y % 2 === 0) this.acidos.push([x, y]);
+    }
+    for (const [x, y] of this.acidos) sumar(x + 0.5, y + 0.5, cfg.acido);
+    const amb = colorLuz((cfg.ambiente_por_estilo || {})[this.mapa.estilo] || cfg.ambiente || '#808080');
+    const t0 = performance.now();
+    const hecho = this.compositor.componer({
+      escena: this.escena, normal: this.capaN, brillo: this.capaE, luces,
+      ambiente: amb, paso: celda / 32, relieve: cfg.relieve ?? 4, halo: cfg.halo ?? 1
+    });
+    const ctx = this.ctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(hecho, 0, 0, this.canvas.width, this.canvas.height);
+    // si la compu (o el celular) no da, se pasa a las luces simples
+    if (this.modoLuz === 'completa') {
+      this.msLuz = (this.msLuz ?? 8) * 0.95 + (performance.now() - t0) * 0.05;
+      if (this.msLuz > 20 && !this.lucesLentas) { this.lucesLentas = true; console.warn('Luces: paso a las simples (' + this.msLuz.toFixed(1) + ' ms)'); }
     }
   }
 
@@ -528,9 +639,13 @@ export class Repeticion {
   }
 
   dibujar() {
-    const ctx = this.ctx, L = this.L, dpr = this.dpr;
+    // con luces, el mapa y las unidades se dibujan en un lienzo aparte y despues se iluminan
+    const iluminar = this.prepararLuz();
+    let ctx = iluminar ? this.escena.getContext('2d') : this.ctx;
+    const L = this.L, dpr = this.dpr;
     const [ancho, alto] = this.mapa.tamano;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const q = iluminar ? this.qLuz : 1; // la escena iluminada puede ir a menos resolucion (pantallas enormes)
+    ctx.setTransform(dpr * q, 0, 0, dpr * q, 0, 0);
     ctx.clearRect(0, 0, this.W, this.H);
     // todo lo del mapa se dibuja en coordenadas del mapa; el giro lo hace la transformacion
     if (this.girado) { ctx.translate(0, ancho * L); ctx.rotate(-Math.PI / 2); }
@@ -544,8 +659,12 @@ export class Repeticion {
     ctx.scale(c.z, c.z);
     ctx.translate(-c.x, -c.y);
     ctx.imageSmoothingEnabled = false;
-    if (this.fondoSucio && this.ladoFondo) { this.fondoSucio = false; dibujarMapa(this.fondo.getContext('2d'), this.mapa, this.ladoFondo); }
+    if (this.fondoSucio && this.ladoFondo) { this.fondoSucio = false; this.pintarFondo(); }
     ctx.drawImage(this.fondo, 0, 0, ancho * L, alto * L);
+    if (iluminar) for (const [capa, f] of [[CAPAS.normal, this.fondoN], [CAPAS.brillo, this.fondoE]]) {
+      capa.setTransform(ctx.getTransform()); capa.imageSmoothingEnabled = false;
+      capa.drawImage(f, 0, 0, ancho * L, alto * L);
+    }
     const vistas = this.visibles();
     const seVe = (u) => !vistas || u.ficha.bando === 0 || vistas.has(Math.round(u.y) * ancho + Math.round(u.x));
 
@@ -568,6 +687,14 @@ export class Repeticion {
     this.anotarCaidos();
     for (const c of this.caidos) dibujarCaido(ctx, c, L);
     for (const u of lista) if (seVe(u)) dibujarUnidad(ctx, u, L, this.T);
+    // lo de arriba queda iluminado; los fogonazos y efectos de abajo dan luz, asi que van encima, a pleno
+    if (iluminar) {
+      const M = ctx.getTransform();
+      this.componerLuz(M, seVe);
+      ctx = this.ctx;
+      ctx.setTransform(M.a / q, M.b / q, M.c / q, M.d / q, M.e / q, M.f / q);
+      ctx.imageSmoothingEnabled = false;
+    }
     // fogonazos en la boca del arma
     for (const f of this.efectos) {
       if (f.tipo !== 'fogonazo') continue;

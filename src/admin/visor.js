@@ -15,6 +15,7 @@ V.zoom = 2;
 
 // Una imagen nueva pasa a ser un sprite del juego (para los dos bandos), como pieza de papel de 32x32
 function registrarNuevo(id, im, config) {
+  im._luz = 'mecha/' + id;
   // una sola version dibujada: el color de equipo se pinta solo (reglas.arte.color_equipo)
   for (const color of ['azul', 'rojo', 'verde']) SPR.imgs[color + '/' + id] = pintarEquipo(im, color, config);
   // 32 pixeles = una casilla (24 unidades del dibujo)
