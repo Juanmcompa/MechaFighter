@@ -361,7 +361,7 @@
     "costo": 70,
     "recuperable": true,
     "descripcion": "Detecta enemigos a 6 casillas aunque haya paredes. Habilita «Marcar objetivo» y la condición «Radar: enemigo oculto».",
-    "sprite": "cabeza_sensor"
+    "sprite": "cabeza_disco"
   },
   "brazo_gancho": {
     "nombre": "Garra con cable",
@@ -386,7 +386,7 @@
     "costo": 65,
     "recuperable": true,
     "descripcion": "Dispara un cable y arrastra a un enemigo hasta el mecha, aturdido. Habilita «Enganchar».",
-    "sprite": "brazo_hoja"
+    "sprite": "brazo_gancho"
   },
   "piernas_estabilizadoras": {
     "nombre": "Piernas con anclas",
@@ -404,7 +404,7 @@
     "costo": 60,
     "recuperable": true,
     "descripcion": "Clava anclas en el piso: no se mueve, pero apunta mucho mejor y aguanta más. Habilita «Anclarse».",
-    "sprite": "piernas_bipode"
+    "sprite": "piernas_anclas"
   },
   "mochila_senuelo": {
     "nombre": "Proyector de señuelos",
@@ -503,7 +503,7 @@
     "peso": 19,
     "costo": 230,
     "recuperable": true,
-    "sprite": "torso_pesado",
+    "sprite": "torso_bastion",
     "descripcion": "Blindaje de crucero reciclado. Aguanta como ningún otro y carga de todo."
   },
   "piernas_fantasma": {
