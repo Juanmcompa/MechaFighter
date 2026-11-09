@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 76,
-  "cambio": "Lo que dicen en batalla llega por radio: globos chicos y oscuros",
+  "numero": 77,
+  "cambio": "La barra de munición muestra cada arma por separado",
   "novedades": [
+    "v0.77 · La barra de munición muestra cada arma por separado",
     "v0.76 · Lo que dicen en batalla llega por radio: globos chicos y oscuros",
     "v0.75 · more_sprites_hotfix",
     "v0.74 · Barra de munición debajo de la vida de nuestros mechas",
     "v0.73 · Restos de mechas con arte propio",
-    "v0.72 · El brillo del ácido queda debajo de las unidades, y los tanques nuevos van por el piso",
-    "v0.71 · Mechas con más peso: piernas, torso y cabeza giran por separado, y batallas más tranquilas"
+    "v0.72 · El brillo del ácido queda debajo de las unidades, y los tanques nuevos van por el piso"
   ]
 }

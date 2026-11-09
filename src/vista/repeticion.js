@@ -963,22 +963,28 @@ function gastarBala(u, slot, t) {
   if (a.municion === 0) a.recargaHasta = t + a.recarga;
 }
 
-// Barra de municion (solo los nuestros, debajo de la vida, la mitad de alta): una rayita por bala si entran,
-// si no cada 5. Mientras recarga se ve como se va llenando, mas apagada.
+// Barra de municion (solo los nuestros, debajo de la vida, la mitad de alta): un tramo por arma con cargador
+// (izquierda, lo del medio, derecha), asi se ve cual recarga mientras la otra sigue tirando. Una rayita por bala si
+// entran, si no cada 5. Mientras recarga, el tramo se va llenando mas apagado.
+const ORDEN_SLOT = { brazo_izq: 0, torso: 1, cabeza: 1, mochila: 1, brazo_der: 2 };
 function barraDeMunicion(ctx, u, x0, y0, w, hb, T) {
-  const armas = (u.armas || []).filter((a) => a.municionMax);
+  const armas = (u.armas || []).filter((a) => a.municionMax).sort((a, b) => (ORDEN_SLOT[a.slot] ?? 1) - (ORDEN_SLOT[b.slot] ?? 1));
   if (!armas.length) return 0;
-  const max = armas.reduce((s, a) => s + a.municionMax, 0);
-  const hay = armas.reduce((s, a) => s + a.municion, 0);
-  const llenando = armas.reduce((s, a) => s + (a.recargaHasta ? a.municionMax * Math.min(1, 1 - (a.recargaHasta - T) / (a.recarga || 1)) : 0), 0);
-  const ancho = w - 2;
   ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(x0, y0, w, hb + 2);
-  ctx.fillStyle = '#1f1a14'; ctx.fillRect(x0 + 1, y0 + 1, ancho, hb);
-  if (llenando > 0) { ctx.fillStyle = 'rgba(217,160,102,0.35)'; ctx.fillRect(x0 + 1 + (ancho * hay) / max, y0 + 1, (ancho * Math.min(max - hay, llenando)) / max, hb); }
-  ctx.fillStyle = '#d9a066'; ctx.fillRect(x0 + 1, y0 + 1, (ancho * hay) / max, hb);
-  const cada = (ancho / max) >= 2.5 ? 1 : 5;
-  ctx.fillStyle = 'rgba(0,0,0,0.7)';
-  for (let v = cada; v < max; v += cada) ctx.fillRect(Math.round(x0 + 1 + (ancho * v) / max), y0 + 1, 1, hb);
+  const hueco = 2, ancho = (w - 2 - hueco * (armas.length - 1)) / armas.length;
+  armas.forEach((a, k) => {
+    const x = x0 + 1 + k * (ancho + hueco), max = a.municionMax;
+    ctx.fillStyle = '#1f1a14'; ctx.fillRect(x, y0 + 1, ancho, hb);
+    if (a.recargaHasta) {
+      const prog = Math.max(0, Math.min(1, 1 - (a.recargaHasta - T) / (a.recarga || 1)));
+      ctx.fillStyle = 'rgba(217,160,102,0.35)'; ctx.fillRect(x, y0 + 1, ancho * prog, hb);
+    } else {
+      ctx.fillStyle = '#d9a066'; ctx.fillRect(x, y0 + 1, (ancho * a.municion) / max, hb);
+    }
+    const cada = ancho / max >= 2.5 ? 1 : 5;
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    for (let v = cada; v < max; v += cada) ctx.fillRect(Math.round(x + (ancho * v) / max), y0 + 1, 1, hb);
+  });
   return hb + 2;
 }
 
