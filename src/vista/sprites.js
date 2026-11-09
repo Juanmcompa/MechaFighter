@@ -156,10 +156,11 @@ export async function cargarTerreno(base = './') {
 
 // Color de equipo del arte nuevo: cambia los pixeles pintados con los colores de marca (reglas.arte.color_equipo)
 // por los del bando. Devuelve un lienzo listo para dibujar (o la misma imagen si no hay nada que cambiar).
+// (de paso: un pixel cian #00ffff marca la punta del arma; se anota en ._punta y se borra del dibujo)
 export function pintarEquipo(im, bando, config) {
-  if (!config || !config.marca || !config[bando]) return im;
   const aRGB = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  const marca = config.marca.map(aRGB), destino = config[bando].map(aRGB);
+  const conColor = !!(config && config.marca && config[bando]);
+  const marca = conColor ? config.marca.map(aRGB) : [], destino = conColor ? config[bando].map(aRGB) : [];
   const c = document.createElement('canvas');
   c.width = im.width; c.height = im.height;
   const x = c.getContext('2d');
@@ -167,8 +168,16 @@ export function pintarEquipo(im, bando, config) {
   const px = x.getImageData(0, 0, c.width, c.height);
   const d = px.data;
   let cambios = 0;
+  let punta = null;
   for (let i = 0; i < d.length; i += 4) {
     if (!d[i + 3]) continue;
+    if (d[i] <= 40 && d[i + 1] >= 215 && d[i + 2] >= 215) {
+      const p = i / 4;
+      punta = [(p % c.width) + 0.5, Math.floor(p / c.width) + 0.5];
+      d[i + 3] = 0;
+      cambios++;
+      continue;
+    }
     for (let k = 0; k < marca.length; k++) {
       const [r, g, b] = marca[k];
       // (tolera una diferencia minima por si el programa de dibujo redondeo el color)
@@ -182,5 +191,6 @@ export function pintarEquipo(im, bando, config) {
   if (!cambios) return im;
   x.putImageData(px, 0, 0);
   c._luz = im._luz;
+  if (punta) c._punta = punta;
   return c;
 }
