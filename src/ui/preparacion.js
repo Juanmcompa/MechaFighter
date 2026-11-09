@@ -79,7 +79,7 @@ export function preparacion(app, raiz) {
           quedan.length ? h('p', { class: 'ayuda' }, 'Se quedan: ' + quedan.map((pi) => '«' + pi.apodo + '» (' + datos.reglas.tareas[pi.tarea].nombre.toLowerCase() + ')').join(', ') + '.') : null),
         h('div', { class: 'acciones' },
           boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),
-          boton('Desplegar', () => app.ir('despliegue'), { iconoNombre: 'play', clase: 'principal' }))),
+          boton('Plan de despliegue', () => app.ir('plan'), { iconoNombre: 'play', clase: 'principal' }))),
       panel('Plano', plano, h('ul', { class: 'leyenda' },
         h('li', {}, h('i', { style: 'background:#4a8fd1' }), 'ustedes'),
         h('li', {}, h('i', { style: 'background:#c4473b' }), 'entrada enemiga'),

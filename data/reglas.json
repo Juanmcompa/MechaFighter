@@ -288,6 +288,24 @@
     "parte_rota_pct": 50,
     "vida_minima_salida": 40
   },
+  "control": {
+    "_ayuda": "Lo que decide Control (el jugador) en cada batalla. Despliegue: cada mecha arranca en una casilla de las primeras 'zona_despliegue' columnas y puede llevar un rumbo (ir primero a un punto) o aguantar en el lugar; el plan se corta cuando hay pelea, o a los 'rumbo_ticks_max' / 'espera_ticks_max' ticks. Ordenes por radio: 'usos' por batalla, con 'recarga' ticks entre una y otra; cada una reemplaza las ordenes de todos los pilotos por 'ticks' ticks con su lista de 'gambits'. No le ganan al panico.",
+    "zona_despliegue": 5,
+    "rumbo_ticks_max": 160,
+    "espera_ticks_max": 400,
+    "usos": 3,
+    "recarga": 50,
+    "ordenes": {
+      "carga": { "nombre": "¡A la carga!", "icono": "espadas", "ticks": 40, "descripcion": "Todos avanzan y le tiran al que tengan más cerca. Nadie se repliega.",
+        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" }, { "condicion": "enemigo_cerca", "accion": "atacar_cuerpo_a_cuerpo", "objetivo": "enemigo_cercano" }, { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_cercano" }] },
+      "fuego": { "nombre": "¡Fuego concentrado!", "icono": "mira", "ticks": 35, "descripcion": "Todos le tiran al enemigo más peligroso hasta bajarlo.",
+        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_mas_peligroso" }, { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_mas_peligroso" }] },
+      "aguanten": { "nombre": "¡Aguanten!", "icono": "escudo", "ticks": 45, "descripcion": "Todos buscan cobertura y tiran desde ahí. Nadie avanza.",
+        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" }, { "condicion": "siempre", "accion": "buscar_cobertura", "objetivo": "yo" }] },
+      "replieguen": { "nombre": "¡Replieguen!", "icono": "huida", "ticks": 30, "descripcion": "Todos se alejan del enemigo. Para salvar a uno o para reagruparse.",
+        "gambits": [{ "condicion": "siempre", "accion": "replegarse", "objetivo": "lejos_de_enemigos" }] }
+    }
+  },
   "combustible": {
     "_ayuda": "Cada salto gasta lo que diga la brujula (1 a 3, segun la distancia). Al llegar a un sector nuevo se cargan 'por_sector'. Sin combustible, el remolque cobra 'remolque_creditos' y todos los mechas pierden 'remolque_danio_pct' de estructura. Las paradas venden a 'precio' (mas o menos segun como te vea su bando). El maximo lo da el tanque de la nodriza (nodriza.json); 'maximo' quedo para guardados viejos.",
     "inicial": 8,

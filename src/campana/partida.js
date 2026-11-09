@@ -625,8 +625,10 @@ export function guardarGambits(datos, p, pilotoId, lista) {
 
 export function escuadronParaMision(datos, p) {
   const animo = (p.nodo && p.nodo.animo && p.nodo.animo.porPiloto) || {};
+  const plan = (p.nodo && p.nodo.plan) || {};
   return desplegables(datos, p).map((pi) => ({
     piloto: pi, mecha: pi.mecha, gambits: pi.gambits, vidaPct: vidaDeSalida(datos, pi),
+    ...(plan[pi.id] ? { casilla: plan[pi.id].casilla, rumbo: plan[pi.id].rumbo } : {}),
     estados: (animo[pi.id] || {}).estados || [], rival: (animo[pi.id] || {}).rival || null, amigo: (animo[pi.id] || {}).amigo || null
   }));
 }

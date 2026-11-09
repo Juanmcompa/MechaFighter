@@ -11,10 +11,18 @@ export function batalla(app, raiz) {
   const m = misionConTareas(datos, p, p.nodo.mision);
   const escuadron = escuadronParaMision(datos, p);
   const pilotoDe = new Map(escuadron.map(({ piloto }) => [piloto.id, piloto]));
-  const resultado = simular(datos, { mision: m, escuadron, semilla: m.semilla });
-  // El resultado se anota YA, antes de mirar la repeticion: recargar la pagina no deshace una muerte.
-  const informe = cerrarMision(datos, p, resultado);
-  app.guardar();
+  // Control puede dar ordenes por radio durante la batalla (reglas.json > control): cada orden vuelve a resolver
+  // la batalla desde ese momento. Lo ya visto y las ordenes dadas se guardan: recargar la pagina no deshace nada,
+  // la batalla sigue desde donde estaba.
+  const nodo = p.nodo;
+  const RC = datos.reglas.control;
+  nodo.control = nodo.control || [];
+  let resultado = simular(datos, { mision: m, escuadron, semilla: m.semilla, control: nodo.control });
+  let informe = null;
+  const cerrar = () => {
+    if (!informe) { informe = cerrarMision(datos, p, resultado); app.guardar(); }
+    return informe;
+  };
 
   const lienzo = h('canvas', { class: 'campo', 'aria-label': 'Batalla' });
   const botonCamara = h('button', {
@@ -28,6 +36,7 @@ export function batalla(app, raiz) {
   const velocidades = [0.5, 1, 2, 4, 8];
   const botones = {};
   const final = h('div', { class: 'final oculto' });
+  let panelControl = null;
 
   // Una tarjeta por piloto (retrato, nombre y vida), armadas una vez y actualizadas en cada cuadro
   const tarjetas = new Map();
@@ -52,6 +61,7 @@ export function batalla(app, raiz) {
       (botones.pausa = botonIcono('pausa', 'Pausa', () => { rep.pausado = !rep.pausado; marcar(); }, 'control')),
       ...velocidades.map((v) => (botones[v] = h('button', { class: 'boton-icono control vel', 'aria-label': 'Velocidad ' + v, onclick: () => { rep.velocidad = v; rep.pausado = false; marcar(); } }, (v < 1 ? '½' : v) + 'x'))),
       botonIcono('saltar', 'Ver el final', () => rep.saltarAlFinal(), 'control')),
+    (panelControl = h('div', { class: 'control-radio', role: 'group', 'aria-label': 'Órdenes de Control' })),
     h('div', { class: 'columnas-batalla' },
       h('div', { class: 'col-campo' }, plantel, envoltura),
       h('section', { class: 'taclog', 'aria-label': 'Registro de combate' }, h('h2', { class: 'taclog-titulo' }, '[ TAC-LOG ]'), feed)),
@@ -68,6 +78,41 @@ export function batalla(app, raiz) {
     alEvento: nuevaLinea,
     alTerminar: () => mostrarFinal()
   });
+
+  // --- Ordenes de Control por radio
+  const dadas = () => resultado.registro.filter((e) => e.tipo === 'control');
+  const pintarControl = () => {
+    const T = Math.floor(rep.T);
+    const lista = dadas();
+    const quedan = RC.usos - lista.length;
+    const ultima = lista[lista.length - 1];
+    const activa = ultima && ultima.hasta >= T ? ultima : null;
+    const espera = ultima ? Math.max(0, ultima.t + RC.recarga - (T + 1)) : 0;
+    const libre = !rep.terminado && !informe && quedan > 0 && espera === 0;
+    const firma = [quedan, activa ? activa.id : '', libre, rep.terminado].join('|');
+    if (firma === pintarControl.firma) return;
+    pintarControl.firma = firma;
+    panelControl.replaceChildren(
+      h('span', { class: 'cr-rotulo' }, 'CONTROL', h('small', {}, activa ? RC.ordenes[activa.id].nombre : quedan > 0 ? (espera ? 'radio ocupada…' : 'quedan ' + quedan) : 'sin señal')),
+      ...Object.entries(RC.ordenes).map(([id, o]) => h('button', {
+        class: 'cr-orden' + (activa && activa.id === id ? ' activa' : ''), disabled: !libre, 'aria-label': o.nombre + ' ' + o.descripcion, title: o.descripcion,
+        onclick: () => darOrden(id)
+      }, ico(o.icono), h('span', {}, o.nombre.replace(/[¡!]/g, '')))));
+  };
+  const darOrden = (id) => {
+    if (rep.terminado || informe) return;
+    nodo.control.push({ t: Math.floor(rep.T) + 1, id });
+    resultado = simular(datos, { mision: m, escuadron, semilla: m.semilla, control: nodo.control });
+    // lo que ya paso es igual (misma semilla, mismas ordenes): la repeticion sigue con lo nuevo desde aca
+    rep.registro = resultado.registro;
+    rep.ultimoTick = resultado.registro.length ? resultado.registro[resultado.registro.length - 1].t : 0;
+    nodo.visto = Math.floor(rep.T);
+    app.guardar();
+    nuevaLinea({ clase: 'control', importante: true, texto: 'CONTROL: ' + RC.ordenes[id].nombre + ' ' + RC.ordenes[id].descripcion });
+    pintarControl.firma = null;
+  };
+  // si recargo la pagina en medio de la batalla: sigue desde lo ultimo que vio
+  if (nodo.visto) { rep.T = nodo.visto; rep.avanzar(0); rep.efectos = []; rep.flotantes = []; }
 
   const marcarCamara = () => {
     for (const [id, t] of tarjetas) {
@@ -104,6 +149,7 @@ export function batalla(app, raiz) {
   };
 
   function mostrarFinal() {
+    const informe = cerrar();
     final.classList.remove('oculto');
     final.append(h('div', { class: 'final-caja ' + (resultado.victoria ? 'victoria' : 'derrota') },
       h('h2', {}, resultado.victoria ? 'MISIÓN CUMPLIDA' : 'MISIÓN FALLIDA'),
@@ -123,6 +169,9 @@ export function batalla(app, raiz) {
     rep.dibujar();
     if (++cuadro % 6 === 0) {
       pintarPlantel();
+      pintarControl();
+      // cada tanto se anota por donde va (para retomar si se recarga la pagina)
+      if (!informe && !rep.terminado && rep.T - (nodo.visto || 0) >= 40) { nodo.visto = Math.floor(rep.T); app.guardar(); }
       const seg = Math.floor((rep.T * datos.reglas.ms_por_tick_en_repeticion) / 1000);
       reloj.textContent = String(Math.floor(seg / 60)).padStart(2, '0') + ':' + String(seg % 60).padStart(2, '0');
     }

@@ -153,7 +153,7 @@ function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
     proxima,
     h('div', { class: 'hg-cartas' }, ...p.pilotos.flatMap((pi) => tarjeta(pi))),
     h('div', { class: 'hg-desplegar' }, enMision
-      ? boton('Desplegar · ' + salen + (salen === 1 ? ' mecha' : ' mechas'), () => app.ir('despliegue'), { iconoNombre: 'play', clase: 'principal' })
+      ? boton('Desplegar · ' + salen + (salen === 1 ? ' mecha' : ' mechas'), () => app.ir('plan'), { iconoNombre: 'play', clase: 'principal' })
       : boton('Volver al mapa', () => volver(app), { iconoNombre: 'mapa', clase: 'principal' }))
   ];
 }

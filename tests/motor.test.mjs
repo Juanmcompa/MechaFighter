@@ -126,6 +126,26 @@ console.log('Campana');
   }
 }
 
+// Control: el despliegue a mano, el rumbo y las ordenes por radio
+{
+  const az = crearAzar(4242);
+  const esc = ['vanguardia', 'tirador', 'medico', 'infiltrador'].map((c, i) => crearRecluta(datos, az, 'p' + i, c)).map((p) => ({ piloto: p, mecha: p.mecha, gambits: p.gambits }));
+  const m = armarMision(datos, 'asalto', 2, crearAzar(11), 2);
+  const libre = simular(datos, { mision: m, escuadron: esc, semilla: m.semilla });
+  const conPlan = esc.map((e, i) => (i === 0 ? { ...e, casilla: [1, 8], rumbo: { x: 9, y: 8 } } : i === 1 ? { ...e, rumbo: { espera: true } } : e));
+  const r = simular(datos, { mision: m, escuadron: conPlan, semilla: m.semilla });
+  const ap = r.registro.filter((e) => e.tipo === 'aparece' && e.ficha.bando === 0);
+  ok(Math.abs(ap[0].ficha.x - 1) <= 1 && Math.abs(ap[0].ficha.y - 8) <= 1, 'despliegue: el mecha arranca donde lo puso Control');
+  const quieto = r.registro.find((e) => e.tipo === 'mueve' && e.u === ap[1].u);
+  const libreQuieto = libre.registro.find((e) => e.tipo === 'mueve' && e.u === ap[1].u);
+  ok(!quieto || !libreQuieto || quieto.t > libreQuieto.t, 'despliegue: el que aguanta no se mueve hasta que hay pelea');
+  const T = 30;
+  const conOrden = simular(datos, { mision: m, escuadron: esc, semilla: m.semilla, control: [{ t: T, id: 'replieguen' }, { t: T + 5, id: 'carga' }] });
+  const antes = (reg) => JSON.stringify(reg.filter((e) => e.t < T));
+  ok(antes(conOrden.registro) === antes(libre.registro), 'orden por radio: lo que paso antes de la orden no cambia');
+  ok(conOrden.registro.filter((e) => e.tipo === 'control').length === 1 && conOrden.huella !== libre.huella, 'orden por radio: cambia la batalla, y la radio tiene recarga');
+}
+
 // Legado: el veterano pasa a la campana siguiente y el escuadron perdido aparece como enemigo
 {
   const vieja = nuevaPartida(datos, 55);

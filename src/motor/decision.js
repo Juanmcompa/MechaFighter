@@ -592,6 +592,22 @@ function abrirPaso(B, u) {
 
 // ---------- La decision completa ----------
 
+// El plan del despliegue: ir primero a un punto (rumbo) o aguantar en el lugar (espera) hasta que haya pelea.
+// Se corta cuando hay un enemigo a tiro (o a la vista, si aguanta), cuando lo lastiman o cuando pasa mucho tiempo.
+function seguirRumbo(B, u, correa) {
+  const C = B.datos.reglas.control;
+  const r = u.rumbo;
+  const alcance = u.armas.reduce((m, a) => Math.max(m, a.alcance), 1) + 1;
+  const limite = r.espera ? u.vision : alcance;
+  const pelea = enemigosConocidos(B, u).some((o) => distancia(u, o) <= limite);
+  if (pelea || u.vida < r.vida || B.t > (r.espera ? C.espera_ticks_max : C.rumbo_ticks_max)) { u.rumbo = null; return null; }
+  if (r.espera) return { tipo: 'mantener', control: 'espera' };
+  if (distancia(u, r) <= 1) { u.rumbo = null; return null; }
+  const i = mover(B, u, r.x, r.y, correa);
+  if (!i) { u.rumbo = null; return null; }
+  return { ...i, control: 'rumbo' };
+}
+
 export function decidir(B, u) {
   let i = decidirSinLimite(B, u);
   // parado en acido y sin ir a ningun lado (tirando, esperando): primero sale. Si esta cruzando, que siga.
@@ -636,6 +652,15 @@ function decidirSinLimite(B, u) {
   const paso = abrirPaso(B, u);
   if (paso) return paso;
 
+  // Control: el plan del despliegue (a donde ir primero, o aguantar) y las ordenes por radio.
+  // Le ganan a las ordenes del piloto, pero no al panico.
+  let propios = u.gambits, deControl = null;
+  if (u.tipo === 'piloto' && u.bando === 0) {
+    const oc = B.control && B.t <= B.control.hasta ? B.datos.reglas.control.ordenes[B.control.id] : null;
+    if (oc) { propios = oc.gambits; deControl = B.control.id; u.rumbo = null; }
+    else if (u.rumbo) { const i = seguirRumbo(B, u, correa); if (i) return i; }
+  }
+
   // Rivales: si estan cerca y no hay tiros, a veces se ponen a discutir y pierden tiempo
   // (como mucho una pelea por piloto en cada mision: despues se la guardan)
   if (u.rival && !u.discutio && !enemigosConocidos(B, u).length) {
@@ -655,7 +680,7 @@ function decidirSinLimite(B, u) {
   const corrimientos = {};
   for (const h of lista) if (h.tipo === 'correr_umbral') corrimientos[h.dato] = (corrimientos[h.dato] || 0) + h.delta;
   const etiquetas = (g) => (G.acciones[g.accion] && G.acciones[g.accion].etiquetas) || [];
-  const claves = u.gambits.map((g, i) => {
+  const claves = propios.map((g, i) => {
     let k = 2 * i;
     for (const h of lista) {
       if (h.tipo === 'subir_prioridad' && etiquetas(g).some((t) => h.etiquetas.includes(t))) k -= 2 * h.delta + 1;
@@ -687,7 +712,8 @@ function decidirSinLimite(B, u) {
     }
     const intencion = accion(B, u, g.accion, elegirObjetivo(B, u, sel), correa);
     if (intencion && confusion && intencion.tipo !== 'esperar' && az.tirada(confusion)) { confundido = true; continue; }
-    if (intencion) return confundido ? { ...intencion, gambit: i, anula: 'confusion' } : { ...intencion, gambit: i };
+    const marca = deControl ? { control: deControl } : { gambit: i };
+    if (intencion) return confundido ? { ...intencion, ...marca, anula: 'confusion' } : { ...intencion, ...marca };
   }
 
   // D. Por defecto

@@ -1,6 +1,8 @@
 // La batalla completa, de punta a punta, sin pantalla:
 //
-//   simular(datos, { mision, escuadron, semilla }) -> { victoria, motivo, ticks, registro, resumen, huella }
+//   simular(datos, { mision, escuadron, semilla, control }) -> { victoria, motivo, ticks, registro, resumen, huella }
+// control (opcional): ordenes de Control por radio durante la batalla, [{ t, id }] (ver reglas.json > control).
+// escuadron[i] puede traer casilla [x, y] (donde arranca) y rumbo { x, y, espera } (el plan del despliegue).
 //
 // mision: la mision ya armada por la campana (ver campana/misiones.js).
 // escuadron: [{ piloto, mecha, gambits }] tal como los guarda la campana.
@@ -14,7 +16,7 @@ import { resolverMovimientos, resolverAcciones, herir, romperParte } from './res
 import { procesarMoral } from './moral.js';
 import { unidadDePiloto, unidadEnemiga } from './unidades.js';
 
-export function simular(datos, { mision, escuadron, semilla }) {
+export function simular(datos, { mision, escuadron, semilla, control = [] }) {
   const azar = crearAzar(semilla);
   const mapa = mision.plano || datos.mapas[mision.mapa]; // plano: mapa generado al azar
   const registro = [];
@@ -75,7 +77,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
   // --- Despliegue
   const ap = mapa.aparicion;
   escuadron.forEach((m, i) => {
-    const [x, y] = ap.jugador[i % ap.jugador.length];
+    const [x, y] = m.casilla || ap.jugador[i % ap.jugador.length];
     const base = unidadDePiloto(datos, m.piloto, m.mecha, m.gambits);
     // el mecha puede venir golpeado de la mision anterior (ver reglas.mantenimiento)
     if (m.vidaPct && m.vidaPct < 100) base.vidaInicial = Math.max(1, Math.trunc((base.vidaMax * m.vidaPct) / 100));
@@ -83,6 +85,8 @@ export function simular(datos, { mision, escuadron, semilla }) {
     if (u && u.slots) for (const [z, s] of Object.entries(u.slots)) if (s.rota) romperParte(B, u, z, true);
     // como llega a la mision (confiado, nervioso, atento, desorientado) y con quien se lleva bien o mal
     if (u) { u.rivalRef = m.rival || null; u.amigoRef = m.amigo || null; u.estadosIniciales = m.estados || []; }
+    // el plan del despliegue: a donde va primero, o si aguanta en el lugar
+    if (u && m.rumbo) u.rumbo = { x: m.rumbo.espera ? u.x : m.rumbo.x, y: m.rumbo.espera ? u.y : m.rumbo.y, espera: !!m.rumbo.espera, vida: u.vida };
   });
   // estados que lleva todo el escuadron por una condicion de la mision (interferencia, atento)
   for (const u of B.unidades) if (u.tipo === 'piloto') for (const est of mision.estadosEscuadron || []) ponerEstado(B, u, est, null);
@@ -141,8 +145,19 @@ export function simular(datos, { mision, escuadron, semilla }) {
   let fin = null, zonaPerdidaTicks = 0, refuerzosLlegaron = false;
   // minas escondidas: explotan con lo primero que las pise
   const minas = new Set((mision.minas || []).map(([x, y]) => x + ',' + y));
+  // ordenes de Control: hasta 'usos' por batalla, con 'recarga' ticks entre una y otra
+  const RC = datos.reglas.control;
+  const porRadio = control.filter((c) => RC.ordenes[c.id]).sort((a, b) => a.t - b.t);
+  let usadas = 0, ultimaOrden = -Infinity;
   for (B.t = 1; B.t <= ticksMax && !fin; B.t++) {
     B.eventosTick = [];
+    while (porRadio.length && porRadio[0].t <= B.t) {
+      const c = porRadio.shift();
+      if (usadas >= RC.usos || B.t - ultimaOrden < RC.recarga) continue;
+      usadas++; ultimaOrden = B.t;
+      B.control = { id: c.id, hasta: B.t + RC.ordenes[c.id].ticks };
+      B.log({ tipo: 'control', id: c.id, hasta: B.control.hasta });
+    }
 
     // 1. mantenimiento
     for (const u of ordenUnidades(B)) {

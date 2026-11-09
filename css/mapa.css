@@ -1,9 +1,9 @@
 /* Campana: brujula, contrato, parada tecnica, frente, nodriza y compania. Usa las variables de hangar.css. */
-.pantalla-sectores, .pantalla-contrato, .pantalla-parada, .pantalla-frente, .pantalla-nodriza, .pantalla-compania {
+.pantalla-sectores, .pantalla-contrato, .pantalla-parada, .pantalla-frente, .pantalla-nodriza, .pantalla-compania, .pantalla-plan {
   max-width: var(--hg-ancho); padding-bottom: calc(var(--hg-tabs) + 90px);
 }
-.br, .ct, .pd, .fr, .nz, .cp { display: grid; gap: 8px; align-content: start; min-width: 0; }
-.br > *, .ct > *, .pd > *, .fr > *, .nz > *, .cp > * { min-width: 0; }
+.br, .ct, .pd, .fr, .nz, .cp, .pl { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.br > *, .ct > *, .pd > *, .fr > *, .nz > *, .cp > *, .pl > * { min-width: 0; }
 
 /* ---- cabecera comun ---- */
 .br-cabeza { display: flex; align-items: center; gap: 8px; padding: 2px 0 8px; border-bottom: 1px solid var(--chapa-borde); }
@@ -235,3 +235,39 @@
 .inf-bando b { font-weight: 400; }
 .inf-bando.sube { border-color: var(--fosforo-tenue); }
 .inf-bando.baja { border-color: #7e2a22; }
+
+/* ---- plan de despliegue ---- */
+.pantalla-plan { padding-bottom: 110px; }
+.pantalla-plan .hg-desplegar { bottom: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+.pl-ayuda { margin: 0; font-size: 16px; line-height: 1.15; color: var(--texto-tenue); }
+.pl-ayuda b { font-weight: 400; } .pl-ayuda .verde { color: var(--fosforo); } .pl-ayuda .ambar { color: var(--ambar); }
+.pl-mapa { width: 100%; height: auto; image-rendering: pixelated; border: 1px solid var(--chapa-borde); cursor: crosshair; touch-action: manipulation; }
+.pl-lista { display: grid; gap: 6px; }
+.pl-piloto { width: 100%; display: grid; grid-template-columns: 22px 34px minmax(0, 1fr) auto; gap: 8px; align-items: center; min-height: 50px; padding: 4px 8px;
+  background: var(--chapa); border: 1px solid var(--chapa-borde); color: var(--texto); font: inherit; text-align: left; cursor: pointer; }
+.pl-piloto.elegido { background: var(--hg-que-fondo); border: 2px solid var(--fosforo); }
+.pl-num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--fosforo); color: var(--fosforo); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.pl-piloto.elegido .pl-num { background: var(--fosforo); color: var(--fondo); }
+.pl-textos { display: grid; line-height: 1.05; min-width: 0; }
+.pl-textos strong { font-weight: 400; font-size: 19px; color: #fff; }
+.pl-textos small { font-size: 14px; color: var(--texto-tenue); }
+.pl-plan { font-size: 14px; color: var(--texto-tenue); text-align: right; max-width: 110px; line-height: 1.05; }
+.pl-plan.ambar { color: var(--ambar); } .pl-plan.azul { color: var(--hg-quien); }
+.pl-opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
+.pl-opcion { min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 6px; background: #121510; border: 1px solid var(--chapa-borde); color: var(--texto); font: 17px 'VT323', monospace; cursor: pointer; }
+.pl-opcion .ico { width: 16px; height: 16px; }
+.pl-opcion.activa { border-color: var(--fosforo); color: var(--fosforo); background: var(--hg-que-fondo); }
+.pl-opcion.fija { grid-column: 1 / -1; cursor: default; border-style: dashed; color: var(--texto-tenue); font-size: 16px; }
+.pl-opcion.fija.activa { border-color: var(--ambar); color: var(--ambar); background: var(--hg-cuando-fondo); }
+
+/* ---- batalla: ordenes de Control por radio ---- */
+.control-radio { display: grid; grid-template-columns: auto repeat(4, minmax(0, 1fr)); gap: 5px; align-items: stretch; margin: 6px 0; }
+.cr-rotulo { display: grid; align-content: center; line-height: 1; padding: 0 6px; font-size: 16px; color: var(--ambar); letter-spacing: 1px; min-width: 76px; }
+.cr-rotulo small { font-size: 13px; color: var(--texto-tenue); letter-spacing: 0; white-space: nowrap; }
+.cr-orden { min-height: 46px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 2px;
+  background: var(--hg-cuando-fondo); border: 1px solid var(--ambar); color: var(--ambar); font: 13px/1 'VT323', monospace; cursor: pointer; min-width: 0; }
+.cr-orden .ico { width: 18px; height: 18px; }
+.cr-orden span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.cr-orden:disabled { opacity: .4; cursor: not-allowed; border-color: var(--chapa-borde); color: var(--texto-tenue); background: none; }
+.cr-orden.activa { opacity: 1; background: var(--ambar); color: var(--fondo); border-color: var(--ambar); }
+.feed .control { color: var(--ambar); }

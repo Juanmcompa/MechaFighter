@@ -16,9 +16,10 @@ import { contrato } from './contrato.js';
 import { frente } from './frente.js';
 import { nodriza } from './nodriza.js';
 import { compania } from './compania.js';
+import { plan } from './plan.js';
 import { fin } from './fin.js';
 
-const PANTALLAS = { portada, sectores, hangar, preparacion, despliegue, batalla, informe, parada, contrato, frente, nodriza, compania, reclutamiento, evento, fin };
+const PANTALLAS = { portada, sectores, hangar, preparacion, despliegue, batalla, informe, parada, contrato, frente, nodriza, compania, plan, reclutamiento, evento, fin };
 
 export function crearApp(datos, raiz) {
   const app = {
@@ -49,6 +50,8 @@ export function crearApp(datos, raiz) {
       const p = app.partida;
       if (!p) return app.ir('portada');
       const destino = { sectores: 'sectores', preparacion: 'preparacion', parada: 'parada', reclutamiento: 'reclutamiento', evento: 'evento', fin: 'fin' }[p.estado];
+      // una batalla empezada (ya se vio una parte): sigue desde ahi, sin volver a planear
+      if (destino === 'preparacion' && p.nodo && p.nodo.visto) return app.ir('batalla');
       app.ir(destino || 'sectores');
     },
     guardar() { if (app.partida) guardar(app.partida); },
