@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 78,
-  "cambio": "more_sprites_fixes",
+  "numero": 79,
+  "cambio": "hotfix",
   "novedades": [
+    "v0.79 · hotfix",
     "v0.78 · more_sprites_fixes",
     "v0.77 · La barra de munición muestra cada arma por separado",
     "v0.76 · Lo que dicen en batalla llega por radio: globos chicos y oscuros",
     "v0.75 · more_sprites_hotfix",
-    "v0.74 · Barra de munición debajo de la vida de nuestros mechas",
-    "v0.73 · Restos de mechas con arte propio"
+    "v0.74 · Barra de munición debajo de la vida de nuestros mechas"
   ]
 }
