@@ -108,6 +108,7 @@ export async function cargarTerreno(base = './') {
         if (!im) break;
         im._luz = 'terreno/' + id;
         TER.imgs[id] = im;
+        TER.sombras[id] = silueta(im);
         lista.push(id);
       }
       if (lista.length) TER.tilesets[tipo] = lista;

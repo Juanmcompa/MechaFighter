@@ -60,7 +60,6 @@ function mapaConArte(ctx, mapa, L) {
       }
       const im = img(variante(id, x, y)) || img('piso_a');
       pintar(ctx, im, px, py, L, L);
-      if (hoja) pintarTile(ctx, hoja, T, t, x, y, L);
       // el acido brilla solo (si no tiene su propio _e.png)
       if (t === 'peligro' && CAPAS.brillo && im && !LUZ.e[im._luz]) {
         const b = CAPAS.brillo;
@@ -74,14 +73,35 @@ function mapaConArte(ctx, mapa, L) {
       if (T(x, y) === 'muro') continue;
       const px = x * L, py = y * L, s = Math.max(2, L * 0.16);
       ctx.fillStyle = 'rgba(0,0,0,0.45)';
-      if (ALTO[T(x - 1, y)]) ctx.fillRect(px, py, s, L);
-      if (ALTO[T(x, y - 1)]) ctx.fillRect(px, py, L, s);
+      // (lo que tiene tileset hace su propia sombra, con su forma: ver abajo)
+      const alto = (t) => ALTO[t] && !(TER.tilesets && TER.tilesets[t]);
+      if (alto(T(x - 1, y))) ctx.fillRect(px, py, s, L);
+      if (alto(T(x, y - 1))) ctx.fillRect(px, py, L, s);
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
       if (TER.tilesets && TER.tilesets.muro) continue; // el tileset ya trae su borde
       if (T(x - 1, y) === 'muro') ctx.fillRect(px, py, Math.max(1, L / 32), L);
       if (T(x + 1, y) === 'muro') ctx.fillRect(px + L - Math.max(1, L / 32), py, Math.max(1, L / 32), L);
       if (T(x, y - 1) === 'muro') ctx.fillRect(px, py, L, Math.max(1, L / 32));
       if (T(x, y + 1) === 'muro') ctx.fillRect(px, py + L - Math.max(1, L / 32), L, Math.max(1, L / 32));
+    }
+  }
+  // 2b. muros y edificios con tileset: primero la sombra (su silueta corrida abajo a la derecha), despues la pieza
+  if (TER.tilesets && Object.keys(TER.tilesets).length) {
+    // las sombras se juntan en un lienzo aparte y se pasan una sola vez (si no, donde se pisan queda mas oscuro)
+    const capa = document.createElement('canvas');
+    capa.width = ctx.canvas.width; capa.height = ctx.canvas.height;
+    const cs = capa.getContext('2d');
+    cs.setTransform(ctx.getTransform()); cs.imageSmoothingEnabled = false;
+    for (const sombra of [true, false]) {
+      for (let y = 0; y < alto; y++) {
+        for (let x = 0; x < ancho; x++) {
+          const hoja = tileset(T(x, y), x, y);
+          if (hoja) pintarTile(sombra ? cs : ctx, hoja, T, T(x, y), x, y, L, sombra);
+        }
+      }
+      if (sombra) {
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 0.45; ctx.drawImage(capa, 0, 0); ctx.restore();
+      }
     }
   }
   // 3. detalles sueltos sobre el piso libre
@@ -119,17 +139,25 @@ function tileset(t, x, y) {
   return v ? TER.imgs[v[ruido(x, y, 17) % v.length]] : null;
 }
 
-function pintarTile(ctx, im, T, t, x, y, L) {
+function pintarTile(ctx, im, T, t, x, y, L, sombra = false) {
   const mismo = (dx, dy) => T(x + dx, y + dy) === t;
   const n = (mismo(0, -1) ? 1 : 0) | (mismo(1, 0) ? 2 : 0) | (mismo(0, 1) ? 4 : 0) | (mismo(-1, 0) ? 8 : 0);
   const c = im.width / 4; // lado de un cuadro en la hoja (32)
-  pintarRecorte(ctx, im, (n % 4) * c, Math.floor(n / 4) * c, c, c, x * L, y * L, L, L);
+  // la sombra es la silueta de la pieza, corrida (asi sigue la forma de la pared y no toda la casilla)
+  const d = sombra ? L * 0.14 : 0;
+  const fuente = sombra ? TER.sombras[im._luz.replace('terreno/', '')] : im;
+  if (!fuente) return;
+  const pinta = (sx, sy, sw, sh, dx, dy, dw, dh) => {
+    if (sombra) ctx.drawImage(fuente, sx, sy, sw, sh, dx + d, dy + d, dw, dh);
+    else pintarRecorte(ctx, im, sx, sy, sw, sh, dx, dy, dw, dh);
+  };
+  pinta((n % 4) * c, Math.floor(n / 4) * c, c, c, x * L, y * L, L, L);
   if (im.height < c * 5) return;
   // rincones de adentro: [lado 1, lado 2, diagonal, columna en la fila 5, cuarto (0/1 en x, 0/1 en y)]
   for (const [a, b, dx, dy, col] of [[1, 2, 1, -1, 0], [4, 2, 1, 1, 1], [4, 8, -1, 1, 2], [1, 8, -1, -1, 3]]) {
     if ((n & a) && (n & b) && !mismo(dx, dy)) {
       const qx = dx > 0 ? 1 : 0, qy = dy > 0 ? 1 : 0, h = c / 2;
-      pintarRecorte(ctx, im, col * c + qx * h, 4 * c + qy * h, h, h, x * L + qx * L / 2, y * L + qy * L / 2, L / 2, L / 2);
+      pinta(col * c + qx * h, 4 * c + qy * h, h, h, x * L + qx * L / 2, y * L + qy * L / 2, L / 2, L / 2);
     }
   }
 }
