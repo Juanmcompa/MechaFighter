@@ -22,28 +22,31 @@ export async function cargarSprites(base = './', cantidadRetratos = 0, { extras 
     SPR.escala = meta._escala || 1;
     delete meta._escala;
     SPR.meta = meta;
-    const pedidos = [];
-    for (const color of ['azul', 'rojo', 'verde']) {
-      for (const id of Object.keys(meta)) {
-        pedidos.push(cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png').then((im) => { if (im) { im._luz = 'mecha/' + id; SPR.imgs[color + '/' + id] = im; } }));
+    // extras: { idDeSprite: encaje } de las piezas (pueden no estar en sprites.json, o tener arte nuevo con otra medida)
+    const encajes = Array.isArray(extras) ? Object.fromEntries(extras.map((id) => [id, ''])) : extras || {};
+    const ids = [...new Set([...Object.keys(meta), ...Object.keys(encajes)])].filter(Boolean);
+    const f = SPR.escala * (24 / 32); // 32 pixeles = una casilla (24 unidades del dibujo)
+    await Promise.all(ids.map(async (id) => {
+      const azul = await cargarImagen(base + 'assets/mecha/azul/' + id + '.png');
+      if (!azul) return;
+      azul._luz = 'mecha/' + id;
+      const viejo = meta[id];
+      // si el dibujo no coincide con lo anotado en sprites.json (o no esta), es arte nuevo: se mide solo
+      const nuevo = !viejo || viejo.w !== azul.width || viejo.h !== azul.height;
+      if (nuevo) {
+        const w = azul.width * f, h = azul.height * f;
+        const papel = azul.width % 32 === 0 && azul.height % 32 === 0;
+        // sin papel, los brazos se enganchan del hombro (abajo) y lo demas del centro
+        const ancla = encajes[id] === 'brazo' ? [w * 0.4, h * 0.82] : [w / 2, h / 2];
+        meta[id] = { w, h, ancla, ...(papel ? { papel: true } : {}) };
       }
-    }
-    await Promise.all(pedidos);
-    // arte nuevo que todavia no esta en sprites.json: se carga igual y se mide solo
-    await Promise.all([...new Set(extras)].filter((id) => id && !meta[id]).map(async (id) => {
-      const im = await cargarImagen(base + 'assets/mecha/azul/' + id + '.png');
-      if (!im) return;
-      im._luz = 'mecha/' + id;
-      // 32 pixeles = una casilla, como el arte "de papel"; si mide justo multiplos de 32, se arma como papel
-      const f = SPR.escala * (24 / 32);
-      const papel = im.width % 32 === 0 && im.height % 32 === 0;
-      meta[id] = { w: im.width * f, h: im.height * f, ancla: [im.width * f / 2, im.height * f / 2], ...(papel ? { papel: true } : {}) };
-      SPR.imgs['azul/' + id] = pintarEquipo(im, 'azul', colorEquipo);
+      SPR.imgs['azul/' + id] = nuevo ? pintarEquipo(azul, 'azul', colorEquipo) : azul;
       for (const color of ['rojo', 'verde']) {
         const otra = await cargarImagen(base + 'assets/mecha/' + color + '/' + id + '.png');
-        if (otra) otra._luz = im._luz;
-        // si las tres son el mismo dibujo (o falta alguna), el color de bando se pinta solo
-        SPR.imgs[color + '/' + id] = pintarEquipo(otra || im, color, colorEquipo);
+        // si falta, o es de otra medida (el dibujo viejo), o es el mismo dibujo: el color de bando se pinta solo
+        const sirve = otra && otra.width === azul.width && otra.height === azul.height;
+        if (sirve) otra._luz = azul._luz;
+        SPR.imgs[color + '/' + id] = !nuevo && sirve ? otra : pintarEquipo(sirve ? otra : azul, color, colorEquipo);
       }
     }));
     SPR.listo = Object.keys(SPR.imgs).length > 0;
