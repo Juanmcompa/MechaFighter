@@ -406,8 +406,9 @@ function mechaConSprites(ctx, f, u) {
     pieza(piernas, dx, dy + (orugas ? 0 : zancada), false, orugas ? 0 : zancada);
     pieza(piernas, -dx, dy - (orugas ? 0 : zancada), true, orugas ? 0 : -zancada);
   }
-  if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
   pintar(ctx, torso, -tw / 2, -th / 2, tw, th);
+  // la mochila va encima del torso (se ve desde arriba, colgada en la espalda)
+  if (a.mochila && a.mochila !== 'mochila_vacia') pieza(a.mochila, 0, th * 0.38);
   if (a.brazo_der) pieza(a.brazo_der, tw * 0.5, -th * 0.05, false);
   if (a.brazo_izq) pieza(a.brazo_izq, -tw * 0.5, -th * 0.05, true);
   if (a.cabeza) pieza(a.cabeza, 0, -th * 0.12);
