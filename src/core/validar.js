@@ -147,6 +147,7 @@ export function validarDatos(d) {
   }
 
   // --- 2. Gambits: cada condicion y accion bien armada
+  for (const [id, pf] of Object.entries(g.perfiles || {})) if (id[0] !== '_') revisarGambits('gambits › perfiles › ' + id, pf.ordenes);
   for (const [id, c] of Object.entries(condiciones)) revisarExpr('gambits › ' + id, c.expr, c.parametros);
   for (const [id, a] of Object.entries(acciones)) {
     if (a.habilidad && !existe(d.habilidades, a.habilidad)) err('gambits › ' + id, 'habilidad "' + a.habilidad + '" no existe');

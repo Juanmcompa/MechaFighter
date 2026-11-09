@@ -495,5 +495,123 @@
     "escolta_peleando",
     "junto_a_barril"
   ],
-  "maximo_por_unidad": 8
+  "maximo_por_unidad": 8,
+  "lugares_por_nivel": {
+    "_ayuda": "Cuantas ordenes puede tener un piloto segun su nivel (nivel minimo: lugares). Las que ya tenia no se pierden.",
+    "1": 3,
+    "3": 4,
+    "5": 5
+  },
+  "perfiles": {
+    "_ayuda": "Juegos de ordenes de un toque en el hangar. Si el piloto tiene menos lugares, se cortan las ultimas.",
+    "agresivo": {
+      "nombre": "Agresivo",
+      "icono": "espadas",
+      "descripcion": "Va al frente y le tira al más débil.",
+      "ordenes": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_debil"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "avanzar",
+          "objetivo": "enemigo_cercano"
+        }
+      ]
+    },
+    "cauteloso": {
+      "nombre": "Cauteloso",
+      "icono": "escudo",
+      "descripcion": "Se cuida: dispara desde cobertura y se va si lo lastiman.",
+      "ordenes": [
+        {
+          "condicion": "yo_vida_bajo",
+          "accion": "replegarse",
+          "objetivo": "lejos_de_enemigos",
+          "parametros": {
+            "valor": 35
+          }
+        },
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        }
+      ]
+    },
+    "francotirador": {
+      "nombre": "Francotirador",
+      "icono": "mira",
+      "descripcion": "Mantiene la distancia y le apunta al más peligroso.",
+      "ordenes": [
+        {
+          "condicion": "enemigo_cerca",
+          "accion": "replegarse",
+          "objetivo": "lejos_de_enemigos",
+          "parametros": {
+            "casillas": 3
+          }
+        },
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_mas_peligroso"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "buscar_cobertura",
+          "objetivo": "yo"
+        }
+      ]
+    },
+    "apoyo": {
+      "nombre": "Apoyo",
+      "icono": "cruz",
+      "descripcion": "Repara al más herido y acompaña al grupo.",
+      "ordenes": [
+        {
+          "condicion": "aliado_vida_bajo",
+          "accion": "reparar",
+          "objetivo": "aliado_mas_herido",
+          "parametros": {
+            "valor": 50
+          }
+        },
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "seguir",
+          "objetivo": "aliado_mas_herido"
+        }
+      ]
+    },
+    "escolta": {
+      "nombre": "Escolta",
+      "icono": "vinculo",
+      "descripcion": "No se separa del grupo y le tira al que se acerca.",
+      "ordenes": [
+        {
+          "condicion": "enemigo_a_rango",
+          "accion": "disparar",
+          "objetivo": "enemigo_cercano"
+        },
+        {
+          "condicion": "siempre",
+          "accion": "seguir",
+          "objetivo": "aliado_cercano"
+        }
+      ]
+    }
+  }
 }

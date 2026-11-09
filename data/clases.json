@@ -1,5 +1,5 @@
 {
-  "_ayuda": "La clase es la formacion del PILOTO: define en que es bueno, sus habilidades y sus gambits de fabrica. Los numeros del mecha salen de sus partes (partes.json). Las bonificaciones se suman a las del mecha.",
+  "_ayuda": "La clase es la formacion del PILOTO: define en que es bueno, sus habilidades y sus gambits de fabrica. prioridades_armado: que numeros mira el boton \"Armar solo\" del hangar (estructura, blindaje, dano, alcance, punteria, evasion, paso, vision; mas alto = le importa mas). Los numeros del mecha salen de sus partes (partes.json). Las bonificaciones se suman a las del mecha.",
   "vanguardia": {
     "nombre": "Vanguardia",
     "rol": "tanque",
@@ -36,7 +36,12 @@
         "accion": "avanzar",
         "objetivo": "enemigo_cercano"
       }
-    ]
+    ],
+    "prioridades_armado": {
+      "estructura": 2,
+      "blindaje": 2,
+      "dano": 1
+    }
   },
   "tirador": {
     "nombre": "Tirador",
@@ -81,7 +86,12 @@
         "accion": "buscar_cobertura",
         "objetivo": "yo"
       }
-    ]
+    ],
+    "prioridades_armado": {
+      "alcance": 2,
+      "dano": 2,
+      "punteria": 1
+    }
   },
   "medico": {
     "nombre": "Médico",
@@ -126,7 +136,12 @@
         "accion": "seguir",
         "objetivo": "aliado_mas_herido"
       }
-    ]
+    ],
+    "prioridades_armado": {
+      "estructura": 1,
+      "evasion": 1,
+      "paso": 1
+    }
   },
   "infiltrador": {
     "nombre": "Infiltrador",
@@ -164,7 +179,12 @@
         "accion": "flanquear",
         "objetivo": "enemigo_mas_debil"
       }
-    ]
+    ],
+    "prioridades_armado": {
+      "paso": 2,
+      "evasion": 2,
+      "dano": 1
+    }
   },
   "ingeniero": {
     "nombre": "Ingeniero",
@@ -206,6 +226,11 @@
         "accion": "seguir",
         "objetivo": "aliado_cercano"
       }
-    ]
+    ],
+    "prioridades_armado": {
+      "estructura": 1,
+      "blindaje": 1,
+      "alcance": 1
+    }
   }
 }

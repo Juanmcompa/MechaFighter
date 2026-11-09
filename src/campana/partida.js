@@ -472,6 +472,8 @@ export function cerrarMision(datos, p, resultado) {
     const s = resultado.resumen.pilotos[pi.id];
     if (!s) continue;
     const linea = { id: pi.id, apodo: pi.apodo, nombre: pi.nombre, retrato: pi.retrato, clase: pi.clase, xp: 0, subioNivel: false, nuevas: [], estado: 'ok', bajas: s.bajas,
+      hecho: Math.round(s.danioHecho || 0), recibido: Math.round(s.danioRecibido || 0), reparado: Math.round(s.reparado || 0),
+      ordenes: (pi.gambits && pi.gambits.length ? pi.gambits : datos.clases[pi.clase].gambits_de_fabrica).map((g, k) => ({ ...g, veces: (s.ordenes || [])[k] || 0 })),
       momentos: (hoja.momentos.get(pi.id) || []).slice() };
     let vivo = s.viva;
 

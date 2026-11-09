@@ -64,7 +64,7 @@ export function simular(datos, { mision, escuadron, semilla }) {
       vida: plantilla.vidaInicial || plantilla.vidaMax, viva: true,
       moralActual: plantilla.moral,
       estados: [], cds: {}, ocupado: 0, mover: 0, vinculo: null, ultimoAtacante: null,
-      s: { bajas: 0, danioHecho: 0, danioRecibido: 0, vidaMinPct: 100, reparado: 0, explosiones: 0, quedoSolo: false, vinculoMurio: false }
+      s: { bajas: 0, danioHecho: 0, danioRecibido: 0, vidaMinPct: 100, reparado: 0, explosiones: 0, quedoSolo: false, vinculoMurio: false, ordenes: [] }
     };
     B.unidades.push(u);
     B.porId.set(u.id, u);
@@ -211,6 +211,9 @@ export function simular(datos, { mision, escuadron, semilla }) {
       const i = decidir(B, u);
       if (i.anula && i.anula !== u.ultimaAnulacion) B.log({ tipo: 'anula', u: u.id, motivo: i.anula });
       u.ultimaAnulacion = i.anula || null;
+      // para el informe: cuantas veces arranco a cumplir cada orden (no cambia nada de la batalla)
+      if (u.s && u.s.ordenes && i.gambit !== undefined && i.gambit !== u.ultimoGambit) u.s.ordenes[i.gambit] = (u.s.ordenes[i.gambit] || 0) + 1;
+      u.ultimoGambit = i.gambit;
       if (i.tipo !== 'esperar' && i.tipo !== 'mantener') intenciones.push({ u, i });
     }
 
