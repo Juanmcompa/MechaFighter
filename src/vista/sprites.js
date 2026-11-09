@@ -98,6 +98,20 @@ export async function cargarTerreno(base = './') {
       }
       if (lista.length > 1) TER.variantes[id] = lista;
     }));
+    // tilesets (muro_tiles.png: hoja de 4x5 casillas, ver dibujo.js > tileset) y sus variantes muro_tiles_2...
+    TER.tilesets = {};
+    await Promise.all(Object.entries(m.tilesets || {}).map(async ([tipo, nombre]) => {
+      const lista = [];
+      for (let n = 1; n <= 40; n++) {
+        const id = n === 1 ? nombre : nombre + '_' + n;
+        const im = await cargarImagen(base + 'assets/terreno/' + id + '.png');
+        if (!im) break;
+        im._luz = 'terreno/' + id;
+        TER.imgs[id] = im;
+        lista.push(id);
+      }
+      if (lista.length) TER.tilesets[tipo] = lista;
+    }));
     // series numeradas (obj_m_cover_barrels_001, _002... u obj_explosive_barrel_1, _2...): se buscan solas
     // hasta que falta un numero, asi para sumar variantes alcanza con dejar el PNG con el numero que sigue
     await Promise.all(Object.entries(m.series || {}).flatMap(([grupo, prefijos]) => prefijos.map(async (pre) => {

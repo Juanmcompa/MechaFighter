@@ -3,7 +3,7 @@
 // Vista cenital: el "frente" de cada unidad mira hacia +x antes de rotar.
 
 import { SPR, sprite, TER, UNI } from './sprites.js';
-import { pintar, CAPAS, LUZ } from './luz.js';
+import { pintar, pintarRecorte, CAPAS, LUZ } from './luz.js';
 
 export const COLORES = {
   piso: '#1a1e16', pisoLinea: 'rgba(143,220,90,0.05)',
@@ -47,7 +47,10 @@ function mapaConArte(ctx, mapa, L) {
     for (let x = 0; x < ancho; x++) {
       const t = T(x, y), r = ruido(x, y), px = x * L, py = y * L;
       let id;
-      if (t === 'muro') id = r < 160 && img('muro_b') ? 'muro_b' : 'muro_a';
+      // muros con tileset: abajo va piso (la hoja tiene partes transparentes) y arriba la pieza que encaja
+      const hoja = tileset(t, x, y);
+      if (hoja) id = r < 250 && img('piso_b') ? 'piso_b' : 'piso_a';
+      else if (t === 'muro') id = r < 160 && img('muro_b') ? 'muro_b' : 'muro_a';
       else if (t === 'peligro') id = 'acido';
       else {
         const z = enZona(x, y);
@@ -57,6 +60,7 @@ function mapaConArte(ctx, mapa, L) {
       }
       const im = img(variante(id, x, y)) || img('piso_a');
       pintar(ctx, im, px, py, L, L);
+      if (hoja) pintarTile(ctx, hoja, T, t, x, y, L);
       // el acido brilla solo (si no tiene su propio _e.png)
       if (t === 'peligro' && CAPAS.brillo && im && !LUZ.e[im._luz]) {
         const b = CAPAS.brillo;
@@ -73,6 +77,7 @@ function mapaConArte(ctx, mapa, L) {
       if (ALTO[T(x - 1, y)]) ctx.fillRect(px, py, s, L);
       if (ALTO[T(x, y - 1)]) ctx.fillRect(px, py, L, s);
       ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      if (TER.tilesets && TER.tilesets.muro) continue; // el tileset ya trae su borde
       if (T(x - 1, y) === 'muro') ctx.fillRect(px, py, Math.max(1, L / 32), L);
       if (T(x + 1, y) === 'muro') ctx.fillRect(px + L - Math.max(1, L / 32), py, Math.max(1, L / 32), L);
       if (T(x, y - 1) === 'muro') ctx.fillRect(px, py, L, Math.max(1, L / 32));
@@ -103,6 +108,30 @@ function mapaConArte(ctx, mapa, L) {
     }
   }
   rompibles(ctx, T, ancho, alto, L);
+}
+
+// ---------- Tilesets (muros y edificios que encajan entre si) ----------
+// Hoja de 4 columnas x 5 filas de 32 px. Las 16 primeras: el cuadro numero N (columna + fila x 4) es la pieza que
+// sigue hacia los lados de N, sumando N=1, E=2, S=4, O=8. La fila 5: rincones de adentro NE, SE, SO, NO
+// (se usa su cuarto de la esquina, cuando dos lados siguen pero la diagonal no).
+function tileset(t, x, y) {
+  const v = TER.tilesets && TER.tilesets[t];
+  return v ? TER.imgs[v[ruido(x, y, 17) % v.length]] : null;
+}
+
+function pintarTile(ctx, im, T, t, x, y, L) {
+  const mismo = (dx, dy) => T(x + dx, y + dy) === t;
+  const n = (mismo(0, -1) ? 1 : 0) | (mismo(1, 0) ? 2 : 0) | (mismo(0, 1) ? 4 : 0) | (mismo(-1, 0) ? 8 : 0);
+  const c = im.width / 4; // lado de un cuadro en la hoja (32)
+  pintarRecorte(ctx, im, (n % 4) * c, Math.floor(n / 4) * c, c, c, x * L, y * L, L, L);
+  if (im.height < c * 5) return;
+  // rincones de adentro: [lado 1, lado 2, diagonal, columna en la fila 5, cuarto (0/1 en x, 0/1 en y)]
+  for (const [a, b, dx, dy, col] of [[1, 2, 1, -1, 0], [4, 2, 1, 1, 1], [4, 8, -1, 1, 2], [1, 8, -1, -1, 3]]) {
+    if ((n & a) && (n & b) && !mismo(dx, dy)) {
+      const qx = dx > 0 ? 1 : 0, qy = dy > 0 ? 1 : 0, h = c / 2;
+      pintarRecorte(ctx, im, col * c + qx * h, 4 * c + qy * h, h, h, x * L + qx * L / 2, y * L + qy * L / 2, L / 2, L / 2);
+    }
+  }
 }
 
 // Si hay variantes de esa imagen (nombre_2, nombre_3...), cada casilla elige una (siempre la misma)
@@ -150,7 +179,7 @@ function rompibles(ctx, T, ancho, alto, L) {
       const serie = TER.objetos && TER.objetos[t];
       if (serie && serie.length && objeto(ctx, serie[ruido(x, y, 5) % serie.length], x, y, L, t === 'edificio' ? 0.14 : 0.08)) continue;
       if (t !== 'piso' && t !== 'muro' && t !== 'peligro' && TER.imgs && TER.imgs[t]) { pintar(ctx, TER.imgs[t], px, py, L, L); continue; }
-      if (t === 'edificio') {
+      if (t === 'edificio' && !tileset(t, x, y)) {
         // techo visto desde arriba; borde mas oscuro donde termina el edificio
         const b = L * 0.14;
         ctx.fillStyle = '#2c333b'; ctx.fillRect(px, py, L, L);

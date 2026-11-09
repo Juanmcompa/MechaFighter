@@ -3,7 +3,7 @@
 
 import { dibujarMapa, dibujarUnidad, COLORES, dibujarCaido, miembrosVivos, moverTropa, posicionMiembro, figuraDe } from './dibujo.js';
 import { crearTablero, lineaDeTiro, distancia, caminable, cambiarCasilla } from '../motor/espacio.js';
-import { CAPAS, crearCompositor, colorLuz } from './luz.js';
+import { CAPAS, crearCompositor, colorLuz, girarNormales } from './luz.js';
 
 const COLOR_TRAZO = { bala: '#ffe08a', rafaga: '#ffd060', riel: '#7fe3ff', llama: '#ff8a2a', misil: '#ffb347', escupida: '#9be04a', tajo: '#ffffff', garra: '#e8dcc0' };
 
@@ -183,6 +183,8 @@ export class Repeticion {
     }
     f.getContext('2d').clearRect(0, 0, f.width, f.height);
     dibujarMapa(f.getContext('2d'), this.mapa, lado);
+    // en el celular parado el mapa se dibuja girado: los normal maps del piso tambien tienen que girar
+    if (this.girado && CAPAS.normal) girarNormales(this.fondoN, -Math.PI / 2);
     Object.assign(CAPAS, antes);
   }
 

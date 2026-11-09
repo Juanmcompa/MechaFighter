@@ -76,7 +76,8 @@ function normalGirado(clave, im, m) {
 
 // Llamar despues de dibujar un sprite: lo repite en las capas de normales y de brillo, con la misma posicion.
 // (la imagen tiene que tener ._luz, que le pone sprites.js al cargarla)
-export function capas(ctx, im, dx, dy, dw, dh) {
+// (con recorte: capas(ctx, im, dx, dy, dw, dh, [sx, sy, sw, sh]) dibuja solo ese pedazo de la imagen)
+export function capas(ctx, im, dx, dy, dw, dh, recorte = null) {
   if (!CAPAS.normal || !im || !im._luz) return;
   const n = LUZ.n[im._luz], e = LUZ.e[im._luz];
   if (!n && !e) return;
@@ -84,13 +85,33 @@ export function capas(ctx, im, dx, dy, dw, dh) {
   if (n) {
     const c = CAPAS.normal;
     c.setTransform(m); c.globalAlpha = ctx.globalAlpha;
-    c.drawImage(normalGirado(im._luz, n, m), dx, dy, dw, dh);
+    const g = normalGirado(im._luz, n, m);
+    if (recorte) c.drawImage(g, ...recorte, dx, dy, dw, dh); else c.drawImage(g, dx, dy, dw, dh);
   }
   if (e) {
     const c = CAPAS.brillo;
     c.setTransform(m); c.globalAlpha = ctx.globalAlpha;
-    c.drawImage(e, dx, dy, dw, dh);
+    if (recorte) c.drawImage(e, ...recorte, dx, dy, dw, dh); else c.drawImage(e, dx, dy, dw, dh);
   }
+}
+
+// Un pedazo de una hoja (tileset) + capas
+export function pintarRecorte(ctx, im, sx, sy, sw, sh, dx, dy, dw, dh) {
+  ctx.drawImage(im, sx, sy, sw, sh, dx, dy, dw, dh);
+  capas(ctx, im, dx, dy, dw, dh, [sx, sy, sw, sh]);
+}
+
+// Gira los vectores de un canvas de normales (cuando todo el dibujo se gira, como el mapa en el celular parado)
+export function girarNormales(c, ang) {
+  const x = c.getContext('2d'), px = x.getImageData(0, 0, c.width, c.height), d = px.data;
+  const co = Math.cos(ang), si = Math.sin(ang);
+  for (let i = 0; i < d.length; i += 4) {
+    if (!d[i + 3]) continue;
+    const nx = d[i] / 127.5 - 1, ny = -(d[i + 1] / 127.5 - 1);
+    d[i] = Math.round((co * nx - si * ny + 1) * 127.5);
+    d[i + 1] = Math.round((-(si * nx + co * ny) + 1) * 127.5);
+  }
+  x.putImageData(px, 0, 0);
 }
 
 // drawImage + capas
