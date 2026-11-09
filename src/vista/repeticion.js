@@ -457,7 +457,7 @@ export class Repeticion {
           if (this.decir(u, e.motivo, true)) break;
         }
         const texto = this.datos.textos.gritos[e.motivo] || '…';
-        u.grito = { texto, hasta: this.T + 22 };
+        u.grito = { texto, hasta: this.T + 22, desde: this.T };
         // el mismo grito seguido no se repite en la lista
         if (u.ultimoGrito !== e.motivo || this.T - u.ultimoGritoT > 60) this.alEvento({ texto: u.ficha.nombre + ': «' + texto + '»', clase: 'aviso' });
         u.ultimoGrito = e.motivo; u.ultimoGritoT = this.T;
@@ -577,7 +577,7 @@ export class Repeticion {
     if (u.grito && this.T < u.grito.hasta && !forzar) return false;
     let texto = lista[this.azarVoz(Math.floor(this.T), u) % lista.length];
     if (vars) texto = texto.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : k));
-    u.grito = { texto, hasta: this.T + 24 };
+    u.grito = { texto, hasta: this.T + 24, desde: this.T };
     u.vozT = this.T; this.ultimaVoz = this.T;
     // los nuestros hablan por radio con Control
     const quien = u.ficha.bando === 0 ? u.ficha.nombre.toUpperCase() + ' › CONTROL' : u.ficha.nombre;
@@ -886,13 +886,7 @@ export class Repeticion {
       if (u.estados.has('en_llamas')) { ctx.fillStyle = '#ff8a2a'; ctx.fillRect(cx + Lz * 0.42, top - 4, 3, 3); }
       if (u.estados.has('suprimido')) { ctx.fillStyle = '#b8b8b8'; ctx.fillRect(cx + Lz * 0.42, top, 3, 3); }
       if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - Lz * 0.5, top + 4); }
-      if (u.grito) {
-        const w = ctx.measureText(u.grito.texto).width + 10;
-        const hb = Math.max(14, Lz * 0.62);
-        const bx = Math.min(Math.max(cx, w / 2 + 2), this.W - w / 2 - 2), by = Math.max(hb, top - 4);
-        ctx.fillStyle = '#e8edd8'; ctx.fillRect(bx - w / 2, by - hb + 2, w, hb);
-        ctx.fillStyle = '#121510'; ctx.fillText(u.grito.texto, bx, by - 2);
-      }
+      if (u.grito) radio(ctx, u, cx, top - (Math.max(5, Lz * 0.16) * 1.5 + 7), Lz, this.W, this.T);
     }
     for (const f of this.flotantes) {
       const k = (this.T - f.t0) / f.dur;
@@ -928,6 +922,39 @@ export { COLORES };
 // Barra de vida estilo MOBA: todas del mismo ancho, con una rayita cada 10 puntos (y una mas marcada cada 50),
 // asi a simple vista se ve cuanta vida tiene. El pedazo recien perdido queda claro un momento y despues se va.
 const SEGMENTO = 10;
+// Lo que dice una unidad, como si llegara por radio: globo oscuro con los colores de la consola
+// (verde fosforo los nuestros, rojo los enemigos), letra chica y una flechita hacia quien habla.
+// Al aparecer titila un instante, como una transmision que entra.
+function radio(ctx, u, cx, abajo, Lz, W, T) {
+  const nuestro = u.ficha.bando === 0;
+  const texto = u.grito.texto;
+  const tam = Math.round(Math.max(11, Lz * 0.34));
+  ctx.save();
+  ctx.font = `${tam}px VT323, monospace`;
+  ctx.textAlign = 'left';
+  const marca = nuestro ? '▸ ' : '◂ ';
+  const w = Math.ceil(ctx.measureText(marca + texto).width) + 10, h = tam + 4;
+  const bx = Math.round(Math.min(Math.max(cx - w / 2, 2), W - w - 2)), by = Math.round(Math.max(2, abajo - h - 4));
+  const recien = u.grito.desde !== undefined ? T - u.grito.desde : 9;
+  if (recien < 1.5 && Math.floor(recien * 8) % 2) ctx.globalAlpha = 0.45;
+  const borde = nuestro ? '#4f7a33' : '#7e2a22', letra = nuestro ? '#8fdc5a' : '#e57a6c';
+  ctx.fillStyle = 'rgba(13,15,11,0.9)'; ctx.fillRect(bx, by, w, h);
+  ctx.strokeStyle = borde; ctx.lineWidth = 1; ctx.strokeRect(bx + 0.5, by + 0.5, w - 1, h - 1);
+  // flechita hacia la unidad
+  const fx = Math.round(Math.min(Math.max(cx, bx + 6), bx + w - 6));
+  ctx.fillStyle = 'rgba(13,15,11,0.9)';
+  ctx.beginPath(); ctx.moveTo(fx - 4, by + h - 1); ctx.lineTo(fx + 4, by + h - 1); ctx.lineTo(fx, by + h + 4); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = borde; ctx.beginPath(); ctx.moveTo(fx - 4, by + h - 0.5); ctx.lineTo(fx, by + h + 4); ctx.lineTo(fx + 4, by + h - 0.5); ctx.stroke();
+  // lineas de barrido, muy suaves
+  ctx.fillStyle = 'rgba(143,220,90,0.05)';
+  for (let y = by + 2; y < by + h - 1; y += 2) ctx.fillRect(bx + 1, y, w - 2, 1);
+  ctx.fillStyle = borde === '#4f7a33' ? '#4f7a33' : '#7e2a22';
+  ctx.fillText(marca, bx + 5, by + h - 4);
+  ctx.fillStyle = letra;
+  ctx.fillText(texto, bx + 5 + ctx.measureText(marca).width, by + h - 4);
+  ctx.restore();
+}
+
 // Un disparo de esa arma: una bala menos (y si se vacia, a recargar)
 function gastarBala(u, slot, t) {
   const a = (u.armas || []).find((x) => x.slot === slot && x.municionMax);
