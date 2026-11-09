@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 72,
-  "cambio": "El brillo del ácido queda debajo de las unidades, y los tanques nuevos van por el piso",
+  "numero": 73,
+  "cambio": "Restos de mechas con arte propio",
   "novedades": [
+    "v0.73 · Restos de mechas con arte propio",
     "v0.72 · El brillo del ácido queda debajo de las unidades, y los tanques nuevos van por el piso",
     "v0.71 · Mechas con más peso: piernas, torso y cabeza giran por separado, y batallas más tranquilas",
     "v0.70 · texture_qual_update",
     "v0.69 · La mochila se dibuja encima del torso",
-    "v0.68 · RETEXTURE_HOTFIX",
-    "v0.67 · texture_fix2"
+    "v0.68 · RETEXTURE_HOTFIX"
   ]
 }

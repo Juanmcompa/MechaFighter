@@ -322,7 +322,7 @@ export function dibujarUnidad(ctx, u, L, t) {
   if (!u.viva) ctx.globalAlpha = 0.85;
   const s = L / 24; // todo se dibuja en una grilla de 24 y se escala (ocupa casi toda la casilla)
   ctx.scale(s, s);
-  if (!u.viva) dibujarRestos(ctx, f);
+  if (!u.viva) dibujarRestos(ctx, f, u);
   else if (UNI.imgs[f.sprite]) dibujarUnidadSprite(ctx, f, u, t);
   else if (f.cuerpo === 'dron') dibujarDronSimple(ctx, f);
   else if (f.cuerpo === 'mutante') dibujarMutante(ctx, f, u, t);
@@ -807,7 +807,21 @@ function dibujarTransporte(ctx, f, u) {
   if (u.golpe > 0) { ctx.fillStyle = `rgba(255,255,255,${u.golpe * 0.7})`; ctx.fillRect(-13, -9, 26, 18); }
 }
 
-function dibujarRestos(ctx, f) {
+function dibujarRestos(ctx, f, u = {}) {
+  // con arte: los restos de esa unidad (restos_<sprite>) o uno de la serie de su tipo (restos_mecha_N...)
+  const R = UNI.restos || {};
+  const lista = R[f.sprite] || R[f.cuerpo || 'mecha'] || (f.apariencia ? R.mecha : null);
+  if (lista) {
+    const h = [...String(u.id || f.nombre || '')].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
+    const r = lista[h % lista.length];
+    const im = f.bando === 0 ? r.azul : r.rojo;
+    ctx.save();
+    ctx.rotate(Math.PI / 2);
+    const w = im.width * 0.75, hh = im.height * 0.75; // 32 px = 24 unidades = una casilla
+    pintar(ctx, im, -w / 2, -hh / 2, w, hh);
+    ctx.restore();
+    return;
+  }
   ctx.fillStyle = f.cuerpo === 'mutante' ? '#3d4a26' : '#24221d';
   ctx.beginPath(); ctx.ellipse(0, 0, 12, 9, 0.5, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = f.cuerpo === 'mutante' ? '#5b6b33' : '#3d3a32';

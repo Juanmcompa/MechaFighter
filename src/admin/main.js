@@ -130,7 +130,7 @@ async function arrancar() {
     raiz.replaceChildren(); montar(raiz, h('p', { class: 'error' }, e.message), h('p', { class: 'ayuda' }, 'Abrí el taller con el servidor local (igual que el juego).'));
     return;
   }
-  await Promise.all([cargarSprites('./', (T.datos.reglas.arte || {}).retratos || 0, { extras: Object.fromEntries(Object.values(T.datos.partes).map((p) => [p.sprite, p.encaje])), colorEquipo: (T.datos.reglas.arte || {}).color_equipo }), cargarTerreno('./'), cargarUnidades('./'), cargarLuces('./')]);
+  await Promise.all([cargarSprites('./', (T.datos.reglas.arte || {}).retratos || 0, { extras: Object.fromEntries(Object.values(T.datos.partes).map((p) => [p.sprite, p.encaje])), colorEquipo: (T.datos.reglas.arte || {}).color_equipo }), cargarTerreno('./'), cargarUnidades('./', (T.datos.reglas.arte || {}).color_equipo), cargarLuces('./')]);
   raiz.replaceChildren();
   montar(raiz, cabecera, cuerpo);
   pintar();

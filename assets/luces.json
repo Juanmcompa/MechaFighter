@@ -5,7 +5,9 @@
     "assets/terreno/muro_tiles_n.png"
   ],
   "brillos": [
-    "assets/mecha/azul/cabeza_sensor_E.png",
+    "assets/mecha/azul/brazo_canon_riel_e.png",
+    "assets/mecha/azul/cabeza_optica_e.png",
+    "assets/mecha/azul/cabeza_sensor_e.png",
     "assets/terreno/acido_2_e.png",
     "assets/terreno/acido_3_e.png",
     "assets/terreno/acido_4_e.png",

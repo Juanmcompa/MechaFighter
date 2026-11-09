@@ -63,7 +63,7 @@ export async function cargarSprites(base = './', cantidadRetratos = 0, { extras 
 // ---------- Unidades enteras (camion, drones): assets/unidades ----------
 export const UNI = { escala: 2, meta: {}, imgs: {} };
 
-export async function cargarUnidades(base = './') {
+export async function cargarUnidades(base = './', colorEquipo = null) {
   try {
     const r = await fetch(base + 'assets/unidades/unidades.json', { cache: 'no-cache' });
     if (!r.ok) return UNI;
@@ -89,6 +89,30 @@ export async function cargarUnidades(base = './') {
         }
       }
       UNI.imgs[id] = im;
+    }));
+    // restos de lo que cae: series numeradas (restos_mecha_1, _2...; restos_mutante_; restos_dron_) y, si hay,
+    // los de una unidad en particular (restos_<sprite>.png, ej. restos_dron_pesado.png). 32 px = una casilla.
+    // Lo pintado con los verdes de equipo toma el color del bando.
+    UNI.restos = {};
+    const config = colorEquipo;
+    const cargarRestos = async (nombre) => {
+      const im = await cargarImagen(base + 'assets/unidades/' + nombre + '.png');
+      if (!im) return null;
+      im._luz = 'unidades/' + nombre;
+      return { azul: pintarEquipo(im, 'azul', config), rojo: pintarEquipo(im, 'rojo', config) };
+    };
+    await Promise.all(['mecha', 'mutante', 'dron'].map(async (cuerpo) => {
+      const lista = [];
+      for (let n = 1; n <= 30; n++) {
+        const r = await cargarRestos('restos_' + cuerpo + '_' + n);
+        if (!r) break;
+        lista.push(r);
+      }
+      if (lista.length) UNI.restos[cuerpo] = lista;
+    }));
+    await Promise.all(Object.keys(meta).map(async (id) => {
+      const r = await cargarRestos('restos_' + id);
+      if (r) UNI.restos[id] = [r];
     }));
   } catch { /* sin sprites: dibujos por codigo */ }
   return UNI;
