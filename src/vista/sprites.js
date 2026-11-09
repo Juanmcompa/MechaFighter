@@ -71,7 +71,25 @@ export async function cargarUnidades(base = './') {
     UNI.escala = meta._escala || 2;
     delete meta._escala;
     UNI.meta = meta;
-    await Promise.all(Object.keys(meta).map((id) => cargarImagen(base + 'assets/unidades/' + id + '.png').then((im) => { if (im) { im._luz = 'unidades/' + id; UNI.imgs[id] = im; } })));
+    await Promise.all(Object.keys(meta).map(async (id) => {
+      let im = await cargarImagen(base + 'assets/unidades/' + id + '.png');
+      if (!im) return;
+      im._luz = 'unidades/' + id;
+      const m = meta[id];
+      // arte nuevo (otra medida que la anotada): 32 pixeles = una casilla; las marcas (magenta = boca del arma,
+      // amarillo = faro) se sacan del dibujo. Si hay id_torreta.png, la torreta gira aparte (apunta) y el casco
+      // va hacia donde camina.
+      if (m.w !== im.width || m.h !== im.height) {
+        meta[id] = { w: im.width * 0.75 * UNI.escala, h: im.height * 0.75 * UNI.escala, nuevo: true };
+        im = pintarEquipo(im, 'azul', null);
+        const torreta = await cargarImagen(base + 'assets/unidades/' + id + '_torreta.png');
+        if (torreta) {
+          torreta._luz = 'unidades/' + id + '_torreta';
+          UNI.imgs[id + '_torreta'] = pintarEquipo(torreta, 'azul', null);
+        }
+      }
+      UNI.imgs[id] = im;
+    }));
   } catch { /* sin sprites: dibujos por codigo */ }
   return UNI;
 }

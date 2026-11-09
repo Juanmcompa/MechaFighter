@@ -757,6 +757,22 @@ export class Repeticion {
     // los caidos de la infanteria, en el piso (debajo de todos)
     this.anotarCaidos();
     for (const c of this.caidos) dibujarCaido(ctx, c, L);
+    // con luces: lo que brilla del piso (y su relieve) no puede quedar encima de las unidades: se borra donde estan
+    if (iluminar) {
+      const capas = { ...CAPAS };
+      CAPAS.normal = null; CAPAS.brillo = null;
+      if (!this.mascara) this.mascara = document.createElement('canvas');
+      const mk = this.mascara;
+      if (mk.width !== this.escena.width || mk.height !== this.escena.height) { mk.width = this.escena.width; mk.height = this.escena.height; }
+      const mc = mk.getContext('2d');
+      mc.setTransform(1, 0, 0, 1, 0, 0); mc.clearRect(0, 0, mk.width, mk.height);
+      mc.setTransform(ctx.getTransform()); mc.imageSmoothingEnabled = false;
+      for (const u of lista) if (seVe(u)) dibujarUnidad(mc, u, L, this.T);
+      for (const c of [capas.normal, capas.brillo]) {
+        c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'destination-out'; c.drawImage(mk, 0, 0); c.restore();
+      }
+      Object.assign(CAPAS, capas);
+    }
     for (const u of lista) if (seVe(u)) dibujarUnidad(ctx, u, L, this.T);
     // lo de arriba queda iluminado; los fogonazos y efectos de abajo dan luz, asi que van encima, a pleno
     if (iluminar) {

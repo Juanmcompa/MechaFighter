@@ -492,6 +492,14 @@ function puntasEnImagen(im) {
 // centro de la unidad y mirando para la derecha: [hacia adelante, hacia el costado derecho]. null = no se sabe.
 // Usa las mismas posiciones con las que se arma el mecha en mechaConSprites. n: numero de disparo (para turnar cañones).
 export function bocaDeArma(f, slot, n = 0) {
+  // unidades de un solo dibujo (tanques, drones): las marcas magenta de la torreta o del cuerpo
+  if (!f.apariencia && UNI.imgs[f.sprite] && UNI.meta[f.sprite] && UNI.meta[f.sprite].nuevo) {
+    const im = UNI.imgs[f.sprite + '_torreta'] || UNI.imgs[f.sprite];
+    if (!im._puntas) return null;
+    const [px, py] = im._puntas[n % im._puntas.length];
+    const k = 0.75 / 24; // pixeles de la imagen -> casillas
+    return [-(py - im.height / 2) * k, (px - im.width / 2) * k];
+  }
   const a = f.apariencia;
   if (!a || !a.torso || !SPR.listo) return null;
   const M = (id) => SPR.meta[id];
@@ -741,7 +749,9 @@ function dibujarUnidadSprite(ctx, f, u, t) {
   const im = UNI.imgs[f.sprite];
   const m = UNI.meta[f.sprite];
   const w = m.w / UNI.escala, h = m.h / UNI.escala;
-  const dron = f.cuerpo === 'dron';
+  // los drones viejos flotan; el arte nuevo (tanques, acorazados) va por el piso
+  const dron = f.cuerpo === 'dron' && !m.nuevo;
+  const torreta = UNI.imgs[f.sprite + '_torreta'];
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   if (dron) {
@@ -752,7 +762,15 @@ function dibujarUnidadSprite(ctx, f, u, t) {
   }
   ctx.rotate(Math.PI / 2);
   if (u.golpe > 0) ctx.filter = 'brightness(' + (1 + u.golpe * 1.5) + ')';
-  pintar(ctx, im, -w / 2, -h / 2, w, h);
+  if (torreta) {
+    // casco hacia donde camina (angPiernas), torreta hacia donde apunta (el angulo de la unidad)
+    let d = (u.angPiernas ?? u.ang) - u.ang;
+    while (d > Math.PI) d -= Math.PI * 2;
+    while (d < -Math.PI) d += Math.PI * 2;
+    ctx.save(); ctx.rotate(d); pintar(ctx, im, -w / 2, -h / 2, w, h); ctx.restore();
+    const tw = torreta.width * 0.75, th = torreta.height * 0.75;
+    pintar(ctx, torreta, -tw / 2, -th / 2, tw, th);
+  } else pintar(ctx, im, -w / 2, -h / 2, w, h);
   ctx.filter = 'none';
   ctx.restore();
 }

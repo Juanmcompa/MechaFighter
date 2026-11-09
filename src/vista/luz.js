@@ -26,7 +26,7 @@ const cargar = (src) => new Promise((ok) => {
 
 // assets/mecha/azul/brazo_x.png -> 'mecha/brazo_x' (los colores de bando comparten normal y brillo)
 export function claveDe(ruta) {
-  return ruta.replace(/^.*assets\//, '').replace(/\.png$/, '').replace(/^mecha\/(azul|rojo|verde)\//, 'mecha/').replace(/_[ne]$/, '');
+  return ruta.replace(/^.*assets\//, '').replace(/\.png$/, '').replace(/^mecha\/(azul|rojo|verde)\//, 'mecha/').replace(/_[neNE]$/, '');
 }
 
 // assets/luces.json lo arma solo el hook de git (tools/hooks/post-commit): la lista de *_n.png y *_e.png
