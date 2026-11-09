@@ -249,7 +249,7 @@ export class Repeticion {
       const u = this.unidades.get(f.id);
       if (!u || !seVe(u)) continue;
       const k = (this.T - f.t0) / f.dur;
-      const [bx, by] = bocaEnMapa(u, f.slot);
+      const [bx, by] = bocaEnMapa(u, f.slot, u.ang, f.n);
       sumar(bx + 0.5, by + 0.5, cfg.fogonazo, {}, 1 - k);
     }
     const vivas = [...this.unidades.values()].filter((u) => u.viva && seVe(u));
@@ -352,9 +352,10 @@ export class Repeticion {
         this.accion.set(u.id, e.t); this.accion.set(o.id, e.t);
         u.angObj = Math.atan2(o.hacia[1] - u.y, o.hacia[0] - u.x);
         u.retroceso = 1;
-        this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, t0: this.T, dur: 1.6 });
+        const tiro = u.tiros = (u.tiros || 0) + 1; // para turnar los cañones
+        this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, n: tiro, t0: this.T, dur: 1.6 });
         const desvio = e.acierta ? 0 : 0.6;
-        this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj), a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
+        this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj, tiro), a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
         if (e.acierta) {
           o.vida -= e.danio; o.golpe = 1;
           if (o.ficha.tipo === 'piloto' && o.ficha.bando === 0 && !o.dijoHerido && o.vida > 0 && o.vida < o.ficha.vidaMax * 0.3) {
@@ -376,9 +377,10 @@ export class Repeticion {
         u.angObj = Math.atan2(e.y - u.y, e.x - u.x);
         u.retroceso = 1;
         this.accion.set(u.id, e.t);
-        this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, t0: this.T, dur: 1.6 });
+        const tiro = u.tiros = (u.tiros || 0) + 1;
+        this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, n: tiro, t0: this.T, dur: 1.6 });
         const d = e.acierta ? 0 : 0.6;
-        this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj), a: [e.x + d * Math.sin(e.t), e.y + d * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
+        this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj, tiro), a: [e.x + d * Math.sin(e.t), e.y + d * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
         break;
       }
       case 'esquirla': if (u) { u.vida -= e.danio; u.golpe = 1; this.flotante(u, '-' + e.danio, '#ff9a5a'); } break;
@@ -714,7 +716,7 @@ export class Repeticion {
       const u = this.unidades.get(f.id);
       if (!u || !seVe(u)) continue;
       const k = (this.T - f.t0) / f.dur;
-      const [bx, by] = bocaEnMapa(u, f.slot);
+      const [bx, by] = bocaEnMapa(u, f.slot, u.ang, f.n);
       const fx = (bx + 0.5) * L, fy = (by + 0.5) * L;
       ctx.globalAlpha = 1 - k;
       ctx.fillStyle = '#fff3b0';

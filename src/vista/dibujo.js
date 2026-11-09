@@ -435,11 +435,12 @@ function mechaConSprites(ctx, f, u) {
 }
 
 // ---------- Boca de las armas ----------
-// Donde esta la punta del arma en la imagen (en pixeles): el pixel cian si lo tenia (ver pintarEquipo),
-// si no el medio de la fila de mas arriba (los brazos apuntan para arriba en el dibujo)
+// Donde estan las puntas del arma en la imagen (en pixeles): los pixeles magenta si los tenia (ver pintarEquipo;
+// uno por cañon, y los disparos se turnan entre ellos), si no el medio de la fila de mas arriba
+// (los brazos apuntan para arriba en el dibujo)
 const PUNTAS = new WeakMap();
-function puntaEnImagen(im) {
-  if (im._punta) return im._punta;
+function puntasEnImagen(im) {
+  if (im._puntas) return im._puntas;
   let p = PUNTAS.get(im);
   if (p) return p;
   const c = document.createElement('canvas');
@@ -447,11 +448,11 @@ function puntaEnImagen(im) {
   const x = c.getContext('2d');
   x.drawImage(im, 0, 0);
   const d = x.getImageData(0, 0, c.width, c.height).data;
-  p = [im.width / 2, 0];
+  p = [[im.width / 2, 0]];
   fila: for (let y = 0; y < c.height; y++) {
     let suma = 0, n = 0;
     for (let xx = 0; xx < c.width; xx++) if (d[(y * c.width + xx) * 4 + 3] > 40) { suma += xx; n++; }
-    if (n) { p = [suma / n + 0.5, y + 0.5]; break fila; }
+    if (n) { p = [[suma / n + 0.5, y + 0.5]]; break fila; }
   }
   PUNTAS.set(im, p);
   return p;
@@ -459,8 +460,8 @@ function puntaEnImagen(im) {
 
 // Donde sale el disparo del arma de ese encaje (brazo_der, brazo_izq, mochila...), en casillas, respecto del
 // centro de la unidad y mirando para la derecha: [hacia adelante, hacia el costado derecho]. null = no se sabe.
-// Usa las mismas posiciones con las que se arma el mecha en mechaConSprites.
-export function bocaDeArma(f, slot) {
+// Usa las mismas posiciones con las que se arma el mecha en mechaConSprites. n: numero de disparo (para turnar cañones).
+export function bocaDeArma(f, slot, n = 0) {
   const a = f.apariencia;
   if (!a || !a.torso || !SPR.listo) return null;
   const E = SPR.escala, M = (id) => SPR.meta[id];
@@ -470,21 +471,22 @@ export function bocaDeArma(f, slot) {
   const im = sprite('azul', id);
   if (!im) return null;
   const tw = T.w / E, th = T.h / E;
-  const lugar = { brazo_der: [tw * 0.5, -th * 0.05, 1], brazo_izq: [-tw * 0.5, -th * 0.05, -1], mochila: [0, th * 0.38, 1], cabeza: [0, -th * 0.12, 1] }[slot];
+  const lugar = { brazo_der: [tw * 0.5, -th * 0.05, 1], brazo_izq: [-tw * 0.5, -th * 0.05, -1], mochila: [0, th * 0.38, 1], cabeza: [0, -th * 0.12, 1], torso: [0, 0, 1] }[slot];
   if (!lugar) return null;
   let [x, y, lado] = lugar;
   const m = M(id), w = m.w / E, h = m.h / E;
-  const [ax, ay] = m.papel ? [w / 2, h / 2] : [m.ancla[0] / E, m.ancla[1] / E];
+  const [ax, ay] = m.papel || slot === 'torso' ? [w / 2, h / 2] : [m.ancla[0] / E, m.ancla[1] / E];
   if (m.papel) { x = 0; y = 0; }
-  const [px, py] = puntaEnImagen(im);
+  const puntas = puntasEnImagen(im);
+  const [px, py] = puntas[n % puntas.length];
   const lx = x + lado * (px * (w / im.width) - ax), ly = y + (py * (h / im.height) - ay);
   // el mecha se dibuja girado 90 grados y en una grilla de 24 por casilla
   return [-ly / 24, lx / 24];
 }
 
 // La boca del arma en el mapa (en casillas) para una unidad mirando con angulo ang
-export function bocaEnMapa(u, slot, ang = u.ang) {
-  const b = bocaDeArma(u.ficha, slot) || [0.62, 0];
+export function bocaEnMapa(u, slot, ang = u.ang, n = 0) {
+  const b = bocaDeArma(u.ficha, slot, n) || [0.62, 0];
   const c = Math.cos(ang), s = Math.sin(ang);
   return [u.x + c * b[0] - s * b[1], u.y + s * b[0] + c * b[1]];
 }

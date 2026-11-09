@@ -103,6 +103,12 @@ export function unidadDePiloto(datos, piloto, mecha, gambits) {
   const armas = [];
   let escudo = null;
   let blindaje = ps.blindaje + torso.blindaje + (mods('torso').blindaje || 0) + ((piernas && piernas.blindaje) || 0);
+  // armas: las de los brazos, y tambien cualquier otra pieza que traiga "arma" (un torso-tanque, un lanzador en la
+  // mochila o en la cabeza); el encaje queda como "slot" del arma
+  for (const e of ['torso', 'mochila', 'cabeza']) {
+    const p = parte(e);
+    if (p && p.arma) armas.push(armaDesde(p.arma, mods(e), punteria, municionPct, e, { etiquetas: p.etiquetas, tipoVisual: tipoVisual(p.etiquetas) }));
+  }
   for (const e of ['brazo_izq', 'brazo_der']) {
     const p = parte(e);
     if (!p) continue;

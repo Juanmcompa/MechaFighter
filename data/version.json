@@ -1,14 +1,14 @@
 {
   "_ayuda": "Version del juego y novedades de la portada. NO se edita a mano: la actualiza sola tools/hooks/post-commit en cada commit (suma 1 a 'numero', pone el titulo del commit en 'cambio' y lo suma arriba de 'novedades', que guarda las ultimas 6). Para pasar a la 1.0 cambia 'mayor' y 'numero' a mano.",
   "mayor": 0,
-  "numero": 63,
-  "cambio": "Las piezas redibujadas se arman bien aunque cambien de medida",
+  "numero": 64,
+  "cambio": "La punta de las armas se marca en magenta, y cualquier pieza puede tener arma",
   "novedades": [
+    "v0.64 · La punta de las armas se marca en magenta, y cualquier pieza puede tener arma",
     "v0.63 · Las piezas redibujadas se arman bien aunque cambien de medida",
     "v0.62 · Los disparos salen de la punta de cada arma, no del centro del mecha",
     "v0.61 · Las piezas con arte nuevo ya se ven en el mecha sin tocar sprites.json",
     "v0.60 · texture_fix",
-    "v0.59 · La luz ya no atraviesa las paredes",
-    "v0.58 · Los muros proyectan su sombra con su forma y tienen relieve con la luz"
+    "v0.59 · La luz ya no atraviesa las paredes"
   ]
 }
