@@ -346,6 +346,7 @@ export class Repeticion {
           ang: f.bando === 0 ? 0 : Math.PI, paso: 0, vida: f.vida ?? f.vidaMax, viva: true, golpe: 0, estados: new Set(), moral: 'moral_firme',
           grito: null, semilla: (Number(e.u.slice(1)) * 1.7) % 6,
           peso, angObj: f.bando === 0 ? 0 : Math.PI, pasos: 0, alza: 0, retroceso: 0,
+          armas: (f.armas || []).map((x) => ({ ...x, recargaHasta: 0 })), // para la barra de municion
           marcas: f.bando === 0 && this.porPiloto.get(f.ref) ? this.porPiloto.get(f.ref).bajas || 0 : 0, vozT: -999 });
         if (e.por) this.alEvento({ texto: (U.get(e.por) || {}).ficha?.nombre + (f.sprite === 'senuelo' ? ' proyecta un señuelo' : ' despliega una torreta'), clase: 'info' });
         // el escuadron de la campana anterior, del otro lado
@@ -376,6 +377,7 @@ export class Repeticion {
         if (e.arma === 'tajo' || e.arma === 'garra') { u.retroceso = -1.6; u.estocada = 1; u.estocadaSlot = e.slot; }
         else u.retroceso = 1;
         const tiro = u.tiros = (u.tiros || 0) + 1; // para turnar los cañones
+        gastarBala(u, e.slot, e.t);
         this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, n: tiro, t0: this.T, dur: 1.6 });
         const desvio = e.acierta ? 0 : 0.6;
         this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj, tiro), a: [o.hacia[0] + desvio * Math.sin(e.t), o.hacia[1] + desvio * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
@@ -395,12 +397,16 @@ export class Repeticion {
         this.temblor = Math.max(this.temblor, e.antes === 'edificio' ? 0.8 : 0.3);
         if (e.antes === 'edificio') this.alEvento({ texto: 'Se viene abajo un edificio', clase: '' });
         break;
+      case 'recarga':
+        if (u) for (const a of u.armas || []) if (a.municionMax && a.municion < a.municionMax && !a.recargaHasta) a.recargaHasta = e.t + a.recarga;
+        break;
       case 'tira_casilla': {
         if (!u) break;
         u.angObj = Math.atan2(e.y - u.y, e.x - u.x);
         u.retroceso = 1;
         this.accion.set(u.id, e.t);
         const tiro = u.tiros = (u.tiros || 0) + 1;
+        gastarBala(u, e.slot, e.t);
         this.efectos.push({ tipo: 'fogonazo', id: u.id, slot: e.slot, n: tiro, t0: this.T, dur: 1.6 });
         const d = e.acierta ? 0 : 0.6;
         this.efectos.push({ tipo: e.arma, de: bocaEnMapa(u, e.slot, u.angObj, tiro), a: [e.x + d * Math.sin(e.t), e.y + d * Math.cos(e.t)], t0: this.T, dur: e.arma === 'riel' ? 4 : 3 });
@@ -641,6 +647,8 @@ export class Repeticion {
         quiere = u.ang + Math.max(-1.75, Math.min(1.75, rel));
         u.angCabeza = girarHacia(u.angCabeza, quiere, giro * 2.5);
       }
+      // municion: las recargas terminan solas
+      for (const a of u.armas || []) if (a.recargaHasta && this.T >= a.recargaHasta) { a.municion = a.municionMax; a.recargaHasta = 0; }
       // estocada (cuerpo a cuerpo): el brazo sale para adelante y vuelve
       if (u.estocada > 0) u.estocada = Math.max(0, u.estocada - dtTicks / 3);
       // sacudon de lo que va arriba de las piernas, al ritmo de los pasos (los pesados se sacuden mas)
@@ -874,7 +882,7 @@ export class Repeticion {
       if (!u.viva || !seVe(u)) continue;
       const [cx, cy] = centro(u);
       const top = cy - Lz * 0.5 - 2;
-      barraDeVida(ctx, u, cx, top, Lz);
+      barraDeVida(ctx, u, cx, top, Lz, this.T);
       if (u.estados.has('en_llamas')) { ctx.fillStyle = '#ff8a2a'; ctx.fillRect(cx + Lz * 0.42, top - 4, 3, 3); }
       if (u.estados.has('suprimido')) { ctx.fillStyle = '#b8b8b8'; ctx.fillRect(cx + Lz * 0.42, top, 3, 3); }
       if (u.moral === 'moral_quebrada') { ctx.fillStyle = '#e0a43a'; ctx.fillText('!', cx - Lz * 0.5, top + 4); }
@@ -920,13 +928,44 @@ export { COLORES };
 // Barra de vida estilo MOBA: todas del mismo ancho, con una rayita cada 10 puntos (y una mas marcada cada 50),
 // asi a simple vista se ve cuanta vida tiene. El pedazo recien perdido queda claro un momento y despues se va.
 const SEGMENTO = 10;
-function barraDeVida(ctx, u, cx, top, Lz) {
+// Un disparo de esa arma: una bala menos (y si se vacia, a recargar)
+function gastarBala(u, slot, t) {
+  const a = (u.armas || []).find((x) => x.slot === slot && x.municionMax);
+  if (!a || a.recargaHasta) return;
+  a.municion = Math.max(0, a.municion - 1);
+  if (a.municion === 0) a.recargaHasta = t + a.recarga;
+}
+
+// Barra de municion (solo los nuestros, debajo de la vida, la mitad de alta): una rayita por bala si entran,
+// si no cada 5. Mientras recarga se ve como se va llenando, mas apagada.
+function barraDeMunicion(ctx, u, x0, y0, w, hb, T) {
+  const armas = (u.armas || []).filter((a) => a.municionMax);
+  if (!armas.length) return 0;
+  const max = armas.reduce((s, a) => s + a.municionMax, 0);
+  const hay = armas.reduce((s, a) => s + a.municion, 0);
+  const llenando = armas.reduce((s, a) => s + (a.recargaHasta ? a.municionMax * Math.min(1, 1 - (a.recargaHasta - T) / (a.recarga || 1)) : 0), 0);
+  const ancho = w - 2;
+  ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(x0, y0, w, hb + 2);
+  ctx.fillStyle = '#1f1a14'; ctx.fillRect(x0 + 1, y0 + 1, ancho, hb);
+  if (llenando > 0) { ctx.fillStyle = 'rgba(217,160,102,0.35)'; ctx.fillRect(x0 + 1 + (ancho * hay) / max, y0 + 1, (ancho * Math.min(max - hay, llenando)) / max, hb); }
+  ctx.fillStyle = '#d9a066'; ctx.fillRect(x0 + 1, y0 + 1, (ancho * hay) / max, hb);
+  const cada = (ancho / max) >= 2.5 ? 1 : 5;
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  for (let v = cada; v < max; v += cada) ctx.fillRect(Math.round(x0 + 1 + (ancho * v) / max), y0 + 1, 1, hb);
+  return hb + 2;
+}
+
+function barraDeVida(ctx, u, cx, top, Lz, T = 0) {
   const max = u.ficha.vidaMax, vida = Math.max(0, u.vida);
   // lo que se ve baja de a poco hasta la vida real (el "rastro" del golpe)
   if (u.vidaVista === undefined || u.vidaVista < vida) u.vidaVista = vida;
   else u.vidaVista += (vida - u.vidaVista) * 0.08;
   const w = Math.round(Math.max(26, Lz * 0.92)), hb = Math.round(Math.max(5, Lz * 0.16));
-  const x0 = Math.round(cx - w / 2), y0 = Math.round(top - hb - 2);
+  // la de municion va abajo, pegada a la unidad, y la vida encima
+  const hm = Math.max(2, Math.round(hb / 2));
+  const conMunicion = u.ficha.bando === 0 && (u.armas || []).some((a) => a.municionMax);
+  const x0 = Math.round(cx - w / 2), y0 = Math.round(top - hb - 2 - (conMunicion ? hm + 1 : 0));
+  if (conMunicion) barraDeMunicion(ctx, u, x0, y0 + hb + 2 - 1, w, hm, T);
   const ancho = w - 2;
   const bueno = u.ficha.bando === 0;
   const pct = vida / max;
