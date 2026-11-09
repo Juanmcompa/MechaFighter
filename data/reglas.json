@@ -306,6 +306,10 @@
         "gambits": [{ "condicion": "siempre", "accion": "replegarse", "objetivo": "lejos_de_enemigos" }] }
     }
   },
+  "malestar": {
+    "_ayuda": "Cuanto aguanta un piloto antes de irse (0 a 100). Sube si se queda sin salir ('por_banco', no cuenta si esta descansando), si se lleva mal con el escuadron ('por_rivales': tiene rivales y ningun amigo), si muere su vinculo ('por_vinculo_muerto') o si no cobra ('por_sueldo_impago'). Baja cuando sale y ganan ('al_ganar') y con un bono ('bono_creditos' creditos bajan 'bono_baja'). Desde 'aviso' se ve en el hangar; al llegar a 100 se va con su mecha y firma con la compania rival. Nunca se va si quedan 'minimo_pilotos' o menos.",
+    "por_banco": 12, "por_rivales": 8, "por_vinculo_muerto": 25, "por_sueldo_impago": 15, "al_ganar": 10, "aviso": 60, "bono_creditos": 60, "bono_baja": 40, "minimo_pilotos": 3
+  },
   "combustible": {
     "_ayuda": "Cada salto gasta lo que diga la brujula (1 a 3, segun la distancia). Al llegar a un sector nuevo se cargan 'por_sector'. Sin combustible, el remolque cobra 'remolque_creditos' y todos los mechas pierden 'remolque_danio_pct' de estructura. Las paradas venden a 'precio' (mas o menos segun como te vea su bando). El maximo lo da el tanque de la nodriza (nodriza.json); 'maximo' quedo para guardados viejos.",
     "inicial": 8,

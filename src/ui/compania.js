@@ -67,8 +67,12 @@ export function compania(app, raiz) {
       const q = quien(datos, b);
       return h('span', { class: 'cp-rep', style: '--c:' + q.color + ';--f:' + q.fondo }, h('strong', {}, q.corto), h('small', { class: escalonDe(datos, p, b).id }, textoReputacion(datos, p, b)));
     })),
+    p.rival ? h('small', { class: 'fr-rotulo' }, 'LA COMPETENCIA') : null,
+    p.rival ? h('div', { class: 'cp-sector' }, h('div', { class: 'cp-fila' }, h('strong', {}, p.rival.nombre), h('span', { class: 'cp-marca' }, p.rival.fuerza >= 50 ? 'FUERTES' : p.rival.fuerza >= 20 ? 'CRECIENDO' : 'CHICOS')),
+      h('small', {}, 'Se quedaron con ' + p.rival.contratos + ' contratos que dejaste vencer. Se cruzaron ' + p.rival.cruces + (p.rival.cruces === 1 ? ' vez' : ' veces') + ' (les ganaste ' + p.rival.ganados + ').' +
+        ((p.stats || {}).desertores ? ' Tienen ' + p.stats.desertores + ' ex piloto' + (p.stats.desertores > 1 ? 's tuyos.' : ' tuyo.') : ''))) : null,
     h('small', { class: 'fr-rotulo' }, nemesis.length ? 'TE BUSCAN' : 'NADIE TE BUSCA (POR AHORA)'),
     ...nemesis.map((n) => h('div', { class: 'cp-nem' }, retrato(datos, n, 'retrato-mini'),
-      h('span', {}, h('strong', {}, '«' + n.apodo + '»'), h('small', {}, (n.objetivoApodo ? 'Busca a «' + n.objetivoApodo + '». ' : '') + (n.historia.slice(-1)[0] || ''))))),
+      h('span', {}, h('strong', {}, '«' + n.apodo + '»' + (n.origen === 'oficial' ? ' · ' + n.bandoNombre : n.origen === 'desertor' ? ' · ex piloto tuyo' : '')), h('small', {}, (n.objetivoApodo ? 'Busca a «' + n.objetivoApodo + '». ' : '') + (n.historia.slice(-1)[0] || ''))))),
     barraJuego(app, 'escuadron')));
 }

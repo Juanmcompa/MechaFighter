@@ -19,6 +19,7 @@ import { desplegables, cumplirTareas } from './tareas.js';
 import { armarLore } from './lore.js';
 import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos, elegirJefeNemesis, nemesisComoJefe } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
+import { oficialTomaNota, actualizarMalestar, desertar, rivalDe, rivalTomaContrato, rivalEnContrato, rivalDespues } from './personajes.js';
 import { crearPlano, agregar, rodear, destinos, duenoEn, amenazasCerca, quien, esAmenaza, escalonDe, escalonPorId, indiceEscalon, sumarReputacion,
   correrFrente, pasaElTiempo, nodrizaInicial, nivelModulo, valorModulo, combustibleMaximo, limitePilotos } from './brujula.js';
 
@@ -76,6 +77,7 @@ export function nuevaPartida(datos, semilla, legado = null) {
   // combustible, nombre y cronica del escuadron
   p.combustible = R.combustible.inicial;
   p.reputacion = {}; p.nodriza = nodrizaInicial(datos); p.restos = 0;
+  rivalDe(datos, p);
   p.nombreEscuadron = az.elegir(datos.textos.nombres_escuadron);
   p.cronica = []; p.stats = {};
   anotar(p, 'Salieron del muelle ' + p.pilotos.map((x) => '«' + x.apodo + '»').join(', ') + '.' +
@@ -162,6 +164,7 @@ export function generarSector(datos, p) {
   p.columna = 0;
   p.posicion = s.actual;
   rodear(datos, p, az, (x, y) => crearDestino(datos, p, s, x, y, az));
+  trabajoCerca(datos, p, s);
   gremioCerca(datos, p, s);
 }
 
@@ -265,8 +268,12 @@ export function elegirNodo(datos, p, i) {
   mientrasViajan(datos, p);
   p.nodo = { ...nodo, indice: i, revisita: yaFue };
   nodo.visitado = true;
+  // los contratos que dejaste vencer se los queda la competencia; y el que estaba harto, se va
+  rivalTomaContrato(datos, p, s.nodos.filter((n) => n !== nodo && !n.visitado && n.tipo === 'mision' && !n.mision.nido && n.vence !== undefined && n.vence < s.saltos).length);
+  p.desertores = desertar(datos, p, azarAparte(p, 'desertor'));
   // destinos nuevos alrededor (se arman al llegar: asi la misma partida da siempre lo mismo)
   rodear(datos, p, azarDe(p, 'brujula'), (x, y) => crearDestino(datos, p, s, x, y, azarDe(p, 'destino')));
+  trabajoCerca(datos, p, s);
   gremioCerca(datos, p, s);
   if (yaFue && nodo.tipo !== 'parada') { p.nodo = null; p.estado = 'sectores'; return null; }
   // al jefe se llega con lo que se averiguo en el camino
@@ -280,6 +287,7 @@ export function elegirNodo(datos, p, i) {
       if (nodo.tipo === 'mision') {
         p.nodo.mision = JSON.parse(JSON.stringify(nodo.mision));
         if (acecho[nodo.i]) quizasAparece(datos, p, p.nodo.mision, desplegables(datos, p), azarAparte(p, 'nemesis'), acecho[nodo.i]);
+        rivalEnContrato(datos, p, p.nodo.mision, azarAparte(p, 'rival'));
       }
       // como llega cada uno: queda fijo para esta mision (recargar la pagina no lo cambia)
       p.nodo.animo = calcularAnimo(datos, p, nodo.mision, desplegables(datos, p), azarAparte(p, 'animo'));
@@ -341,6 +349,22 @@ export function elegirNodo(datos, p, i) {
 export function seguir(datos, p) {
   p.nodo = null;
   if (p.estado !== 'fin') p.estado = 'sectores';
+}
+
+// Siempre hay trabajo a la vista: si no quedo ningun contrato cerca, aparece uno (salvo que nadie quiera contratarte)
+function trabajoCerca(datos, p, s) {
+  const Bj = datos.bandos.brujula;
+  const aca = s.nodos.find((n) => n.i === s.actual);
+  const cerca = (n) => n !== aca && Math.hypot(n.x - aca.x, n.y - aca.y) <= Bj.visible;
+  if (s.nodos.some((n) => n.tipo === 'mision' && !n.visitado && cerca(n))) return;
+  const az = azarDe(p, 'trabajo');
+  for (let k = 0; k < 24; k++) {
+    const a = (az.entero(0, 359) / 180) * Math.PI, d = 1 + az.entero(0, 10) / 10;
+    const x = Math.round((aca.x + Math.cos(a) * d) * 100) / 100, y = Math.round((aca.y + Math.sin(a) * d) * 100) / 100;
+    if (Math.hypot(x, y) > Bj.radio_sector || s.nodos.some((n) => Math.hypot(n.x - x, n.y - y) < Bj.separacion * 0.7)) continue;
+    crearDestino(datos, p, s, x, y, az, 'contrato');
+    return;
+  }
 }
 
 // Con poco combustible y ninguna parada a la vista, el gremio de transportistas aparece cerca (a un salto)
@@ -782,6 +806,17 @@ export function cerrarMision(datos, p, resultado) {
       presentar(datos, p, pi, azarAparte(p, 'afinidad:' + pi.id));
       informe.rescatado = pi.apodo;
     }
+  }
+
+  // Malestar: el que se queda sin salir, el que se lleva mal con todos y el que pierde a su vinculo se van hartando
+  actualizarMalestar(datos, p, new Set(desplegados.map((x) => x.id)), resultado.victoria,
+    new Set(Object.entries(resultado.resumen.pilotos).filter(([, s]) => s.vinculoMurio).map(([id]) => id)));
+  informe.malestar = p.pilotos.filter((x) => (x.malestar || 0) >= R.malestar.aviso).map((x) => x.apodo);
+  // La compania rival y los oficiales del bando al que le ganaron
+  informe.rival = rivalDespues(datos, p, m, resultado.victoria);
+  if (resultado.victoria && m.cliente && datos.bandos.bandos[m.objetivo]) {
+    const of = oficialTomaNota(datos, p, m, azarAparte(p, 'oficial'));
+    if (of) informe.oficial = { apodo: of.apodo, retrato: of.retrato, intro: of.intro };
   }
 
   // Bandos: el que pago y contra quien. La reputacion, el frente y las amenazas se mueven con el resultado.

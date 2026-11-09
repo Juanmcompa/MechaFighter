@@ -15,7 +15,7 @@ const llenar = (t, v) => t.replace(/\{(\w+)\}/g, (_, k) => (v[k] !== undefined ?
 
 export const activos = (p) => (p.nemesis || []).filter((n) => n.estado === 'activo');
 
-function mechaCon(datos, clase, partes) {
+export function mechaCon(datos, clase, partes) {
   const mecha = mechaDeClase(datos, clase);
   let brazos = 0;
   for (const pid of partes || []) {
@@ -27,7 +27,8 @@ function mechaCon(datos, clase, partes) {
   return mecha;
 }
 
-function nuevo(datos, p, az, origen, objetivo, lugar, nivel, base = null) {
+// extra: { bando, oficial } para los oficiales de un bando y los ex pilotos (ver personajes.js)
+export function nuevo(datos, p, az, origen, objetivo, lugar, nivel, base = null, extra = {}) {
   const N = datos.nemesis;
   const usados = new Set((p.nemesis || []).map((n) => n.apodo).concat(p.pilotos.map((x) => x.apodo)));
   const libres = N.apodos.filter((a) => !usados.has(a));
@@ -47,7 +48,8 @@ function nuevo(datos, p, az, origen, objetivo, lugar, nivel, base = null) {
     historia: [], estado: 'activo', apariciones: 0, derrotas: 0, ultima: p.misionesJugadas, aviso: null
   };
   const O = N.origenes[origen];
-  n.intro = llenar(az.elegir(O.intro), { yo: n.apodo, objetivo: n.objetivoApodo || 'ustedes', lugar });
+  Object.assign(n, extra);
+  n.intro = llenar(az.elegir(O.intro), { yo: n.apodo, objetivo: n.objetivoApodo || 'ustedes', lugar, bando: extra.bandoNombre || 'otra compañía' });
   n.historia.push(n.intro);
   (p.nemesis = p.nemesis || []).push(n);
   return n;
@@ -92,7 +94,10 @@ export function nemesisEnNodos(datos, p, nodos, azarDeNodo) {
     if (!libres.length) break;
     if (nodo.tipo !== 'mision' || !nodo.mision || nodo.mision.encuentro) continue;
     const az = azarDeNodo(nodo.i);
-    const n = az.elegir(libres);
+    // un oficial solo aparece en contratos contra su bando (salvo que el bando ya los cace: hostil)
+    const posibles = libres.filter((x) => x.origen !== 'oficial' || nodo.mision.objetivo === x.bando || x.caza);
+    if (!posibles.length) continue;
+    const n = az.elegir(posibles);
     const busca = p.pilotos.some((pi) => pi.id === n.objetivo);
     if (az.tirada(N.chance_aparece + (busca ? N.chance_aparece_si_va_su_objetivo : 0))) res[nodo.i] = n.id;
   }
@@ -106,7 +111,7 @@ export function quizasAparece(datos, p, m, desplegados, az, nemesisId) {
   if (!n || m.encuentro || m.jefe) return null;
   const va = desplegados.some((pi) => pi.id === n.objetivo);
   const O = N.origenes[n.origen];
-  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo };
+  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo, bando: n.bandoNombre || 'otra compañía' };
   const frase = llenar(az.elegir(O.frases), v);
   // todo lo que dice en la batalla queda armado aca (la vista no tira azar). cae: si lo bajan, esta vez no se levanta.
   const di = (lista) => llenar(az.elegir(lista), v);
@@ -226,7 +231,7 @@ export function elegirJefeNemesis(p, sector) {
 export function nemesisComoJefe(datos, p, m, n, titulo, az) {
   const N = datos.nemesis;
   const O = N.origenes[n.origen];
-  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo };
+  const v = { objetivo: n.objetivoApodo || 'Control', nemesis: n.apodo, yo: n.apodo, bando: n.bandoNombre || 'otra compañía' };
   const di = (lista) => llenar(az.elegir(lista), v);
   const B = N.batalla, R = N.respuestas;
   const lineas = { replica: di(N.replicas), escapa: di(B.escapa), cae: di(B.cae), baja: di(B.baja), bajaObjetivo: di(B.baja_objetivo),

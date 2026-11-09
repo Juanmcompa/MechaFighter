@@ -6,6 +6,7 @@ import { quien, esAmenaza, efectoContrato } from '../campana/brujula.js';
 import { mapaDe } from '../core/datos.js';
 import { enemigoDominante } from '../campana/lore.js';
 import { existeIcono } from './iconos.js';
+import { contactoDe } from '../campana/personajes.js';
 
 const NOMBRE_ENEMIGO = { mecha: 'Mechas', infanteria: 'Infantería', mutante: 'Mutantes', dron: 'Drones', mixto: 'Piratas y drones' };
 
@@ -22,6 +23,7 @@ export function contrato(app, raiz, nodoId) {
   const nemId = nemesisDelMapa(datos, p)[n.i];
   const nem = nemId ? (p.nemesis || []).find((x) => x.id === nemId) : null;
   const mapa = mapaDe(datos, m);
+  const contacto = contactoDe(datos, p, m.cliente);
   const plantilla = datos.misiones[m.plantilla] || {};
 
   const lado = (rotulo, q) => h('div', { class: 'ct-lado', style: '--c:' + q.color + ';--cl:' + q.claro + ';--f:' + q.fondo },
@@ -51,6 +53,7 @@ export function contrato(app, raiz, nodoId) {
       h('span', { class: 'br-comb' }, ico('combustible'), String(d.costo))),
     h('div', { class: 'ct-lados' }, lado('TE PAGA', C), h('span', { class: 'ct-vs' }, 'vs'), lado(contraAmenaza ? 'AMENAZA' : 'CONTRA', Q)),
     h('h2', { class: 'ct-titulo' }, m.nombre),
+    contacto ? h('p', { class: 'ct-contacto' }, ico('piloto'), ' Tu contacto: ', h('strong', {}, contacto.nombre), ' («' + contacto.apodo + '»)') : null,
     m.lore ? h('p', { class: 'ct-porque' }, m.lore.porque) : null,
     m.lore ? h('p', { class: 'ct-busca' }, 'Buscamos: ' + m.lore.buscamos) : null,
     h('div', { class: 'ct-datos' },

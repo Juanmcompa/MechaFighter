@@ -34,6 +34,31 @@
         "piernas_patio",
         "brazo_remachadora",
         "mochila_soldadora"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Yunque",
+          "nombre": "Capataz Elvira Roldán",
+          "clase": "vanguardia",
+          "personalidad": "leal",
+          "partes": [
+            "torso_yunque",
+            "brazo_escudo_torre",
+            "brazo_remachadora",
+            "piernas_patio"
+          ]
+        },
+        {
+          "apodo": "Soldador",
+          "nombre": "Ramiro Paz",
+          "clase": "ingeniero",
+          "personalidad": "leal",
+          "partes": [
+            "torso_pesado",
+            "brazo_remachadora",
+            "mochila_soldadora"
+          ]
+        }
       ]
     },
     "grua": {
@@ -69,6 +94,31 @@
         "torso_remolque",
         "piernas_desguace",
         "brazo_soplete"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Tuerca",
+          "nombre": "Nico «Tuerca» Varga",
+          "clase": "vanguardia",
+          "personalidad": "temerario",
+          "partes": [
+            "torso_remolque",
+            "brazo_martillo",
+            "brazo_recortada",
+            "piernas_desguace"
+          ]
+        },
+        {
+          "apodo": "Mecha Corta",
+          "nombre": "Dalia Ruiz",
+          "clase": "infiltrador",
+          "personalidad": "sanguinario",
+          "partes": [
+            "brazo_soplete",
+            "brazo_hoja",
+            "piernas_desguace"
+          ]
+        }
       ]
     },
     "vesta": {
@@ -105,6 +155,31 @@
         "brazo_lanza_pulso",
         "torso_prisma",
         "mochila_celdas"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Auditora",
+          "nombre": "Dra. Ingrid Solberg",
+          "clase": "tirador",
+          "personalidad": "leal",
+          "partes": [
+            "torso_prisma",
+            "brazo_lanza_pulso",
+            "cabeza_telemetro"
+          ]
+        },
+        {
+          "apodo": "Protocolo",
+          "nombre": "Unidad de seguridad 7",
+          "clase": "tirador",
+          "personalidad": "leal",
+          "partes": [
+            "torso_reactor",
+            "brazo_laser",
+            "brazo_laser",
+            "cabeza_telemetro"
+          ]
+        }
       ]
     },
     "colonos": {
@@ -137,6 +212,32 @@
         "brazo_clavadora",
         "torso_cosechadora",
         "brazo_arpon"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Abuela",
+          "nombre": "Marta Quiroga",
+          "clase": "medico",
+          "personalidad": "leal",
+          "partes": [
+            "torso_cosechadora",
+            "brazo_arpon",
+            "mochila_taller",
+            "piernas_colono"
+          ]
+        },
+        {
+          "apodo": "Zorro",
+          "nombre": "Tomás Ibarra",
+          "clase": "infiltrador",
+          "personalidad": "temerario",
+          "partes": [
+            "torso_ligero",
+            "brazo_clavadora",
+            "brazo_arpon",
+            "piernas_colono"
+          ]
+        }
       ]
     },
     "flota": {
@@ -173,6 +274,32 @@
         "cabeza_mando",
         "torso_fragata",
         "piernas_asalto"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Teniente Gris",
+          "nombre": "Tte. Aldo Ferrán",
+          "clase": "tirador",
+          "personalidad": "leal",
+          "partes": [
+            "torso_fragata",
+            "brazo_carabina",
+            "brazo_mortero",
+            "cabeza_mando"
+          ]
+        },
+        {
+          "apodo": "Halcón",
+          "nombre": "Cap. Irene Molnar",
+          "clase": "tirador",
+          "personalidad": "sanguinario",
+          "partes": [
+            "torso_fragata",
+            "brazo_canon_riel",
+            "brazo_carabina",
+            "piernas_asalto"
+          ]
+        }
       ]
     },
     "desertores": {
@@ -207,6 +334,30 @@
         "torso_parche",
         "mochila_contrabando",
         "brazo_lanzagranadas"
+      ],
+      "oficiales": [
+        {
+          "apodo": "Sargento",
+          "nombre": "Sgto. Bruno Aceval",
+          "clase": "vanguardia",
+          "personalidad": "temerario",
+          "partes": [
+            "torso_parche",
+            "brazo_m7_gastado",
+            "brazo_lanzagranadas"
+          ]
+        },
+        {
+          "apodo": "Rata",
+          "nombre": "Lucía «Rata» Peña",
+          "clase": "infiltrador",
+          "personalidad": "cobarde",
+          "partes": [
+            "torso_medio",
+            "brazo_riel_recortado",
+            "mochila_contrabando"
+          ]
+        }
       ]
     },
     "transportistas": {
@@ -416,5 +567,32 @@
         "desde": 12000
       }
     ]
+  },
+  "oficiales": {
+    "_ayuda": "Oficiales con nombre de cada bando (bandos > X > oficiales). Cuando ganas un contrato contra un bando, con 'chance_toma_nota' uno de sus oficiales empieza a seguirte (como un nemesis; seguro si el bando ya te ve hostil). Aparece en los contratos contra su bando; si el bando es hostil, te caza en cualquier contrato. Del lado del cliente, el primer oficial vivo es tu contacto. Como mucho 'max_por_bando' siguiendote a la vez.",
+    "chance_toma_nota": 35,
+    "max_por_bando": 1,
+    "nivel_extra": 1
+  },
+  "rival": {
+    "_ayuda": "La compania rival: otros mercenarios en el mismo sector. Se queda con los contratos que dejas vencer (cada uno le suma 'fuerza_por_contrato'). En un contrato contra un bando, con 'chance_base' + su fuerza (hasta 'chance_max') trabaja para el otro lado: se suman 'mercenarios' pilotos enemigos con mecha. Ganarles paga 'premio' y les baja la fuerza en 'fuerza_al_perder'. Tus ex pilotos firman con ellos.",
+    "nombres": [
+      "Los Buitres",
+      "Compañía Cierzo",
+      "La Jauría",
+      "Hermanos Kovač",
+      "Lanza Negra",
+      "Los Sin Bandera"
+    ],
+    "chance_base": 14,
+    "chance_max": 40,
+    "fuerza_por_contrato": 6,
+    "fuerza_al_perder": 12,
+    "mercenarios": [
+      1,
+      2
+    ],
+    "premio": 80,
+    "desde_mision": 3
   }
 }

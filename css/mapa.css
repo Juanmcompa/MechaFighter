@@ -271,3 +271,15 @@
 .cr-orden:disabled { opacity: .4; cursor: not-allowed; border-color: var(--chapa-borde); color: var(--texto-tenue); background: none; }
 .cr-orden.activa { opacity: 1; background: var(--ambar); color: var(--fondo); border-color: var(--ambar); }
 .feed .control { color: var(--ambar); }
+
+/* ---- personajes: hartos, contacto, avisos ---- */
+.hc-harto { padding: 1px 5px; border: 1px solid var(--alarma); background: var(--hg-mal-fondo); color: var(--hg-mal); font: 15px 'VT323', monospace; cursor: pointer; }
+.malestar { display: grid; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--chapa-borde); }
+.malestar-fila { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; font-size: 17px; }
+.malestar-barra { display: block; height: 8px; background: var(--hg-pista); }
+.malestar-barra i { display: block; height: 8px; background: var(--ambar); }
+.malestar.alto .malestar-barra i { background: var(--alarma); }
+.malestar .ayuda { margin: 0; }
+.ct-contacto { margin: 0; font-size: 16px; color: var(--texto-tenue); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.ct-contacto strong { font-weight: 400; color: var(--texto); }
+.inf-sector.mal { border-color: #7e2a22; background: var(--hg-mal-fondo); color: var(--hg-mal); }

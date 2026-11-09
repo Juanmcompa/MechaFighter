@@ -103,7 +103,13 @@ export function informe(app, raiz, inf) {
         (c.antesEscalon !== c.despuesEscalon ? ' · ahora te ven ' + c.despuesEscalon.toLowerCase() : ''))),
       inf.bandos.frente ? h('span', { class: 'inf-bando sube' }, 'El frente se corrió: ' + inf.bandos.frente.antes + '% → ' + inf.bandos.frente.despues + '%') : null,
       inf.bandos.amenaza ? h('span', { class: 'inf-bando sube' }, inf.bandos.amenaza) : null) : null,
+    inf.rival ? h('p', { class: 'inf-sector' + (inf.rival.gano ? '' : ' mal') }, ico('espadas'), inf.rival.gano
+      ? ' Le ganaron a ' + inf.rival.nombre + ', la compañía rival. Premio: ₵' + inf.rival.premio + '.' : ' ' + inf.rival.nombre + ', la compañía rival, se quedó con el contrato.') : null,
+    inf.malestar && inf.malestar.length ? h('p', { class: 'inf-sector mal' }, ico('trauma'), ' ' + inf.malestar.map((a) => '«' + a + '»').join(', ') + (inf.malestar.length > 1 ? ' están hartos' : ' está harto') + ': mirá su ficha antes del próximo salto.') : null,
     lista,
+    inf.oficial ? panel('Tomaron nota',
+      h('div', { class: 'nemesis' }, retrato(app.datos, inf.oficial, 'retrato-mini'), h('strong', { class: 'apodo' }, '«' + inf.oficial.apodo + '»')),
+      h('p', { class: 'briefing' }, inf.oficial.intro)) : null,
     inf.nemesis ? panel('Némesis',
       h('div', { class: 'nemesis' }, retrato(app.datos, inf.nemesis, 'retrato-mini'), h('strong', { class: 'apodo' }, '«' + inf.nemesis.apodo + '»')),
       ...inf.nemesis.textos.map((t) => h('p', { class: inf.nemesis.muerto ? 'briefing bien' : 'briefing' }, t))) : null,

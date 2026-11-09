@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Némesis: pilotos enemigos con nombre que vuelven una y otra vez. Nacen cuando uno de los nuestros baja un mecha enemigo y el piloto sobrevive (bronca o un familiar que busca venganza), o de la campaña anterior (caído). Se los ve en el mapa del sector (un contrato marcado con su calavera) antes de aceptarlo, buscan a su objetivo en la batalla y, si pierden y escapan, vuelven preparados contra lo que los bajó. Chances en %. Si lo bajan, casi siempre se eyecta y vuelve mejor preparado: cae para siempre solo con un tiro a la cabina o a la derrota número 'derrotas_para_caer'. {yo} = el némesis, {objetivo} = el piloto que busca, {lugar} = donde empezó todo, {asesino}, {victima}. El primer némesis de la campaña nace seguro la primera vez que bajan un mecha con piloto (después de la primera misión).",
+  "_ayuda": "Némesis: pilotos enemigos con nombre que vuelven una y otra vez. Nacen cuando uno de los nuestros baja un mecha enemigo y el piloto sobrevive (bronca o un familiar que busca venganza), o de la campaña anterior (caído). Se los ve en el mapa del sector (un contrato marcado con su calavera) antes de aceptarlo, buscan a su objetivo en la batalla y, si pierden y escapan, vuelven preparados contra lo que los bajó. Chances en %. Si lo bajan, casi siempre se eyecta y vuelve mejor preparado: cae para siempre solo con un tiro a la cabina o a la derrota número 'derrotas_para_caer'. {yo} = el némesis, {objetivo} = el piloto que busca, {lugar} = donde empezó todo, {asesino}, {victima}. El primer némesis de la campaña nace seguro la primera vez que bajan un mecha con piloto (después de la primera misión). Origen 'oficial': un oficial de un bando (bandos.json > oficiales) que toma nota cuando le ganan a su bando; solo aparece en contratos contra su bando, salvo que ese bando ya sea hostil (entonces los caza en cualquiera). Origen 'desertor': un piloto propio que se fue (reglas.json > malestar) y firmo con la compania rival.",
   "chance_nace": 45,
   "max_activos": 2,
   "misiones_entre_apariciones": 1,
@@ -58,6 +58,30 @@
         "Me dejaron ahí, Control. Ahora me toca a mí.",
         "¿Me extrañaron? Yo a ustedes sí.",
         "Conozco sus órdenes. Las escribí con ustedes."
+      ]
+    },
+    "oficial": {
+      "nombre": "Oficial",
+      "intro": [
+        "«{yo}» manda gente para {bando}. Después de {lugar}, tiene el nombre de la compañía anotado.",
+        "{bando} le pasó el problema a «{yo}»: ustedes. Desde {lugar} los sigue de cerca."
+      ],
+      "frases": [
+        "Control, esto no es personal. Es {bando}.",
+        "Les avisaron que no se metieran. Yo soy el aviso.",
+        "Me pagan por cada mecha de ustedes que vuelva en un remolque."
+      ]
+    },
+    "desertor": {
+      "nombre": "Ex piloto",
+      "intro": [
+        "«{yo}» se fue de la compañía con su mecha y firmó con {bando}. Conoce cada orden que le enseñaron.",
+        "«{yo}» se cansó de esperar. Ahora cobra de {bando}, y sabe cómo pelean ustedes."
+      ],
+      "frases": [
+        "Hola, Control. ¿Me extrañaban?",
+        "Nada personal, {objetivo}. Bueno, un poco sí.",
+        "Ustedes me enseñaron a pelear. Gracias."
       ]
     }
   },

@@ -11,6 +11,7 @@ import { nombreDeMecha } from '../campana/reclutas.js';
 import { relaciones } from '../campana/animo.js';
 import { asignarTarea, puedeQuedarse, desplegables } from '../campana/tareas.js';
 import { loBuscan } from '../campana/nemesis.js';
+import { pagarBono } from '../campana/personajes.js';
 import { existeIcono } from './iconos.js';
 
 const SLOTS = [['cabeza', 'Cabeza'], ['torso', 'Torso'], ['piernas', 'Piernas'], ['brazo_izq', 'Brazo izq.'], ['brazo_der', 'Brazo der.'], ['mochila', 'Mochila']];
@@ -106,6 +107,7 @@ function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
         h('div', { class: 'hc-integridad ' + colorVida, role: 'meter', 'aria-label': 'Integridad ' + vida + '%', 'aria-valuenow': vida, 'aria-valuemax': 100, title: 'Integridad ' + vida + '%' + (rotas.length ? ' · roto: ' + rotas.map((z) => NOMBRE_SLOT[z].toLowerCase()).join(', ') : '') },
           ...[0, 1, 2, 3, 4].map((k) => h('i', { class: k < llenos ? 'lleno' : '' }))),
         h('div', { class: 'hc-fila' },
+          (pi.malestar || 0) >= datos.reglas.malestar.aviso ? h('button', { class: 'hc-harto', title: 'Está por irse de la compañía. Sacalo a pelear o dale un bono (en su ficha).', onclick: () => ir('info', pi.id) }, 'HARTO') : null,
           tarea ? h('span', { class: 'hc-estado fuera' }, ico(tarea.icono), tarea.nombre.toUpperCase())
             : reparo || h('span', { class: 'hc-estado' }, rotas.length ? 'ROTO' : 'LISTO'),
           h('span', { class: 'hc-perfil' + (perfil.id === 'propio' ? ' propio' : ''), role: 'img', 'aria-label': 'Órdenes: ' + perfil.nombre, title: 'Órdenes: ' + perfil.nombre }, ico(perfil.icono)),
@@ -742,11 +744,23 @@ function vistaInfo(ctx) {
         chip(pers.icono || 'evento', pers.texto, pers.titulo, 'chip-personalidad'),
         vinculo ? chip('vinculo', vinculo.apodo, 'Vínculo: pelean mejor cerca y les duele perderse') : chip('vinculo', 'Sin vínculo', 'No tiene a nadie cercano en el escuadrón', 'apagado'),
         ...loBuscan(p, pi.id).map((n) => chip('calavera', 'Lo busca «' + n.apodo + '»', n.intro, 'chip-alerta'))),
-      h('p', { class: 'ayuda' }, 'Misiones: ' + pi.misiones + ' · Bajas: ' + pi.bajas)),
+      h('p', { class: 'ayuda' }, 'Misiones: ' + pi.misiones + ' · Bajas: ' + pi.bajas),
+      panelMalestar(ctx)),
     panel('Lo que lleva encima', panelPasivas(app, pi)),
     panel('Relaciones', panelRelaciones(app, pi)),
     panel('Hoja de servicio', panelHoja(pi))
   ];
+}
+
+// Que tan harto esta (reglas.json > malestar): si llega al tope se va con su mecha a la compania rival
+function panelMalestar({ app, datos, p, pi, pintar }) {
+  const M = datos.reglas.malestar;
+  const v = pi.malestar || 0;
+  const texto = v >= M.aviso ? 'Está harto: si no cambia algo, se va con su mecha.' : v >= 30 ? 'Anda con cara larga.' : 'Está bien acá.';
+  return h('div', { class: 'malestar' + (v >= M.aviso ? ' alto' : '') },
+    h('div', { class: 'malestar-fila' }, h('span', {}, 'Ganas de irse'), h('span', { class: 'malestar-barra', role: 'meter', 'aria-valuenow': v, 'aria-valuemax': 100, 'aria-label': 'Ganas de irse' }, h('i', { style: 'width:' + v + '%' }))),
+    h('p', { class: 'ayuda' }, texto + ' Sube si se queda sin salir, si se lleva mal con todos o si pierde a su vínculo; baja cuando sale y ganan.'),
+    v > 0 ? boton('Darle un bono · ₵' + M.bono_creditos, () => { if (pagarBono(datos, p, pi.id)) { app.guardar(); pintar(); } }, { iconoNombre: 'creditos', clase: 'secundario compacto', deshabilitado: p.creditos < M.bono_creditos }) : null);
 }
 
 // Con quien se lleva bien y con quien no (afinidad)

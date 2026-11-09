@@ -66,6 +66,7 @@ export function preparacion(app, raiz) {
         (m.aliados || []).length ? panel('Apoyo',
           h('p', { class: 'ayuda' }, ico('vinculo'), ' La resistencia local pelea con ustedes: ' +
             m.aliados.map((id) => datos.enemigos.unidades[id].nombre.toLowerCase()).join(' y ') + '. Pocos, pero suman.')) : null,
+        m.rival ? panel('La competencia', h('p', { class: 'ayuda' }, ico('espadas'), ' ' + m.rival + ', la compañía rival, trabaja para el otro lado: ' + m.rivales.filter((r) => !r.nemesis).length + ' mecha' + (m.rivales.filter((r) => !r.nemesis).length > 1 ? 's' : '') + ' con piloto. Ganarles paga aparte.')) : null,
         panel('Hostiles', mj.niebla ? h('p', { class: 'ayuda' }, 'Reportes confusos. Esperen emboscadas.') : null, h('div', { class: 'chips' }, ...enemigos)),
         notasAnimo.length ? panel('Ánimo del escuadrón',
           h('ul', { class: 'condiciones animo' }, ...notasAnimo.map((n) => h('li', { class: 'animo-' + n.tipo }, ico(ICONO_NOTA[n.tipo] || 'piloto'), h('span', {}, n.texto)))),

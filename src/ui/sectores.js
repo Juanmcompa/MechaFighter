@@ -71,6 +71,7 @@ export function sectores(app, raiz) {
         h('span', { class: 'pips-intel', title: 'Inteligencia: cada contrato ganado da datos' }, ...Array.from({ length: I.maxima }, (_, k) => h('i', { class: k < s.inteligencia ? 'lleno' : '' }))),
         h('small', {}, guaridaAbierta(datos, s) ? 'guarida a la vista' : 'cada contrato ganado da datos')),
       p.remolque ? h('p', { class: 'br-aviso' }, ico('combustible'), ' Sin combustible: el remolque cobró ₵' + p.remolque.creditos + ' y los mechas perdieron ' + p.remolque.danio + '%.') : null,
+      ...(p.desertores || []).map((d) => h('p', { class: 'br-aviso' }, ico('calavera'), ' «' + d.apodo + '» se hartó y se fue con su mecha. Firmó con ' + d.rival + '.')),
       p.emboscada ? h('p', { class: 'br-aviso violeta' }, ico('enjambre'), ' En el salto largo se les pegó fauna al casco: los mechas perdieron ' + p.emboscada.danio + '%.') : null,
       radar(),
       sel ? tarjeta(sel) : h('p', { class: 'ayuda' }, 'No hay destinos a la vista.'),
