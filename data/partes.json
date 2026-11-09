@@ -543,7 +543,7 @@
     "peso": 9,
     "costo": 320,
     "recuperable": true,
-    "sprite": "brazo_rotativa",
+    "sprite": "brazo_rotativa_kessler",
     "habilidad": "sobrecarga",
     "descripcion": "La rotativa de la coronel Ostrova. Una sola en todo el cinturón. Trae Sobrecarga."
   },
