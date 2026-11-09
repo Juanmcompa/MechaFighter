@@ -29,7 +29,11 @@
         "piernas_estabilizadoras",
         "torso_bastion",
         "mochila_reparacion",
-        "brazo_rifle"
+        "torso_yunque",
+        "brazo_escudo_torre",
+        "piernas_patio",
+        "brazo_remachadora",
+        "mochila_soldadora"
       ]
     },
     "grua": {
@@ -57,10 +61,14 @@
         "brazo_hoja",
         "brazo_gancho",
         "brazo_lanzallamas",
-        "torso_medio",
-        "mochila_municion",
         "brazo_rotativa",
-        "cabeza_ojo_de_varga"
+        "mochila_municion",
+        "cabeza_ojo_de_varga",
+        "brazo_martillo",
+        "brazo_recortada",
+        "torso_remolque",
+        "piernas_desguace",
+        "brazo_soplete"
       ]
     },
     "vesta": {
@@ -91,7 +99,12 @@
         "brazo_canon_riel",
         "brazo_emp",
         "torso_reactor",
-        "brazo_riel_valquiria"
+        "brazo_riel_valquiria",
+        "brazo_laser",
+        "cabeza_telemetro",
+        "brazo_lanza_pulso",
+        "torso_prisma",
+        "mochila_celdas"
       ]
     },
     "colonos": {
@@ -118,8 +131,12 @@
         "mochila_reparacion",
         "piernas_saltarinas",
         "mochila_propulsor",
-        "cabeza_sensor",
-        "mochila_senuelo"
+        "mochila_senuelo",
+        "piernas_colono",
+        "mochila_taller",
+        "brazo_clavadora",
+        "torso_cosechadora",
+        "brazo_arpon"
       ]
     },
     "flota": {
@@ -150,7 +167,12 @@
         "cabeza_optica",
         "torso_pesado_bf_recharged",
         "brazo_tormenta",
-        "piernas_fantasma"
+        "piernas_fantasma",
+        "brazo_mortero",
+        "brazo_carabina",
+        "cabeza_mando",
+        "torso_fragata",
+        "piernas_asalto"
       ]
     },
     "desertores": {
@@ -176,12 +198,15 @@
         "escolta"
       ],
       "partes": [
-        "brazo_rifle",
         "brazo_rotativa",
         "piernas_bipode",
         "torso_medio",
-        "mochila_municion",
-        "brazo_lanzamisiles"
+        "brazo_lanzamisiles",
+        "brazo_m7_gastado",
+        "brazo_riel_recortado",
+        "torso_parche",
+        "mochila_contrabando",
+        "brazo_lanzagranadas"
       ]
     },
     "transportistas": {
@@ -228,6 +253,11 @@
       "escuadra_irrumpe": [
         "enjambre_larvas",
         "nido"
+      ],
+      "partes": [
+        "brazo_aguijon",
+        "piernas_quitina",
+        "torso_caparazon"
       ]
     },
     "contagio": {

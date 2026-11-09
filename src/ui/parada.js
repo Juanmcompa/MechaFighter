@@ -1,6 +1,6 @@
 // Parada tecnica: combustible, reparacion, mejoras de la nave y piezas. Cada bando vende lo suyo, y como te vea
 // cambia los precios y que piezas te vende. Las paradas libres del gremio venden de todo, a precio normal.
-import { h, montar, ico, boton, iconoParte, nombrePieza, describirParte, NOMBRE_RAREZA } from './comun.js';
+import { h, montar, ico, boton, iconoParte, nombrePieza, describirParte, NOMBRE_RAREZA, origenParte } from './comun.js';
 import { comprar, vender, seguir, precioPieza, comprarCombustible, paradaActual, precioCombustible, ofertaDe, reparar, costoReparacion, vidaDelMecha, partesRotas } from '../campana/partida.js';
 import { quien, escalonDe, combustibleMaximo } from '../campana/brujula.js';
 
@@ -30,7 +30,7 @@ export function parada(app, raiz) {
       const pt = datos.partes[o.pieza.parte];
       return h('li', { class: 'pd-pieza rareza-' + pt.rareza + (o.vendida ? ' vendida' : '') + (of.bloqueada ? ' bloqueada' : '') },
         iconoParte(datos, o.pieza.parte, 'pz-icono rareza-' + pt.rareza),
-        h('span', { class: 'pz-textos' }, h('strong', {}, nombrePieza(datos, o.pieza)), h('small', {}, NOMBRE_RAREZA[pt.rareza] + ' · ' + describirParte(datos, o.pieza))),
+        h('span', { class: 'pz-textos' }, h('strong', {}, nombrePieza(datos, o.pieza)), h('small', {}, NOMBRE_RAREZA[pt.rareza] + origenParte(datos, o.pieza.parte) + ' · ' + describirParte(datos, o.pieza))),
         o.vendida ? h('span', { class: 'pd-nota' }, 'Vendida')
           : of.bloqueada ? h('span', { class: 'pd-nota' }, ico('candado'), ' ' + of.pide)
           : h('button', { class: 'pd-precio', disabled: p.creditos < of.precio, onclick: () => { comprar(datos, p, i); app.guardar(); pintar(); } }, '₵' + of.precio));
@@ -40,7 +40,7 @@ export function parada(app, raiz) {
       const valor = Math.trunc((precioPieza(datos, pz) * datos.reglas.campana.venta_pct) / 100);
       return h('li', { class: 'pd-pieza rareza-' + pt.rareza },
         iconoParte(datos, pz.parte, 'pz-icono rareza-' + pt.rareza),
-        h('span', { class: 'pz-textos' }, h('strong', {}, nombrePieza(datos, pz)), h('small', {}, NOMBRE_RAREZA[pt.rareza] + ' · ' + describirParte(datos, pz))),
+        h('span', { class: 'pz-textos' }, h('strong', {}, nombrePieza(datos, pz)), h('small', {}, NOMBRE_RAREZA[pt.rareza] + origenParte(datos, pz.parte) + ' · ' + describirParte(datos, pz))),
         h('button', { class: 'pd-precio vende', onclick: () => { vender(datos, p, i); app.guardar(); pintar(); } }, '+' + valor));
     };
 

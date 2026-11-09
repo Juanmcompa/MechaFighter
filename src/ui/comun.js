@@ -66,6 +66,8 @@ export function describirParte(datos, pieza) {
   if (p.habilidad && datos.habilidades[p.habilidad]) out.push('★ ' + datos.habilidades[p.habilidad].nombre);
   if (p.radar) out.push('Radar ' + p.radar);
   if (p.encaje === 'torso') out.push('Estructura ' + p.estructura, 'Blindaje ' + p.blindaje, 'Carga ' + p.capacidad);
+  if (p.encaje === 'torso' && p.velocidad) out.push('Paso +' + p.velocidad);
+  if (p.encaje === 'torso' && p.evasion) out.push('Evasión ' + (p.evasion > 0 ? '+' : '') + p.evasion);
   if (p.encaje === 'piernas') out.push('Paso ' + p.velocidad, 'Evasión ' + p.evasion + (p.blindaje ? ' · Blindaje +' + p.blindaje : ''));
   if (p.encaje === 'cabeza') out.push('Visión ' + p.vision + (p.punteria ? ' · Puntería +' + p.punteria : ''));
   if (p.arma) out.push('Daño ' + p.arma.danio, 'Alcance ' + p.arma.alcance, 'Cadencia ' + p.arma.cadencia + (p.arma.municion ? ' · Cargador ' + p.arma.municion : ''));
@@ -95,6 +97,13 @@ export function textoPersonalidad(datos, piloto) {
   if (!pe) return { texto: '—', titulo: '' };
   if (!pe.visible && (piloto.misiones || 0) < 3) return { texto: '???', titulo: pe.pista + ' (se revela con la experiencia)', icono: 'evento' };
   return { texto: pe.nombre, titulo: pe.pista, icono: pe.icono };
+}
+
+// De que bando es una pieza, para las listas ("Rara · Vesta")
+export function origenParte(datos, id) {
+  const b = datos.partes[id] && datos.partes[id].bando;
+  const q = b && datos.bandos ? datos.bandos.bandos[b] || datos.bandos.amenazas[b] : null;
+  return q ? ' · ' + q.corto : '';
 }
 
 // Barra de abajo de la campana (la misma del hangar): Escuadron, Armado, Ordenes y Mapa

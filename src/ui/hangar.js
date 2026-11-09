@@ -3,7 +3,7 @@
 //   Armado: el mecha caminando con sus 6 lugares alrededor; tocar uno abre la lista de piezas, de la mejor a la peor.
 //   Ordenes: perfiles de un toque y cada orden como una fila de iconos (cuando > que > a quien).
 //   Info: la ficha del piloto (se llega tocando su nombre).
-import { h, montar, ico, boton, botonIcono, panel, chip, barra, describirParte, nombrePieza, textoPersonalidad, retrato, NOMBRE_RAREZA, iconoParte } from './comun.js';
+import { h, montar, ico, boton, botonIcono, panel, chip, barra, describirParte, nombrePieza, textoPersonalidad, retrato, NOMBRE_RAREZA, iconoParte, origenParte } from './comun.js';
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha, dibujarMechaVisor } from '../vista/dibujo.js';
 import { equipar, guardarGambits, encajeDeSlot, reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida } from '../campana/partida.js';
@@ -379,7 +379,7 @@ function hojaPiezas({ app, datos, p, pi, pintar }, actual, prueba) {
     pz ? iconoParte(datos, pz.parte, 'pz-icono rareza-' + pp.rareza) : h('span', { class: 'pz-icono vacio' }, ico('cerrar')),
     h('span', { class: 'pz-textos' },
       h('strong', {}, pz ? nombrePieza(datos, pz) : 'Dejar vacío'),
-      h('small', { class: pp ? 'rareza-' + pp.rareza : '' }, (pp ? NOMBRE_RAREZA[pp.rareza] : '') + (cand === null ? ' · puesta' : elegida ? ' · probando' : '') +
+      h('small', { class: pp ? 'rareza-' + pp.rareza : '' }, (pp ? NOMBRE_RAREZA[pp.rareza] + origenParte(datos, pz.parte) : '') + (cand === null ? ' · puesta' : elegida ? ' · probando' : '') +
         (pp && pp.habilidad && datos.habilidades[pp.habilidad] ? ' · ★ ' + datos.habilidades[pp.habilidad].nombre : ''))),
     h('span', { class: 'pz-difs' }, ...(cand === null ? [] : dif.length ? dif.slice(0, 3).map((x) => h('span', { class: x.bien ? 'bien' : 'mal' }, x.nombre + ' ' + (x.d > 0 ? '+' : '−') + Math.abs(x.d))) : [h('span', {}, 'igual')])));
   };

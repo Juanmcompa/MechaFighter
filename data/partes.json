@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Cada mecha se arma con una parte por encaje: cabeza, torso, piernas, mochila y dos brazos (izquierdo y derecho usan las mismas partes de tipo 'brazo'). El peso total no puede pasar la capacidad del torso. velocidad = ticks que tarda en avanzar una casilla (menos es mas rapido). Un brazo con 'arma' dispara; con 'escudo' bloquea. 'recuperable' dice si se puede rescatar del mecha de un piloto muerto.",
+  "_ayuda": "Cada mecha se arma con una parte por encaje: cabeza, torso, piernas, mochila y dos brazos (izquierdo y derecho usan las mismas partes de tipo 'brazo'). El peso total no puede pasar la capacidad del torso. velocidad = ticks que tarda en avanzar una casilla (menos es mas rapido). Un brazo con 'arma' dispara; con 'escudo' bloquea. 'recuperable' dice si se puede rescatar del mecha de un piloto muerto. 'bando': de que bando es la pieza (bandos.json). 'provisoria': true = usa el dibujo de otra pieza ('sprite') hasta que tenga el suyo: para darle arte propio, subi el sprite con el id de la pieza y borra 'provisoria' y 'sprite'. En un torso, 'velocidad' son ticks de mas por casilla (los pesados frenan) y 'evasion' suma o resta a la del mecha (los livianos esquivan mejor).",
   "torso_ligero": {
     "nombre": "Torso Gacela",
     "encaje": "torso",
@@ -10,6 +10,7 @@
     "estructura": 90,
     "blindaje": 2,
     "capacidad": 30,
+    "evasion": 15,
     "peso": 8,
     "costo": 40,
     "recuperable": true,
@@ -23,12 +24,13 @@
       "medio"
     ],
     "estructura": 130,
-    "blindaje": 4,
+    "blindaje": 5,
     "capacidad": 40,
     "peso": 12,
     "costo": 60,
     "recuperable": true,
-    "sprite": "torso_medio"
+    "sprite": "torso_medio",
+    "evasion": 3
   },
   "torso_pesado": {
     "nombre": "Torso Bunker",
@@ -40,6 +42,8 @@
     "estructura": 180,
     "blindaje": 7,
     "capacidad": 55,
+    "velocidad": 1,
+    "evasion": -8,
     "peso": 18,
     "costo": 90,
     "recuperable": true,
@@ -500,6 +504,8 @@
     "estructura": 220,
     "blindaje": 10,
     "capacidad": 68,
+    "velocidad": 1,
+    "evasion": -5,
     "peso": 19,
     "costo": 230,
     "recuperable": true,
@@ -576,9 +582,737 @@
     "estructura": 100,
     "blindaje": 20,
     "capacidad": 40,
+    "velocidad": 1,
+    "evasion": -5,
     "peso": 15,
     "costo": 320,
     "recuperable": true,
     "sprite": "torso_pesado_bf_recharged"
+  },
+  "torso_yunque": {
+    "nombre": "Torso Yunque",
+    "encaje": "torso",
+    "rareza": "raro",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 165,
+    "blindaje": 9,
+    "capacidad": 44,
+    "velocidad": 1,
+    "evasion": -8,
+    "peso": 17,
+    "descripcion": "Chapa sobre chapa. Aguanta de todo, pero le entra poco armamento.",
+    "recuperable": true,
+    "sprite": "torso_pesado",
+    "bando": "cooperativa",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_escudo_torre": {
+    "nombre": "Escudo torre",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "escudo",
+      "defensivo"
+    ],
+    "escudo": {
+      "bloqueo": 45,
+      "blindaje": 5
+    },
+    "peso": 11,
+    "descripcion": "Una compuerta de desarmadero con manija. Frena casi todo y pesa como tal.",
+    "recuperable": true,
+    "sprite": "brazo_escudo",
+    "bando": "cooperativa",
+    "provisoria": true,
+    "costo": 95
+  },
+  "piernas_patio": {
+    "nombre": "Orugas de patio",
+    "encaje": "piernas",
+    "rareza": "raro",
+    "etiquetas": [
+      "orugas",
+      "estable"
+    ],
+    "velocidad": 7,
+    "evasion": 0,
+    "blindaje": 4,
+    "peso": 12,
+    "descripcion": "Para mover chatarra, no para correr. Blindadas hasta el piso.",
+    "recuperable": true,
+    "sprite": "piernas_orugas",
+    "bando": "cooperativa",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_remachadora": {
+    "nombre": "Remachadora",
+    "encaje": "brazo",
+    "rareza": "normal",
+    "etiquetas": [
+      "arma",
+      "balistico"
+    ],
+    "arma": {
+      "danio": 18,
+      "alcance": 3,
+      "cadencia": 3,
+      "municion": 16,
+      "recarga": 10,
+      "punteria": 10,
+      "perfora": 2
+    },
+    "ranuras_afijo": 1,
+    "peso": 7,
+    "descripcion": "Clava remaches al rojo a corta distancia. Atraviesa algo de blindaje.",
+    "recuperable": true,
+    "sprite": "brazo_rotativa",
+    "bando": "cooperativa",
+    "provisoria": true,
+    "costo": 55
+  },
+  "mochila_soldadora": {
+    "nombre": "Soldadora de campo",
+    "encaje": "mochila",
+    "rareza": "raro",
+    "etiquetas": [
+      "reparacion",
+      "consumible"
+    ],
+    "usos": 5,
+    "habilidad": "reparacion_de_campo",
+    "peso": 7,
+    "descripcion": "Más cargas que el kit común, y más peso.",
+    "recuperable": true,
+    "sprite": "mochila_reparacion",
+    "bando": "cooperativa",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_martillo": {
+    "nombre": "Martillo de demolición",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "cuerpo_a_cuerpo"
+    ],
+    "arma": {
+      "danio": 38,
+      "alcance": 1,
+      "cadencia": 6,
+      "municion": 0,
+      "recarga": 0,
+      "punteria": 5,
+      "estado": "aturdido",
+      "chance_estado": 35
+    },
+    "ranuras_afijo": 1,
+    "peso": 9,
+    "descripcion": "Lento y brutal. A veces deja al otro viendo estrellas.",
+    "recuperable": true,
+    "sprite": "brazo_hoja",
+    "bando": "grua",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_recortada": {
+    "nombre": "Recortada de chatarra",
+    "encaje": "brazo",
+    "rareza": "normal",
+    "etiquetas": [
+      "arma",
+      "balistico"
+    ],
+    "arma": {
+      "danio": 26,
+      "alcance": 2,
+      "cadencia": 5,
+      "municion": 6,
+      "recarga": 10,
+      "punteria": 15
+    },
+    "ranuras_afijo": 1,
+    "peso": 6,
+    "descripcion": "Tuercas y tornillos a quemarropa. A tres casillas ya no sirve.",
+    "recuperable": true,
+    "sprite": "brazo_rifle",
+    "bando": "grua",
+    "provisoria": true,
+    "costo": 55
+  },
+  "torso_remolque": {
+    "nombre": "Torso Remolque",
+    "encaje": "torso",
+    "rareza": "normal",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 150,
+    "blindaje": 3,
+    "capacidad": 60,
+    "velocidad": 1,
+    "evasion": -5,
+    "peso": 16,
+    "descripcion": "Carga lo que le pongas. El blindaje se lo vendieron aparte.",
+    "recuperable": true,
+    "sprite": "torso_pesado",
+    "bando": "grua",
+    "provisoria": true,
+    "costo": 55
+  },
+  "piernas_desguace": {
+    "nombre": "Zancos de desguace",
+    "encaje": "piernas",
+    "rareza": "raro",
+    "etiquetas": [
+      "piernas"
+    ],
+    "velocidad": 3,
+    "evasion": 6,
+    "blindaje": 2,
+    "peso": 9,
+    "descripcion": "Rápidos y con algo de chapa. Pesan más que unas patas de salto.",
+    "recuperable": true,
+    "sprite": "piernas_bipode",
+    "bando": "grua",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_soplete": {
+    "nombre": "Soplete industrial",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "fuego",
+      "area"
+    ],
+    "arma": {
+      "danio": 5,
+      "alcance": 2,
+      "cadencia": 1,
+      "municion": 30,
+      "recarga": 14,
+      "punteria": 20,
+      "estado": "en_llamas",
+      "chance_estado": 30,
+      "ignora_cobertura": true
+    },
+    "ranuras_afijo": 1,
+    "peso": 7,
+    "descripcion": "No para de escupir fuego. Hay que estar encima.",
+    "recuperable": true,
+    "sprite": "brazo_lanzallamas",
+    "bando": "grua",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_laser": {
+    "nombre": "Láser de corte",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "energia",
+      "precision"
+    ],
+    "arma": {
+      "danio": 10,
+      "alcance": 7,
+      "cadencia": 3,
+      "municion": 0,
+      "recarga": 0,
+      "punteria": 12,
+      "perfora": 2
+    },
+    "ranuras_afijo": 1,
+    "peso": 8,
+    "descripcion": "No usa munición: nunca recarga. Pega poco, pero no para.",
+    "recuperable": true,
+    "sprite": "brazo_canon_riel",
+    "bando": "vesta",
+    "provisoria": true,
+    "costo": 95
+  },
+  "cabeza_telemetro": {
+    "nombre": "Telémetro Vesta",
+    "encaje": "cabeza",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "sensor",
+      "precision"
+    ],
+    "vision": 10,
+    "punteria": 14,
+    "peso": 4,
+    "descripcion": "Ve lejos y apunta mejor que nadie. Pesa más que una óptica.",
+    "recuperable": true,
+    "sprite": "cabeza_optica",
+    "bando": "vesta",
+    "provisoria": true,
+    "costo": 150
+  },
+  "brazo_lanza_pulso": {
+    "nombre": "Lanza de pulso",
+    "encaje": "brazo",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "arma",
+      "energia",
+      "precision"
+    ],
+    "arma": {
+      "danio": 60,
+      "alcance": 9,
+      "cadencia": 16,
+      "municion": 2,
+      "recarga": 22,
+      "punteria": 10,
+      "perfora": 8
+    },
+    "ranuras_afijo": 2,
+    "peso": 13,
+    "descripcion": "Dos disparos que parten un blindado al medio. Después, a esperar.",
+    "recuperable": true,
+    "sprite": "brazo_canon_riel",
+    "bando": "vesta",
+    "provisoria": true,
+    "costo": 150
+  },
+  "torso_prisma": {
+    "nombre": "Torso Prisma",
+    "encaje": "torso",
+    "rareza": "raro",
+    "etiquetas": [
+      "ligero"
+    ],
+    "estructura": 110,
+    "blindaje": 2,
+    "capacidad": 46,
+    "evasion": 12,
+    "peso": 9,
+    "descripcion": "Liviano y con lugar para armas grandes. De vidrio.",
+    "recuperable": true,
+    "sprite": "torso_ligero",
+    "bando": "vesta",
+    "provisoria": true,
+    "costo": 95
+  },
+  "mochila_celdas": {
+    "nombre": "Celdas de energía",
+    "encaje": "mochila",
+    "rareza": "raro",
+    "etiquetas": [
+      "municion"
+    ],
+    "municion_pct": 100,
+    "peso": 7,
+    "descripcion": "El doble de munición para todas las armas.",
+    "recuperable": true,
+    "sprite": "mochila_municion",
+    "bando": "vesta",
+    "provisoria": true,
+    "costo": 95
+  },
+  "piernas_colono": {
+    "nombre": "Patas de colono",
+    "encaje": "piernas",
+    "rareza": "normal",
+    "etiquetas": [
+      "piernas"
+    ],
+    "velocidad": 5,
+    "evasion": 12,
+    "peso": 4,
+    "descripcion": "Hechas para terreno roto: esquivan bien, no corren.",
+    "recuperable": true,
+    "sprite": "piernas_saltarinas",
+    "bando": "colonos",
+    "provisoria": true,
+    "costo": 55
+  },
+  "mochila_taller": {
+    "nombre": "Taller portátil",
+    "encaje": "mochila",
+    "rareza": "raro",
+    "etiquetas": [
+      "reparacion",
+      "consumible"
+    ],
+    "usos": 4,
+    "habilidad": "reparacion_de_campo",
+    "peso": 6,
+    "descripcion": "Cuatro arreglos en plena pelea.",
+    "recuperable": true,
+    "sprite": "mochila_reparacion",
+    "bando": "colonos",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_clavadora": {
+    "nombre": "Clavadora neumática",
+    "encaje": "brazo",
+    "rareza": "normal",
+    "etiquetas": [
+      "arma",
+      "balistico",
+      "rifle"
+    ],
+    "arma": {
+      "danio": 9,
+      "alcance": 5,
+      "cadencia": 2,
+      "municion": 24,
+      "recarga": 8,
+      "punteria": 5
+    },
+    "ranuras_afijo": 1,
+    "peso": 4,
+    "descripcion": "Una herramienta que aprendió a pelear. Liviana y con mucho cargador.",
+    "recuperable": true,
+    "sprite": "brazo_rifle",
+    "bando": "colonos",
+    "provisoria": true,
+    "costo": 55
+  },
+  "torso_cosechadora": {
+    "nombre": "Torso Cosechadora",
+    "encaje": "torso",
+    "rareza": "raro",
+    "etiquetas": [
+      "medio"
+    ],
+    "estructura": 140,
+    "blindaje": 3,
+    "capacidad": 42,
+    "evasion": 6,
+    "peso": 10,
+    "descripcion": "Aguanta más de lo que pesa. Blindaje, el justo.",
+    "recuperable": true,
+    "sprite": "torso_medio",
+    "bando": "colonos",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_arpon": {
+    "nombre": "Arpón de faena",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "balistico"
+    ],
+    "arma": {
+      "danio": 28,
+      "alcance": 4,
+      "cadencia": 7,
+      "municion": 5,
+      "recarga": 9,
+      "punteria": 10,
+      "perfora": 5
+    },
+    "ranuras_afijo": 1,
+    "peso": 7,
+    "descripcion": "Atraviesa blindaje a media distancia. Pocos tiros y lento de cargar.",
+    "recuperable": true,
+    "sprite": "brazo_canon_riel",
+    "bando": "colonos",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_mortero": {
+    "nombre": "Mortero de asedio",
+    "encaje": "brazo",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "arma",
+      "explosivo",
+      "area"
+    ],
+    "arma": {
+      "danio": 24,
+      "alcance": 9,
+      "cadencia": 12,
+      "municion": 5,
+      "recarga": 22,
+      "punteria": -5,
+      "radio": 2
+    },
+    "ranuras_afijo": 2,
+    "peso": 13,
+    "descripcion": "Tira lejos y revienta una zona entera. Lento y con pocos tiros.",
+    "recuperable": true,
+    "sprite": "brazo_lanzamisiles",
+    "bando": "flota",
+    "provisoria": true,
+    "costo": 150
+  },
+  "brazo_carabina": {
+    "nombre": "Carabina de la Flota",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "balistico",
+      "rifle"
+    ],
+    "arma": {
+      "danio": 16,
+      "alcance": 7,
+      "cadencia": 4,
+      "municion": 14,
+      "recarga": 7,
+      "punteria": 12
+    },
+    "ranuras_afijo": 2,
+    "peso": 6,
+    "descripcion": "El rifle que el M7 quiso ser.",
+    "recuperable": true,
+    "sprite": "brazo_rifle",
+    "bando": "flota",
+    "provisoria": true,
+    "costo": 95
+  },
+  "cabeza_mando": {
+    "nombre": "Casco de mando",
+    "encaje": "cabeza",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "sensor",
+      "radar"
+    ],
+    "vision": 8,
+    "punteria": 6,
+    "peso": 4,
+    "radar": 5,
+    "habilidad": "marcar_objetivo",
+    "descripcion": "Radar y puntería en el mismo casco.",
+    "recuperable": true,
+    "sprite": "cabeza_sensor",
+    "bando": "flota",
+    "provisoria": true,
+    "costo": 150
+  },
+  "torso_fragata": {
+    "nombre": "Torso Fragata",
+    "encaje": "torso",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 170,
+    "blindaje": 8,
+    "capacidad": 58,
+    "velocidad": 1,
+    "evasion": -5,
+    "peso": 17,
+    "descripcion": "Estructura de nave en un mecha. Carga mucho y aguanta bien.",
+    "recuperable": true,
+    "sprite": "torso_pesado",
+    "bando": "flota",
+    "provisoria": true,
+    "costo": 150
+  },
+  "piernas_asalto": {
+    "nombre": "Piernas de asalto",
+    "encaje": "piernas",
+    "rareza": "raro",
+    "etiquetas": [
+      "piernas"
+    ],
+    "velocidad": 4,
+    "evasion": 8,
+    "blindaje": 1,
+    "peso": 8,
+    "descripcion": "El bípode reglamentario, mejor terminado.",
+    "recuperable": true,
+    "sprite": "piernas_bipode",
+    "bando": "flota",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_m7_gastado": {
+    "nombre": "Rifle M7 gastado",
+    "encaje": "brazo",
+    "rareza": "normal",
+    "etiquetas": [
+      "arma",
+      "balistico",
+      "rifle"
+    ],
+    "arma": {
+      "danio": 15,
+      "alcance": 6,
+      "cadencia": 4,
+      "municion": 8,
+      "recarga": 10,
+      "punteria": -2
+    },
+    "ranuras_afijo": 1,
+    "peso": 5,
+    "descripcion": "Pega un poco más, apunta peor y el cargador viene por la mitad.",
+    "recuperable": true,
+    "sprite": "brazo_rifle",
+    "bando": "desertores",
+    "provisoria": true,
+    "costo": 55
+  },
+  "brazo_riel_recortado": {
+    "nombre": "Riel recortado",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "energia",
+      "precision"
+    ],
+    "arma": {
+      "danio": 34,
+      "alcance": 6,
+      "cadencia": 10,
+      "municion": 4,
+      "recarga": 14,
+      "punteria": 5,
+      "perfora": 4
+    },
+    "ranuras_afijo": 1,
+    "peso": 8,
+    "descripcion": "Un cañón de riel serruchado: más liviano, menos alcance.",
+    "recuperable": true,
+    "sprite": "brazo_canon_riel",
+    "bando": "desertores",
+    "provisoria": true,
+    "costo": 95
+  },
+  "torso_parche": {
+    "nombre": "Torso Parche",
+    "encaje": "torso",
+    "rareza": "normal",
+    "etiquetas": [
+      "medio"
+    ],
+    "estructura": 160,
+    "blindaje": 2,
+    "capacidad": 50,
+    "velocidad": 1,
+    "evasion": -3,
+    "peso": 15,
+    "descripcion": "Mucha estructura soldada a mano. Blindaje casi no tiene.",
+    "recuperable": true,
+    "sprite": "torso_medio",
+    "bando": "desertores",
+    "provisoria": true,
+    "costo": 55
+  },
+  "mochila_contrabando": {
+    "nombre": "Bidones de contrabando",
+    "encaje": "mochila",
+    "rareza": "normal",
+    "etiquetas": [
+      "municion"
+    ],
+    "municion_pct": 80,
+    "peso": 6,
+    "descripcion": "Bastante más munición, en bidones que pesan.",
+    "recuperable": true,
+    "sprite": "mochila_municion",
+    "bando": "desertores",
+    "provisoria": true,
+    "costo": 55
+  },
+  "brazo_lanzagranadas": {
+    "nombre": "Lanzagranadas",
+    "encaje": "brazo",
+    "rareza": "raro",
+    "etiquetas": [
+      "arma",
+      "explosivo",
+      "area"
+    ],
+    "arma": {
+      "danio": 18,
+      "alcance": 5,
+      "cadencia": 7,
+      "municion": 8,
+      "recarga": 12,
+      "punteria": 0,
+      "radio": 1
+    },
+    "ranuras_afijo": 1,
+    "peso": 7,
+    "descripcion": "Explosivos a media distancia. Cuidado con los propios.",
+    "recuperable": true,
+    "sprite": "brazo_lanzamisiles",
+    "bando": "desertores",
+    "provisoria": true,
+    "costo": 95
+  },
+  "brazo_aguijon": {
+    "nombre": "Aguijón injertado",
+    "encaje": "brazo",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "arma",
+      "cuerpo_a_cuerpo"
+    ],
+    "arma": {
+      "danio": 18,
+      "alcance": 1,
+      "cadencia": 2,
+      "municion": 0,
+      "recarga": 0,
+      "punteria": 15,
+      "estado": "aturdido",
+      "chance_estado": 20
+    },
+    "ranuras_afijo": 1,
+    "peso": 3,
+    "descripcion": "Todavía se mueve. Pica rápido y a veces deja al otro tieso.",
+    "recuperable": true,
+    "sprite": "brazo_hoja",
+    "bando": "fauna",
+    "provisoria": true,
+    "costo": 150
+  },
+  "piernas_quitina": {
+    "nombre": "Patas de quitina",
+    "encaje": "piernas",
+    "rareza": "muy_raro",
+    "etiquetas": [
+      "salto"
+    ],
+    "velocidad": 3,
+    "evasion": 16,
+    "blindaje": 1,
+    "peso": 6,
+    "descripcion": "Corren como el bicho del que salieron.",
+    "recuperable": true,
+    "sprite": "piernas_saltarinas",
+    "bando": "fauna",
+    "provisoria": true,
+    "costo": 150
+  },
+  "torso_caparazon": {
+    "nombre": "Caparazón vivo",
+    "encaje": "torso",
+    "rareza": "legendario",
+    "etiquetas": [
+      "pesado"
+    ],
+    "estructura": 200,
+    "blindaje": 8,
+    "capacidad": 48,
+    "velocidad": 1,
+    "peso": 14,
+    "descripcion": "Un caparazón de acorazado vaciado por dentro. Se regenera solo… casi.",
+    "recuperable": true,
+    "sprite": "torso_pesado",
+    "bando": "fauna",
+    "provisoria": true,
+    "costo": 240
   }
 }

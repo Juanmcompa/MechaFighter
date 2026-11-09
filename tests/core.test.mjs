@@ -50,7 +50,7 @@ const atrapa = (msg, cambio, texto) => {
   const e = conCambio(cambio);
   ok(e.some((x) => x.includes(texto)), 'atrapa: ' + msg);
 };
-atrapa('parte inexistente en una clase', (d) => d.clases.tirador.partes_sugeridas.push('brazo_laser'), 'brazo_laser');
+atrapa('parte inexistente en una clase', (d) => d.clases.tirador.partes_sugeridas.push('brazo_que_no_existe'), 'brazo_que_no_existe');
 atrapa('accion mal escrita en un gambit', (d) => { d.clases.medico.gambits_de_fabrica[0].accion = 'curar'; }, '"curar" no existe');
 atrapa('parametro fuera de rango', (d) => { d.clases.tirador.gambits_de_fabrica[0].parametros.casillas = 50; }, 'fuera de rango');
 atrapa('decimales', (d) => { d.partes.brazo_rifle.arma.danio = 14.5; }, 'decimales');

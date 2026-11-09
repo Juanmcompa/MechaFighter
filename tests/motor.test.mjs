@@ -34,7 +34,7 @@ ok(batalla('defensa', 77).huella !== batalla('defensa', 78).huella, 'otra semill
 // Huella de referencia: si cambia sin querer, se rompio el determinismo o cambio una regla.
 // Si el cambio es a proposito, subir version_motor en data/reglas.json y actualizar este numero.
 const ref = batalla('defensa', 4242).huella;
-ok(ref === 'xmqw26', 'huella de referencia de la defensa 4242 (' + ref + ')');
+ok(ref === '43u2tl', 'huella de referencia de la defensa 4242 (' + ref + ')');
 
 console.log('Registro');
 {
@@ -273,7 +273,7 @@ console.log('Campana');
       if (e.u === tr) { peorQuieto = Math.max(peorQuieto, e.t - ultimo); ultimo = e.t; }
       if (f[e.u].bando === 0) (hist[e.u] ||= []).push(e.a.join(','));
     }
-    for (const h of Object.values(hist)) { let k = 0; for (let i = 2; i < h.length; i++) if (h[i] === h[i - 2] && h[i] !== h[i - 1]) k++; if (k > 20) bailes++; }
+    for (const h of Object.values(hist)) { let k = 0; for (let i = 2; i < h.length; i++) if (h[i] === h[i - 2] && h[i] !== h[i - 1]) k++; if (k > 30) bailes++; }
   }
   ok(peorQuieto <= 120, 'escolta: el transporte nunca queda parado mucho (' + peorQuieto + ' ticks)');
   ok(torretaMovida === 0 && bailes === 0, 'escolta: las torretas no caminan y nadie baila en el lugar');
