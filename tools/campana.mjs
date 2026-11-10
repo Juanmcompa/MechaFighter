@@ -1,11 +1,20 @@
 // Juega campanas enteras con un piloto automatico (va a la guarida si puede, si no al contrato mas cerca; para en
 // las paradas cuando le falta combustible; contrata si puede, compra lo primero que le alcanza) para ver que tan dificil es la campana completa.
 //   node tools/campana.mjs [cantidad] [legado]   (con 'legado', cada campana arranca con lo que dejo la anterior)
+// Por defecto juega "pensando" (tools/jugador.mjs): rota el escuadron, elige formacion de despliegue y ordenes por
+// radio comparando en batallas parecidas. Es lento (~10 s por campaña). Variables:
+//   JUGADOR=tonto   el piloto de antes: sale siempre igual, sin plan ni ordenes (rapido; sirve para comparar)
+//   MUESTRAS=2      en cuantas batallas parecidas prueba cada idea (1 por defecto; mas = elige mejor, mas lento)
 import { cargarDatos } from '../src/core/datos.js';
 import { simular } from '../src/motor/simular.js';
 import { nuevaPartida, destinosDeLaNave, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar, reparar, costoReparacion, elegirOpcion, comprarCombustible, paradaActual, instalarMejora, mejoraDe } from '../src/campana/partida.js';
 import { opcionDisponible } from '../src/campana/dilemas.js';
 import { leerDisco } from './leer-disco.mjs';
+import { rotar, pensar } from './jugador.mjs';
+
+const PIENSA = process.env.JUGADOR !== 'tonto';
+const MUESTRAS = Number(process.env.MUESTRAS || 1);
+const J = { formacion: {}, radio: {}, misiones: 0, conPlan: 0, sinPlan: 0, banco: 0, desertores: 0 };
 
 const datos = await cargarDatos(leerDisco());
 const N = Number(process.argv[2] || 20);
@@ -28,6 +37,7 @@ for (let n = 0; n < N; n++) {
     if (!d && p.pilotos.length < 5 && p.creditos >= 90) d = nuevos.find((x) => x.nodo.tipo === 'reclutamiento');
     if (!d) d = nuevos.find((x) => x.nodo.tipo === 'mision') || nuevos[0] || lista[0];
     if (!d) break;
+    if (PIENSA && (d.nodo.tipo === 'mision' || d.nodo.tipo === 'jefe')) J.banco += rotar(datos, p);
     elegirNodo(datos, p, d.nodo);
     if (p.estado === 'suceso') {
       const ops = datos.dilemas[p.suceso.dilema].opciones;
@@ -36,7 +46,19 @@ for (let n = 0; n < N; n++) {
       elegirOpcion(datos, p, k); seguir(datos, p);
     }
     if (p.estado === 'preparacion') {
-      const r = simular(datos, { mision: p.nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: p.nodo.mision.semilla });
+      let r;
+      if (PIENSA) {
+        const idea = pensar(datos, p, MUESTRAS);
+        const plan = p.nodo.plan;
+        // (para medir: la misma batalla sin pensar, con las entradas de siempre y sin ordenes)
+        p.nodo.plan = idea.sinPensar;
+        const tonta = simular(datos, { mision: idea.mision, escuadron: escuadronParaMision(datos, p), semilla: idea.mision.semilla });
+        p.nodo.plan = plan;
+        r = simular(datos, { mision: idea.mision, escuadron: escuadronParaMision(datos, p), semilla: idea.mision.semilla, control: idea.control });
+        J.misiones++; J.conPlan += r.victoria ? 1 : 0; J.sinPlan += tonta.victoria ? 1 : 0;
+        if (r.victoria && !tonta.victoria) J.salvadas = (J.salvadas || 0) + 1; if (!r.victoria && tonta.victoria) J.arruinadas = (J.arruinadas || 0) + 1;
+        J.formacion[idea.formacion] = (J.formacion[idea.formacion] || 0) + 1; J.radio[idea.radio] = (J.radio[idea.radio] || 0) + 1;
+      } else r = simular(datos, { mision: p.nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: p.nodo.mision.semilla });
       misiones++; if (r.victoria) ganadasM++;
       { const m = p.nodo.mision; const k2 = p.sector + ":" + (m.objetivo || "-") + ":" + m.plantilla + (m.condiciones && m.condiciones.some((c) => c.startsWith("irrumpe")) ? "+i" : ""); (globalThis.porObj ||= {})[k2] = (globalThis.porObj[k2] || [0, 0]); globalThis.porObj[k2][0] += r.victoria ? 1 : 0; globalThis.porObj[k2][1]++; }
       const k = p.sector + (p.nodo.tipo === "jefe" ? (p.nodo.mision.nemesisJefe ? "N" : "J") : ""); (globalThis.porSector ||= {})[k] = (globalThis.porSector[k] || [0, 0]); globalThis.porSector[k][0] += r.victoria ? 1 : 0; globalThis.porSector[k][1]++;
@@ -69,6 +91,7 @@ for (let n = 0; n < N; n++) {
     }
   }
   if (p.resultado === 'victoria') ganadas++;
+  J.desertores += (p.desertores || []).length;
   for (const k of ['sueldos', 'impagos', 'sucesos', 'noticias']) (globalThis.extra ||= {})[k] = ((globalThis.extra || {})[k] || 0) + ((p.stats && p.stats[k]) || 0);
   (globalThis.extra ||= {}).creditos = (globalThis.extra.creditos || 0) + p.creditos;
   remolques += (p.stats && p.stats.remolques) || 0; combFinal += p.combustible || 0;
@@ -87,6 +110,15 @@ console.log(`pasan el sector 3: ${Math.round((pasaron * 100) / N)}% · mejor sec
 console.log(Object.entries(globalThis.porSector).map(([k,[g,t]])=>k+": "+Math.round(g*100/t)+"% de "+t).join(" · "))
 console.log(`remolques por campana ${(remolques / N).toFixed(1)} · combustible al final ${(combFinal / N).toFixed(1)} · saltos ${(saltos / N).toFixed(0)} · mejoras ${(mejoras / N).toFixed(1)} · emboscadas ${(emboscadas / N).toFixed(1)}`);
 console.log('por campana: ' + Object.entries(globalThis.extra).map(([k, v]) => k + ' ' + (v / N).toFixed(1)).join(' · '));
+if (PIENSA && J.misiones) {
+  const pct = (n) => Math.round((n * 100) / J.misiones) + '%';
+  const tabla = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, v]) => k + ' ' + pct(v)).join(' · ');
+  console.log(`\nPENSAR EL DESPLIEGUE: gana ${pct(J.conPlan)} de las misiones; las mismas batallas sin pensar, ${pct(J.sinPlan)}`);
+  console.log(`de ${J.misiones} misiones: ${J.salvadas || 0} se ganaron gracias al plan (sin pensar se perdían) y ${J.arruinadas || 0} se perdieron por el plan`);
+  console.log('formación elegida: ' + tabla(J.formacion));
+  console.log('órdenes por radio: ' + tabla(J.radio));
+  console.log(`banco: ${(J.banco / N).toFixed(1)} turnos de banco por campaña · desertores ${(J.desertores / N).toFixed(1)} por campaña`);
+}
 if (conLegado) console.log(`legado: ${veteranos} veteranos · ${encuentros} encuentros con el escuadron anterior (${encuentrosGanados} ganados, ${rescates} rescates)`);
 // DETALLE=1: como le fue contra cada bando y tipo de mision, por sector
 if (process.env.DETALLE) console.log(Object.entries(globalThis.porObj).sort().map(([k,[g,t]])=>k+" "+Math.round(g*100/t)+"%/"+t).join("\n"));

@@ -11,7 +11,7 @@ const pasos = [
   ['Pruebas del núcleo', ['tests/core.test.mjs']],
   ['Pruebas del motor y la campaña', ['tests/motor.test.mjs']],
   ['Inventario de arte (informativo)', ['tools/inventario-arte.mjs', '--corto']],
-  !rapido && ['Campañas con piloto automático (10)', ['tools/campana.mjs', '10']],
+  !rapido && ['Campañas con piloto automático (3, pensando el despliegue)', ['tools/campana.mjs', '3']],
   !rapido && ['Navegador en castellano', ['tools/jugar.mjs', '3', 'es']],
   !rapido && ['Navegador en inglés', ['tools/jugar.mjs', '3', 'en']]
 ].filter(Boolean);
