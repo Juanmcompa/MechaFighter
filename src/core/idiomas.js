@@ -1,11 +1,15 @@
 // Idiomas: el castellano esta en los mismos archivos de data/. Cada otro idioma es un archivo
 // data/idiomas/<codigo>.json con solo las traducciones: { "textos": { "<tabla>": { "<ruta>": "texto" } } }.
 // La ruta usa puntos y numeros de posicion: "control_abre.0", "clientes.cooperativa.nombre".
-// Lo que no esta traducido queda en castellano. (Los textos de la interfaz que estan en el codigo, todavia no.)
+// Lo que no esta traducido queda en castellano. Los textos de la interfaz que estan en el codigo: core/traducir.js.
 
 // Tablas con textos para el jugador (las que se editan en el taller)
 export const TABLAS_DE_TEXTO = ['textos', 'charlas', 'voces', 'lore', 'nemesis', 'misiones', 'sectores', 'dilemas',
-  'condiciones_mision', 'estados', 'personalidades', 'clases', 'partes', 'habilidades', 'enemigos', 'traumas', 'gambits'];
+  'condiciones_mision', 'estados', 'personalidades', 'clases', 'partes', 'habilidades', 'enemigos', 'traumas', 'gambits',
+  'bandos', 'nodriza', 'medallas', 'cicatrices', 'afijos', 'reglas', 'generador_mapas', 'nombres'];
+
+// De estas tablas solo se traduce una parte (en nombres: los apodos y los nombres de mecha, no los nombres de pila)
+export const SOLO_RUTAS = { nombres: /^(apodos|mechas|apellidos_alien)\./ };
 
 // Un texto para el jugador (no un id): tiene espacios, mayusculas, tildes o signos
 export const esTexto = (s) => typeof s === 'string' && s.length > 0 && (/\s/.test(s) || /[A-ZÁÉÍÓÚÑ¡¿«]/.test(s));

@@ -9,9 +9,12 @@ const CARPETAS = ['src/ui', 'src/vista', 'src/campana'];
 const NO_ES_TEXTO = /(class|clase|iconoNombre|role|type|tipo|estado|pestana|modo|accion|condicion|objetivo|encaje|rareza|color|fondo|cursor|display|sel)\s*[:=]=?=?\s*$|(querySelector(All)?|closest|getElementById|classList\.\w+|addEventListener|setAttribute|getAttribute|dataset\.\w+|startsWith|endsWith|includes|split|join|replace|ico|icono|iconoParte|retrato|existeIcono|derivar|azarAparte|azarDe|tirada|elegir|import|from|case|===|!==)\s*\(?\s*$/;
 
 const esTexto = (s) => /[A-Za-zÁÉÍÓÚáéíóúñÑ]/.test(s) &&
-  (/\s/.test(s.trim()) || /[A-ZÁÉÍÓÚÑ¡¿«»·…:!?.,]/.test(s) || /[áéíóúñ]/.test(s)) &&
-  !/^[.#\[]/.test(s) && !/<\w/.test(s) && !/^(\.\/|\/|https?:)/.test(s) && !/\.(png|json|js|css|svg)$/.test(s) &&
-  !/^#[0-9a-f]{3,8}$/i.test(s) && !/\.v\d+$/.test(s) && !/^[IVX]+$/.test(s) && !/^(rgba?|hsla?)\(/.test(s) && !/^[a-z0-9_-]+(\s+[a-z0-9_-]+)*$/.test(s); // (lista de clases)
+  (/\s/.test(s.trim()) || (/^\s|\s$/.test(s) && CASTELLANO.test(s)) || /[A-ZÁÉÍÓÚÑ¡¿«»·…:!?.,]/.test(s) || /[áéíóúñ]/.test(s)) &&
+  !/^([.#][\w-]|\[)/.test(s) && !/<\w/.test(s) && !/^(\.\/|\/|https?:)/.test(s) && !/\.(png|json|js|css|svg)$/.test(s) &&
+  !/^#[0-9a-f]{3,8}$/i.test(s) && !/\.v\d+$/.test(s) && !/^[IVX]+$/.test(s) && !/^(rgba?|hsla?)\(/.test(s) &&
+  // todo en minusculas y con guiones: parece una lista de clases, salvo que sea castellano (palabras de la lista o pedazo con espacios en los bordes)
+  (!/^[a-z0-9_-]+(\s+[a-z0-9_-]+)*$/.test(s) || /^\s.*\s$|^\s|\s$/.test(s) || CASTELLANO.test(s));
+const CASTELLANO = /\b(de|del|la|las|el|los|sin|con|por|para|que|una?|y|o|en|al|se|lo|le|su|sus|mas|hay|ya|no|ni|pieza|piezas|vez|veces|baja|bajas|explorar|salto|saltos|nivel|turno|turnos|piloto|pilotos|mecha|mechas|dias?|mision|misiones)\b/;
 
 const catalogo = {};
 for (const dir of CARPETAS) {

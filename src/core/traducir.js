@@ -10,7 +10,11 @@ let PEDAZOS = [];     // [original, nuevo] de pedazos que se arman pegando parte
 export function cargarInterfaz(...mapas) {
   EXACTOS = Object.assign({}, ...mapas.filter(Boolean));
   if (!Object.keys(EXACTOS).length) { EXACTOS = null; PEDAZOS = []; return; }
-  PEDAZOS = Object.entries(EXACTOS).filter(([o, n]) => n && o.trim().length >= 3 && o !== n).sort((a, b) => b[0].length - a[0].length);
+  // cada pedazo se busca como palabra entera: "Moral" no se toca adentro de "Morale" (ya traducido).
+  // Los cortos solo si van entre espacios (' de ', ' y '): conectores de textos pegados.
+  const escapar = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  PEDAZOS = Object.entries(EXACTOS).filter(([o, n]) => n && o !== n && (o.trim().length >= 3 || /^\s.*\S.*\s$/.test(o))).sort((a, b) => b[0].length - a[0].length)
+    .map(([o, n]) => [new RegExp((/^\p{L}/u.test(o) ? '(?<!\\p{L})' : '') + escapar(o) + (/\p{L}$/u.test(o) ? '(?!\\p{L})' : ''), 'gu'), n]);
 }
 
 // El texto en el idioma elegido (o el mismo, si no hay cambio para el)
@@ -20,6 +24,6 @@ export function tr(s) {
   if (exacto) return exacto;
   // textos armados pegando pedazos: se cambia cada pedazo conocido que aparezca entero
   let out = s;
-  for (const [o, n] of PEDAZOS) if (out.includes(o)) out = out.split(o).join(n);
+  for (const [re, n] of PEDAZOS) { re.lastIndex = 0; if (re.test(out)) out = out.replace(re, () => n); }
   return out;
 }

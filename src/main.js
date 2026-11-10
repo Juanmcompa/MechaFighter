@@ -16,13 +16,18 @@ function linea(texto, clase = '') {
   registro.appendChild(li);
 }
 
+// (los mensajes de carga salen antes de tener la traduccion: se elige aca, con lo mismo que usa arrancar)
+const INGLES = (() => { let c = new URLSearchParams(location.search).get('idioma'); try { c = c || localStorage.getItem('mechafighter.idioma'); } catch { /* sin guardado */ } return (c || (/^es\b/i.test(navigator.language || '') ? 'es' : 'en')) === 'en'; })();
+
 async function arrancar() {
   let datos;
   try {
-    linea('Enlazando con el hangar...');
-    // idioma: ?idioma=en en la direccion, o el que quedo elegido (castellano si no hay)
+    linea(INGLES ? 'Linking to the hangar...' : 'Enlazando con el hangar...');
+    // idioma: ?idioma=en en la direccion, o el que quedo elegido; si no, el del navegador (castellano o ingles)
     let idioma = new URLSearchParams(location.search).get('idioma');
     try { if (idioma) localStorage.setItem('mechafighter.idioma', idioma); else idioma = localStorage.getItem('mechafighter.idioma'); } catch { /* sin guardado */ }
+    if (!idioma) idioma = /^es\b/i.test(navigator.language || '') ? 'es' : 'en';
+    document.documentElement.lang = idioma;
     datos = await cargarDatos(leerConFetch(), idioma);
     // textos de la interfaz: cambios al castellano (es.json) y la traduccion del idioma elegido
     const leer = leerConFetch();
@@ -30,7 +35,7 @@ async function arrancar() {
     cargarInterfaz(await opcional('es'), idioma && idioma !== 'es' ? await opcional(idioma) : null);
   } catch (e) {
     linea(e.message, 'error');
-    if (location.protocol === 'file:') linea('Abrí el juego con un servidor local (ver README).', 'aviso');
+    if (location.protocol === 'file:') linea(INGLES ? 'Open the game from a local server (see README).' : 'Abrí el juego con un servidor local (ver README).', 'aviso');
     return;
   }
   const errores = validarDatos(datos);
@@ -39,7 +44,7 @@ async function arrancar() {
     for (const e of errores) linea(e, 'error');
     return;
   }
-  linea('Calibrando sensores...');
+  linea(INGLES ? 'Calibrating sensors...' : 'Calibrando sensores...');
   await Promise.all([cargarSprites('./', (datos.reglas.arte || {}).retratos || 0, { extras: Object.fromEntries(Object.values(datos.partes).map((p) => [p.sprite, p.encaje])), colorEquipo: (datos.reglas.arte || {}).color_equipo }), cargarTerreno('./'), cargarUnidades('./', (datos.reglas.arte || {}).color_equipo), cargarLuces('./')]);
   const app = crearApp(datos, raiz);
   window.mechafighter = app; // para las pruebas y para mirar desde la consola

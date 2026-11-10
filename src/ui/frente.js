@@ -4,6 +4,7 @@
 import { h, montar, ico, botonIcono, barraJuego } from './comun.js';
 import { quien, duenoEn, reputacion, escalonDe, contagioPct, nodoActual, guaridaAbierta, textoReputacion } from '../campana/brujula.js';
 import { barraFrente } from './sectores.js';
+import { tr } from '../core/traducir.js';
 
 const HEX = 0.62; // radio de cada hexagono, en saltos
 
@@ -69,7 +70,7 @@ export function frente(app, raiz) {
   const lado = Math.max(9, x1 - x0, y1 - y0);
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   x0 = cx - lado / 2; y0 = cy - lado / 2;
-  const svg = `<svg viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${lado.toFixed(2)} ${lado.toFixed(2)}" width="100%" height="100%" role="img" aria-label="Lo escaneado del sector: territorios de cada bando, contagio, nidos, paradas, la ruta de la nave y la guarida del jefe">` +
+  const svg = `<svg viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${lado.toFixed(2)} ${lado.toFixed(2)}" width="100%" height="100%" role="img" aria-label="${tr('Lo escaneado del sector: territorios de cada bando, contagio, nidos, paradas, la ruta de la nave y la guarida del jefe')}">` +
     `<defs>${tramas}</defs><circle cx="0" cy="0" r="${R}" fill="none" stroke="#2d3427" stroke-width=".05" stroke-dasharray=".2 .3"/>` +
     borde.join('') + hexes.join('') + ruta + marcas.join('') + nave + etiquetas + texto(x0 + lado - 0.2, y0 + lado - 0.25, sigNombre + ' →', '#78846c', 'end', 0.5) + '</svg>';
 

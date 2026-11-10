@@ -370,3 +370,9 @@ details.seccion > *:not(summary) { margin: 0 10px 10px; }
   .noticias-tira + .noticias-tira { display: none; }
   .noticias-ventana { overflow-x: auto; }
 }
+
+/* Selector de idioma (portada) */
+.idiomas { display: flex; justify-content: center; gap: 6px; margin: 10px 0 4px; }
+.idioma { font: 17px/1 VT323, monospace; padding: 8px 14px; min-height: 40px; background: none; color: var(--texto-tenue); border: 1px solid var(--chapa-borde, #2d3427); cursor: pointer; }
+.idioma.activo { color: var(--fosforo, #8fdc5a); border-color: var(--fosforo, #8fdc5a); }
+.idioma:focus-visible { outline: 2px solid var(--fosforo, #8fdc5a); outline-offset: 2px; }

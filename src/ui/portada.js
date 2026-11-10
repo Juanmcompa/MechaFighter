@@ -48,15 +48,35 @@ export function portada(app, raiz) {
         h('ol', { class: 'pasos' },
           h('li', {}, h('strong', {}, 'Elegí un contrato'), ' en el mapa del sector.'),
           h('li', {}, h('strong', {}, 'En el hangar'), ' cambiá partes y programá cada mecha: SI pasa algo → HACÉ algo.'),
-          h('li', {}, h('strong', {}, 'Mirá la batalla.'), ' No hay control: lo que programaste, y lo que el piloto decida, es lo que pasa.'),
+          h('li', {}, h('strong', {}, 'Vos sos Control.'), ' Elegí dónde baja cada uno y dales órdenes por radio. El resto lo deciden lo que programaste y el carácter de cada piloto.'),
           h('li', {}, h('strong', {}, 'Cuidá a tu gente.'), ' Ganan experiencia, cicatrices y medallas. La muerte es permanente.'))),
-      h('p', { class: 'firma' }, 'App en desarrollo · Early Access')));
+      h('p', { class: 'firma' }, 'App en desarrollo · Early Access'),
+      selectorIdioma()));
+}
+
+// Castellano o ingles: queda guardado y se recarga (los datos se traducen al cargar)
+function selectorIdioma() {
+  const actual = document.documentElement.lang === 'en' ? 'en' : 'es';
+  const elegir = (c) => {
+    try { localStorage.setItem('mechafighter.idioma', c); } catch { /* sin guardado */ }
+    // (si la direccion trae ?idioma=, manda sobre lo guardado: se cambia ahi tambien)
+    const u = new URL(location.href);
+    if (u.searchParams.has('idioma')) { u.searchParams.set('idioma', c); location.replace(u); } else location.reload();
+  };
+  return h('div', { class: 'idiomas', role: 'group', 'aria-label': 'Idioma' },
+    ...[['es', 'Español'], ['en', 'English']].map(([c, n]) => {
+      const b = h('button', { class: 'idioma' + (c === actual ? ' activo' : ''), 'aria-pressed': c === actual ? 'true' : 'false', lang: c,
+        onclick: () => { if (c !== actual) elegir(c); } });
+      b.textContent = n; // (el nombre de cada idioma no se traduce)
+      return b;
+    }));
 }
 
 // Cinta de noticias arriba de todo: las ultimas versiones pasando de derecha a izquierda (data/version.json)
 function noticias(datos) {
   const V = datos.version;
-  if (!V) return null;
+  // los titulos de los commits estan en castellano: en otro idioma la cinta no se muestra (quedaria mitad y mitad)
+  if (!V || (document.documentElement.lang || 'es') !== 'es') return null;
   const lista = V.novedades && V.novedades.length ? V.novedades : ['v' + version(datos) + ' · ' + V.cambio];
   // dos copias seguidas: cuando la primera termina de pasar, la segunda ocupa su lugar y no se nota el salto
   const tira = () => h('span', { class: 'noticias-tira' }, ...lista.map((t) => {

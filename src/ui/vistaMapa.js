@@ -1,6 +1,7 @@
 // Dibujo esquematico de un mapa (para el arranque y, mas adelante, para la preparacion de la mision).
 // No es el render de batalla (eso es src/vista/): es un plano, como el de una mesa de operaciones.
 import { TER } from '../vista/sprites.js';
+import { tr } from '../core/traducir.js';
 import { dibujarMapa as mapaConArte } from '../vista/dibujo.js';
 
 export const COLORES_CASILLA = {
@@ -47,7 +48,8 @@ export function dibujarMapa(canvas, mapa) {
   ctx.strokeStyle = '#e0a43a';
   ctx.font = Math.max(10, lado - 4) + 'px VT323, monospace';
   ctx.fillStyle = '#e0a43a';
-  for (const [nombre, [[x1, y1], [x2, y2]]] of Object.entries(mapa.zonas || {})) {
+  for (const [clave, [[x1, y1], [x2, y2]]] of Object.entries(mapa.zonas || {})) {
+    const nombre = tr(clave);
     ctx.strokeRect(x1 * lado + 1, y1 * lado + 1, (x2 - x1 + 1) * lado - 2, (y2 - y1 + 1) * lado - 2);
     // el rotulo arriba de la zona; si no entra, abajo. Y nunca afuera del mapa por los costados.
     const tx = Math.min(x1 * lado + 2, canvas.width - ctx.measureText(nombre).width - 2);

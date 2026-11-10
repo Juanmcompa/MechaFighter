@@ -3,6 +3,7 @@
 //   Armado: el mecha caminando con sus 6 lugares alrededor; tocar uno abre la lista de piezas, de la mejor a la peor.
 //   Ordenes: perfiles de un toque y cada orden como una fila de iconos (cuando > que > a quien).
 //   Info: la ficha del piloto (se llega tocando su nombre).
+import { tr } from '../core/traducir.js';
 import { h, montar, ico, boton, botonIcono, panel, chip, barra, describirParte, nombrePieza, textoPersonalidad, retrato, NOMBRE_RAREZA, iconoParte, origenParte } from './comun.js';
 import { unidadDePiloto, pesoMecha, normalizarPieza } from '../motor/unidades.js';
 import { dibujarMechaFicha, dibujarMechaVisor } from '../vista/dibujo.js';
@@ -548,7 +549,7 @@ function vistaOrdenes(ctx) {
       const nombre = !o ? '?' : campo === 'condicion' ? textoCondicion(o, g.parametros) : o.texto;
       return h('button', {
         class: 'or-ficha or-' + campo + (elegida ? ' elegida' : '') + (bloq ? ' bloqueada' : ''),
-        'aria-label': nombreTipo[0].toUpperCase() + nombreTipo.slice(1) + ': ' + nombre + (bloq ? ' (le falta ' + bloq + ')' : ''), title: nombre,
+        'aria-label': tr(nombreTipo)[0].toUpperCase() + tr(nombreTipo).slice(1) + ': ' + nombre + (bloq ? ' (le falta ' + bloq + ')' : ''), title: nombre,
         onclick: () => { ORDEN.abierta = i; ORDEN.paso = campo; pintar(); }
       }, ico(o && existeIcono(o.icono) ? o.icono : 'evento'), campo === 'condicion' && o ? h('small', {}, marcaParametro(o, g.parametros)) : null,
       bloq ? h('span', { class: 'or-candado' }, ico('candado')) : null);
