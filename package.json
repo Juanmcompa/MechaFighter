@@ -10,5 +10,8 @@
     "datos": "node tools/validar-datos.mjs",
     "revisar": "node tools/revisar.mjs",
     "jugar": "node tools/jugar.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
   }
 }
