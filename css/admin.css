@@ -70,3 +70,28 @@ textarea.mal { border-color: var(--alarma); }
 .boton.peligro { background: #2a0f0b; border-color: var(--alarma); color: var(--alarma); }
 input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--fosforo); vertical-align: middle; }
 .tl-config label:has(input[type=checkbox]) { display: flex; gap: 6px; align-items: center; }
+
+/* Taller > Arte: inventario */
+.ar-resumen { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 8px; }
+.ar-numero { display: grid; padding: 6px 10px; border: 1px solid var(--chapa-borde); background: #0b120d; }
+.ar-numero strong { font: 400 30px/1 'Pixelify Sans', sans-serif; color: var(--texto); }
+.ar-numero span { font-size: 14px; color: var(--texto-tenue); }
+.ar-numero.bien strong { color: var(--fosforo); } .ar-numero.ambar strong { color: var(--ambar); } .ar-numero.mal strong { color: var(--alarma); }
+.tl-arte .tl-controles .pestana { min-height: 36px; padding: 4px 10px; font-size: 16px; }
+.ar-rollo { overflow-x: auto; margin-top: 8px; }
+.ar-tabla { width: 100%; border-collapse: collapse; font-size: 16px; }
+.ar-tabla th { text-align: left; color: var(--fosforo); font-weight: 400; padding: 4px 6px; border-bottom: 1px solid var(--chapa-borde); white-space: nowrap; }
+.ar-tabla td { padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
+.ar-tabla td small { display: block; font-size: 13px; color: var(--texto-tenue); }
+.ar-tabla tr.con-aviso td:first-child { box-shadow: inset 3px 0 0 var(--ambar); }
+.ar-celda { text-align: center; width: 56px; }
+.ar-mini { width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; background: #141d16; border: 1px solid var(--chapa-borde); }
+.ar-falta { color: var(--alarma); font-size: 20px; } .ar-no { color: var(--texto-tenue); }
+.ar-estado { display: inline-block; padding: 0 6px; margin-right: 4px; border: 1px solid var(--chapa-borde); font-size: 14px; color: var(--texto-tenue); white-space: nowrap; }
+.ar-estado.bien { color: var(--fosforo); border-color: #3f6b2a; } .ar-estado.ambar { color: var(--ambar); border-color: #6b5a26; } .ar-estado.mal { color: var(--alarma); border-color: #7e2a22; }
+.ar-avisos p { margin: 0; font-size: 14px; color: var(--ambar); }
+.ar-lista { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+.tl-arte { min-width: 0; display: grid; gap: 12px; }
+.tl-arte .panel { min-width: 0; }
+.tl-arte .tl-controles select { width: auto; flex: 0 1 200px; }
+.tl-arte .tl-controles input[type=search] { width: auto; flex: 1 1 180px; }

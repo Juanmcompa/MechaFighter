@@ -111,3 +111,18 @@ export async function listarJSON(rutaDir) {
   for await (const [nombre, h] of dir.entries()) if (h.kind === 'file' && nombre.endsWith('.json')) out.push(nombre.slice(0, -5));
   return out;
 }
+
+// Todas las rutas de archivos de una carpeta del proyecto y sus subcarpetas ('assets/iconos/brazo_rifle.png'...)
+export async function listarTodo(rutaDir) {
+  if (!carpeta) return null;
+  let dir = carpeta;
+  try { for (const p of rutaDir.split('/').filter(Boolean)) dir = await dir.getDirectoryHandle(p); } catch { return null; }
+  const out = [];
+  const recorrer = async (d, ruta) => {
+    for await (const [nombre, h] of d.entries()) {
+      if (h.kind === 'directory') await recorrer(h, ruta + '/' + nombre); else out.push(ruta + '/' + nombre);
+    }
+  };
+  await recorrer(dir, rutaDir);
+  return out;
+}

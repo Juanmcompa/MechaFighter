@@ -1,6 +1,7 @@
 // Taller del desarrollador (admin.html): una herramienta local para auditar antes de publicar.
 //  - Batalla de prueba: armar un escuadron y enemigos a mano y mirar la pelea.
 //  - Sprites: ver cada pieza montada en el mecha, girarla, animarla, y probar el arte nuevo desde una carpeta.
+//  - Arte: inventario de lo que hay en assets/ contra lo que piden los datos (que falta, que es prestado, que sobra).
 //  - Datos: ABM de piezas, enemigos, clases... con validacion antes de guardar.
 //  - Textos: todas las frases del juego, editables, con columnas por idioma.
 // Lee y escribe los archivos del proyecto (Chrome/Edge). Sin carpeta elegida, "Guardar" descarga el archivo.
@@ -14,6 +15,7 @@ import { pestanaBatalla } from './batalla.js';
 import { pestanaVisor } from './visor.js';
 import { pestanaDatos } from './datos.js';
 import { pestanaTextos } from './textos.js';
+import { pestanaArte } from './arte.js';
 
 const raiz = document.getElementById('taller');
 
@@ -78,6 +80,7 @@ function avisar(texto, clase = '') {
 const PESTANAS = [
   ['batalla', 'Batalla de prueba', 'espadas', pestanaBatalla],
   ['visor', 'Sprites', 'hangar', pestanaVisor],
+  ['arte', 'Arte', 'estrella', pestanaArte],
   ['datos', 'Piezas y datos', 'llave', pestanaDatos],
   ['textos', 'Textos e idiomas', 'menu', pestanaTextos]
 ];
