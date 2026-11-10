@@ -196,12 +196,21 @@ export function correrFrente(datos, s, gana, pierde, n) {
   return movido;
 }
 
+// Lo que cambia en este sector: suma de sus rasgos (sectores.json) y de la noticia que este corriendo (bandos.json)
+export function modSector(s, clave) {
+  if (!s) return 0;
+  let n = 0;
+  for (const r of s.rasgos || []) n += (r.efectos && r.efectos[clave]) || 0;
+  if (s.noticia && s.noticia.mods && s.noticia.hasta > s.saltos) n += s.noticia.mods[clave] || 0;
+  return n;
+}
+
 // En cada salto la guerra sigue: el frente se mueve un poco y el contagio crece
 export function pasaElTiempo(datos, s, az) {
   const F = datos.bandos.frente;
   if (s.bandos.length > 1 && F.deriva_por_salto) {
     const gana = az.elegir(s.bandos);
-    correrFrente(datos, s, gana, az.elegir(s.bandos.filter((b) => b !== gana)), F.deriva_por_salto);
+    correrFrente(datos, s, gana, az.elegir(s.bandos.filter((b) => b !== gana)), F.deriva_por_salto + modSector(s, 'deriva'));
   }
   for (const a of s.amenazas) {
     const A = datos.bandos.amenazas[a.tipo];

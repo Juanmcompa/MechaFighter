@@ -408,7 +408,7 @@
       "partes": [
         "brazo_aguijon",
         "piernas_quitina",
-        "torso_caparazon"
+        "torso_caparazon_vivo"
       ]
     },
     "contagio": {
@@ -507,7 +507,7 @@
     "jefe_cae": 20
   },
   "brujula": {
-    "_ayuda": "Los destinos alrededor de la nave. radio_sector: tamano del sector (en saltos de 1). visible: hasta que distancia se ven los nodos ya conocidos. tipos: pesos de lo que aparece en un destino nuevo. vence: en cuantos saltos se va un contrato que no tomaste.",
+    "_ayuda": "Los destinos alrededor de la nave. radio_sector: tamano del sector (en saltos de 1). visible: hasta que distancia se ven los nodos ya conocidos. tipos: pesos de lo que aparece en un destino nuevo. vence: en cuantos saltos se va un contrato que no tomaste. suceso_chance: % de que pase algo en un salto (un dilema con 'viaje' de dilemas.json), antes de llegar.",
     "radio_sector": 9,
     "visible": 3.3,
     "maximo": 6,
@@ -541,7 +541,8 @@
       "desde_distancia": 3,
       "chance": 25,
       "danio_pct": 10
-    }
+    },
+    "suceso_chance": 22
   },
   "renombre": {
     "_ayuda": "Como se conoce a la compania segun su puntaje (desde: puntaje minimo). Se ve en la pantalla de Compania.",
@@ -594,5 +595,98 @@
     ],
     "premio": 80,
     "desde_mision": 3
+  },
+  "noticias": {
+    "_ayuda": "Noticias del sector: cada 'cada' saltos pasa algo en todo el sector. 'requiere': amenaza (viva en el sector) o bandos (minimo). Efectos: 'frente' (un bando le saca ese % a otro), 'amenaza' {tipo, crece} (se agranda), 'reputacion' (sube con el bando que peor te ve), 'mods' durante 'dura' saltos (precio_combustible_pct, precio_partes_pct, pago_pct, sueldos_pct, deriva). {bando} y {otro} se reemplazan.",
+    "cada": 4,
+    "lista": {
+      "ofensiva": {
+        "titulo": "Ofensiva",
+        "texto": "{bando} lanzó una ofensiva y le sacó terreno a {otro}.",
+        "peso": 10,
+        "requiere": {
+          "bandos": 2
+        },
+        "frente": 8
+      },
+      "enjambre": {
+        "titulo": "Los nidos crecen",
+        "texto": "La fauna salió a comer: los nidos alcanzan más lejos.",
+        "peso": 6,
+        "requiere": {
+          "amenaza": "fauna"
+        },
+        "amenaza": {
+          "tipo": "fauna",
+          "crece": 0.8
+        }
+      },
+      "brote": {
+        "titulo": "Brote",
+        "texto": "Una colonia entera cayó en una noche. El contagio avanza.",
+        "peso": 6,
+        "requiere": {
+          "amenaza": "contagio"
+        },
+        "amenaza": {
+          "tipo": "contagio",
+          "crece": 0.9
+        }
+      },
+      "escasez": {
+        "titulo": "Escasez de combustible",
+        "texto": "Reventó una refinería. El combustible sale más caro por un tiempo.",
+        "peso": 8,
+        "dura": 4,
+        "mods": {
+          "precio_combustible_pct": 50
+        }
+      },
+      "bonanza": {
+        "titulo": "Se calienta la guerra",
+        "texto": "Todos quieren mercenarios ya: los contratos nuevos pagan más.",
+        "peso": 8,
+        "dura": 4,
+        "mods": {
+          "pago_pct": 25
+        }
+      },
+      "saldos": {
+        "titulo": "Saldos de guerra",
+        "texto": "Sobra chatarra de la última batalla: las piezas salen más baratas.",
+        "peso": 7,
+        "dura": 4,
+        "mods": {
+          "precio_partes_pct": -25
+        }
+      },
+      "amnistia": {
+        "titulo": "Amnistía",
+        "texto": "{bando} necesita brazos y perdona viejas cuentas.",
+        "peso": 5,
+        "reputacion": 12
+      },
+      "paro": {
+        "titulo": "Plus de riesgo",
+        "texto": "El gremio de pilotos consiguió un plus por zona caliente: los sueldos suben por un tiempo.",
+        "peso": 5,
+        "dura": 5,
+        "mods": {
+          "sueldos_pct": 30
+        }
+      },
+      "tregua_rota": {
+        "titulo": "Se rompió la tregua",
+        "texto": "Nadie respeta las líneas: el frente se mueve mucho más rápido.",
+        "peso": 5,
+        "requiere": {
+          "bandos": 2
+        },
+        "dura": 5,
+        "mods": {
+          "deriva": 3
+        }
+      }
+    }
   }
 }

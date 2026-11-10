@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Dilemas entre misiones (nodo 'Señal'). Cada opcion tiene 'efectos' o, si lleva 'chance', 'exito' y 'fracaso'. 'requiere' muestra la opcion solo si se cumple: clase en el escuadron, creditos o combustible. Efectos: creditos (numero o [min,max]), combustible, parte (true), danio_mecha {pct, quien: uno|todos}, trauma {chance}, recluta, inteligencia, reparar_todo, xp, afinidad (a todos los pares), cronica (texto para la historia del escuadron). {piloto} se reemplaza por el apodo del elegido.",
+  "_ayuda": "Dilemas entre misiones (nodo 'Señal'). Cada opcion tiene 'efectos' o, si lleva 'chance', 'exito' y 'fracaso'. 'requiere' muestra la opcion solo si se cumple: clase en el escuadron, creditos o combustible. Efectos: creditos (numero o [min,max]), combustible, parte (true), danio_mecha {pct, quien: uno|todos}, trauma {chance}, recluta, inteligencia, reparar_todo, xp, afinidad (a todos los pares), cronica (texto para la historia del escuadron). {piloto} se reemplaza por el apodo del elegido. Los que llevan 'viaje': true no son señales: pasan solos durante un salto (bandos.json > brujula.suceso_chance). Efectos nuevos: reputacion {bando: 'local' o id, d}, malestar {d, quien: uno|todos}, restos (restos de nido). {bando} es el bando que controla la zona.",
   "civiles": {
     "titulo": "Carguero de civiles",
     "texto": "Un transatlántico de civiles pide auxilio: piratas lo están abordando. Meterse cuesta combustible y expone a los pilotos, pero el capitán promete un procesador militar.",
@@ -395,6 +395,565 @@
         "efectos": {
           "texto": "Nadie gana nada, pero se ríen un rato.",
           "afinidad": 5
+        }
+      }
+    ]
+  },
+  "v_averia": {
+    "titulo": "Avería en el reactor",
+    "texto": "A mitad del salto el reactor empieza a toser. Hay que decidir rápido.",
+    "peso": 8,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Parar y arreglarlo con lo que hay",
+        "efectos": {
+          "texto": "Pierden medio día y un tanque en purgar el sistema.",
+          "combustible": -1
+        }
+      },
+      {
+        "texto": "Que lo mire la ingeniera",
+        "requiere": {
+          "clase": "ingeniero"
+        },
+        "efectos": {
+          "texto": "{piloto} lo deja mejor que antes. Y sobró para los mechas.",
+          "reparar_todo": true
+        }
+      },
+      {
+        "texto": "Seguir así y rezar",
+        "chance": 55,
+        "exito": {
+          "texto": "Aguantó. Nadie dice nada hasta llegar."
+        },
+        "fracaso": {
+          "texto": "Una sacudida suelta medio hangar. Los mechas se golpean entre ellos.",
+          "danio_mecha": {
+            "pct": 12,
+            "quien": "todos"
+          }
+        }
+      }
+    ]
+  },
+  "v_polizon": {
+    "titulo": "Polizón",
+    "texto": "Encuentran a alguien escondido en la bodega. Dice que sabe pilotear y que {bando} lo busca.",
+    "peso": 6,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Darle una oportunidad",
+        "chance": 60,
+        "exito": {
+          "texto": "No mentía: sabe pilotear.",
+          "recluta": true
+        },
+        "fracaso": {
+          "texto": "A la mañana no está. Tampoco la caja chica.",
+          "creditos": -40
+        }
+      },
+      {
+        "texto": "Entregarlo a {bando}",
+        "efectos": {
+          "texto": "Lo vienen a buscar. Agradecen sin sonreír.",
+          "reputacion": {
+            "bando": "local",
+            "d": 6
+          },
+          "malestar": {
+            "d": 4,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "Dejarlo en la próxima parada",
+        "efectos": {
+          "texto": "Se baja sin mirar atrás."
+        }
+      }
+    ]
+  },
+  "v_aduana": {
+    "titulo": "Control de {bando}",
+    "texto": "Una patrullera de {bando} les corta el paso: «Inspección. O peaje».",
+    "peso": 9,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Pagar el peaje (40)",
+        "requiere": {
+          "creditos": 40
+        },
+        "efectos": {
+          "texto": "Pasan sin que nadie abra una caja.",
+          "creditos": -40,
+          "reputacion": {
+            "bando": "local",
+            "d": 3
+          }
+        }
+      },
+      {
+        "texto": "Dejar que inspeccionen",
+        "chance": 65,
+        "exito": {
+          "texto": "Revisan por arriba y los dejan ir."
+        },
+        "fracaso": {
+          "texto": "«Esto queda decomisado.» Se llevan combustible.",
+          "combustible": -2
+        }
+      },
+      {
+        "texto": "Acelerar y pasar",
+        "chance": 50,
+        "exito": {
+          "texto": "Los pierden entre los escombros. Van a acordarse.",
+          "reputacion": {
+            "bando": "local",
+            "d": -5
+          }
+        },
+        "fracaso": {
+          "texto": "Les meten dos ráfagas antes de perderlos.",
+          "danio_mecha": {
+            "pct": 10,
+            "quien": "todos"
+          },
+          "reputacion": {
+            "bando": "local",
+            "d": -10
+          }
+        }
+      }
+    ]
+  },
+  "v_escombros": {
+    "titulo": "Campo de escombros",
+    "texto": "El camino corto pasa por los restos de una batalla vieja. Algo brilla ahí adentro.",
+    "peso": 8,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Rodearlo",
+        "efectos": {
+          "texto": "Más largo, más seguro.",
+          "combustible": -1
+        }
+      },
+      {
+        "texto": "Cruzar y revolver",
+        "chance": 60,
+        "exito": {
+          "texto": "{piloto} vuelve con algo que todavía sirve.",
+          "parte": true
+        },
+        "fracaso": {
+          "texto": "Un casco viejo se les viene encima.",
+          "danio_mecha": {
+            "pct": 12,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "Cruzar sin tocar nada",
+        "efectos": {
+          "texto": "Pasan despacio, con las luces apagadas."
+        }
+      }
+    ]
+  },
+  "v_pelea": {
+    "titulo": "Pelea en el comedor",
+    "texto": "Dos pilotos se agarraron a trompadas por una pavada. El resto mira a ver qué hace Control.",
+    "peso": 7,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Sancionarlos",
+        "efectos": {
+          "texto": "Orden hay. Ganas, menos.",
+          "malestar": {
+            "d": 6,
+            "quien": "todos"
+          },
+          "afinidad": 1
+        }
+      },
+      {
+        "texto": "Pagar una ronda para todos (30)",
+        "requiere": {
+          "creditos": 30
+        },
+        "efectos": {
+          "texto": "A la segunda vuelta ya se están riendo.",
+          "creditos": -30,
+          "malestar": {
+            "d": -10,
+            "quien": "todos"
+          },
+          "afinidad": 1
+        }
+      },
+      {
+        "texto": "Que lo arreglen entre ellos",
+        "efectos": {
+          "texto": "Lo arreglan. Más o menos.",
+          "afinidad": -1
+        }
+      }
+    ]
+  },
+  "v_adelanto": {
+    "titulo": "Un adelanto",
+    "texto": "{piloto} pide un adelanto del sueldo. No dice para qué.",
+    "peso": 7,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Dárselo (40)",
+        "requiere": {
+          "creditos": 40
+        },
+        "efectos": {
+          "texto": "{piloto} no se olvida de estas cosas.",
+          "creditos": -40,
+          "malestar": {
+            "d": -25,
+            "quien": "uno"
+          }
+        }
+      },
+      {
+        "texto": "Decirle que no",
+        "efectos": {
+          "texto": "{piloto} se va sin saludar.",
+          "malestar": {
+            "d": 12,
+            "quien": "uno"
+          }
+        }
+      }
+    ]
+  },
+  "v_vendedor": {
+    "titulo": "Lancha de un buhonero",
+    "texto": "Una lancha se les pega al casco. «¡Ofertas! ¡Solo por este salto!»",
+    "peso": 8,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Caja cerrada (70)",
+        "requiere": {
+          "creditos": 70
+        },
+        "efectos": {
+          "texto": "Adentro hay una pieza. Cuál, se ve en el hangar.",
+          "creditos": -70,
+          "parte": true
+        }
+      },
+      {
+        "texto": "Dos tanques de combustible (25)",
+        "requiere": {
+          "creditos": 25
+        },
+        "efectos": {
+          "texto": "Huele raro, pero quema.",
+          "creditos": -25,
+          "combustible": 2
+        }
+      },
+      {
+        "texto": "No, gracias",
+        "efectos": {
+          "texto": "«¡Ustedes se lo pierden!»"
+        }
+      }
+    ]
+  },
+  "v_llamarada": {
+    "titulo": "Llamarada",
+    "texto": "Los sensores avisan de una llamarada solar justo en la ruta.",
+    "peso": 7,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Apagar todo y esperar",
+        "efectos": {
+          "texto": "Doce horas a oscuras y con frío. Nadie está contento.",
+          "malestar": {
+            "d": 5,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "Atravesarla",
+        "chance": 55,
+        "exito": {
+          "texto": "Pasan antes del pico. En la estática se cuela una transmisión del enemigo.",
+          "inteligencia": 1
+        },
+        "fracaso": {
+          "texto": "Se fríe media electrónica de los mechas.",
+          "danio_mecha": {
+            "pct": 15,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "Rodearla",
+        "requiere": {
+          "combustible": 2
+        },
+        "efectos": {
+          "texto": "Un rodeo largo.",
+          "combustible": -1
+        }
+      }
+    ]
+  },
+  "v_carguero": {
+    "titulo": "Carguero a la deriva",
+    "texto": "Un carguero sin luces, con marcas de cuarentena pintadas a mano en el casco.",
+    "peso": 6,
+    "desde": 2,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Abordarlo",
+        "chance": 50,
+        "exito": {
+          "texto": "Vacío de gente, lleno de carga.",
+          "creditos": [
+            60,
+            120
+          ],
+          "parte": true
+        },
+        "fracaso": {
+          "texto": "No estaba vacío. {piloto} sale, pero no vuelve igual.",
+          "danio_mecha": {
+            "pct": 25,
+            "quien": "uno"
+          },
+          "trauma": {
+            "chance": 60
+          }
+        }
+      },
+      {
+        "texto": "Quemarlo desde lejos",
+        "efectos": {
+          "texto": "Un foco menos. {bando} toma nota.",
+          "reputacion": {
+            "bando": "local",
+            "d": 4
+          }
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "efectos": {
+          "texto": "Nadie mira por la ventana."
+        }
+      }
+    ]
+  },
+  "v_auxilio": {
+    "titulo": "La competencia pide auxilio",
+    "texto": "Una nave de otra compañía de mercenarios, sin motor. Piden remolque por radio abierta.",
+    "peso": 6,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Remolcarlos",
+        "requiere": {
+          "combustible": 2
+        },
+        "efectos": {
+          "texto": "Pagan lo que tienen. Hoy por ti, mañana por mí.",
+          "combustible": -1,
+          "creditos": 50,
+          "afinidad": 1
+        }
+      },
+      {
+        "texto": "Saquearlos",
+        "chance": 60,
+        "exito": {
+          "texto": "No estaban en condiciones de discutir.",
+          "creditos": [
+            40,
+            80
+          ],
+          "parte": true,
+          "malestar": {
+            "d": 4,
+            "quien": "todos"
+          }
+        },
+        "fracaso": {
+          "texto": "Todavía les andaban las torretas.",
+          "danio_mecha": {
+            "pct": 12,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "Hacerse los sordos",
+        "efectos": {
+          "texto": "La radio sigue pidiendo un rato largo."
+        }
+      }
+    ]
+  },
+  "v_atajo": {
+    "titulo": "Corredor viejo",
+    "texto": "El mapa marca un corredor minero abandonado. Si sigue abierto, ahorra combustible.",
+    "peso": 8,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Probar el corredor",
+        "chance": 65,
+        "exito": {
+          "texto": "Abierto de punta a punta.",
+          "combustible": 2
+        },
+        "fracaso": {
+          "texto": "Derrumbado a la mitad. Hay que volver, raspando las paredes.",
+          "combustible": -1,
+          "danio_mecha": {
+            "pct": 8,
+            "quien": "todos"
+          }
+        }
+      },
+      {
+        "texto": "La ruta de siempre",
+        "efectos": {
+          "texto": "Sin sorpresas."
+        }
+      }
+    ]
+  },
+  "v_cumple": {
+    "titulo": "Cumpleaños a bordo",
+    "texto": "Es el cumpleaños de {piloto}. Alguien sugiere parar a festejar.",
+    "peso": 6,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Festejo como se debe (25)",
+        "requiere": {
+          "creditos": 25
+        },
+        "efectos": {
+          "texto": "Torta de ración y música fea. Hacía falta.",
+          "creditos": -25,
+          "malestar": {
+            "d": -12,
+            "quien": "todos"
+          },
+          "afinidad": 1
+        }
+      },
+      {
+        "texto": "No hay tiempo",
+        "efectos": {
+          "texto": "{piloto} dice que no importa.",
+          "malestar": {
+            "d": 8,
+            "quien": "uno"
+          }
+        }
+      }
+    ]
+  },
+  "v_soplon": {
+    "titulo": "Un soplón",
+    "texto": "Un transportista dice tener datos frescos sobre el jefe del sector. No son gratis.",
+    "peso": 7,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Comprar los datos (50)",
+        "requiere": {
+          "creditos": 50
+        },
+        "efectos": {
+          "texto": "Coordenadas, horarios, nombres. Sirve.",
+          "creditos": -50,
+          "inteligencia": 1
+        }
+      },
+      {
+        "texto": "Regatear",
+        "chance": 45,
+        "exito": {
+          "texto": "Los suelta por nada: le caen mal.",
+          "inteligencia": 1
+        },
+        "fracaso": {
+          "texto": "Se ofende y corta."
+        }
+      },
+      {
+        "texto": "No interesa",
+        "efectos": {
+          "texto": "«Después no digan que no avisé.»"
+        }
+      }
+    ]
+  },
+  "v_quitina": {
+    "titulo": "Nube de quitina",
+    "texto": "La nave atraviesa los restos de una muda de fauna. En las paradas pagan por eso para mejorar naves.",
+    "peso": 5,
+    "desde": 1,
+    "viaje": true,
+    "opciones": [
+      {
+        "texto": "Salir a juntar",
+        "chance": 60,
+        "exito": {
+          "texto": "{piloto} vuelve con las bodegas llenas.",
+          "restos": 1
+        },
+        "fracaso": {
+          "texto": "No todo estaba muerto.",
+          "danio_mecha": {
+            "pct": 20,
+            "quien": "uno"
+          }
+        }
+      },
+      {
+        "texto": "Pasar de largo",
+        "efectos": {
+          "texto": "Mejor no tentar."
         }
       }
     ]

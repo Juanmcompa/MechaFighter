@@ -49,7 +49,7 @@ export function crearApp(datos, raiz) {
     continuar() {
       const p = app.partida;
       if (!p) return app.ir('portada');
-      const destino = { sectores: 'sectores', preparacion: 'preparacion', parada: 'parada', reclutamiento: 'reclutamiento', evento: 'evento', fin: 'fin' }[p.estado];
+      const destino = { sectores: 'sectores', preparacion: 'preparacion', parada: 'parada', reclutamiento: 'reclutamiento', evento: 'evento', suceso: 'evento', fin: 'fin' }[p.estado];
       // una batalla empezada (ya se vio una parte): sigue desde ahi, sin volver a planear
       if (destino === 'preparacion' && p.nodo && p.nodo.visto) return app.ir('batalla');
       app.ir(destino || 'sectores');

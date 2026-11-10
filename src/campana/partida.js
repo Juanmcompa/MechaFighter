@@ -8,7 +8,7 @@ import { crearAzar } from '../core/azar.js';
 import { crearRecluta } from './reclutas.js';
 import { armarMision, sumarCondicion } from './misiones.js';
 import { saquear } from './saqueo.js';
-import { sortearDilema, resolverDilema } from './dilemas.js';
+import { sortearDilema, resolverDilema, dilemaAbierto } from './dilemas.js';
 import { anotar, sumarStat } from './cronica.js';
 import { anotarDanios, vidaDeSalida, reparar, costoReparacion, vidaDelMecha, partesRotas } from './mantenimiento.js';
 export { reparar, costoReparacion, vidaDelMecha, partesRotas, vidaDeSalida };
@@ -20,7 +20,8 @@ import { armarLore } from './lore.js';
 import { nemesisDelLegado, quizasNace, quizasAparece, resolverNemesis, reasignarObjetivos, nemesisEnNodos, elegirJefeNemesis, nemesisComoJefe } from './nemesis.js';
 import { ENCAJES, normalizarPieza, nombrePieza } from '../motor/unidades.js';
 import { oficialTomaNota, actualizarMalestar, desertar, rivalDe, rivalTomaContrato, rivalEnContrato, rivalDespues } from './personajes.js';
-import { crearPlano, agregar, rodear, destinos, duenoEn, amenazasCerca, quien, esAmenaza, escalonDe, escalonPorId, indiceEscalon, sumarReputacion,
+import { rasgosDelSector, condicionesDelSector, diaDePago, noticiaDelSector, sucesoDeViaje } from './sucesos.js';
+import { crearPlano, agregar, rodear, destinos, duenoEn, amenazasCerca, quien, esAmenaza, escalonDe, escalonPorId, indiceEscalon, sumarReputacion, modSector,
   correrFrente, pasaElTiempo, nodrizaInicial, nivelModulo, valorModulo, combustibleMaximo, limitePilotos } from './brujula.js';
 
 export const VERSION_PARTIDA = 1;
@@ -121,7 +122,8 @@ export function generarSector(datos, p) {
     : heredero ? heredero.nombre + ' se quedó con lo que dejó ' + sdef.jefe.nombre + '. Encontralo y bajalo.' : sdef.objetivo;
   const s = {
     nombre, numero: p.sector + 1, objetivo, jefe: nombreJefe, jefeNemesis: jefeNemesis ? jefeNemesis.id : null,
-    dificultad: dif, nivel, inteligencia: 0, bandoJefe: sdef.bando_jefe || null, amenazaJefe: sdef.amenaza_jefe || null
+    dificultad: dif, nivel, inteligencia: 0, bandoJefe: sdef.bando_jefe || null, amenazaJefe: sdef.amenaza_jefe || null,
+    rasgos: rasgosDelSector(datos, sdef, p.sector + 1, azarAparte(p, 'rasgos:' + p.sector))
   };
   p.sectores[p.sector] = s;
   crearPlano(datos, s, sdef, az);
@@ -214,12 +216,18 @@ function armarContrato(datos, p, s, nodo, az, contraAmenaza = null) {
   // contra la fauna y el contagio se pelea con escuadras de una dificultad menos (son muchos y no paran)
   const dif = esAmenaza(datos, objetivo) ? Math.max(1, s.dificultad - 1) : s.dificultad;
   const m = armarMision(datos, mid, dif, az, s.nivel, cambios);
-  m.recompensa.creditos = Math.round((m.recompensa.creditos * (C.pago_pct || 100)) / 100);
+  m.recompensa.creditos = Math.round((m.recompensa.creditos * (C.pago_pct || 100) * (100 + modSector(s, 'pago_pct'))) / 10000);
   m.cliente = cliente;
   m.objetivo = objetivo;
   if (nodo.nido) m.nido = nodo.nido;
   // una amenaza cerca se cuela en la mision (no distingue bandos)
   for (const a of cerca) if (a.tipo !== objetivo && az.tirada(datos.bandos.amenazas[a.tipo].chance_irrumpe)) sumarCondicion(datos, m, 'irrumpe_' + a.tipo, az, []);
+  // lo que el sector mete seguido en sus contratos (rasgos)
+  for (const c of condicionesDelSector(s)) {
+    const E = datos.condiciones_mision;
+    const choca = !E[c.id] || m.condiciones.some((o) => Object.keys(E[o].efectos).some((k) => k in E[c.id].efectos));
+    if (!choca && az.tirada(c.chance)) sumarCondicion(datos, m, c.id, az, Q.escuadras);
+  }
   m.lore = armarLore(datos, m, p.sector, null, { id: cliente, nombre: C.nombre, quien: C.quien });
   return m;
 }
@@ -266,6 +274,8 @@ export function elegirNodo(datos, p, i) {
   p.posicion = nodo.i;
   pasaElTiempo(datos, s, azarAparte(p, 'frente'));
   mientrasViajan(datos, p);
+  noticiaDelSector(datos, p, azarAparte(p, 'noticia:' + s.numero + ':' + s.saltos));
+  diaDePago(datos, p);
   p.nodo = { ...nodo, indice: i, revisita: yaFue };
   nodo.visitado = true;
   // los contratos que dejaste vencer se los queda la competencia; y el que estaba harto, se va
@@ -275,7 +285,7 @@ export function elegirNodo(datos, p, i) {
   rodear(datos, p, azarDe(p, 'brujula'), (x, y) => crearDestino(datos, p, s, x, y, azarDe(p, 'destino')));
   trabajoCerca(datos, p, s);
   gremioCerca(datos, p, s);
-  if (yaFue && nodo.tipo !== 'parada') { p.nodo = null; p.estado = 'sectores'; return null; }
+  if (yaFue && nodo.tipo !== 'parada') { p.nodo = null; p.estado = 'sectores'; enViaje(datos, p, nodo); return null; }
   // al jefe se llega con lo que se averiguo en el camino
   if (nodo.tipo === 'jefe') inteligenciaAlJefe(datos, p, p.nodo);
   const R = datos.reglas.campana;
@@ -342,11 +352,22 @@ export function elegirNodo(datos, p, i) {
       p.nodo = null;
       p.estado = 'sectores';
   }
+  enViaje(datos, p, nodo);
   return p.nodo;
+}
+
+// Quizas pasa algo en pleno salto (no camino al jefe): primero se resuelve eso, despues se llega
+function enViaje(datos, p, nodo) {
+  p.suceso = null;
+  if (nodo.tipo === 'jefe') return;
+  const s = p.sectores[p.sector];
+  if (sucesoDeViaje(datos, p, azarAparte(p, 'suceso:' + s.numero + ':' + s.saltos))) { p.suceso.luego = p.estado; p.estado = 'suceso'; }
 }
 
 // Cerrar un nodo que no es mision (parada, reclutamiento, evento): seguir viaje.
 export function seguir(datos, p) {
+  // un suceso de viaje: se llega a donde se iba
+  if (p.suceso) { if (p.estado === 'suceso') p.estado = p.suceso.luego; p.suceso = null; return; }
   p.nodo = null;
   if (p.estado !== 'fin') p.estado = 'sectores';
 }
@@ -459,7 +480,7 @@ export function paradaActual(p) {
 export const pctPrecio = (datos, p, dueno) => escalonDe(datos, p, dueno).precio_pct;
 export const precioCombustible = (datos, p) => {
   const n = paradaActual(p);
-  return Math.round((datos.reglas.combustible.precio * (n ? pctPrecio(datos, p, n.dueno) : 100)) / 100);
+  return Math.round((datos.reglas.combustible.precio * (n ? pctPrecio(datos, p, n.dueno) : 100) * (100 + modSector(p.sectores[p.sector], 'precio_combustible_pct'))) / 10000);
 };
 
 export function comprarCombustible(datos, p) {
@@ -475,7 +496,7 @@ export function ofertaDe(datos, p, o, dueno) {
   const rareza = datos.partes[o.pieza.parte].rareza;
   const pide = datos.bandos.reputacion.rareza_pide[rareza] || 'hostil';
   const bloqueada = indiceEscalon(datos, escalonDe(datos, p, dueno).id) < indiceEscalon(datos, pide);
-  return { precio: Math.round((precioPieza(datos, o.pieza) * pctPrecio(datos, p, dueno)) / 100), bloqueada, pide: escalonPorId(datos, pide).nombre };
+  return { precio: Math.round((precioPieza(datos, o.pieza) * pctPrecio(datos, p, dueno) * (100 + modSector(p.sectores[p.sector], 'precio_partes_pct'))) / 10000), bloqueada, pide: escalonPorId(datos, pide).nombre };
 }
 
 // Mejoras de la nodriza: que hace falta para la siguiente (en la parada donde esta la nave)
@@ -508,7 +529,8 @@ export function instalarMejora(datos, p, id) {
 
 // Elegir una opcion del dilema de la señal
 export function elegirOpcion(datos, p, indice) {
-  if (!p.nodo || !p.nodo.dilema || p.nodo.resultado) return null;
+  const donde = dilemaAbierto(p);
+  if (!donde || donde.resultado) return null;
   return resolverDilema(datos, p, indice, azarDe(p, 'dilema'));
 }
 

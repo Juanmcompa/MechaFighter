@@ -1203,7 +1203,7 @@
     "peso": 15,
     "descripcion": "Mucha estructura soldada a mano. Blindaje casi no tiene.",
     "recuperable": true,
-    "sprite": "torso_medio",
+    "sprite": "torso_parche",
     "bando": "desertores",
     "provisoria": true,
     "costo": 55
@@ -1219,7 +1219,7 @@
     "peso": 6,
     "descripcion": "Bastante más munición, en bidones que pesan.",
     "recuperable": true,
-    "sprite": "mochila_municion",
+    "sprite": "mochila_contrabando",
     "bando": "desertores",
     "provisoria": true,
     "costo": 55
@@ -1246,7 +1246,7 @@
     "peso": 7,
     "descripcion": "Explosivos a media distancia. Cuidado con los propios.",
     "recuperable": true,
-    "sprite": "brazo_lanzamisiles",
+    "sprite": "brazo_lanzagranadas",
     "bando": "desertores",
     "provisoria": true,
     "costo": 95
@@ -1273,7 +1273,7 @@
     "peso": 3,
     "descripcion": "Todavía se mueve. Pica rápido y a veces deja al otro tieso.",
     "recuperable": true,
-    "sprite": "brazo_hoja",
+    "sprite": "brazo_aquijon",
     "bando": "fauna",
     "provisoria": true,
     "costo": 150
@@ -1291,12 +1291,12 @@
     "peso": 6,
     "descripcion": "Corren como el bicho del que salieron.",
     "recuperable": true,
-    "sprite": "piernas_saltarinas",
+    "sprite": "piernas_quitina",
     "bando": "fauna",
     "provisoria": true,
     "costo": 150
   },
-  "torso_caparazon": {
+  "torso_caparazon_vivo": {
     "nombre": "Caparazón vivo",
     "encaje": "torso",
     "rareza": "legendario",
@@ -1310,7 +1310,7 @@
     "peso": 14,
     "descripcion": "Un caparazón de acorazado vaciado por dentro. Se regenera solo… casi.",
     "recuperable": true,
-    "sprite": "torso_pesado",
+    "sprite": "torso_caparazon_vivo",
     "bando": "fauna",
     "provisoria": true,
     "costo": 240

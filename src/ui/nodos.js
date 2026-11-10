@@ -2,29 +2,32 @@
 import { h, montar, ico, boton, panel, chip, barraCampana, describirParte, nombrePieza, textoPersonalidad, retrato, iconoParte, NOMBRE_RAREZA } from './comun.js';
 import { contratar, seguir, elegirOpcion } from '../campana/partida.js';
 import { limitePilotos } from '../campana/brujula.js';
-import { opcionDisponible } from '../campana/dilemas.js';
+import { opcionDisponible, dilemaAbierto, textoDilema } from '../campana/dilemas.js';
 
 function pie(app) {
   return h('div', { class: 'acciones' },
     boton('Hangar', () => app.ir('hangar'), { iconoNombre: 'hangar', clase: 'secundario' }),
-    boton('Seguir viaje', () => { seguir(app.datos, app.partida); app.guardar(); app.continuar(); }, { iconoNombre: 'play', clase: 'principal' }));
+    boton(app.partida.suceso ? 'Seguir el salto' : 'Seguir viaje', () => { seguir(app.datos, app.partida); app.guardar(); app.continuar(); }, { iconoNombre: 'play', clase: 'principal' }));
 }
 
 // Una señal: el dilema y sus opciones; despues de elegir, lo que paso
 function dilema(app, raiz) {
   const { datos } = app;
   const p = app.partida;
-  const d = datos.dilemas[p.nodo.dilema];
-  const r = p.nodo.resultado;
+  const donde = dilemaAbierto(p);
+  const d = datos.dilemas[donde.dilema];
+  const r = donde.resultado;
+  const T = (t) => textoDilema(datos, p, t);
   const opciones = d.opciones.map((op, i) => ({ op, i, disp: opcionDisponible(datos, p, op) })).filter((x) => x.disp.visible);
   montar(raiz,
     barraCampana(datos, p, []),
-    h('h1', { class: 'titulo-pantalla' }, ico('evento'), ' ' + d.titulo),
-    panel(null, h('p', { class: 'briefing' }, d.texto),
+    h('h1', { class: 'titulo-pantalla' }, ico(p.suceso ? 'nave' : 'evento'), ' ' + T(d.titulo)),
+    p.suceso ? h('p', { class: 'ayuda' }, 'En pleno salto · después siguen viaje a donde iban.') : null,
+    panel(null, h('p', { class: 'briefing' }, T(d.texto)),
       r ? null : h('div', { class: 'opciones-dilema' }, ...opciones.map(({ op, i, disp }) => h('button', {
         class: 'opcion-dilema' + (op.requiere && op.requiere.clase ? ' especial' : ''), disabled: !disp.ok,
         onclick: () => { elegirOpcion(datos, p, i); app.guardar(); app.ir('evento'); }
-      }, h('strong', {}, op.texto),
+      }, h('strong', {}, T(op.texto)),
       h('small', {}, [
         op.requiere && op.requiere.clase ? '★ ' + datos.clases[op.requiere.clase].nombre + ' en el escuadrón' : null,
         op.chance !== undefined ? 'Riesgo: sale bien ' + (op.chance >= 70 ? 'casi siempre' : op.chance >= 50 ? 'a veces' : 'pocas veces') : null,
@@ -68,7 +71,8 @@ export function reclutamiento(app, raiz) {
 export function evento(app, raiz) {
   const { datos } = app;
   const p = app.partida;
-  if (p.nodo.dilema) return dilema(app, raiz);
+  if (dilemaAbierto(p)) return dilema(app, raiz);
+  if (!p.nodo) return app.continuar();
   const r = p.nodo.resultado || {};
   montar(raiz, 
     barraCampana(datos, p, []),

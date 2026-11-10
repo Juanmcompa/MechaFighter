@@ -296,19 +296,91 @@
     "usos": 3,
     "recarga": 50,
     "ordenes": {
-      "carga": { "nombre": "¡A la carga!", "icono": "espadas", "ticks": 40, "descripcion": "Todos avanzan y le tiran al que tengan más cerca. Nadie se repliega.",
-        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" }, { "condicion": "enemigo_cerca", "accion": "atacar_cuerpo_a_cuerpo", "objetivo": "enemigo_cercano" }, { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_cercano" }] },
-      "fuego": { "nombre": "¡Fuego concentrado!", "icono": "mira", "ticks": 35, "descripcion": "Todos le tiran al enemigo más peligroso hasta bajarlo.",
-        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_mas_peligroso" }, { "condicion": "siempre", "accion": "avanzar", "objetivo": "enemigo_mas_peligroso" }] },
-      "aguanten": { "nombre": "¡Aguanten!", "icono": "escudo", "ticks": 45, "descripcion": "Todos buscan cobertura y tiran desde ahí. Nadie avanza.",
-        "gambits": [{ "condicion": "enemigo_a_rango", "accion": "disparar", "objetivo": "enemigo_cercano" }, { "condicion": "siempre", "accion": "buscar_cobertura", "objetivo": "yo" }] },
-      "replieguen": { "nombre": "¡Replieguen!", "icono": "huida", "ticks": 30, "descripcion": "Todos se alejan del enemigo. Para salvar a uno o para reagruparse.",
-        "gambits": [{ "condicion": "siempre", "accion": "replegarse", "objetivo": "lejos_de_enemigos" }] }
+      "carga": {
+        "nombre": "¡A la carga!",
+        "icono": "espadas",
+        "ticks": 40,
+        "descripcion": "Todos avanzan y le tiran al que tengan más cerca. Nadie se repliega.",
+        "gambits": [
+          {
+            "condicion": "enemigo_a_rango",
+            "accion": "disparar",
+            "objetivo": "enemigo_cercano"
+          },
+          {
+            "condicion": "enemigo_cerca",
+            "accion": "atacar_cuerpo_a_cuerpo",
+            "objetivo": "enemigo_cercano"
+          },
+          {
+            "condicion": "siempre",
+            "accion": "avanzar",
+            "objetivo": "enemigo_cercano"
+          }
+        ]
+      },
+      "fuego": {
+        "nombre": "¡Fuego concentrado!",
+        "icono": "mira",
+        "ticks": 35,
+        "descripcion": "Todos le tiran al enemigo más peligroso hasta bajarlo.",
+        "gambits": [
+          {
+            "condicion": "enemigo_a_rango",
+            "accion": "disparar",
+            "objetivo": "enemigo_mas_peligroso"
+          },
+          {
+            "condicion": "siempre",
+            "accion": "avanzar",
+            "objetivo": "enemigo_mas_peligroso"
+          }
+        ]
+      },
+      "aguanten": {
+        "nombre": "¡Aguanten!",
+        "icono": "escudo",
+        "ticks": 45,
+        "descripcion": "Todos buscan cobertura y tiran desde ahí. Nadie avanza.",
+        "gambits": [
+          {
+            "condicion": "enemigo_a_rango",
+            "accion": "disparar",
+            "objetivo": "enemigo_cercano"
+          },
+          {
+            "condicion": "siempre",
+            "accion": "buscar_cobertura",
+            "objetivo": "yo"
+          }
+        ]
+      },
+      "replieguen": {
+        "nombre": "¡Replieguen!",
+        "icono": "huida",
+        "ticks": 30,
+        "descripcion": "Todos se alejan del enemigo. Para salvar a uno o para reagruparse.",
+        "gambits": [
+          {
+            "condicion": "siempre",
+            "accion": "replegarse",
+            "objetivo": "lejos_de_enemigos"
+          }
+        ]
+      }
     }
   },
   "malestar": {
     "_ayuda": "Cuanto aguanta un piloto antes de irse (0 a 100). Sube si se queda sin salir ('por_banco', no cuenta si esta descansando), si se lleva mal con el escuadron ('por_rivales': tiene rivales y ningun amigo), si muere su vinculo ('por_vinculo_muerto') o si no cobra ('por_sueldo_impago'). Baja cuando sale y ganan ('al_ganar') y con un bono ('bono_creditos' creditos bajan 'bono_baja'). Desde 'aviso' se ve en el hangar; al llegar a 100 se va con su mecha y firma con la compania rival. Nunca se va si quedan 'minimo_pilotos' o menos.",
-    "por_banco": 12, "por_rivales": 8, "por_vinculo_muerto": 25, "por_sueldo_impago": 15, "al_ganar": 10, "aviso": 60, "bono_creditos": 60, "bono_baja": 40, "minimo_pilotos": 3
+    "por_banco": 12,
+    "por_rivales": 8,
+    "por_vinculo_muerto": 25,
+    "por_sueldo_impago": 15,
+    "al_ganar": 10,
+    "aviso": 60,
+    "bono_creditos": 60,
+    "bono_baja": 40,
+    "minimo_pilotos": 3
   },
   "combustible": {
     "_ayuda": "Cada salto gasta lo que diga la brujula (1 a 3, segun la distancia). Al llegar a un sector nuevo se cargan 'por_sector'. Sin combustible, el remolque cobra 'remolque_creditos' y todos los mechas pierden 'remolque_danio_pct' de estructura. Las paradas venden a 'precio' (mas o menos segun como te vea su bando). El maximo lo da el tanque de la nodriza (nodriza.json); 'maximo' quedo para guardados viejos.",
@@ -320,5 +392,11 @@
     "remolque_danio_pct": 15,
     "precio": 18
   },
-  "_rarezas": "Normal (blanco), Raro (verde esmeralda), Muy raro (azul cobalto), Legendario (violeta), Único (dorado: hay una sola por campaña). Los jefes siempre dejan una legendaria o única."
+  "_rarezas": "Normal (blanco), Raro (verde esmeralda), Muy raro (azul cobalto), Legendario (violeta), Único (dorado: hay una sola por campaña). Los jefes siempre dejan una legendaria o única.",
+  "sueldos": {
+    "_ayuda": "La nomina: cada 'cada' saltos se paga 'por_piloto' + 'por_nivel' x nivel por cada piloto de la nave (salgan o no). Si no alcanza la plata no se paga nada y a todos les sube el malestar (malestar.por_sueldo_impago). Mas pilotos = mas opciones, pero mas caros.",
+    "cada": 5,
+    "por_piloto": 6,
+    "por_nivel": 2
+  }
 }

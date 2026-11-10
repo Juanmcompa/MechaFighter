@@ -88,7 +88,8 @@
         "bando_jefe": "grua",
         "amenazas": [
           "fauna"
-        ]
+        ],
+        "rasgo": "desarmaderos"
       },
       {
         "nombre": "Colonias Muertas",
@@ -124,7 +125,8 @@
         "amenazas": [
           "contagio",
           "fauna"
-        ]
+        ],
+        "rasgo": "aire_viciado"
       },
       {
         "nombre": "Anillo de Kessler",
@@ -158,13 +160,118 @@
         "amenazas": [
           "fauna",
           "contagio"
-        ]
+        ],
+        "rasgo": "zona_militar"
       }
     ],
     "infinito": {
       "_ayuda": "La campaña no termina: despues del ultimo territorio se vuelve al primero, mas dificil. Cada vuelta suma 'nivel_extra_por_sector' al nivel de los enemigos por cada sector despues del ultimo de la lista.",
       "nivel_extra_por_sector": 1
     },
-    "_ayuda": "Campaña infinita: los territorios de 'sectores_def' se repiten en ronda, cada vuelta más difíciles ('infinito'). El jefe de cada sector es el némesis más curtido que ande suelto (con 'titulo_jefe'); si no hay, el jefe de la lista, y en las vueltas siguientes uno de sus 'herederos'. bandos: quienes se disputan el sector (bandos.json); bando_jefe: de que bando es el jefe (o amenaza_jefe si es una amenaza); amenazas: fauna y contagio que hay."
+    "_ayuda": "Campaña infinita: los territorios de 'sectores_def' se repiten en ronda, cada vuelta más difíciles ('infinito'). El jefe de cada sector es el némesis más curtido que ande suelto (con 'titulo_jefe'); si no hay, el jefe de la lista, y en las vueltas siguientes uno de sus 'herederos'. bandos: quienes se disputan el sector (bandos.json); bando_jefe: de que bando es el jefe (o amenaza_jefe si es una amenaza); amenazas: fauna y contagio que hay.",
+    "rasgos": {
+      "_ayuda": "Rasgos del sector: cada sector tiene el suyo ('rasgo' en sectores_def) y uno mas al azar de los que tienen 'peso'. Efectos: precio_combustible_pct, precio_partes_pct, pago_pct, sueldos_pct, deriva (el frente se mueve mas por salto) y condicion {id, chance} (una condicion de condiciones_mision.json que aparece seguido en los contratos).",
+      "desarmaderos": {
+        "nombre": "Desarmaderos",
+        "texto": "Chatarra por todos lados: las piezas salen más baratas.",
+        "efectos": {
+          "precio_partes_pct": -15
+        }
+      },
+      "aire_viciado": {
+        "nombre": "Colonias a oscuras",
+        "texto": "Sin luz ni refinerías: mucho contrato nocturno y el combustible es caro.",
+        "efectos": {
+          "precio_combustible_pct": 30,
+          "condicion": {
+            "id": "noche",
+            "chance": 35
+          }
+        }
+      },
+      "zona_militar": {
+        "nombre": "Zona militar",
+        "texto": "Pagan bien, pero todo cuesta más: combustible y sueldos.",
+        "efectos": {
+          "pago_pct": 20,
+          "precio_combustible_pct": 25,
+          "sueldos_pct": 20
+        }
+      },
+      "polvo": {
+        "nombre": "Polvo eterno",
+        "texto": "Las tormentas no paran: muchos contratos con poca visión.",
+        "peso": 8,
+        "efectos": {
+          "condicion": {
+            "id": "tormenta",
+            "chance": 35
+          }
+        }
+      },
+      "minado": {
+        "nombre": "Campos minados",
+        "texto": "Quedaron minas de otra guerra: mirá dónde bajás.",
+        "peso": 6,
+        "desde": 2,
+        "efectos": {
+          "condicion": {
+            "id": "minas",
+            "chance": 35
+          }
+        }
+      },
+      "guerra_abierta": {
+        "nombre": "Guerra abierta",
+        "texto": "El frente se mueve rápido y los contratos pagan un poco más.",
+        "peso": 7,
+        "efectos": {
+          "deriva": 2,
+          "pago_pct": 10
+        }
+      },
+      "ruta_comercial": {
+        "nombre": "Ruta comercial",
+        "texto": "Pasan cargueros todo el tiempo: combustible y piezas más baratos.",
+        "peso": 7,
+        "efectos": {
+          "precio_combustible_pct": -25,
+          "precio_partes_pct": -10
+        }
+      },
+      "sector_pobre": {
+        "nombre": "Sector pobre",
+        "texto": "Acá nadie tiene un peso: pagan menos, pero venden barato.",
+        "peso": 6,
+        "efectos": {
+          "pago_pct": -15,
+          "precio_partes_pct": -20
+        }
+      },
+      "radio_saturada": {
+        "nombre": "Radio saturada",
+        "texto": "Tanta señal cruzada que cuesta dar órdenes: interferencia seguido.",
+        "peso": 6,
+        "efectos": {
+          "condicion": {
+            "id": "interferencia",
+            "chance": 35
+          }
+        }
+      },
+      "refuerzos_cerca": {
+        "nombre": "Cuarteles cerca",
+        "texto": "Nadie pelea solo acá: suelen llegar refuerzos enemigos.",
+        "peso": 5,
+        "desde": 2,
+        "efectos": {
+          "condicion": {
+            "id": "refuerzos",
+            "chance": 30
+          },
+          "pago_pct": 10
+        }
+      }
+    }
   }
 }

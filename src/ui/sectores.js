@@ -1,6 +1,7 @@
 // La brujula del sector: la nodriza en el centro y los destinos alrededor (de 1 a 6), a 1, 2 o 3 de combustible.
 // El color de cada destino dice de que bando es; los visitados quedan en gris (se puede volver, pagando el salto).
 // Arriba, el frente del sector y como te ve cada bando. Tocar un destino muestra su tarjeta abajo.
+import { nomina, saltosParaCobrar, noticiaActiva } from '../campana/sucesos.js';
 import { h, montar, ico, botonIcono, barraJuego, retrato } from './comun.js';
 import { destinosDeLaNave, elegirNodo, nemesisDelMapa } from '../campana/partida.js';
 import { quien, esAmenaza, escalonDe, textoReputacion, contagioPct, combustibleMaximo, efectoContrato, textoEfecto, nodoActual, guaridaAbierta, veSenales } from '../campana/brujula.js';
@@ -70,6 +71,11 @@ export function sectores(app, raiz) {
       h('p', { class: 'br-intel' }, ico('ojo'), h('span', {}, s.jefe),
         h('span', { class: 'pips-intel', title: 'Inteligencia: cada contrato ganado da datos' }, ...Array.from({ length: I.maxima }, (_, k) => h('i', { class: k < s.inteligencia ? 'lleno' : '' }))),
         h('small', {}, guaridaAbierta(datos, s) ? 'guarida a la vista' : 'cada contrato ganado da datos')),
+      h('p', { class: 'br-rasgos' }, ...(s.rasgos || []).map((r) => h('span', { title: r.texto }, r.nombre)),
+        (() => { const n = saltosParaCobrar(datos, p), t = nomina(datos, p); return h('span', { class: 'br-sueldo' + (n <= 1 && p.creditos < t ? ' poco' : ''), title: 'Sueldos de los pilotos: si no alcanza, a todos les suben las ganas de irse', 'aria-label': 'Sueldos: ' + t + ' créditos en ' + n + ' saltos' }, ico('creditos'), '₵' + t + ' en ' + n + (n === 1 ? ' salto' : ' saltos')); })()),
+      s.novedad ? h('p', { class: 'br-aviso noticia' }, ico('radar'), h('span', {}, h('strong', {}, s.novedad.titulo + '. '), s.novedad.texto))
+        : noticiaActiva(s) ? h('p', { class: 'br-aviso noticia tenue' }, ico('radar'), h('span', {}, h('strong', {}, noticiaActiva(s).titulo), ' · ' + (noticiaActiva(s).hasta - s.saltos) + ' saltos más')) : null,
+      p.sueldo ? h('p', { class: 'br-aviso' + (p.sueldo.pagado ? ' bien' : '') }, ico('creditos'), p.sueldo.pagado ? ' Día de pago: ₵' + p.sueldo.total + ' en sueldos.' : ' No alcanzó para los sueldos (₵' + p.sueldo.total + '): todos tienen más ganas de irse.') : null,
       p.remolque ? h('p', { class: 'br-aviso' }, ico('combustible'), ' Sin combustible: el remolque cobró ₵' + p.remolque.creditos + ' y los mechas perdieron ' + p.remolque.danio + '%.') : null,
       ...(p.desertores || []).map((d) => h('p', { class: 'br-aviso' }, ico('calavera'), ' «' + d.apodo + '» se hartó y se fue con su mecha. Firmó con ' + d.rival + '.')),
       p.emboscada ? h('p', { class: 'br-aviso violeta' }, ico('enjambre'), ' En el salto largo se les pegó fauna al casco: los mechas perdieron ' + p.emboscada.danio + '%.') : null,

@@ -11,6 +11,8 @@ import { fotoPiloto } from '../src/campana/legado.js';
 import { saquear } from '../src/campana/saqueo.js';
 import { reparar, costoReparacion, partesRotas } from '../src/campana/mantenimiento.js';
 import { leerDisco } from '../tools/leer-disco.mjs';
+import { nomina, diaDePago, noticiaDelSector, sucesoDeViaje } from '../src/campana/sucesos.js';
+import { modSector } from '../src/campana/brujula.js';
 import { nemesisDelLegado, quizasAparece, resolverNemesis } from '../src/campana/nemesis.js';
 import { normalizarPieza } from '../src/motor/unidades.js';
 
@@ -235,6 +237,39 @@ console.log('Campana');
   const c = costoReparacion(datos, pi);
   const antes = p.creditos;
   ok(reparar(datos, p, pi.id, 'todo') && p.creditos === antes - c.total && !partesRotas(pi).length && pi.mechaVida === 100, 'reparar todo cobra y deja el mecha sano');
+}
+
+// Entre mision y mision: sueldos, noticias, rasgos y sucesos de viaje
+{
+  const p = nuevaPartida(datos, 777);
+  const s = p.sectores[p.sector];
+  ok(s.rasgos.length === 2 && s.rasgos[0].id === 'desarmaderos' && modSector(s, 'precio_partes_pct') <= -15, 'cada sector tiene su rasgo y uno mas al azar');
+  const total = nomina(datos, p);
+  p.creditos = total + 5; p.nomina = 1;
+  diaDePago(datos, p);
+  ok(p.sueldo && p.sueldo.pagado && p.creditos === 5 && p.nomina === datos.reglas.sueldos.cada, 'el dia de pago cobra la nomina y vuelve a contar');
+  p.nomina = 1;
+  diaDePago(datos, p);
+  ok(!p.sueldo.pagado && p.creditos === 5 && p.pilotos.every((x) => x.malestar === datos.reglas.malestar.por_sueldo_impago), 'si no alcanza no se paga y a todos les sube el malestar');
+  s.saltos = datos.bandos.noticias.cada;
+  noticiaDelSector(datos, p, crearAzar(5));
+  ok(s.novedad && s.noticias.length === 1 && !/\{/.test(s.novedad.texto), 'cada tantos saltos hay una noticia del sector');
+  const conCien = JSON.parse(JSON.stringify(datos)); conCien.bandos.brujula.suceso_chance = 100;
+  p.estado = 'sectores';
+  elegirNodo(conCien, p, 0);
+  ok(p.estado === 'suceso' && p.suceso && datos.dilemas[p.suceso.dilema].viaje, 'en un salto puede pasar algo (suceso de viaje)');
+  const luego = p.suceso.luego;
+  const ops = datos.dilemas[p.suceso.dilema].opciones;
+  ok(elegirOpcion(conCien, p, ops.length - 1) && p.suceso.resultado, 'el suceso se decide como un dilema');
+  seguir(conCien, p);
+  ok(!p.suceso && p.estado === luego, 'despues del suceso se llega a donde se iba');
+  // todos los dilemas de viaje se pueden resolver con cualquier opcion sin romper nada
+  for (const [id, d] of Object.entries(datos.dilemas)) if (d.viaje) d.opciones.forEach((_, k) => {
+    const q = nuevaPartida(datos, 31 + k); q.creditos = 500;
+    q.suceso = { dilema: id, resultado: null, piloto: q.pilotos[0].id };
+    elegirOpcion(datos, q, k);
+  });
+  ok(true, 'todos los sucesos de viaje se resuelven');
 }
 
 // Dilemas, combustible y cronica

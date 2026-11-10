@@ -283,3 +283,18 @@
 .ct-contacto { margin: 0; font-size: 16px; color: var(--texto-tenue); display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .ct-contacto strong { font-weight: 400; color: var(--texto); }
 .inf-sector.mal { border-color: #7e2a22; background: var(--hg-mal-fondo); color: var(--hg-mal); }
+
+/* Rasgos del sector, sueldos y noticias (brujula y frente) */
+.br-rasgos { margin: 0; display: flex; gap: 6px; align-items: center; font-size: 14px; min-width: 0; }
+.br-rasgos > span { padding: 1px 6px; border: 1px solid #2d3427; color: var(--texto-tenue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.br-rasgos .br-sueldo { margin-left: auto; flex: none; display: inline-flex; gap: 4px; align-items: center; border-color: #5c4a1c; color: #e0a43a; }
+.br-rasgos .br-sueldo.poco { border-color: #7e2a22; color: var(--hg-mal); background: var(--hg-mal-fondo); }
+.br-rasgos .ico { width: 13px; height: 13px; }
+.br-aviso.noticia { border-color: #5c4a1c; background: #2a1f12; color: #e8c377; align-items: flex-start; }
+.br-aviso.noticia strong { font-weight: 400; color: #fff; }
+.br-aviso.noticia.tenue { background: none; color: var(--texto-tenue); border-color: #2d3427; }
+.br-aviso.bien { border-color: #3f5a2a; background: #16200f; color: #a9d67f; }
+.fr-rasgo { display: grid; padding: 5px 8px; border-left: 3px solid #e0a43a; background: #1a1710; line-height: 1.1; }
+.fr-rasgo strong { font-weight: 400; font-size: 17px; color: #fff; }
+.fr-rasgo small { font-size: 14px; color: #a8b39b; }
+.br-aviso > span:not(.ico-envoltura) { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }

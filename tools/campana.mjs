@@ -29,6 +29,12 @@ for (let n = 0; n < N; n++) {
     if (!d) d = nuevos.find((x) => x.nodo.tipo === 'mision') || nuevos[0] || lista[0];
     if (!d) break;
     elegirNodo(datos, p, d.nodo);
+    if (p.estado === 'suceso') {
+      const ops = datos.dilemas[p.suceso.dilema].opciones;
+      // el piloto automatico es prudente: la ultima opcion (casi siempre "seguir")
+      let k = ops.length - 1; while (k > 0 && !opcionDisponible(datos, p, ops[k]).ok) k--;
+      elegirOpcion(datos, p, k); seguir(datos, p);
+    }
     if (p.estado === 'preparacion') {
       const r = simular(datos, { mision: p.nodo.mision, escuadron: escuadronParaMision(datos, p), semilla: p.nodo.mision.semilla });
       misiones++; if (r.victoria) ganadasM++;
@@ -63,6 +69,8 @@ for (let n = 0; n < N; n++) {
     }
   }
   if (p.resultado === 'victoria') ganadas++;
+  for (const k of ['sueldos', 'impagos', 'sucesos', 'noticias']) (globalThis.extra ||= {})[k] = ((globalThis.extra || {})[k] || 0) + ((p.stats && p.stats[k]) || 0);
+  (globalThis.extra ||= {}).creditos = (globalThis.extra.creditos || 0) + p.creditos;
   remolques += (p.stats && p.stats.remolques) || 0; combFinal += p.combustible || 0;
   mejoras += (p.stats && p.stats.mejoras) || 0; emboscadas += (p.stats && p.stats.emboscadas) || 0; saltos += p.sectores.reduce((t, x) => t + ((x && x.saltos) || 0), 0);
   legado = p.legado || null;
@@ -78,6 +86,7 @@ console.log(`pasan el sector 3: ${Math.round((pasaron * 100) / N)}% · mejor sec
   `caidos/campana ${(caidos / N).toFixed(1)} · sector alcanzado ${(sectorMax / N).toFixed(1)} · puntaje ${Math.round(puntaje / N)} · ${Math.round((Date.now() - t0) / N)} ms`);
 console.log(Object.entries(globalThis.porSector).map(([k,[g,t]])=>k+": "+Math.round(g*100/t)+"% de "+t).join(" · "))
 console.log(`remolques por campana ${(remolques / N).toFixed(1)} · combustible al final ${(combFinal / N).toFixed(1)} · saltos ${(saltos / N).toFixed(0)} · mejoras ${(mejoras / N).toFixed(1)} · emboscadas ${(emboscadas / N).toFixed(1)}`);
+console.log('por campana: ' + Object.entries(globalThis.extra).map(([k, v]) => k + ' ' + (v / N).toFixed(1)).join(' · '));
 if (conLegado) console.log(`legado: ${veteranos} veteranos · ${encuentros} encuentros con el escuadron anterior (${encuentrosGanados} ganados, ${rescates} rescates)`);
 // DETALLE=1: como le fue contra cada bando y tipo de mision, por sector
 if (process.env.DETALLE) console.log(Object.entries(globalThis.porObj).sort().map(([k,[g,t]])=>k+" "+Math.round(g*100/t)+"%/"+t).join("\n"));
