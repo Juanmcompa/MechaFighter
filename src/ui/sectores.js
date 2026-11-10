@@ -1,6 +1,7 @@
 // La brujula del sector: la nodriza en el centro y los destinos alrededor (de 1 a 6), a 1, 2 o 3 de combustible.
 // El color de cada destino dice de que bando es; los visitados quedan en gris (se puede volver, pagando el salto).
 // Arriba, el frente del sector y como te ve cada bando. Tocar un destino muestra su tarjeta abajo.
+import { tr } from '../core/traducir.js';
 import { nomina, saltosParaCobrar, noticiaActiva } from '../campana/sucesos.js';
 import { h, montar, ico, botonIcono, barraJuego, retrato } from './comun.js';
 import { destinosDeLaNave, elegirNodo, nemesisDelMapa } from '../campana/partida.js';
@@ -149,7 +150,7 @@ export function sectores(app, raiz) {
     const n = d.nodo, m = n.mision, pz = pintaDe(datos, n);
     const nem = acecho[n.i] ? (p.nemesis || []).find((x) => x.id === acecho[n.i]) : null;
     const busca = nem && nem.objetivo ? p.pilotos.find((x) => x.id === nem.objetivo) : null;
-    let rotulo = (TIPO[n.tipo] || n.tipo).toUpperCase(), texto = '', chips = [];
+    let rotulo = tr(TIPO[n.tipo] || n.tipo).toUpperCase(), texto = '', chips = [];
     if (n.tipo === 'jefe') {
       rotulo = 'GUARIDA · ' + (quien(datos, m.objetivo) || { nombre: 'jefe del sector' }).nombre.toUpperCase();
       texto = d.bloqueado ? 'Sabemos que está por acá. Con ' + (I.para_guarida - s.inteligencia) + ' contrato' + (I.para_guarida - s.inteligencia === 1 ? '' : 's') + ' ganado' + (I.para_guarida - s.inteligencia === 1 ? '' : 's') + ' más aparece la ruta.'

@@ -7,6 +7,8 @@
   "scripts": {
     "test": "node tools/validar-datos.mjs && node tests/core.test.mjs && node tests/motor.test.mjs",
     "balance": "node tools/simular.mjs todas 1 30 && node tools/campana.mjs 30",
-    "datos": "node tools/validar-datos.mjs"
+    "datos": "node tools/validar-datos.mjs",
+    "revisar": "node tools/revisar.mjs",
+    "jugar": "node tools/jugar.mjs"
   }
 }
