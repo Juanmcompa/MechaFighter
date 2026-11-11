@@ -83,11 +83,16 @@ function cabeceraPiloto({ datos, p, pi, ir }, titulo, sub) {
 function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
   const T = datos.reglas.tareas;
   const s = p.sectores && p.sectores[p.sector];
-  const salen = desplegables(datos, p).length;
+  const salenLista = desplegables(datos, p);
+  const salen = salenLista.length;
+  const MAX = datos.reglas.escuadra_maxima;
+  // sin tarea pero sin lugar: el escuadron ya esta lleno (se quedan en el banco, mirando)
+  const sinLugar = p.pilotos.filter((pi) => !pi.tarea && !salenLista.includes(pi));
   const enMision = p.estado === 'preparacion' && p.nodo && p.nodo.mision;
 
   const tarjeta = (pi) => {
     const tarea = pi.tarea ? T[pi.tarea] : null;
+    const banco = !tarea && sinLugar.includes(pi);
     const vida = vidaDelMecha(pi), rotas = partesRotas(pi), c = costoReparacion(datos, pi);
     const abierta = VISTA.tareaAbierta === pi.id;
     const lienzo = h('canvas', { width: 152, height: 152, class: 'hc-lienzo', 'aria-hidden': 'true' });
@@ -110,13 +115,14 @@ function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
         h('div', { class: 'hc-fila' },
           (pi.malestar || 0) >= datos.reglas.malestar.aviso ? h('button', { class: 'hc-harto', title: 'Está por irse de la compañía. Sacalo a pelear o dale un bono (en su ficha).', onclick: () => ir('info', pi.id) }, 'HARTO') : null,
           tarea ? h('span', { class: 'hc-estado fuera' }, ico(tarea.icono), tarea.nombre.toUpperCase())
+            : banco ? h('span', { class: 'hc-estado fuera', title: 'Entran hasta ' + MAX + ' mechas: este se queda mirando' }, 'NO ENTRA')
             : reparo || h('span', { class: 'hc-estado' }, rotas.length ? 'ROTO' : 'LISTO'),
           h('span', { class: 'hc-perfil' + (perfil.id === 'propio' ? ' propio' : ''), role: 'img', 'aria-label': 'Órdenes: ' + perfil.nombre, title: 'Órdenes: ' + perfil.nombre }, ico(perfil.icono)),
           h('button', { class: 'hc-ir', 'aria-label': 'Armado de ' + pi.apodo, title: 'Armado', onclick: () => ir('armado', pi.id) }, ico('llave')),
           h('button', { class: 'hc-ir', 'aria-label': 'Órdenes de ' + pi.apodo, title: 'Órdenes', onclick: () => ir('ordenes', pi.id) }, ico('lista')))),
       h('button', {
         class: 'hc-tarea' + (tarea ? ' fuera' : '') + (abierta ? ' activa' : ''), 'aria-expanded': abierta ? 'true' : 'false',
-        'aria-label': 'Próxima misión: ' + (tarea ? tarea.nombre.toLowerCase() : 'sale') + '. Tocar para cambiar',
+        'aria-label': 'Próxima misión: ' + (tarea ? tarea.nombre.toLowerCase() : banco ? 'no entra, el escuadrón está lleno' : 'sale') + '. Tocar para cambiar',
         onclick: () => { VISTA.tareaAbierta = abierta ? null : pi.id; pintar(); }
       }, ico(iconoTarea)));
     if (!abierta) return carta;
@@ -154,6 +160,9 @@ function vistaEscuadron({ app, datos, p, pintar, ir }, opciones) {
     opciones.primeraVez ? h('p', { class: 'aviso-inicial' }, ico('estrella'),
       ' Este es tu escuadrón. Tocá un mecha para armarlo, el ícono de lista para sus órdenes y el botón de la derecha para decidir quién sale.') : null,
     proxima,
+    p.pilotos.length > MAX ? h('p', { class: 'hg-cupo' + (sinLugar.length ? ' lleno' : '') }, ico('escuadron'),
+      ' Salen ' + salen + ' de ' + MAX + ' lugares.' + (sinLugar.length ? ' ' + sinLugar.map((x) => '«' + x.apodo + '»').join(', ') + (sinLugar.length === 1 ? ' no entra y se queda' : ' no entran y se quedan') + ' mirando: dales una tarea.'
+        : ' Los que se quedan suman ganas de irse, salvo los que descansan.')) : null,
     h('div', { class: 'hg-cartas' }, ...p.pilotos.flatMap((pi) => tarjeta(pi))),
     h('div', { class: 'hg-desplegar' }, enMision
       ? boton('Desplegar · ' + salen + (salen === 1 ? ' mecha' : ' mechas'), () => app.ir('plan'), { iconoNombre: 'play', clase: 'principal' })

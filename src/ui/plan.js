@@ -29,6 +29,7 @@ export function plan(app, raiz) {
       botonIcono('atras', 'Volver a la misión', () => app.ir('preparacion'), 'hg-volver'),
       h('div', { class: 'br-titulo' }, h('h1', {}, 'Despliegue'), h('small', {}, m.nombre + ' · ' + mapa.nombre))),
     h('p', { class: 'pl-ayuda' }, 'Elegí un piloto. Tocá la ', h('b', { class: 'verde' }, 'zona verde'), ' para ubicarlo, o cualquier otro lugar del mapa para marcarle ', h('b', { class: 'ambar' }, 'a dónde ir primero'), '.'),
+    m.bombardeo ? h('p', { class: 'br-aviso' }, ico('explosion'), h('span', {}, h('strong', {}, 'Saben dónde bajan. '), 'Las casillas ', h('b', { class: 'rojo' }, 'rayadas en rojo'), ' las bombardean apenas empieza.')) : null,
     lienzo, lista,
     h('div', { class: 'hg-desplegar' }, boton('Desplegar', () => { app.guardar(); app.ir('despliegue'); }, { iconoNombre: 'play', clase: 'principal' })));
   montar(raiz, cuerpo);
@@ -50,6 +51,16 @@ export function plan(app, raiz) {
     // zona de entrada
     ctx.fillStyle = 'rgba(143, 220, 90, .16)';
     for (const k of zona) { const [x, y] = k.split(',').map(Number); ctx.fillRect(x * L + 1, y * L + 1, L - 2, L - 2); }
+    // el bombardeo: donde va a caer (rayado rojo)
+    if (m.bombardeo) {
+      ctx.save();
+      for (const [x, y] of m.bombardeo.casillas) {
+        ctx.fillStyle = 'rgba(217, 85, 63, .28)'; ctx.fillRect(x * L, y * L, L, L);
+        ctx.strokeStyle = 'rgba(229, 122, 108, .8)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(x * L, (y + 1) * L); ctx.lineTo((x + 1) * L, y * L); ctx.stroke();
+      }
+      ctx.restore();
+    }
     // lo que pide la mision: a donde llegar o que defender
     ctx.setLineDash([L / 3, L / 4]); ctx.lineWidth = 2; ctx.strokeStyle = '#e0a43a'; ctx.fillStyle = '#e0a43a';
     ctx.font = Math.round(L * 0.8) + 'px VT323, monospace';

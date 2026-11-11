@@ -518,6 +518,24 @@ export class Repeticion {
         break;
       }
       case 'refuerzos': this.estatica = this.T + 10; this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ¡Refuerzos enemigos por detrás! ' + e.cantidad + ' contactos.', clase: 'control', importante: true }); this.temblor = Math.max(this.temblor, 0.3); break;
+      case 'bombardeo_aviso': {
+        this.alEvento({ texto: 'CONTROL › ESCUADRÓN: ¡Artillería apuntando a la zona de bajada! Muévanse.', clase: 'aviso', importante: true });
+        break;
+      }
+      case 'bombardeo': {
+        // una explosion por casilla (con un poco de desfase, para que se vea como una andanada)
+        e.casillas.forEach(([x, y], i) => this.efectos.push({ tipo: 'explosion', a: [x, y], r: 1.1, t0: this.T + (i % 5) * 1.5, dur: 10 }));
+        this.temblor = Math.max(this.temblor, 1.4);
+        const tocados = [];
+        for (const g of e.golpes) {
+          const v = U.get(g.u);
+          if (!v) continue;
+          v.vida -= g.danio; v.golpe = 1; this.flotante(v, '-' + g.danio, '#ff7a6a');
+          if (v.ficha.bando === 0) tocados.push(v.ficha.nombre);
+        }
+        this.alEvento({ texto: '¡BOMBARDEO! ' + (tocados.length ? 'Le dio a ' + tocados.join(', ') + '.' : 'No le dio a nadie: bien ahí.'), clase: tocados.length ? 'mal' : 'bien', importante: true });
+        break;
+      }
       case 'mina': {
         this.efectos.push({ tipo: 'explosion', a: [e.x, e.y], r: 1.2, t0: this.T, dur: 10 });
         this.temblor = Math.max(this.temblor, 0.9);

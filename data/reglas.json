@@ -1,10 +1,10 @@
 {
   "_ayuda": "Constantes globales. Porcentajes en enteros (0 a 100), distancias en casillas, tiempos en ticks.",
   "version_datos": 2,
-  "version_motor": 14,
+  "version_motor": 15,
   "ms_por_tick_en_repeticion": 150,
   "ticks_maximos": 3000,
-  "escuadra_maxima": 6,
+  "escuadra_maxima": 5,
   "reclutas_iniciales": 4,
   "moral": {
     "base": 70,
@@ -289,7 +289,7 @@
     "vida_minima_salida": 40
   },
   "control": {
-    "_ayuda": "Lo que decide Control (el jugador) en cada batalla. Despliegue: cada mecha arranca en una casilla de las primeras 'zona_despliegue' columnas y puede llevar un rumbo (ir primero a un punto) o aguantar en el lugar; el plan se corta cuando hay pelea, o a los 'rumbo_ticks_max' / 'espera_ticks_max' ticks. Ordenes por radio: 'usos' por batalla, con 'recarga' ticks entre una y otra; cada una reemplaza las ordenes de todos los pilotos por 'ticks' ticks con su lista de 'gambits'. No le ganan al panico.",
+    "_ayuda": "Lo que decide Control (el jugador) en cada batalla. Despliegue: cada mecha arranca en una casilla de las primeras 'zona_despliegue' columnas y puede llevar un rumbo (ir primero a un punto) o aguantar en el lugar; el plan se corta cuando hay pelea, o a los 'rumbo_ticks_max' / 'espera_ticks_max' ticks. Ordenes por radio: 'usos' por batalla, con 'recarga' ticks entre una y otra; cada una reemplaza las ordenes de todos los pilotos por 'ticks' ticks con su lista de 'gambits'. No le ganan al panico. Cada orden puede poner un 'estado' (estados.json) a todo el escuadron mientras dura: el empujon de la orden.",
     "zona_despliegue": 5,
     "rumbo_ticks_max": 160,
     "espera_ticks_max": 400,
@@ -299,8 +299,8 @@
       "carga": {
         "nombre": "¡A la carga!",
         "icono": "espadas",
-        "ticks": 40,
-        "descripcion": "Todos avanzan y le tiran al que tengan más cerca. Nadie se repliega.",
+        "ticks": 55,
+        "descripcion": "Todos avanzan y le tiran al que tengan más cerca, más rápido y pegando más fuerte. Nadie se repliega.",
         "gambits": [
           {
             "condicion": "enemigo_a_rango",
@@ -317,13 +317,14 @@
             "accion": "avanzar",
             "objetivo": "enemigo_cercano"
           }
-        ]
+        ],
+        "estado": "orden_carga"
       },
       "fuego": {
         "nombre": "¡Fuego concentrado!",
         "icono": "mira",
-        "ticks": 35,
-        "descripcion": "Todos le tiran al enemigo más peligroso hasta bajarlo.",
+        "ticks": 50,
+        "descripcion": "Todos le tiran al enemigo más peligroso, con mejor puntería, hasta bajarlo.",
         "gambits": [
           {
             "condicion": "enemigo_a_rango",
@@ -335,13 +336,14 @@
             "accion": "avanzar",
             "objetivo": "enemigo_mas_peligroso"
           }
-        ]
+        ],
+        "estado": "orden_fuego"
       },
       "aguanten": {
         "nombre": "¡Aguanten!",
         "icono": "escudo",
-        "ticks": 45,
-        "descripcion": "Todos buscan cobertura y tiran desde ahí. Nadie avanza.",
+        "ticks": 65,
+        "descripcion": "Todos buscan cobertura y tiran desde ahí, más blindados. Nadie avanza.",
         "gambits": [
           {
             "condicion": "enemigo_a_rango",
@@ -353,20 +355,22 @@
             "accion": "buscar_cobertura",
             "objetivo": "yo"
           }
-        ]
+        ],
+        "estado": "orden_aguanten"
       },
       "replieguen": {
         "nombre": "¡Replieguen!",
         "icono": "huida",
-        "ticks": 30,
-        "descripcion": "Todos se alejan del enemigo. Para salvar a uno o para reagruparse.",
+        "ticks": 45,
+        "descripcion": "Todos se alejan del enemigo, más rápido y esquivando mejor. Para salvar a uno o para reagruparse.",
         "gambits": [
           {
             "condicion": "siempre",
             "accion": "replegarse",
             "objetivo": "lejos_de_enemigos"
           }
-        ]
+        ],
+        "estado": "orden_replieguen"
       }
     }
   },

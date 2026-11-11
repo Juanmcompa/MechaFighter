@@ -145,6 +145,8 @@ export function simular(datos, { mision, escuadron, semilla, control = [] }) {
   let fin = null, zonaPerdidaTicks = 0, refuerzosLlegaron = false;
   // minas escondidas: explotan con lo primero que las pise
   const minas = new Set((mision.minas || []).map(([x, y]) => x + ',' + y));
+  const bombardeo = mision.bombardeo ? { ...mision.bombardeo, zona: new Set(mision.bombardeo.casillas.map(([x, y]) => x + ',' + y)) } : null;
+  if (bombardeo) B.log({ tipo: 'bombardeo_aviso', tick: bombardeo.tick, casillas: bombardeo.casillas });
   // ordenes de Control: hasta 'usos' por batalla, con 'recarga' ticks entre una y otra
   const RC = datos.reglas.control;
   const porRadio = control.filter((c) => RC.ordenes[c.id]).sort((a, b) => a.t - b.t);
@@ -157,6 +159,13 @@ export function simular(datos, { mision, escuadron, semilla, control = [] }) {
       usadas++; ultimaOrden = B.t;
       B.control = { id: c.id, hasta: B.t + RC.ordenes[c.id].ticks };
       B.log({ tipo: 'control', id: c.id, hasta: B.control.hasta });
+      // la orden tambien empuja: un estado para todo el escuadron mientras dura (y saca el de la orden anterior)
+      for (const u of B.unidades) {
+        if (!u.viva || u.bando !== 0) continue; // (0 = el escuadron)
+        for (const o of Object.values(RC.ordenes)) if (o.estado) quitarEstado(B, u, o.estado);
+        const est = RC.ordenes[c.id].estado;
+        if (est) { ponerEstado(B, u, est, 'control'); const e = u.estados.find((x) => x.id === est); if (e) e.resta = RC.ordenes[c.id].ticks; }
+      }
     }
 
     // 1. mantenimiento
@@ -244,6 +253,18 @@ export function simular(datos, { mision, escuadron, semilla, control = [] }) {
         herir(B, u, danio, null);
         for (const v of B.unidades) if (v.viva && distancia(v, u) <= 2) { evento(B, 'explosion_cerca', v); v.s.explosiones++; }
       }
+    }
+    // bombardeo sobre la zona de bajada (condicion 'bombardeo'): una vez, a todo lo que este en esas casillas
+    if (bombardeo && B.t === bombardeo.tick) {
+      const golpes = [];
+      for (const u of ordenUnidades(B)) {
+        if (!u.viva || !bombardeo.zona.has(u.x + ',' + u.y)) continue;
+        const danio = Math.max(datos.reglas.danio_minimo, bombardeo.danio - (u.blindaje >> 1));
+        golpes.push({ u: u.id, danio });
+        herir(B, u, danio, null);
+        evento(B, 'explosion_cerca', u); u.s.explosiones++;
+      }
+      B.log({ tipo: 'bombardeo', casillas: bombardeo.casillas, golpes });
     }
     resolverAcciones(B, intenciones);
     for (const u of ordenUnidades(B)) {

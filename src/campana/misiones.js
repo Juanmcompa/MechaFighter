@@ -117,6 +117,12 @@ function sortearCondiciones(datos, dificultad, azar) {
     if (!aptas.length) break;
     elegidas.push(azar.elegirConPeso(aptas.map(([id, c]) => [id, c.peso])));
   }
+  // las que tienen 'chance' propia salen aparte, en cualquier mision (si no chocan con otra)
+  for (const [id, c] of Object.entries(todas)) {
+    if (id[0] === '_' || !c.chance || c.desde > dificultad || elegidas.includes(id)) continue;
+    if (elegidas.some((e) => (c.choca || []).includes(e) || (todas[e].choca || []).includes(id))) continue;
+    if (azar.tirada(c.chance)) elegidas.push(id);
+  }
   return elegidas;
 }
 
@@ -148,6 +154,16 @@ export function sumarCondicion(datos, m, id, azar, escuadras) {
     if (e.unidad_extra) {
       if (m.oleadas.length) m.oleadas[0].push(e.unidad_extra);
       else m.emboscadas.push({ unidades: [e.unidad_extra], casilla: mapa.aparicion.enemigo[0] });
+    }
+    if (e.bombardeo) {
+      // el enemigo sabe por donde bajan: artilleria sobre las entradas de siempre (y alrededor), al empezar
+      const B = e.bombardeo, [ancho, alto] = mapa.tamano;
+      const set = new Set();
+      for (const [ex, ey] of mapa.aparicion.jugador) for (let dy = -B.radio; dy <= B.radio; dy++) for (let dx = -B.radio; dx <= B.radio; dx++) {
+        const x = ex + dx, y = ey + dy;
+        if (x >= 0 && y >= 0 && x < ancho && y < alto && mapa.leyenda[mapa.filas[y][x]] !== 'muro') set.add(x + ',' + y);
+      }
+      m.bombardeo = { tick: B.tick, danio: B.danio, casillas: [...set].map((k) => k.split(',').map(Number)) };
     }
     if (e.minas) {
       // en el medio del mapa (ni en las entradas ni en las zonas), sobre piso

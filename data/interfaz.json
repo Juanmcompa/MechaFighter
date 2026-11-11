@@ -18,7 +18,7 @@
   ],
   "Velocidad": [
    "src/ui/batalla.js:60",
-   "src/ui/hangar.js:327"
+   "src/ui/hangar.js:336"
   ],
   "Pausa": [
    "src/ui/batalla.js:61"
@@ -103,9 +103,9 @@
   " saltos": [
    "src/ui/compania.js:38",
    "src/ui/contrato.js:52",
-   "src/ui/sectores.js:75",
-   "src/ui/sectores.js:75",
-   "src/ui/sectores.js:163"
+   "src/ui/sectores.js:76",
+   "src/ui/sectores.js:76",
+   "src/ui/sectores.js:164"
   ],
   "Volver al escuadrón": [
    "src/ui/compania.js:51",
@@ -119,7 +119,7 @@
   ],
   "La compañía": [
    "src/ui/compania.js:52",
-   "src/ui/hangar.js:150"
+   "src/ui/hangar.js:156"
   ],
   "Renombre": [
    "src/ui/compania.js:53",
@@ -131,12 +131,12 @@
   "width:": [
    "src/ui/compania.js:55",
    "src/ui/comun.js:53",
-   "src/ui/hangar.js:311",
-   "src/ui/hangar.js:330",
-   "src/ui/hangar.js:762",
+   "src/ui/hangar.js:320",
+   "src/ui/hangar.js:339",
+   "src/ui/hangar.js:771",
    "src/ui/informe.js:51",
-   "src/ui/sectores.js:122",
-   "src/ui/sectores.js:125"
+   "src/ui/sectores.js:123",
+   "src/ui/sectores.js:126"
   ],
   "Más renombre: contratos más grandes y los bandos te llaman primero. También te buscan más.": [
    "src/ui/compania.js:56"
@@ -154,10 +154,11 @@
   " de ": [
    "src/ui/compania.js:61",
    "src/ui/contrato.js:66",
-   "src/ui/hangar.js:578",
+   "src/ui/hangar.js:164",
+   "src/ui/hangar.js:587",
    "src/ui/nodriza.js:30",
    "src/ui/nodriza.js:50",
-   "src/ui/sectores.js:64",
+   "src/ui/sectores.js:65",
    "src/vista/repeticion.js:505"
   ],
   " mejoras · ": [
@@ -171,7 +172,7 @@
   ],
   "Ver ›": [
    "src/ui/compania.js:61",
-   "src/ui/hangar.js:143"
+   "src/ui/hangar.js:149"
   ],
   "LO QUE CAMBIASTE": [
    "src/ui/compania.js:62"
@@ -187,13 +188,13 @@
    "src/ui/contrato.js:29",
    "src/ui/frente.js:81",
    "src/ui/parada.js:52",
-   "src/ui/sectores.js:178"
+   "src/ui/sectores.js:179"
   ],
   ";--f:": [
    "src/ui/compania.js:68",
    "src/ui/contrato.js:29",
    "src/ui/frente.js:81",
-   "src/ui/sectores.js:133"
+   "src/ui/sectores.js:134"
   ],
   "LA COMPETENCIA": [
    "src/ui/compania.js:70"
@@ -245,7 +246,7 @@
   ],
   "Busca a «": [
    "src/ui/compania.js:76",
-   "src/ui/sectores.js:183"
+   "src/ui/sectores.js:184"
   ],
   "Radar ": [
    "src/ui/comun.js:67"
@@ -326,22 +327,22 @@
   "Escuadrón": [
    "src/ui/comun.js:116",
    "src/ui/hangar.js:64",
-   "src/ui/hangar.js:149",
+   "src/ui/hangar.js:155",
    "src/ui/preparacion.js:74"
   ],
   "Armado": [
    "src/ui/comun.js:117",
    "src/ui/hangar.js:65",
-   "src/ui/hangar.js:115",
-   "src/ui/hangar.js:349",
-   "src/ui/hangar.js:599"
+   "src/ui/hangar.js:121",
+   "src/ui/hangar.js:358",
+   "src/ui/hangar.js:608"
   ],
   "Órdenes": [
    "src/ui/comun.js:118",
    "src/ui/hangar.js:66",
-   "src/ui/hangar.js:116",
-   "src/ui/hangar.js:578",
-   "src/ui/hangar.js:599"
+   "src/ui/hangar.js:122",
+   "src/ui/hangar.js:587",
+   "src/ui/hangar.js:608"
   ],
   "Misión": [
    "src/ui/comun.js:119",
@@ -353,9 +354,9 @@
   ],
   "Créditos": [
    "src/ui/comun.js:127",
-   "src/ui/hangar.js:151",
+   "src/ui/hangar.js:157",
    "src/ui/nodos.js:83",
-   "src/ui/sectores.js:65"
+   "src/ui/sectores.js:66"
   ],
   "Puntaje": [
    "src/ui/comun.js:128"
@@ -373,15 +374,15 @@
   ],
   " Sin combustible: el remolque cobró ": [
    "src/ui/comun.js:134",
-   "src/ui/hangar.js:152"
+   "src/ui/hangar.js:158"
   ],
   " créditos y los mechas perdieron ": [
    "src/ui/comun.js:135",
-   "src/ui/hangar.js:153"
+   "src/ui/hangar.js:159"
   ],
   "% de estructura.": [
    "src/ui/comun.js:135",
-   "src/ui/hangar.js:153"
+   "src/ui/hangar.js:159"
   ],
   "Mechas": [
    "src/ui/contrato.js:11"
@@ -400,8 +401,8 @@
   ],
   ";--cl:": [
    "src/ui/contrato.js:29",
-   "src/ui/sectores.js:133",
-   "src/ui/sectores.js:178"
+   "src/ui/sectores.js:134",
+   "src/ui/sectores.js:179"
   ],
   "color:": [
    "src/ui/contrato.js:39",
@@ -409,21 +410,21 @@
    "src/ui/frente.js:83",
    "src/ui/informe.js:102",
    "src/ui/parada.js:49",
-   "src/ui/sectores.js:69"
+   "src/ui/sectores.js:70"
   ],
   "left:": [
    "src/ui/contrato.js:41",
    "src/ui/contrato.js:42",
    "src/ui/frente.js:84",
-   "src/ui/hangar.js:312",
+   "src/ui/hangar.js:321",
    "src/ui/nodriza.js:29",
-   "src/ui/sectores.js:133"
+   "src/ui/sectores.js:134"
   ],
   "%;width:": [
    "src/ui/contrato.js:41",
    "src/ui/contrato.js:42",
    "src/ui/frente.js:84",
-   "src/ui/hangar.js:312"
+   "src/ui/hangar.js:321"
   ],
   "%;background:": [
    "src/ui/contrato.js:41",
@@ -436,7 +437,7 @@
   ],
   "Contrato": [
    "src/ui/contrato.js:52",
-   "src/ui/sectores.js:11"
+   "src/ui/sectores.js:12"
   ],
   " · vence en ": [
    "src/ui/contrato.js:52"
@@ -492,15 +493,15 @@
   ],
   " pieza": [
    "src/ui/contrato.js:66",
-   "src/ui/hangar.js:403",
+   "src/ui/hangar.js:412",
    "src/ui/informe.js:96",
-   "src/ui/sectores.js:162"
+   "src/ui/sectores.js:163"
   ],
   " piezas": [
    "src/ui/contrato.js:66",
-   "src/ui/hangar.js:403",
+   "src/ui/hangar.js:412",
    "src/ui/informe.js:96",
-   "src/ui/sectores.js:162"
+   "src/ui/sectores.js:163"
   ],
   "+1 resto de nido para mejorar la nave": [
    "src/ui/contrato.js:67"
@@ -517,12 +518,12 @@
   ],
   "flex:": [
    "src/ui/contrato.js:72",
-   "src/ui/sectores.js:43",
-   "src/ui/sectores.js:44"
+   "src/ui/sectores.js:44",
+   "src/ui/sectores.js:45"
   ],
   ";background:": [
    "src/ui/contrato.js:72",
-   "src/ui/sectores.js:43"
+   "src/ui/sectores.js:44"
   ],
   "Pasás a ": [
    "src/ui/contrato.js:75"
@@ -791,7 +792,7 @@
   ],
   " · Nv ": [
    "src/ui/hangar.js:76",
-   "src/ui/hangar.js:107"
+   "src/ui/hangar.js:112"
   ],
   "Piloto anterior": [
    "src/ui/hangar.js:78"
@@ -800,494 +801,524 @@
    "src/ui/hangar.js:79"
   ],
   "No alcanzan los créditos": [
-   "src/ui/hangar.js:99"
+   "src/ui/hangar.js:104"
   ],
   "Reparar todo el mecha": [
-   "src/ui/hangar.js:99"
+   "src/ui/hangar.js:104"
   ],
   "Reparar ₵": [
-   "src/ui/hangar.js:101",
+   "src/ui/hangar.js:106",
    "src/ui/informe.js:79",
    "src/ui/parada.js:62"
   ],
   "Armado de ": [
-   "src/ui/hangar.js:104",
-   "src/ui/hangar.js:115"
+   "src/ui/hangar.js:109",
+   "src/ui/hangar.js:121"
   ],
   "Ficha de ": [
-   "src/ui/hangar.js:106"
+   "src/ui/hangar.js:111"
   ],
   "Integridad ": [
-   "src/ui/hangar.js:108",
-   "src/ui/hangar.js:108"
+   "src/ui/hangar.js:113",
+   "src/ui/hangar.js:113"
   ],
   " · roto: ": [
-   "src/ui/hangar.js:108",
+   "src/ui/hangar.js:113",
    "src/ui/informe.js:56"
   ],
   "Está por irse de la compañía. Sacalo a pelear o dale un bono (en su ficha).": [
-   "src/ui/hangar.js:111"
-  ],
-  "HARTO": [
-   "src/ui/hangar.js:111"
-  ],
-  "ROTO": [
-   "src/ui/hangar.js:113"
-  ],
-  "LISTO": [
-   "src/ui/hangar.js:113"
-  ],
-  "Órdenes: ": [
-   "src/ui/hangar.js:114",
-   "src/ui/hangar.js:114"
-  ],
-  "Órdenes de ": [
    "src/ui/hangar.js:116"
   ],
+  "HARTO": [
+   "src/ui/hangar.js:116"
+  ],
+  "Entran hasta ": [
+   "src/ui/hangar.js:118"
+  ],
+  " mechas: este se queda mirando": [
+   "src/ui/hangar.js:118"
+  ],
+  "NO ENTRA": [
+   "src/ui/hangar.js:118"
+  ],
+  "ROTO": [
+   "src/ui/hangar.js:119"
+  ],
+  "LISTO": [
+   "src/ui/hangar.js:119"
+  ],
+  "Órdenes: ": [
+   "src/ui/hangar.js:120",
+   "src/ui/hangar.js:120"
+  ],
+  "Órdenes de ": [
+   "src/ui/hangar.js:122"
+  ],
   "Próxima misión: ": [
-   "src/ui/hangar.js:119"
-  ],
-  ". Tocar para cambiar": [
-   "src/ui/hangar.js:119"
-  ],
-  "Salir": [
-   "src/ui/hangar.js:124"
-  ],
-  "Va a la misión con su mecha y sus órdenes.": [
-   "src/ui/hangar.js:124"
-  ],
-  " Sale al ": [
-   "src/ui/hangar.js:124"
-  ],
-  " No sale a pelear.": [
    "src/ui/hangar.js:125"
   ],
+  "no entra, el escuadrón está lleno": [
+   "src/ui/hangar.js:125"
+  ],
+  ". Tocar para cambiar": [
+   "src/ui/hangar.js:125"
+  ],
+  "Salir": [
+   "src/ui/hangar.js:130"
+  ],
+  "Va a la misión con su mecha y sus órdenes.": [
+   "src/ui/hangar.js:130"
+  ],
+  " Sale al ": [
+   "src/ui/hangar.js:130"
+  ],
+  " No sale a pelear.": [
+   "src/ui/hangar.js:131"
+  ],
   "Qué hace ": [
-   "src/ui/hangar.js:128"
+   "src/ui/hangar.js:134"
   ],
   " en la próxima misión": [
-   "src/ui/hangar.js:128"
+   "src/ui/hangar.js:134"
   ],
   " (alguien tiene que salir)": [
-   "src/ui/hangar.js:134"
+   "src/ui/hangar.js:140"
   ],
   "Alguien tiene que salir a la misión": [
-   "src/ui/hangar.js:134"
+   "src/ui/hangar.js:140"
   ],
   "PRÓXIMA MISIÓN": [
-   "src/ui/hangar.js:143"
+   "src/ui/hangar.js:149"
   ],
   "PRÓXIMO DESTINO": [
-   "src/ui/hangar.js:145"
+   "src/ui/hangar.js:151"
   ],
   "Elegilo en el mapa": [
-   "src/ui/hangar.js:145"
+   "src/ui/hangar.js:151"
   ],
   "Mapa ›": [
-   "src/ui/hangar.js:145"
+   "src/ui/hangar.js:151"
   ],
   "La compañía: renombre, nave, bandos y némesis": [
-   "src/ui/hangar.js:150"
+   "src/ui/hangar.js:156"
   ],
   "es-AR": [
-   "src/ui/hangar.js:151",
+   "src/ui/hangar.js:157",
    "src/ui/nodriza.js:39",
    "src/ui/nodriza.js:44",
    "src/ui/parada.js:51",
-   "src/ui/sectores.js:65"
+   "src/ui/sectores.js:66"
   ],
   " Este es tu escuadrón. Tocá un mecha para armarlo, el ícono de lista para sus órdenes y el botón de la derecha para decidir quién sale.": [
-   "src/ui/hangar.js:155"
+   "src/ui/hangar.js:161"
+  ],
+  " Salen ": [
+   "src/ui/hangar.js:164"
+  ],
+  " lugares.": [
+   "src/ui/hangar.js:164"
+  ],
+  " no entra y se queda": [
+   "src/ui/hangar.js:164"
+  ],
+  " no entran y se quedan": [
+   "src/ui/hangar.js:164"
+  ],
+  " mirando: dales una tarea.": [
+   "src/ui/hangar.js:164"
+  ],
+  " Los que se quedan suman ganas de irse, salvo los que descansan.": [
+   "src/ui/hangar.js:165"
   ],
   "Desplegar · ": [
-   "src/ui/hangar.js:159"
+   "src/ui/hangar.js:168"
   ],
   " mecha": [
-   "src/ui/hangar.js:159",
+   "src/ui/hangar.js:168",
    "src/ui/preparacion.js:69"
   ],
   " mechas": [
-   "src/ui/hangar.js:159"
+   "src/ui/hangar.js:168"
   ],
   "Volver al mapa": [
-   "src/ui/hangar.js:160"
+   "src/ui/hangar.js:169"
   ],
   "Estructura": [
-   "src/ui/hangar.js:205",
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:214",
+   "src/ui/hangar.js:706"
   ],
   "Blindaje": [
-   "src/ui/hangar.js:205",
-   "src/ui/hangar.js:324",
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:214",
+   "src/ui/hangar.js:333",
+   "src/ui/hangar.js:705"
   ],
   "Daño": [
-   "src/ui/hangar.js:205",
-   "src/ui/hangar.js:325"
+   "src/ui/hangar.js:214",
+   "src/ui/hangar.js:334"
   ],
   "Alcance": [
-   "src/ui/hangar.js:205",
-   "src/ui/hangar.js:326",
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:214",
+   "src/ui/hangar.js:335",
+   "src/ui/hangar.js:706"
   ],
   "Puntería": [
-   "src/ui/hangar.js:206",
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:215",
+   "src/ui/hangar.js:705"
   ],
   "Evasión": [
-   "src/ui/hangar.js:206",
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:215",
+   "src/ui/hangar.js:705"
   ],
   "Paso": [
-   "src/ui/hangar.js:206",
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:215",
+   "src/ui/hangar.js:706"
   ],
   "Visión": [
-   "src/ui/hangar.js:206",
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:215",
+   "src/ui/hangar.js:706"
   ],
   "Peso": [
-   "src/ui/hangar.js:257"
+   "src/ui/hangar.js:266"
   ],
   "El mecha de ": [
-   "src/ui/hangar.js:289"
-  ],
-  ", con una pieza a prueba": [
-   "src/ui/hangar.js:289"
-  ],
-  "Vacía": [
-   "src/ui/hangar.js:295"
-  ],
-  "vacío": [
    "src/ui/hangar.js:298"
   ],
+  ", con una pieza a prueba": [
+   "src/ui/hangar.js:298"
+  ],
+  "Vacía": [
+   "src/ui/hangar.js:304"
+  ],
+  "vacío": [
+   "src/ui/hangar.js:307"
+  ],
   " Sobrepeso: camina más lento.": [
-   "src/ui/hangar.js:319"
+   "src/ui/hangar.js:328"
   ],
   " Mochila vacía: te sobran ": [
-   "src/ui/hangar.js:320"
-  ],
-  " de carga.": [
-   "src/ui/hangar.js:320"
-  ],
-  " Roto: ": [
-   "src/ui/hangar.js:321"
-  ],
-  ". No anda hasta repararlo o cambiarlo.": [
-   "src/ui/hangar.js:321"
-  ],
-  "Resumen del mecha": [
-   "src/ui/hangar.js:323"
-  ],
-  "Carga": [
    "src/ui/hangar.js:329"
   ],
+  " de carga.": [
+   "src/ui/hangar.js:329"
+  ],
+  " Roto: ": [
+   "src/ui/hangar.js:330"
+  ],
+  ". No anda hasta repararlo o cambiarlo.": [
+   "src/ui/hangar.js:330"
+  ],
+  "Resumen del mecha": [
+   "src/ui/hangar.js:332"
+  ],
+  "Carga": [
+   "src/ui/hangar.js:338"
+  ],
   "Nombre del mecha": [
-   "src/ui/hangar.js:336"
+   "src/ui/hangar.js:345"
   ],
   "Armar solo: poner lo mejor del depósito para su clase": [
-   "src/ui/hangar.js:346"
+   "src/ui/hangar.js:355"
   ],
   "Marcas de bajas en el torso": [
-   "src/ui/hangar.js:353"
+   "src/ui/hangar.js:362"
   ],
   "Habilidades especiales": [
-   "src/ui/hangar.js:354"
+   "src/ui/hangar.js:363"
   ],
   "Dejar vacío": [
-   "src/ui/hangar.js:384"
+   "src/ui/hangar.js:393"
   ],
   " · puesta": [
-   "src/ui/hangar.js:385"
+   "src/ui/hangar.js:394"
   ],
   " · probando": [
-   "src/ui/hangar.js:385"
+   "src/ui/hangar.js:394"
   ],
   "Queda el lugar vacío.": [
-   "src/ui/hangar.js:396"
+   "src/ui/hangar.js:405"
   ],
   " ★ Gana: ": [
-   "src/ui/hangar.js:397"
+   "src/ui/hangar.js:406"
   ],
   " (y sus órdenes).": [
-   "src/ui/hangar.js:397"
+   "src/ui/hangar.js:406"
   ],
   " ✕ Pierde: ": [
-   "src/ui/hangar.js:398"
+   "src/ui/hangar.js:407"
   ],
   "Piezas para ": [
-   "src/ui/hangar.js:401"
+   "src/ui/hangar.js:410"
   ],
   "sin piezas": [
-   "src/ui/hangar.js:403"
+   "src/ui/hangar.js:412"
   ],
   "Mejor para ": [
-   "src/ui/hangar.js:404"
+   "src/ui/hangar.js:413"
   ],
   "Cerrar": [
-   "src/ui/hangar.js:405",
-   "src/ui/hangar.js:665"
+   "src/ui/hangar.js:414",
+   "src/ui/hangar.js:674"
   ],
   "No hay piezas de este tipo en el depósito. Se ganan en las misiones o se compran en las paradas técnicas.": [
-   "src/ui/hangar.js:408"
+   "src/ui/hangar.js:417"
   ],
   "Armar solo": [
-   "src/ui/hangar.js:411"
+   "src/ui/hangar.js:420"
   ],
   "Elegí una pieza": [
-   "src/ui/hangar.js:412"
+   "src/ui/hangar.js:421"
   ],
   "Equipar ": [
-   "src/ui/hangar.js:412"
+   "src/ui/hangar.js:421"
   ],
   "Sacar": [
-   "src/ui/hangar.js:412"
+   "src/ui/hangar.js:421"
   ],
   "Clase ": [
-   "src/ui/hangar.js:440"
+   "src/ui/hangar.js:449"
   ],
   " · le falta: ": [
-   "src/ui/hangar.js:450"
+   "src/ui/hangar.js:459"
   ],
   "Ninguna.": [
-   "src/ui/hangar.js:451"
+   "src/ui/hangar.js:460"
   ],
   "Algunas partes traen habilidades y órdenes nuevas (★). Si las equipás, aparecen en las órdenes.": [
-   "src/ui/hangar.js:452"
+   "src/ui/hangar.js:461"
   ],
   "a:": [
-   "src/ui/hangar.js:462",
-   "src/ui/hangar.js:544"
+   "src/ui/hangar.js:471",
+   "src/ui/hangar.js:553"
   ],
   "c:": [
-   "src/ui/hangar.js:463",
-   "src/ui/hangar.js:544"
+   "src/ui/hangar.js:472",
+   "src/ui/hangar.js:553"
   ],
   "De fábrica": [
-   "src/ui/hangar.js:506",
-   "src/ui/hangar.js:536"
+   "src/ui/hangar.js:515",
+   "src/ui/hangar.js:545"
   ],
   "Las órdenes con las que viene un ": [
-   "src/ui/hangar.js:506"
+   "src/ui/hangar.js:515"
   ],
   "Propias": [
-   "src/ui/hangar.js:508"
+   "src/ui/hangar.js:517"
   ],
   "Órdenes armadas a mano.": [
-   "src/ui/hangar.js:508"
+   "src/ui/hangar.js:517"
   ],
   "N": [
-   "src/ui/hangar.js:512",
+   "src/ui/hangar.js:521",
    "src/ui/informe.js:24"
   ],
   "cuándo": [
-   "src/ui/hangar.js:522"
+   "src/ui/hangar.js:531"
   ],
   "qué": [
-   "src/ui/hangar.js:522"
+   "src/ui/hangar.js:531"
   ],
   "a quién": [
-   "src/ui/hangar.js:522"
+   "src/ui/hangar.js:531"
   ],
   "Perfiles": [
-   "src/ui/hangar.js:537"
+   "src/ui/hangar.js:546"
   ],
   "Perfil ": [
-   "src/ui/hangar.js:538"
+   "src/ui/hangar.js:547"
   ],
   " (le falta ": [
-   "src/ui/hangar.js:552"
+   "src/ui/hangar.js:561"
   ],
   " con-bloqueo": [
-   "src/ui/hangar.js:557"
+   "src/ui/hangar.js:566"
   ],
   "Arrastrar la orden ": [
-   "src/ui/hangar.js:562"
+   "src/ui/hangar.js:571"
   ],
   " para cambiarla de lugar": [
-   "src/ui/hangar.js:562"
+   "src/ui/hangar.js:571"
   ],
   "Arrastrá para cambiar el orden": [
-   "src/ui/hangar.js:562"
+   "src/ui/hangar.js:571"
   ],
   "Orden ": [
-   "src/ui/hangar.js:573",
-   "src/ui/hangar.js:574",
-   "src/ui/hangar.js:659"
+   "src/ui/hangar.js:582",
+   "src/ui/hangar.js:583",
+   "src/ui/hangar.js:668"
   ],
   ": se gana en el nivel ": [
-   "src/ui/hangar.js:574"
+   "src/ui/hangar.js:583"
   ],
   "· Nv ": [
-   "src/ui/hangar.js:575"
-  ],
-  "■ cuándo": [
-   "src/ui/hangar.js:583"
-  ],
-  "■ qué": [
-   "src/ui/hangar.js:583"
-  ],
-  "■ a quién": [
-   "src/ui/hangar.js:583"
-  ],
-  "↓ en orden": [
-   "src/ui/hangar.js:583"
-  ],
-  "Órdenes, de arriba abajo: hace la primera que se cumpla": [
    "src/ui/hangar.js:584"
   ],
+  "■ cuándo": [
+   "src/ui/hangar.js:592"
+  ],
+  "■ qué": [
+   "src/ui/hangar.js:592"
+  ],
+  "■ a quién": [
+   "src/ui/hangar.js:592"
+  ],
+  "↓ en orden": [
+   "src/ui/hangar.js:592"
+  ],
+  "Órdenes, de arriba abajo: hace la primera que se cumpla": [
+   "src/ui/hangar.js:593"
+  ],
   "Pasivas": [
-   "src/ui/hangar.js:585"
+   "src/ui/hangar.js:594"
   ],
   "Lo que lleva encima siempre, sin que se lo ordenes.": [
-   "src/ui/hangar.js:585"
+   "src/ui/hangar.js:594"
   ],
   "Editar": [
-   "src/ui/hangar.js:599"
+   "src/ui/hangar.js:608"
   ],
   "Listo": [
-   "src/ui/hangar.js:600",
-   "src/ui/hangar.js:692"
+   "src/ui/hangar.js:609",
+   "src/ui/hangar.js:701"
   ],
   "translateY(": [
-   "src/ui/hangar.js:623"
+   "src/ui/hangar.js:632"
   ],
   ": elegir ": [
-   "src/ui/hangar.js:659"
+   "src/ui/hangar.js:668"
   ],
   " (bloqueada: ": [
-   "src/ui/hangar.js:671"
-  ],
-  "No la puede cumplir: le falta ": [
    "src/ui/hangar.js:680"
   ],
-  "Menos": [
-   "src/ui/hangar.js:686"
-  ],
-  "Más": [
-   "src/ui/hangar.js:686"
-  ],
-  "Subir la orden": [
+  "No la puede cumplir: le falta ": [
    "src/ui/hangar.js:689"
   ],
+  "Menos": [
+   "src/ui/hangar.js:695"
+  ],
+  "Más": [
+   "src/ui/hangar.js:695"
+  ],
+  "Subir la orden": [
+   "src/ui/hangar.js:698"
+  ],
   "Bajar la orden": [
-   "src/ui/hangar.js:690"
+   "src/ui/hangar.js:699"
   ],
   "Borrar la orden": [
-   "src/ui/hangar.js:691"
+   "src/ui/hangar.js:700"
   ],
   "Moral": [
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:705"
   ],
   "Daño %": [
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:705"
   ],
   "Recarga": [
-   "src/ui/hangar.js:696"
+   "src/ui/hangar.js:705"
   ],
   "Iniciativa": [
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:706"
   ],
   "Cadencia": [
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:706"
   ],
   "Cargador": [
-   "src/ui/hangar.js:697"
+   "src/ui/hangar.js:706"
   ],
   "Se cura con un vínculo nuevo": [
-   "src/ui/hangar.js:702"
+   "src/ui/hangar.js:711"
   ],
   "Se cura descansando (": [
-   "src/ui/hangar.js:702"
+   "src/ui/hangar.js:711"
   ],
   " más)": [
-   "src/ui/hangar.js:702"
+   "src/ui/hangar.js:711"
   ],
   "Personalidad: ": [
-   "src/ui/hangar.js:711"
+   "src/ui/hangar.js:720"
   ],
   " A veces pasa por alto tus órdenes.": [
-   "src/ui/hangar.js:711"
+   "src/ui/hangar.js:720"
   ],
   "Vínculo con «": [
-   "src/ui/hangar.js:713"
+   "src/ui/hangar.js:722"
   ],
   "Cerca de su vínculo pelea mejor; si lo pierde, se derrumba.": [
-   "src/ui/hangar.js:713"
+   "src/ui/hangar.js:722"
   ],
   "Le pesa en combate: puede quebrarse.": [
-   "src/ui/hangar.js:715"
+   "src/ui/hangar.js:724"
   ],
   "Piloto": [
-   "src/ui/hangar.js:734"
+   "src/ui/hangar.js:743"
   ],
   "NIV": [
-   "src/ui/hangar.js:741"
+   "src/ui/hangar.js:750"
   ],
   " XP": [
-   "src/ui/hangar.js:742",
-   "src/ui/hangar.js:742",
+   "src/ui/hangar.js:751",
+   "src/ui/hangar.js:751",
    "src/ui/informe.js:65",
    "src/campana/tareas.js:51"
   ],
   "Nivel máximo": [
-   "src/ui/hangar.js:742"
+   "src/ui/hangar.js:751"
   ],
   "Vínculo: pelean mejor cerca y les duele perderse": [
-   "src/ui/hangar.js:746"
+   "src/ui/hangar.js:755"
   ],
   "Sin vínculo": [
-   "src/ui/hangar.js:746"
+   "src/ui/hangar.js:755"
   ],
   "No tiene a nadie cercano en el escuadrón": [
-   "src/ui/hangar.js:746"
+   "src/ui/hangar.js:755"
   ],
   "Lo busca «": [
-   "src/ui/hangar.js:747"
+   "src/ui/hangar.js:756"
   ],
   "Misiones: ": [
-   "src/ui/hangar.js:748"
+   "src/ui/hangar.js:757"
   ],
   " · Bajas: ": [
-   "src/ui/hangar.js:748"
+   "src/ui/hangar.js:757"
   ],
   "Lo que lleva encima": [
-   "src/ui/hangar.js:750"
+   "src/ui/hangar.js:759"
   ],
   "Relaciones": [
-   "src/ui/hangar.js:751",
+   "src/ui/hangar.js:760",
    "src/ui/informe.js:126"
   ],
   "Hoja de servicio": [
-   "src/ui/hangar.js:752"
+   "src/ui/hangar.js:761"
   ],
   "Está harto: si no cambia algo, se va con su mecha.": [
-   "src/ui/hangar.js:760"
+   "src/ui/hangar.js:769"
   ],
   "Anda con cara larga.": [
-   "src/ui/hangar.js:760"
+   "src/ui/hangar.js:769"
   ],
   "Está bien acá.": [
-   "src/ui/hangar.js:760"
+   "src/ui/hangar.js:769"
   ],
   "Ganas de irse": [
-   "src/ui/hangar.js:762",
-   "src/ui/hangar.js:762"
+   "src/ui/hangar.js:771",
+   "src/ui/hangar.js:771"
   ],
   " Sube si se queda sin salir, si se lleva mal con todos o si pierde a su vínculo; baja cuando sale y ganan.": [
-   "src/ui/hangar.js:763"
+   "src/ui/hangar.js:772"
   ],
   "Darle un bono · ₵": [
-   "src/ui/hangar.js:764"
+   "src/ui/hangar.js:773"
   ],
   "Se lleva normal con todos. Lo que vivan juntos lo va a cambiar.": [
-   "src/ui/hangar.js:774"
+   "src/ui/hangar.js:783"
   ],
   "Los amigos cerca apuntan mejor. Los rivales juntos discuten por radio.": [
-   "src/ui/hangar.js:775"
+   "src/ui/hangar.js:784"
   ],
   "Todavía no hay nada para contar. Ya va a haber.": [
-   "src/ui/hangar.js:784"
+   "src/ui/hangar.js:793"
   ],
   "brazo izq.": [
    "src/ui/informe.js:7"
@@ -1476,7 +1507,7 @@
   ],
   " créditos.": [
    "src/ui/informe.js:135",
-   "src/ui/sectores.js:173"
+   "src/ui/sectores.js:174"
   ],
   " Para llevarte sus armas enteras, apuntá a la cabina.": [
    "src/ui/informe.js:136"
@@ -1555,7 +1586,7 @@
   ],
   "%;top:": [
    "src/ui/nodriza.js:29",
-   "src/ui/sectores.js:133"
+   "src/ui/sectores.js:134"
   ],
   ", nivel ": [
    "src/ui/nodriza.js:30"
@@ -1584,7 +1615,7 @@
   ],
   "NODRIZA": [
    "src/ui/nodriza.js:43",
-   "src/ui/sectores.js:127"
+   "src/ui/sectores.js:128"
   ],
   "Módulos de la nave": [
    "src/ui/nodriza.js:45"
@@ -1611,29 +1642,29 @@
   ],
   "PARADA TÉCNICA · ": [
    "src/ui/parada.js:49",
-   "src/ui/sectores.js:169"
+   "src/ui/sectores.js:170"
   ],
   "PUERTO LIBRE": [
    "src/ui/parada.js:49"
   ],
   "Puerto del gremio": [
    "src/ui/parada.js:50",
-   "src/ui/sectores.js:145"
+   "src/ui/sectores.js:146"
   ],
   "Parada de ": [
    "src/ui/parada.js:50",
-   "src/ui/sectores.js:145"
+   "src/ui/sectores.js:146"
   ],
   "Los transportistas no se meten en la guerra: precios normales y piezas de todos.": [
    "src/ui/parada.js:52"
   ],
   "Te ven ": [
    "src/ui/parada.js:53",
-   "src/ui/sectores.js:172"
+   "src/ui/sectores.js:173"
   ],
   ": precios ": [
    "src/ui/parada.js:53",
-   "src/ui/sectores.js:172"
+   "src/ui/sectores.js:173"
   ],
   " Venden ": [
    "src/ui/parada.js:53"
@@ -1641,11 +1672,11 @@
   "Combustible": [
    "src/ui/parada.js:54",
    "src/ui/parada.js:56",
-   "src/ui/sectores.js:64"
+   "src/ui/sectores.js:65"
   ],
   "Combustible ": [
    "src/ui/parada.js:55",
-   "src/ui/sectores.js:64"
+   "src/ui/sectores.js:65"
   ],
   " cada uno": [
    "src/ui/parada.js:55"
@@ -1707,37 +1738,49 @@
   "a dónde ir primero": [
    "src/ui/plan.js:31"
   ],
+  "Saben dónde bajan. ": [
+   "src/ui/plan.js:32"
+  ],
+  "Las casillas ": [
+   "src/ui/plan.js:32"
+  ],
+  "rayadas en rojo": [
+   "src/ui/plan.js:32"
+  ],
+  " las bombardean apenas empieza.": [
+   "src/ui/plan.js:32"
+  ],
   "Desplegar": [
-   "src/ui/plan.js:33"
+   "src/ui/plan.js:34"
   ],
   "px VT323, monospace": [
-   "src/ui/plan.js:55",
-   "src/ui/plan.js:87",
+   "src/ui/plan.js:66",
+   "src/ui/plan.js:98",
    "src/ui/vistaMapa.js:49"
   ],
   "Sigue sus órdenes": [
-   "src/ui/plan.js:92"
-  ],
-  "Aguanta hasta ver al enemigo": [
-   "src/ui/plan.js:92"
-  ],
-  "Va primero al punto marcado": [
-   "src/ui/plan.js:92"
-  ],
-  " · alcance ": [
-   "src/ui/plan.js:98"
-  ],
-  "Qué hace primero ": [
-   "src/ui/plan.js:102"
-  ],
-  "Sus órdenes": [
    "src/ui/plan.js:103"
   ],
+  "Aguanta hasta ver al enemigo": [
+   "src/ui/plan.js:103"
+  ],
+  "Va primero al punto marcado": [
+   "src/ui/plan.js:103"
+  ],
+  " · alcance ": [
+   "src/ui/plan.js:109"
+  ],
+  "Qué hace primero ": [
+   "src/ui/plan.js:113"
+  ],
+  "Sus órdenes": [
+   "src/ui/plan.js:114"
+  ],
   "Aguantar acá": [
-   "src/ui/plan.js:104"
+   "src/ui/plan.js:115"
   ],
   "Ir a un punto: tocá el mapa": [
-   "src/ui/plan.js:105"
+   "src/ui/plan.js:116"
   ],
   "MECHA": [
    "src/ui/portada.js:21"
@@ -1806,22 +1849,22 @@
    "src/ui/portada.js:53"
   ],
   "mechafighter.idioma": [
-   "src/ui/portada.js:60"
-  ],
-  "Idioma": [
    "src/ui/portada.js:61"
   ],
+  "Idioma": [
+   "src/ui/portada.js:66"
+  ],
   "Español": [
-   "src/ui/portada.js:62"
+   "src/ui/portada.js:67"
   ],
   "English": [
-   "src/ui/portada.js:62"
+   "src/ui/portada.js:67"
   ],
   "Novedades: ": [
-   "src/ui/portada.js:82"
+   "src/ui/portada.js:88"
   ],
   "NOVEDADES": [
-   "src/ui/portada.js:83"
+   "src/ui/portada.js:89"
   ],
   "Plano del mapa": [
    "src/ui/preparacion.js:16"
@@ -1965,201 +2008,201 @@
    "src/ui/preparacion.js:108"
   ],
   "Parada técnica": [
-   "src/ui/sectores.js:11"
+   "src/ui/sectores.js:12"
   ],
   "Reclutas": [
-   "src/ui/sectores.js:11"
+   "src/ui/sectores.js:12"
   ],
   "Señal": [
-   "src/ui/sectores.js:11"
+   "src/ui/sectores.js:12"
   ],
   "Refugio": [
-   "src/ui/sectores.js:11"
+   "src/ui/sectores.js:12"
   ],
   "Guarida": [
-   "src/ui/sectores.js:11",
-   "src/ui/sectores.js:31"
-  ],
-  "Nido": [
+   "src/ui/sectores.js:12",
    "src/ui/sectores.js:32"
   ],
+  "Nido": [
+   "src/ui/sectores.js:33"
+  ],
   "SECTOR ": [
-   "src/ui/sectores.js:63"
+   "src/ui/sectores.js:64"
   ],
   " · SALTO ": [
-   "src/ui/sectores.js:63"
+   "src/ui/sectores.js:64"
   ],
   "Menú principal": [
-   "src/ui/sectores.js:66"
-  ],
-  "El frente del sector y cómo te ve cada bando": [
    "src/ui/sectores.js:67"
   ],
+  "El frente del sector y cómo te ve cada bando": [
+   "src/ui/sectores.js:68"
+  ],
   "Frente ›": [
-   "src/ui/sectores.js:70"
+   "src/ui/sectores.js:71"
   ],
   "Inteligencia: cada contrato ganado da datos": [
-   "src/ui/sectores.js:72"
-  ],
-  "guarida a la vista": [
    "src/ui/sectores.js:73"
   ],
+  "guarida a la vista": [
+   "src/ui/sectores.js:74"
+  ],
   "Sueldos de los pilotos: si no alcanza, a todos les suben las ganas de irse": [
-   "src/ui/sectores.js:75"
+   "src/ui/sectores.js:76"
   ],
   "Sueldos: ": [
-   "src/ui/sectores.js:75"
+   "src/ui/sectores.js:76"
   ],
   " créditos en ": [
-   "src/ui/sectores.js:75"
+   "src/ui/sectores.js:76"
   ],
   " en ": [
-   "src/ui/sectores.js:75",
+   "src/ui/sectores.js:76",
    "src/campana/hoja.js:49"
   ],
   " salto": [
-   "src/ui/sectores.js:75"
+   "src/ui/sectores.js:76"
   ],
   " saltos más": [
-   "src/ui/sectores.js:77"
+   "src/ui/sectores.js:78"
   ],
   " Día de pago: ₵": [
-   "src/ui/sectores.js:78"
+   "src/ui/sectores.js:79"
   ],
   " en sueldos.": [
-   "src/ui/sectores.js:78"
+   "src/ui/sectores.js:79"
   ],
   " No alcanzó para los sueldos (₵": [
-   "src/ui/sectores.js:78"
+   "src/ui/sectores.js:79"
   ],
   "): todos tienen más ganas de irse.": [
-   "src/ui/sectores.js:78"
+   "src/ui/sectores.js:79"
   ],
   " Sin combustible: el remolque cobró ₵": [
-   "src/ui/sectores.js:79"
-  ],
-  " y los mechas perdieron ": [
-   "src/ui/sectores.js:79"
-  ],
-  "» se hartó y se fue con su mecha. Firmó con ": [
    "src/ui/sectores.js:80"
   ],
-  " En el salto largo se les pegó fauna al casco: los mechas perdieron ": [
+  " y los mechas perdieron ": [
+   "src/ui/sectores.js:80"
+  ],
+  "» se hartó y se fue con su mecha. Firmó con ": [
    "src/ui/sectores.js:81"
   ],
+  " En el salto largo se les pegó fauna al casco: los mechas perdieron ": [
+   "src/ui/sectores.js:82"
+  ],
   "No hay destinos a la vista.": [
-   "src/ui/sectores.js:83"
+   "src/ui/sectores.js:84"
   ],
   "Brújula: destinos al alcance de la nave": [
-   "src/ui/sectores.js:121"
-  ],
-  "%;height:": [
    "src/ui/sectores.js:122"
   ],
+  "%;height:": [
+   "src/ui/sectores.js:123"
+  ],
   "%;transform:rotate(": [
-   "src/ui/sectores.js:125"
+   "src/ui/sectores.js:126"
   ],
   "rad);border-color:": [
-   "src/ui/sectores.js:125"
+   "src/ui/sectores.js:126"
   ],
   "La nodriza, con el escuadrón": [
-   "src/ui/sectores.js:127"
+   "src/ui/sectores.js:128"
   ],
   "%;--c:": [
-   "src/ui/sectores.js:133"
+   "src/ui/sectores.js:134"
   ],
   " de combustible": [
-   "src/ui/sectores.js:135",
-   "src/ui/sectores.js:181"
+   "src/ui/sectores.js:136",
+   "src/ui/sectores.js:182"
   ],
   ". Ya estuviste": [
-   "src/ui/sectores.js:135"
+   "src/ui/sectores.js:136"
   ],
   "Se vio a un némesis": [
-   "src/ui/sectores.js:139"
+   "src/ui/sectores.js:140"
   ],
   "Una señal conocida": [
-   "src/ui/sectores.js:144"
+   "src/ui/sectores.js:145"
   ],
   "GUARIDA · ": [
-   "src/ui/sectores.js:154"
+   "src/ui/sectores.js:155"
   ],
   "jefe del sector": [
-   "src/ui/sectores.js:154",
+   "src/ui/sectores.js:155",
    "src/campana/partida.js:118",
    "src/campana/partida.js:137"
   ],
   "Sabemos que está por acá. Con ": [
-   "src/ui/sectores.js:155"
-  ],
-  " más aparece la ruta.": [
-   "src/ui/sectores.js:155"
-  ],
-  "Bajarlo cierra el sector y se cruza al siguiente. Si sale mal, se puede volver a intentar.": [
    "src/ui/sectores.js:156"
   ],
-  "Peligro ": [
-   "src/ui/sectores.js:157",
-   "src/ui/sectores.js:162"
+  " más aparece la ruta.": [
+   "src/ui/sectores.js:156"
   ],
-  " + trofeo": [
+  "Bajarlo cierra el sector y se cruza al siguiente. Si sale mal, se puede volver a intentar.": [
    "src/ui/sectores.js:157"
   ],
-  "CONTRATO · ": [
-   "src/ui/sectores.js:160"
-  ],
-  "Contra ": [
-   "src/ui/sectores.js:161",
-   "src/ui/sectores.js:161"
-  ],
-  "vence en ": [
+  "Peligro ": [
+   "src/ui/sectores.js:158",
    "src/ui/sectores.js:163"
   ],
+  " + trofeo": [
+   "src/ui/sectores.js:158"
+  ],
+  "CONTRATO · ": [
+   "src/ui/sectores.js:161"
+  ],
+  "Contra ": [
+   "src/ui/sectores.js:162",
+   "src/ui/sectores.js:162"
+  ],
+  "vence en ": [
+   "src/ui/sectores.js:164"
+  ],
   "Una frecuencia que el escuadrón reconoce. No dice quién manda.": [
-   "src/ui/sectores.js:166"
+   "src/ui/sectores.js:167"
   ],
   "Combustible, reparaciones, mejoras de la nave y piezas de ": [
-   "src/ui/sectores.js:171"
-  ],
-  "todos los bandos": [
-   "src/ui/sectores.js:171"
-  ],
-  "Precios normales.": [
    "src/ui/sectores.js:172"
   ],
-  "Pilotos sin trabajo buscan escuadrón. Cada uno cuesta ": [
+  "todos los bandos": [
+   "src/ui/sectores.js:172"
+  ],
+  "Precios normales.": [
    "src/ui/sectores.js:173"
   ],
+  "Pilotos sin trabajo buscan escuadrón. Cada uno cuesta ": [
+   "src/ui/sectores.js:174"
+  ],
   "El sensor la identifica: alguien pide ayuda (o eso dice).": [
-   "src/ui/sectores.js:174"
-  ],
-  "Una señal sin identificar. Puede ser gente, chatarra o una trampa.": [
-   "src/ui/sectores.js:174"
-  ],
-  "Un refugio tranquilo: se reparan los mechas y se ordenan las cabezas.": [
    "src/ui/sectores.js:175"
   ],
-  "Ya estuviste acá. Volver cuesta el salto, pero no hay nada nuevo.": [
+  "Una señal sin identificar. Puede ser gente, chatarra o una trampa.": [
+   "src/ui/sectores.js:175"
+  ],
+  "Un refugio tranquilo: se reparan los mechas y se ordenan las cabezas.": [
    "src/ui/sectores.js:176"
   ],
+  "Ya estuviste acá. Volver cuesta el salto, pero no hay nada nuevo.": [
+   "src/ui/sectores.js:177"
+  ],
   "Se vio a «": [
-   "src/ui/sectores.js:183"
+   "src/ui/sectores.js:184"
   ],
   "» por acá. ": [
-   "src/ui/sectores.js:183"
+   "src/ui/sectores.js:184"
   ],
   "Viene por el escuadrón.": [
-   "src/ui/sectores.js:183"
+   "src/ui/sectores.js:184"
   ],
   "Saltar · ": [
-   "src/ui/sectores.js:186",
-   "src/ui/sectores.js:187"
+   "src/ui/sectores.js:187",
+   "src/ui/sectores.js:188"
   ],
   "Ver contrato": [
-   "src/ui/sectores.js:186"
+   "src/ui/sectores.js:187"
   ],
   "Faltan datos (": [
-   "src/ui/sectores.js:187"
+   "src/ui/sectores.js:188"
   ],
   "Luces: sin WebGL, uso la version simple": [
    "src/vista/luz.js:252"
@@ -2259,17 +2302,17 @@
   ],
   "ex:": [
    "src/vista/repeticion.js:354",
-   "src/vista/repeticion.js:590",
+   "src/vista/repeticion.js:608",
    "src/campana/saqueo.js:34"
   ],
   "NÉMESIS · ": [
    "src/vista/repeticion.js:356",
-   "src/vista/repeticion.js:595"
+   "src/vista/repeticion.js:613"
   ],
   " (canal abierto): «": [
    "src/vista/repeticion.js:356",
-   "src/vista/repeticion.js:535",
-   "src/vista/repeticion.js:595"
+   "src/vista/repeticion.js:553",
+   "src/vista/repeticion.js:613"
   ],
   "Se viene abajo un edificio": [
    "src/vista/repeticion.js:398"
@@ -2304,39 +2347,51 @@
   " contactos.": [
    "src/vista/repeticion.js:520"
   ],
+  "CONTROL › ESCUADRÓN: ¡Artillería apuntando a la zona de bajada! Muévanse.": [
+   "src/vista/repeticion.js:522"
+  ],
+  "¡BOMBARDEO! ": [
+   "src/vista/repeticion.js:536"
+  ],
+  "Le dio a ": [
+   "src/vista/repeticion.js:536"
+  ],
+  "No le dio a nadie: bien ahí.": [
+   "src/vista/repeticion.js:536"
+  ],
   "¡MINA! ": [
-   "src/vista/repeticion.js:526"
+   "src/vista/repeticion.js:544"
   ],
   " pisó una mina.": [
-   "src/vista/repeticion.js:526"
+   "src/vista/repeticion.js:544"
   ],
   "CONTROL › ESCUADRÓN: ": [
-   "src/vista/repeticion.js:530",
-   "src/vista/repeticion.js:542"
+   "src/vista/repeticion.js:548",
+   "src/vista/repeticion.js:560"
   ],
   "CONTROL › ESCUADRÓN: La milicia local pelea con ustedes (": [
-   "src/vista/repeticion.js:532"
+   "src/vista/repeticion.js:550"
   ],
   " pelotón": [
-   "src/vista/repeticion.js:532"
+   "src/vista/repeticion.js:550"
   ],
   "). No los dejen solos.": [
-   "src/vista/repeticion.js:532"
+   "src/vista/repeticion.js:550"
   ],
   "CONTROL › ESCUADRÓN: Objetivo confirmado: ": [
-   "src/vista/repeticion.js:534"
+   "src/vista/repeticion.js:552"
   ],
   ". No vuelvan sin su cabeza.": [
-   "src/vista/repeticion.js:534"
+   "src/vista/repeticion.js:552"
   ],
   " › CONTROL": [
-   "src/vista/repeticion.js:583"
+   "src/vista/repeticion.js:601"
   ],
   " › CONTROL: «": [
-   "src/vista/repeticion.js:598"
+   "src/vista/repeticion.js:616"
   ],
   "¡EYECCIÓN!": [
-   "src/vista/repeticion.js:603"
+   "src/vista/repeticion.js:621"
   ],
   " viene confiado: ": [
    "src/campana/animo.js:62"

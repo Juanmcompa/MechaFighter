@@ -45,7 +45,9 @@
    "irrumpe_fauna.nombre": "Fauna Nearby",
    "irrumpe_fauna.descripcion": "There's a nest nearby: midway through the mission, void fauna storms in, and it doesn't pick sides.",
    "irrumpe_contagio.nombre": "Blighted Nearby",
-   "irrumpe_contagio.descripcion": "The area is blighted: midway through the mission, a horde shows up. They're weak but many: watch your ammo."
+   "irrumpe_contagio.descripcion": "The area is blighted: midway through the mission, a horde shows up. They're weak but many: watch your ammo.",
+   "bombardeo.nombre": "They Know Where You Drop",
+   "bombardeo.descripcion": "They've got the coordinates of your drop zone: they'll shell the usual entry points as soon as it starts. Drop somewhere else."
   },
   "enemigos": {
    "unidades.saqueador.nombre": "Raider",
@@ -113,7 +115,11 @@
    "anclado.nombre": "Pinned Down",
    "sobrecargado.nombre": "Overloaded",
    "recalentado.nombre": "Overheated",
-   "aturdido.nombre": "Stunned"
+   "aturdido.nombre": "Stunned",
+   "orden_carga.nombre": "Charging!",
+   "orden_fuego.nombre": "Focus Fire",
+   "orden_aguanten.nombre": "Holding",
+   "orden_replieguen.nombre": "Falling Back"
   },
   "gambits": {
    "condiciones.siempre.texto": "Always",
@@ -475,13 +481,13 @@
    "tareas.explorar.nombre": "Scout",
    "tareas.explorar.descripcion": "Goes ahead to recon: the mission starts with no fog and adds intel on the sector boss.",
    "control.ordenes.carga.nombre": "Charge!",
-   "control.ordenes.carga.descripcion": "Everyone advances and fires at the nearest enemy. Nobody falls back.",
+   "control.ordenes.carga.descripcion": "Everyone advances and fires at the nearest enemy, faster and hitting harder. Nobody falls back.",
    "control.ordenes.fuego.nombre": "Focus fire!",
-   "control.ordenes.fuego.descripcion": "Everyone fires at the most dangerous enemy until it goes down.",
+   "control.ordenes.fuego.descripcion": "Everyone fires at the most dangerous enemy, with better aim, until it goes down.",
    "control.ordenes.aguanten.nombre": "Hold!",
-   "control.ordenes.aguanten.descripcion": "Everyone finds cover and fires from there. Nobody advances.",
+   "control.ordenes.aguanten.descripcion": "Everyone finds cover and fires from there, better armored. Nobody advances.",
    "control.ordenes.replieguen.nombre": "Fall back!",
-   "control.ordenes.replieguen.descripcion": "Everyone pulls away from the enemy. To save someone or to regroup."
+   "control.ordenes.replieguen.descripcion": "Everyone pulls away from the enemy, faster and harder to hit. To save someone or to regroup."
   },
   "textos": {
    "gritos.huye_en_panico.0": "Ahhhhh!",
@@ -3021,6 +3027,24 @@
   ". Encontralo y bajalo.": ". Find them and take them down.",
   ". Volvió a casa.": ". Came home.",
   ". Ahí se terminó el contrato de ": ". That's where the contract ran out for ",
-  ". El escuadrón que dimos por muerto en ": ". The squad we left for dead in "
+  ". El escuadrón que dimos por muerto en ": ". The squad we left for dead in ",
+  "Entran hasta ": "Only ",
+  " mechas: este se queda mirando": " mechs fit: this one sits it out",
+  "NO ENTRA": "BENCHED",
+  "no entra, el escuadrón está lleno": "benched, the squad is full",
+  " Salen ": " Deploying ",
+  " lugares.": " slots.",
+  " no entra y se queda": " doesn't fit and sits",
+  " no entran y se quedan": " don't fit and sit",
+  " mirando: dales una tarea.": " it out: give them a task.",
+  " Los que se quedan suman ganas de irse, salvo los que descansan.": " Whoever stays behind gets itchier to quit, unless they rest.",
+  "Saben dónde bajan. ": "They know where you drop. ",
+  "Las casillas ": "The ",
+  "rayadas en rojo": "red-striped tiles",
+  " las bombardean apenas empieza.": " get shelled right at the start.",
+  "CONTROL › ESCUADRÓN: ¡Artillería apuntando a la zona de bajada! Muévanse.": "CONTROL › SQUAD: Artillery locked on the drop zone! Move it!",
+  "¡BOMBARDEO! ": "INCOMING! ",
+  "Le dio a ": "Hit ",
+  "No le dio a nadie: bien ahí.": "Missed everyone. Nice."
  }
 }

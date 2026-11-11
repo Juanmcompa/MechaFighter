@@ -298,3 +298,4 @@
 .fr-rasgo strong { font-weight: 400; font-size: 17px; color: #fff; }
 .fr-rasgo small { font-size: 14px; color: #a8b39b; }
 .br-aviso > span:not(.ico-envoltura) { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.pl .br-aviso b { font-weight: 400; } .pl .br-aviso .rojo { color: #e57a6c; }

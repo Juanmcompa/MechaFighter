@@ -323,3 +323,8 @@
 .inf-pie .boton.principal { flex: 1; font-size: 18px; }
 .inf-pie .reparar-todo { border-color: var(--ambar); color: var(--ambar); flex: 0 1 auto; }
 .inf-pie .inf-hangar { width: 50px; height: 50px; flex: none; }
+
+/* Cupo del escuadron: cuantos salen y quien no entra */
+.hg-cupo { margin: 0 0 8px; display: flex; gap: 6px; align-items: flex-start; font-size: 16px; color: var(--texto-tenue); line-height: 1.15; }
+.hg-cupo .ico { width: 15px; height: 15px; flex: none; margin-top: 2px; }
+.hg-cupo.lleno { color: var(--ambar); }

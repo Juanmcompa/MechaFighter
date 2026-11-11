@@ -89,8 +89,10 @@ export function pensar(datos, p, muestras = 2) {
     let puntos = 0;
     for (let k = 1; k <= muestras; k++) {
       const r = simular(datos, { mision, escuadron, semilla: mision.semilla + k * 7919, control });
-      const vivos = Object.values((r.resumen && r.resumen.pilotos) || {}).filter((u) => u.viva).length;
-      puntos += (r.victoria ? 100 : 0) + vivos; // ganar, y de paso que vuelvan
+      const pilotos = Object.values((r.resumen && r.resumen.pilotos) || {});
+      const vivos = pilotos.filter((u) => u.viva).length;
+      const vida = pilotos.reduce((s, u) => s + (u.viva ? u.vidaFinalPct || 0 : 0), 0) / 100;
+      puntos += (r.victoria ? 100 : 0) + vivos * 3 + vida; // ganar; despues, que vuelvan todos y lo mas enteros posible
     }
     return puntos;
   };

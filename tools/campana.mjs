@@ -9,6 +9,7 @@ import { cargarDatos } from '../src/core/datos.js';
 import { simular } from '../src/motor/simular.js';
 import { nuevaPartida, destinosDeLaNave, elegirNodo, seguir, comprar, contratar, escuadronParaMision, cerrarMision, equipar, reparar, costoReparacion, elegirOpcion, comprarCombustible, paradaActual, instalarMejora, mejoraDe } from '../src/campana/partida.js';
 import { opcionDisponible } from '../src/campana/dilemas.js';
+import { limitePilotos } from '../src/campana/brujula.js';
 import { leerDisco } from './leer-disco.mjs';
 import { rotar, pensar } from './jugador.mjs';
 
@@ -34,7 +35,7 @@ for (let n = 0; n < N; n++) {
     // la guarida si se abrio; una parada si falta combustible; reclutas si faltan pilotos; si no, el contrato mas cerca
     let d = esperar > 0 ? null : lista.find((x) => x.nodo.tipo === 'jefe');
     if (!d && p.combustible < 5 && p.creditos >= 60) d = lista.filter((x) => x.nodo.tipo === 'parada').sort((a, b) => a.costo - b.costo)[0];
-    if (!d && p.pilotos.length < 5 && p.creditos >= 90) d = nuevos.find((x) => x.nodo.tipo === 'reclutamiento');
+    if (!d && p.pilotos.length < Math.min(limitePilotos(datos, p), datos.reglas.escuadra_maxima + 2) && p.creditos >= 90) d = nuevos.find((x) => x.nodo.tipo === 'reclutamiento');
     if (!d) d = nuevos.find((x) => x.nodo.tipo === 'mision') || nuevos[0] || lista[0];
     if (!d) break;
     if (PIENSA && (d.nodo.tipo === 'mision' || d.nodo.tipo === 'jefe')) J.banco += rotar(datos, p);
